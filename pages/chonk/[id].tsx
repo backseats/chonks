@@ -28,11 +28,14 @@ export default function ChonkDetail({ id }: { id: string }) {
   const [traitData1, setTraitData1] = useState<Chonk | null>(null);
   const [traitData2, setTraitData2] = useState<Chonk | null>(null);
 
-  const generatedObject = {
+  const generatedObject: { [key: string]: number[] } = {
     "1": [1, 2],
     "2": [3, 4],
     "3": [5, 6],
   };
+
+  // Ensure id is a string key of generatedObject
+  const traitIds = generatedObject[id as keyof typeof generatedObject];
 
   const { data: tokenURIData } = useReadContract({
     address: mainContract,
@@ -55,15 +58,16 @@ export default function ChonkDetail({ id }: { id: string }) {
     address: traitsContract,
     abi: tokenURIABI,
     functionName: TOKEN_URI,
-    args: [BigInt(generatedObject[id][0])],
+    args: [BigInt(traitIds[0])],
     chainId: baseSepolia.id,
   }) as { data: string };
 
+  // @ts-ignore
   const { data: traitTokenURIData2 } = useReadContract({
     address: traitsContract,
     abi: tokenURIABI,
     functionName: TOKEN_URI,
-    args: [BigInt(generatedObject[id][1])],
+    args: [BigInt(traitIds[1])],
     chainId: baseSepolia.id,
   }) as { data: string };
 
@@ -142,6 +146,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   );
 }
 
+// @ts-ignore
 export async function getServerSideProps(context) {
   const { id } = context.params;
 
