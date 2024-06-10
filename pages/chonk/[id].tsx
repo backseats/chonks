@@ -3,8 +3,14 @@ import { baseSepolia } from "viem/chains";
 import { useReadContract, useWalletClient } from "wagmi";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
-import { mainContract, traitsContract, tokenURIABI } from "@/contract_data";
+import {
+  mainContract,
+  traitsContract,
+  tokenURIABI,
+  traitsAbi,
+} from "@/contract_data";
 import { useRouter } from "next/navigation";
+import { Address } from "viem";
 
 function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
   const base64String = data.split(",")[1];
@@ -25,17 +31,6 @@ export default function ChonkDetail({ id }: { id: string }) {
   });
 
   const [tokenData, setTokenData] = useState<Chonk | null>(null);
-  const [traitData1, setTraitData1] = useState<Chonk | null>(null);
-  const [traitData2, setTraitData2] = useState<Chonk | null>(null);
-
-  const generatedObject: { [key: string]: number[] } = {
-    "1": [1, 2],
-    "2": [3, 4],
-    "3": [5, 6],
-  };
-
-  // Ensure id is a string key of generatedObject
-  const traitIds = generatedObject[id as keyof typeof generatedObject];
 
   const { data: tokenURIData } = useReadContract({
     address: mainContract,
@@ -54,30 +49,20 @@ export default function ChonkDetail({ id }: { id: string }) {
     tokenId: id.toString(),
   });
 
-  const { data: traitTokenURIData1 } = useReadContract({
+  const { data: balanceOf } = useReadContract({
     address: traitsContract,
-    abi: tokenURIABI,
-    functionName: TOKEN_URI,
-    args: [BigInt(traitIds[0])],
-    chainId: baseSepolia.id,
-  }) as { data: string };
-
-  // @ts-ignore
-  const { data: traitTokenURIData2 } = useReadContract({
-    address: traitsContract,
-    abi: tokenURIABI,
-    functionName: TOKEN_URI,
-    args: [BigInt(traitIds[1])],
-    chainId: baseSepolia.id,
-  }) as { data: string };
-
-  useEffect(() => {
-    if (traitTokenURIData1) decodeAndSetData(traitTokenURIData1, setTraitData1);
-  }, [traitTokenURIData1]);
-
-  useEffect(() => {
-    if (traitTokenURIData2) decodeAndSetData(traitTokenURIData2, setTraitData2);
-  }, [traitTokenURIData2]);
+    abi: [
+      {
+        inputs: [{ internalType: "address", name: "owner", type: "address" }],
+        name: "balanceOf",
+        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+        stateMutability: "view",
+        type: "function",
+      },
+    ],
+    functionName: "balanceOf",
+    args: [account],
+  });
 
   const handleNavigation = (direction: "prev" | "next") => {
     let newId = direction === "prev" ? parseInt(id) - 1 : parseInt(id) + 1;
@@ -111,17 +96,13 @@ export default function ChonkDetail({ id }: { id: string }) {
           </div>
 
           <div className="flex flex-row mt-2">
-            {traitData1 ? (
-              <>
-                <img src={traitData1.image} className="w-[200px] h-[200px]" />
-              </>
-            ) : null}
-
-            {traitData2 ? (
-              <>
-                <img src={traitData2.image} className="w-[200px] h-[200px]" />
-              </>
-            ) : null}
+            {account &&
+              balanceOf &&
+              Array.from({ length: Number(balanceOf) }, (_, index) => (
+                <div key={index}>
+                  <Trait account={account} index={index.toString()} />
+                </div>
+              ))}
           </div>
 
           <div className="flex flex-row mt-4 justify-between w-[400px]">
@@ -160,3 +141,31 @@ export async function getServerSideProps(context) {
     props: { id },
   };
 }
+
+const Trait = ({ account, index }: { account: Address; index: string }) => {
+  const [traitData, setTraitData] = useState<Chonk | null>(null);
+
+  const { data: tokenId } = useReadContract({
+    address: traitsContract,
+    abi: traitsAbi,
+    functionName: "tokenOfOwnerByIndex",
+    args: [account, index],
+    chainId: baseSepolia.id,
+  }) as { data: string };
+
+  const { data: traitTokenURIData } = useReadContract({
+    address: traitsContract,
+    abi: tokenURIABI,
+    functionName: "tokenURI",
+    args: [tokenId],
+    chainId: baseSepolia.id,
+  }) as { data: string };
+
+  useEffect(() => {
+    if (traitTokenURIData) decodeAndSetData(traitTokenURIData, setTraitData);
+  }, [traitTokenURIData]);
+
+  return traitData ? (
+    <img src={traitData.image} className="w-[200px] h-[200px]" />
+  ) : null;
+};
