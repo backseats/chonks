@@ -13,7 +13,7 @@ import {
 import { useRouter } from "next/navigation";
 import { EquipmentStorage } from "@/types/Equipment";
 import EquippedTrait from "@/components/EquippedTrait";
-import Equipment from "@/components/Equipment";
+import EquipmentContainer from "@/components/EquipmentContainer";
 
 export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
   const base64String = data.split(",")[1];
@@ -101,7 +101,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             </div>
 
             {account && traitTokenIds && equipment && (
-              <Equipment
+              <EquipmentContainer
                 traitTokenIds={traitTokenIds}
                 equipment={equipment.stored}
               />

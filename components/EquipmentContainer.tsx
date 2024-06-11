@@ -1,6 +1,5 @@
 import { useState } from "react";
 import Trait from "@/components/Trait";
-import { Address } from "viem";
 import { Equipment } from "@/types/Equipment";
 
 interface Props {
@@ -8,7 +7,7 @@ interface Props {
   equipment: Equipment;
 }
 
-export default function Equipment(props: Props) {
+export default function EquipmentContainer(props: Props) {
   const { traitTokenIds, equipment } = props;
 
   // console.log("traits i own", traitTokenIds);
