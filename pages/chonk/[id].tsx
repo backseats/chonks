@@ -4,15 +4,18 @@ import { useReadContract, useWalletClient } from "wagmi";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
 import {
+  abi,
   mainContract,
   traitsContract,
   tokenURIABI,
   traitsAbi,
 } from "@/contract_data";
 import { useRouter } from "next/navigation";
-import { Address } from "viem";
+import { EquipmentStorage } from "@/types/Equipment";
+import EquippedTrait from "@/components/EquippedTrait";
+import Equipment from "@/components/Equipment";
 
-function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
+export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
   const base64String = data.split(",")[1];
   const jsonString = atob(base64String);
   const jsonData = JSON.parse(jsonString) as Chonk;
@@ -32,6 +35,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   const [tokenData, setTokenData] = useState<Chonk | null>(null);
 
+  // Get main body tokenURI
   const { data: tokenURIData } = useReadContract({
     address: mainContract,
     abi: tokenURIABI,
@@ -44,25 +48,27 @@ export default function ChonkDetail({ id }: { id: string }) {
     if (tokenURIData) decodeAndSetData(tokenURIData, setTokenData);
   }, [tokenURIData]);
 
+  // Get the trait ids that are equipped to the body
+  const { data: equipment } = useReadContract({
+    address: mainContract,
+    abi,
+    functionName: "getPeter",
+    args: [BigInt(id)],
+    chainId: baseSepolia.id,
+  }) as { data: EquipmentStorage };
+
   const account = tokenboundClient.getAccount({
     tokenContract: mainContract,
     tokenId: id.toString(),
   });
 
-  const { data: balanceOf } = useReadContract({
+  const { data: traitTokenIds } = useReadContract({
     address: traitsContract,
-    abi: [
-      {
-        inputs: [{ internalType: "address", name: "owner", type: "address" }],
-        name: "balanceOf",
-        outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-        stateMutability: "view",
-        type: "function",
-      },
-    ],
-    functionName: "balanceOf",
+    abi: traitsAbi,
+    functionName: "walletOfOwner",
     args: [account],
-  });
+    chainId: baseSepolia.id,
+  }) as { data: BigInt[] };
 
   const handleNavigation = (direction: "prev" | "next") => {
     let newId = direction === "prev" ? parseInt(id) - 1 : parseInt(id) + 1;
@@ -93,16 +99,31 @@ export default function ChonkDetail({ id }: { id: string }) {
                 ))}
               </ul>
             </div>
+
+            {account && traitTokenIds && equipment && (
+              <Equipment
+                traitTokenIds={traitTokenIds}
+                equipment={equipment.stored}
+              />
+            )}
           </div>
 
           <div className="flex flex-row mt-2">
-            {account &&
-              balanceOf &&
-              Array.from({ length: Number(balanceOf) }, (_, index) => (
-                <div key={index}>
-                  <Trait account={account} index={index.toString()} />
-                </div>
-              ))}
+            {equipment?.stored &&
+              Object.keys(equipment.stored).map((key, index) => {
+                if (key === "tokenId") return null;
+                const stored = equipment.stored;
+
+                // @ts-ignore
+                if (stored[key] == 0n) return null;
+
+                return (
+                  <div key={index}>
+                    {/* @ts-ignore */}
+                    <EquippedTrait tokenId={stored[key].toString()} />
+                  </div>
+                );
+              })}
           </div>
 
           <div className="flex flex-row mt-4 justify-between w-[400px]">
@@ -117,6 +138,15 @@ export default function ChonkDetail({ id }: { id: string }) {
               onClick={() => handleNavigation("next")}
             >
               Next
+            </button>
+          </div>
+
+          <div className="flex flex-row mt-4 justify-between w-[400px]">
+            <button className="w-1/2 underline" onClick={() => {}}>
+              Mint Trait
+            </button>
+            <button className="w-1/2 underline" onClick={() => {}}>
+              Mint Body
             </button>
           </div>
         </div>
@@ -141,31 +171,3 @@ export async function getServerSideProps(context) {
     props: { id },
   };
 }
-
-const Trait = ({ account, index }: { account: Address; index: string }) => {
-  const [traitData, setTraitData] = useState<Chonk | null>(null);
-
-  const { data: tokenId } = useReadContract({
-    address: traitsContract,
-    abi: traitsAbi,
-    functionName: "tokenOfOwnerByIndex",
-    args: [account, index],
-    chainId: baseSepolia.id,
-  }) as { data: string };
-
-  const { data: traitTokenURIData } = useReadContract({
-    address: traitsContract,
-    abi: tokenURIABI,
-    functionName: "tokenURI",
-    args: [tokenId],
-    chainId: baseSepolia.id,
-  }) as { data: string };
-
-  useEffect(() => {
-    if (traitTokenURIData) decodeAndSetData(traitTokenURIData, setTraitData);
-  }, [traitTokenURIData]);
-
-  return traitData ? (
-    <img src={traitData.image} className="w-[200px] h-[200px]" />
-  ) : null;
-};
