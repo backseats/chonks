@@ -1,5 +1,5 @@
-export const mainContract = "0x9A4d6F22535a3a354a3AAb328eC968F7ecD7E31c";
-export const traitsContract = "0x9F9B55Ebef66596C2603C055AD67a82F5718d1bE";
+export const mainContract = "0xcc2c3eb8bf6e9437f74e68a24473f20c6dd19012";
+export const traitsContract = "0x071Ff1AfcD016a70e19ccB893E5d3Bf6b76052E6";
 
 export const abi = [
   { inputs: [], stateMutability: "nonpayable", type: "constructor" },
