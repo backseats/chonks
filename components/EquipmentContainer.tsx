@@ -1,40 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Trait from "@/components/Trait";
 import { Equipment } from "@/types/Equipment";
+import { Category } from "@/types/Category";
+
+// {
+//     tokenId: BigInt;
+//     cateogry: Category,
+//     isEquipped: Boolean;
+//   }
 
 interface Props {
+  chonkId: string;
   traitTokenIds: BigInt[];
-  equipment: Equipment;
 }
 
 export default function EquipmentContainer(props: Props) {
-  const { traitTokenIds, equipment } = props;
-
-  // console.log("traits i own", traitTokenIds);
-  // console.log("current equipment", equipment);
+  const { chonkId, traitTokenIds } = props;
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
-  };
-
-  const isTokenIdEquipped = (tokenId: BigInt): boolean => {
-    for (const key in equipment) {
-      if (key !== "tokenId" && equipment[key as keyof Equipment] === tokenId) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  const getEquipMethodName = (key: string): string | null => {
-    if (key === "shirtId") {
-      return "equipShirt";
-    } else if (key === "pantsId") {
-      return "equipPants";
-    }
-    return null;
   };
 
   return (
@@ -124,30 +110,14 @@ export default function EquipmentContainer(props: Props) {
       </div>
 
       <div className="grid grid-cols-4 gap-4 mt-4">
-        {traitTokenIds.map((tokenId, index) => {
-          const isEquipped = isTokenIdEquipped(tokenId);
-          if (isEquipped) return null;
-
-          let functionName = null;
-          for (const key in equipment) {
-            if (key === "tokenId") continue;
-
-            if (equipment[key as keyof Equipment] !== tokenId) {
-              functionName = getEquipMethodName(key);
-              break;
-            }
-          }
-
-          // TODO: figure out why this isn't working
-          return (
-            <Trait
-              key={index}
-              tokenId={tokenId.toString()}
-              isEquipped={isEquipped}
-              functionName={functionName}
-            />
-          );
-        })}
+        {traitTokenIds.map((tokenId, index) => (
+          <Trait
+            key={index}
+            chonkId={chonkId}
+            traitTokenId={tokenId.toString()}
+            isEquipped={false}
+          />
+        ))}
       </div>
     </div>
   );

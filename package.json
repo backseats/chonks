@@ -12,6 +12,7 @@
     "@tanstack/query-core": "^5.40.0",
     "@tanstack/react-query": "^5.40.1",
     "@tokenbound/sdk": "^0.5.4",
+    "connectkit": "^1.8.0",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
