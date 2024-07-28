@@ -7,5 +7,3 @@ export enum Category {
   Pants = "Pants",
   Shoes = "Shoes",
 }
-
-export const categoryList = Object.values(Category);

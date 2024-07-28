@@ -57,6 +57,14 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
 
+  const { data } = writeContract({
+    address: mainContract,
+    abi: abi,
+    functionName: "mint",
+    args: [],
+    chainId: baseSepolia.id,
+  });
+
   // Get main body tokenURI
   const { data: tokenURIData } = useReadContract({
     address: mainContract,
