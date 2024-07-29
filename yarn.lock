@@ -1386,6 +1386,14 @@
   resolved "https://registry.yarnpkg.com/@uiw/color-convert/-/color-convert-2.3.0.tgz#e9b46bfce85aad5b4aeffacce4d381a4116706dc"
   integrity sha512-cBkJ6L2vgHlrAnM6XkeLAusOXxl2b+5HsX1URhCSmBzJSshM50hW096kY7ItS5B3CffabZr7Y2+NbJiCWfdaSw==
 
+"@uiw/react-color-alpha@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@uiw/react-color-alpha/-/react-color-alpha-2.3.0.tgz#050f416d9d884c8897e9516b44336cd66ebbc747"
+  integrity sha512-Ya4GLGNT62VACRlUStMEsv9QiAUQpCej6eu9N6CCGbYhtT+CLYQQ6+PI86doygXK8vp8PykfRFiSO+oGOCbz9w==
+  dependencies:
+    "@uiw/color-convert" "2.3.0"
+    "@uiw/react-drag-event-interactive" "2.3.0"
+
 "@uiw/react-color-block@^2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@uiw/react-color-block/-/react-color-block-2.3.0.tgz#4b3cf6bed6549a9a753569d59b68e40df1fa0d24"
@@ -1403,10 +1411,36 @@
     "@uiw/color-convert" "2.3.0"
     "@uiw/react-color-swatch" "2.3.0"
 
+"@uiw/react-color-colorful@^2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@uiw/react-color-colorful/-/react-color-colorful-2.3.0.tgz#f29b894c0a939adc6120c2af7cb7a2c2b1a45d77"
+  integrity sha512-/N5Zh6C4NutXTYTMtbgDraORwZoI3WbzQ2eYYmgYZdaSuip8iVfp+vBkMa7rCcY4wwrzrorCUF6UPDf/4y7XeQ==
+  dependencies:
+    "@uiw/color-convert" "2.3.0"
+    "@uiw/react-color-alpha" "2.3.0"
+    "@uiw/react-color-hue" "2.3.0"
+    "@uiw/react-color-saturation" "2.3.0"
+
 "@uiw/react-color-editable-input@2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@uiw/react-color-editable-input/-/react-color-editable-input-2.3.0.tgz#c52f9708325d121fb8b1d161555f146172ac822c"
   integrity sha512-3wUPOBKlI7RQYFyxqDkfcj5mjLLVFi3D0uP1dPppDvuhP3k7/DIPtomq4GM693ZZK+Gr+u3SblM+zP4gglNclQ==
+
+"@uiw/react-color-hue@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@uiw/react-color-hue/-/react-color-hue-2.3.0.tgz#0a0edfa35c4892d4cd67edced7ef46cbe1ab1154"
+  integrity sha512-laaPBKxY035OqJuCDxXCrfQ4arsfcl8oFz/RXMJGAOZxPsTsSMdENRDVpW6s8pYRqtBY/jD1UDr51SVj7o2I3w==
+  dependencies:
+    "@uiw/color-convert" "2.3.0"
+    "@uiw/react-color-alpha" "2.3.0"
+
+"@uiw/react-color-saturation@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@uiw/react-color-saturation/-/react-color-saturation-2.3.0.tgz#237cfbaea02b22406aa82a023c78388a390134f4"
+  integrity sha512-sdRGZFf8IVqM39ttlYm3Ew3aLu4+mzhJWCltMvDbteJmK24MBaPUt634HNYW5WiJMqrIOT2c5CJdgTS40xKQng==
+  dependencies:
+    "@uiw/color-convert" "2.3.0"
+    "@uiw/react-drag-event-interactive" "2.3.0"
 
 "@uiw/react-color-swatch@2.3.0":
   version "2.3.0"
@@ -1414,6 +1448,11 @@
   integrity sha512-Z9EgQ2hKmNlbiMb5nYnLw2d08FZF8LetfTe60jFbSsTwUsdoDeVf2JvKSlmodBMMlFC0fK4h+2RfVR1Z1HeO+Q==
   dependencies:
     "@uiw/color-convert" "2.3.0"
+
+"@uiw/react-drag-event-interactive@2.3.0":
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@uiw/react-drag-event-interactive/-/react-drag-event-interactive-2.3.0.tgz#1f40659a86286b82ac60b1a341a897c8bbbb33b1"
+  integrity sha512-Sk41LadFaUs05172N7Bh3QZgp7T1DWTC7LrtLn6qnnhZjDiPQy8vWX+5JuOkcgMffRf2j79d/ZNii8U9dyLThw==
 
 "@ungap/structured-clone@^1.2.0":
   version "1.2.0"
