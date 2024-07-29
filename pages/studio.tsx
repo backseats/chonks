@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import superlightbody from "../bodies/superlightbody.json";
 import lightbody from "../bodies/lightbody.json";
 import midbody from "../bodies/midbody.json";
 import darkbody from "../bodies/darkbody.json";
+import Block from "@uiw/react-color-block";
 
 type Pixel = {
   x: number;
@@ -27,6 +28,19 @@ const Grid: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<string>("#EFB15E");
   const [textAreaContent, setTextAreaContent] = useState<string>("");
   const [history, setHistory] = useState<Pixel[][]>([]);
+  const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
+  const [lastModifiedPixel, setLastModifiedPixel] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [hoveredPixel, setHoveredPixel] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  console.log(history);
 
   useEffect(() => {
     updateTextArea();
@@ -44,15 +58,66 @@ const Grid: React.FC = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const handlePixelClick = (x: number, y: number) => {
-    setHistory((prevHistory) => [...prevHistory, gridData]);
+  const handlePixelChange = (
+    x: number,
+    y: number,
+    isShiftClick: boolean = false
+  ) => {
+    if (lastModifiedPixel?.x === x && lastModifiedPixel?.y === y) {
+      return; // Skip if this pixel was just modified
+    }
+
+    setHistory((prevHistory) => [...prevHistory, [...gridData]]);
     setGridData((prevGrid) =>
       prevGrid.map((pixel) =>
         pixel.x === x && pixel.y === y
-          ? { ...pixel, color: selectedColor }
+          ? { ...pixel, color: isShiftClick ? "" : selectedColor }
           : pixel
       )
     );
+    setLastModifiedPixel({ x, y });
+  };
+
+  const handleMouseDown = (event: React.MouseEvent) => {
+    setIsMouseDown(true);
+    const { x, y } = getPixelCoordinates(event);
+    handlePixelChange(x, y, event.shiftKey);
+  };
+
+  const handleMouseUp = () => {
+    setIsMouseDown(false);
+    setLastModifiedPixel(null);
+  };
+
+  const handleMouseMove = (event: React.MouseEvent) => {
+    const { x, y } = getPixelCoordinates(event);
+    setHoveredPixel({ x, y });
+    if (isMouseDown) {
+      handlePixelChange(x, y, event.shiftKey);
+    }
+  };
+
+  const getPixelCoordinates = (
+    event: React.MouseEvent
+  ): { x: number; y: number } => {
+    if (!gridRef.current) return { x: -1, y: -1 };
+
+    const rect = gridRef.current.getBoundingClientRect();
+    const pixelSize = 40; // Size of each pixel
+
+    // Calculate x and y using the mouse position relative to the grid
+    const relativeX = event.clientX - rect.left;
+    const relativeY = event.clientY - rect.top;
+
+    // Use Math.floor to ensure we're always selecting the pixel the cursor is within
+    const x = Math.floor(relativeX / pixelSize);
+    const y = Math.floor(relativeY / pixelSize);
+
+    // Ensure x and y are within the grid bounds
+    return {
+      x: Math.max(0, Math.min(x, gridSize - 1)),
+      y: Math.max(0, Math.min(y, gridSize - 1)),
+    };
   };
 
   const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +153,7 @@ const Grid: React.FC = () => {
   };
 
   const resetGrid = () => {
-    setHistory((prevHistory) => [...prevHistory, gridData]);
+    setHistory(() => []);
     setGridData(generateGrid());
   };
 
@@ -101,7 +166,7 @@ const Grid: React.FC = () => {
   }, [history]);
 
   const setBodyData = (bodyData: any) => {
-    setHistory((prevHistory) => [...prevHistory, gridData]);
+    setHistory((prevHistory) => [...prevHistory, [...gridData]]);
     const newGridData = generateGrid().map((pixel) => ({
       ...pixel,
       color: bodyData[pixel.y][pixel.x] || "",
@@ -141,20 +206,41 @@ const Grid: React.FC = () => {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
 
+  const printGrid = () => {
+    console.log(textAreaContent);
+  };
+
+  const copyTextAreaContent = () => {
+    navigator.clipboard
+      .writeText(textAreaContent)
+      .then(() => {
+        console.log("Text area content copied to clipboard");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
+
   return (
     <div className="p-4 flex">
       <div>
+        <Block
+          color={selectedColor}
+          colors={[
+            "#000",
+            "#fff",
+            "#EAD9D9", // lightest body
+            "#E2CACA",
+            "#EFB15E", // light body
+            "#D69743",
+            "#BA8136", // mid body
+            "#9A6D2E",
+            "#8A5E24", // dark body
+            "#77511E",
+          ]}
+          onChange={(color) => setSelectedColor(color.hex)}
+        />
         <div className="mb-4 flex items-center">
-          <label htmlFor="colorPicker" className="mr-2">
-            Select color:{" "}
-          </label>
-          <input
-            id="colorPicker"
-            type="color"
-            value={selectedColor}
-            onChange={handleColorChange}
-            className="mr-4 h-8 w-8 cursor-pointer"
-          />
           <button
             onClick={resetGrid}
             className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-600 transition-colors"
@@ -192,24 +278,53 @@ const Grid: React.FC = () => {
           >
             Ghost
           </button>
+          <button
+            onClick={printGrid}
+            className="px-4 py-2 ml-2 bg-blue-500 text-white rounded hover:brightness-[70%] transition-colors"
+          >
+            Console.log Heightmap
+          </button>
+          <button
+            onClick={copyTextAreaContent}
+            className="px-4 py-2 ml-2 bg-green-500 text-white rounded hover:brightness-[70%] transition-colors"
+          >
+            Copy Heightmap
+          </button>
         </div>
         <div
+          ref={gridRef}
           className="grid gap-px bg-gray-300 p-px w-fit"
           style={{
             gridTemplateColumns: `repeat(${gridSize}, 40px)`,
             gridTemplateRows: `repeat(${gridSize}, 40px)`,
+          }}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => {
+            handleMouseUp();
+            setHoveredPixel(null);
+          }}
+          onClick={(event: React.MouseEvent) => {
+            const { x, y } = getPixelCoordinates(event);
+            handlePixelChange(x, y, event.shiftKey);
           }}
         >
           {gridData.map((pixel, index) => (
             <div
               key={index}
               className={`pointer w-[40px] h-[40px] cursor-pointer transition-colors duration-300
-                          ${pixel.color ? "" : "hover:bg-gray-200"}`}
+                ${pixel.color ? "" : "hover:bg-gray-200"}`}
               style={{
                 backgroundColor: pixel.color || "white",
                 filter: pixel.color ? "hover:brightness(80%)" : undefined,
+                outline:
+                  hoveredPixel &&
+                  hoveredPixel.x === pixel.x &&
+                  hoveredPixel.y === pixel.y
+                    ? "2px solid black"
+                    : "none",
               }}
-              onClick={() => handlePixelClick(pixel.x, pixel.y)}
               title={`x: ${pixel.x}, y: ${pixel.y}, color: ${
                 pixel.color || "white"
               }`}
@@ -217,6 +332,7 @@ const Grid: React.FC = () => {
           ))}
         </div>
       </div>
+
       <div className="ml-8">
         <textarea
           value={textAreaContent}
