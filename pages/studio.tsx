@@ -370,45 +370,69 @@ const Grid: React.FC = () => {
           </div>
         </div>
 
-        <div
-          ref={gridRef}
-          className="grid gap-px bg-gray-300 p-px w-fit mx-auto"
-          style={{
-            gridTemplateColumns: `repeat(${gridSize}, 40px)`,
-            gridTemplateRows: `repeat(${gridSize}, 40px)`,
-          }}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={() => {
-            handleMouseUp();
-            setHoveredPixel(null);
-          }}
-          onClick={(event: React.MouseEvent) => {
-            const { x, y } = getPixelCoordinates(event);
-            handlePixelChange(x, y, event.shiftKey);
-          }}
-        >
-          {gridData.map((pixel, index) => (
-            <div
-              key={index}
-              className={`pointer w-[40px] h-[40px] cursor-pointer transition-colors duration-300
-                ${pixel.color ? "" : "hover:bg-gray-200"}`}
-              style={{
-                backgroundColor: pixel.color || "white",
-                filter: pixel.color ? "hover:brightness(80%)" : undefined,
-                outline:
-                  hoveredPixel &&
-                  hoveredPixel.x === pixel.x &&
-                  hoveredPixel.y === pixel.y
-                    ? "2px solid black"
-                    : "none",
-              }}
-              title={`x: ${pixel.x}, y: ${pixel.y}, color: ${
-                pixel.color || "white"
-              }`}
+        <div className="relative w-fit mx-auto border border-[#6b7280]">
+          {/* Background image */}
+          <div
+            className="absolute top-0 left-0"
+            style={{
+              width: `${gridSize * 40 + (gridSize - 1)}px`,
+              height: `${gridSize * 40 + (gridSize - 1)}px`,
+            }}
+          >
+            <img
+              src="/midbody.svg"
+              alt="Mid Body"
+              className="w-full h-full object-cover"
             />
-          ))}
+          </div>
+
+          {/* This is the drawing grid */}
+          <div
+            ref={gridRef}
+            className="grid gap-px bg-transparent relative z-10"
+            style={{
+              gridTemplateColumns: `repeat(${gridSize}, 40px)`,
+              gridTemplateRows: `repeat(${gridSize}, 40px)`,
+              width: `${gridSize * 40 + (gridSize - 1)}px`,
+              height: `${gridSize * 40 + (gridSize - 1)}px`,
+            }}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => {
+              handleMouseUp();
+              setHoveredPixel(null);
+            }}
+            onClick={(event: React.MouseEvent) => {
+              const { x, y } = getPixelCoordinates(event);
+              handlePixelChange(x, y, event.shiftKey);
+            }}
+          >
+            {gridData.map((pixel, index) => (
+              <div
+                key={index}
+                className={`pointer w-[40px] h-[40px] cursor-pointer transition-colors duration-300
+                  ${pixel.color ? "" : "hover:bg-gray-200"}`}
+                style={{
+                  borderTop: pixel.y === 0 ? "1px solid #6b7280" : "none",
+                  borderLeft: pixel.x === 0 ? "1px solid #6b7280" : "none",
+                  borderRight: "1px solid #6b7280",
+                  borderBottom: "1px solid #6b7280",
+                  backgroundColor: pixel.color || "transparent",
+                  filter: pixel.color ? "hover:brightness(80%)" : undefined,
+                  outline:
+                    hoveredPixel &&
+                    hoveredPixel.x === pixel.x &&
+                    hoveredPixel.y === pixel.y
+                      ? "2px solid black"
+                      : "none",
+                }}
+                title={`x: ${pixel.x}, y: ${pixel.y}, color: ${
+                  pixel.color || "transparent"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
