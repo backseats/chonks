@@ -25,6 +25,7 @@ const Grid: React.FC = () => {
     return grid;
   };
 
+  const [backgroundBody, setBackgroundBody] = useState<string>("lightbody.svg");
   const [gridData, setGridData] = useState<Pixel[]>(generateGrid());
   const [selectedColor, setSelectedColor] = useState<string>("#EFB15E");
   const [textAreaContent, setTextAreaContent] = useState<string>("");
@@ -187,30 +188,6 @@ const Grid: React.FC = () => {
     setTextAreaContent(JSON.stringify(bodyData, null, 2));
   };
 
-  const setGhostData = () => {
-    try {
-      const currentBodyData = JSON.parse(textAreaContent);
-      const ghostBodyData = currentBodyData.map((row: string[]) =>
-        row.map((color: string) => {
-          if (color) {
-            const rgba = hexToRGBA(color, 0.5);
-            return rgba;
-          }
-          return color;
-        })
-      );
-      setHistory((prevHistory) => [...prevHistory, gridData]);
-      const newGridData = generateGrid().map((pixel) => ({
-        ...pixel,
-        color: ghostBodyData[pixel.y][pixel.x] || "",
-      }));
-      setGridData(newGridData);
-      setTextAreaContent(JSON.stringify(ghostBodyData, null, 2));
-    } catch (error) {
-      console.error("Invalid JSON format in textarea");
-    }
-  };
-
   const hexToRGBA = (hex: string, alpha: number): string => {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
@@ -324,34 +301,34 @@ const Grid: React.FC = () => {
             <h2 className="text-xl font-bold mb-2">Body Presets</h2>
             <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => setBodyData(superlightbody)}
+                onClick={() => setBackgroundBody("superlightbody.svg")}
                 className="px-4 py-2 bg-[#EAD9D9] text-black rounded hover:brightness-[70%] transition-colors"
               >
                 Super Light Body
               </button>
               <button
-                onClick={() => setBodyData(lightbody)}
+                onClick={() => setBackgroundBody("lightbody.svg")}
                 className="px-4 py-2 bg-[#EFB15D] text-black rounded hover:brightness-[70%] transition-colors"
               >
                 Light Body
               </button>
               <button
-                onClick={() => setBodyData(midbody)}
+                onClick={() => setBackgroundBody("midbody.svg")}
                 className="px-4 py-2 bg-[#BB8136] text-white rounded hover:brightness-[70%] transition-colors"
               >
                 Mid Body
               </button>
               <button
-                onClick={() => setBodyData(darkbody)}
+                onClick={() => setBackgroundBody("darkbody.svg")}
                 className="px-4 py-2 bg-[#8B5E24] text-white rounded hover:brightness-[70%] transition-colors"
               >
                 Dark Body
               </button>
               <button
-                onClick={setGhostData}
+                onClick={() => setBackgroundBody("ghost.svg")}
                 className="px-4 py-2 bg-gray-700 text-white rounded hover:brightness-[70%] transition-colors"
               >
-                Ghost
+                Body With Opacity
               </button>
             </div>
           </div>
@@ -380,9 +357,14 @@ const Grid: React.FC = () => {
             }}
           >
             <img
-              src="/midbody.svg"
-              alt="Mid Body"
+              src={
+                backgroundBody === "ghost.svg"
+                  ? "lightbody.svg"
+                  : backgroundBody
+              }
+              alt=""
               className="w-full h-full object-cover"
+              style={{ opacity: backgroundBody === "ghost.svg" ? 0.5 : 1 }}
             />
           </div>
 
