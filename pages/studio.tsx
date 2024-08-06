@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import superlightbody from "../bodies/superlightbody.json";
-import lightbody from "../bodies/lightbody.json";
-import midbody from "../bodies/midbody.json";
-import darkbody from "../bodies/darkbody.json";
-import Block from "@uiw/react-color-block";
-import Colorful from "@uiw/react-color-colorful";
+import SVGPreview from "@/components/studio/SVGPreview";
+import TextEditor from "@/components/studio/TextEditor";
+import BodyPresets from "@/components/studio/BodyPresets";
+import ResetCanvas from "@/components/studio/ResetCanvas";
+import SelectColor from "@/components/studio/SelectColor";
+import Canvas from "@/components/studio/Canvas";
 
-type Pixel = {
+export type Pixel = {
   x: number;
   y: number;
   color: string;
@@ -107,7 +107,7 @@ const Grid: React.FC = () => {
     if (!gridRef.current) return { x: -1, y: -1 };
 
     const rect = gridRef.current.getBoundingClientRect();
-    const pixelSize = 40; // Size of each pixel
+    const pixelSize = 30; // Size of each pixel
 
     // Calculate x and y using the mouse position relative to the grid
     const relativeX = event.clientX - rect.left;
@@ -177,23 +177,6 @@ const Grid: React.FC = () => {
       setHistory((prevHistory) => prevHistory.slice(0, -1));
     }
   }, [history]);
-
-  const setBodyData = (bodyData: any) => {
-    setHistory((prevHistory) => [...prevHistory, [...gridData]]);
-    const newGridData = generateGrid().map((pixel) => ({
-      ...pixel,
-      color: bodyData[pixel.y][pixel.x] || "",
-    }));
-    setGridData(newGridData);
-    setTextAreaContent(JSON.stringify(bodyData, null, 2));
-  };
-
-  const hexToRGBA = (hex: string, alpha: number): string => {
-    const r = parseInt(hex.slice(1, 3), 16);
-    const g = parseInt(hex.slice(3, 5), 16);
-    const b = parseInt(hex.slice(5, 7), 16);
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
 
   const printGrid = () => {
     console.log(textAreaContent);
@@ -265,211 +248,46 @@ const Grid: React.FC = () => {
     <div className="p-4 flex flex-col">
       {/* Menus and Grid */}
       <div>
+        {/* Menu bar */}
         <div className="flex flex-row gap-8">
-          {/* Select Color */}
-          <div className="flex flex-col max-w-1/3">
-            <h2 className="text-xl font-bold mb-2">Select Color</h2>
-            <div className="flex flex-row items-start gap-4 mb-4">
-              <Colorful
-                color={selectedColor}
-                disableAlpha={true}
-                onChange={(color) => {
-                  setSelectedColor(color.hex);
-                }}
-              />
-              <Block
-                color={selectedColor}
-                colors={[
-                  "#000",
-                  "#fff",
-                  "#EAD9D9", // lightest body
-                  "#E2CACA",
-                  "#EFB15E", // light body
-                  "#D69743",
-                  "#BA8136", // mid body
-                  "#9A6D2E",
-                  "#8A5E24", // dark body
-                  "#77511E",
-                ]}
-                onChange={(color) => setSelectedColor(color.hex)}
-              />
-            </div>
-          </div>
-
-          {/* Body Presets */}
-          <div className="flex flex-col max-w-1/3">
-            <h2 className="text-xl font-bold mb-2">Body Presets</h2>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setBackgroundBody("superlightbody.svg")}
-                className="px-4 py-2 bg-[#EAD9D9] text-black rounded hover:brightness-[70%] transition-colors"
-              >
-                Super Light Body
-              </button>
-              <button
-                onClick={() => setBackgroundBody("lightbody.svg")}
-                className="px-4 py-2 bg-[#EFB15D] text-black rounded hover:brightness-[70%] transition-colors"
-              >
-                Light Body
-              </button>
-              <button
-                onClick={() => setBackgroundBody("midbody.svg")}
-                className="px-4 py-2 bg-[#BB8136] text-white rounded hover:brightness-[70%] transition-colors"
-              >
-                Mid Body
-              </button>
-              <button
-                onClick={() => setBackgroundBody("darkbody.svg")}
-                className="px-4 py-2 bg-[#8B5E24] text-white rounded hover:brightness-[70%] transition-colors"
-              >
-                Dark Body
-              </button>
-              <button
-                onClick={() => setBackgroundBody("ghost.svg")}
-                className="px-4 py-2 bg-gray-700 text-white rounded hover:brightness-[70%] transition-colors"
-              >
-                Body With Opacity
-              </button>
-            </div>
-          </div>
-
-          {/* Menu */}
-          <div className="flex flex-col max-w-1/3">
-            <h2 className="text-xl font-bold mb-2">Menu</h2>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={resetGrid}
-                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-600 transition-colors"
-              >
-                Reset Canvas
-              </button>
-            </div>
-          </div>
+          <SelectColor
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+          />
+          <BodyPresets setBackgroundBody={setBackgroundBody} />
+          <ResetCanvas resetGrid={resetGrid} />
         </div>
 
-        <div className="relative w-fit mx-auto border border-[#6b7280]">
-          {/* Background image */}
-          <div
-            className="absolute top-0 left-0"
-            style={{
-              width: `${gridSize * 40 + (gridSize - 1)}px`,
-              height: `${gridSize * 40 + (gridSize - 1)}px`,
-            }}
-          >
-            <img
-              src={
-                backgroundBody === "ghost.svg"
-                  ? "lightbody.svg"
-                  : backgroundBody
-              }
-              alt=""
-              className="w-full h-full object-cover"
-              style={{ opacity: backgroundBody === "ghost.svg" ? 0.5 : 1 }}
-            />
-          </div>
-
-          {/* This is the drawing grid */}
-          <div
-            ref={gridRef}
-            className="grid gap-px bg-transparent relative z-10"
-            style={{
-              gridTemplateColumns: `repeat(${gridSize}, 40px)`,
-              gridTemplateRows: `repeat(${gridSize}, 40px)`,
-              width: `${gridSize * 40 + (gridSize - 1)}px`,
-              height: `${gridSize * 40 + (gridSize - 1)}px`,
-            }}
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={() => {
-              handleMouseUp();
-              setHoveredPixel(null);
-            }}
-            onClick={(event: React.MouseEvent) => {
-              const { x, y } = getPixelCoordinates(event);
-              handlePixelChange(x, y, event.shiftKey);
-            }}
-          >
-            {gridData.map((pixel, index) => (
-              <div
-                key={index}
-                className={`pointer w-[40px] h-[40px] cursor-pointer transition-colors duration-300
-                  ${pixel.color ? "" : "hover:bg-gray-200"}`}
-                style={{
-                  borderTop: pixel.y === 0 ? "1px solid #6b7280" : "none",
-                  borderLeft: pixel.x === 0 ? "1px solid #6b7280" : "none",
-                  borderRight: "1px solid #6b7280",
-                  borderBottom: "1px solid #6b7280",
-                  backgroundColor: pixel.color || "transparent",
-                  filter: pixel.color ? "hover:brightness(80%)" : undefined,
-                  outline:
-                    hoveredPixel &&
-                    hoveredPixel.x === pixel.x &&
-                    hoveredPixel.y === pixel.y
-                      ? "2px solid black"
-                      : "none",
-                }}
-                title={`x: ${pixel.x}, y: ${pixel.y}, color: ${
-                  pixel.color || "transparent"
-                }`}
-              />
-            ))}
-          </div>
-        </div>
+        <Canvas
+          gridRef={gridRef}
+          gridSize={gridSize}
+          gridData={gridData}
+          backgroundBody={backgroundBody}
+          handleMouseDown={handleMouseDown}
+          handleMouseUp={handleMouseUp}
+          handleMouseMove={handleMouseMove}
+          handlePixelChange={handlePixelChange}
+          setHoveredPixel={setHoveredPixel}
+          hoveredPixel={hoveredPixel}
+          getPixelCoordinates={getPixelCoordinates}
+        />
       </div>
 
+      {/* Bottom section */}
       <div className="ml-8 my-8 flex flex-row">
-        <div className="w-1/2">
-          <h3 className="text-xl font-semibold mb-2">Text Editor</h3>
-          <div className="w-8/12 flex flex-col gap-2">
-            <textarea
-              ref={textareaRef}
-              value={textAreaContent}
-              onChange={handleTextAreaChange}
-              className=" h-[400px] p-2 border border-gray-300 rounded"
-              placeholder="Grid data in JSON format"
-            />
+        <TextEditor
+          textareaRef={textareaRef}
+          textAreaContent={textAreaContent}
+          handleTextAreaChange={handleTextAreaChange}
+          copyTextAreaContent={copyTextAreaContent}
+          printGrid={printGrid}
+        />
 
-            <div className="flex gap-2 mt-2 justify-center">
-              <button
-                onClick={copyTextAreaContent}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:brightness-[70%] transition-colors"
-              >
-                Copy Colormap
-              </button>
-              <button
-                onClick={printGrid}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:brightness-[70%] transition-colors"
-              >
-                Console.log Colormap
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="max-w-1/2">
-          <h3 className="text-xl font-semibold mb-2">SVG Preview</h3>
-          <div className="flex flex-col gap-2">
-            <div
-              className="border border-gray-300"
-              dangerouslySetInnerHTML={{ __html: svgContent }}
-            />
-            <div className="flex gap-2 mt-2 justify-center">
-              <button
-                onClick={copySVGText}
-                className="px-4 py-2 bg-orange-500 text-white rounded hover:brightness-[70%] transition-colors"
-              >
-                Copy SVG Text
-              </button>
-              <button
-                onClick={downloadSVG}
-                className="px-4 py-2  bg-purple-500 text-white rounded hover:brightness-[70%] transition-colors"
-              >
-                Download SVG
-              </button>
-            </div>
-          </div>
-        </div>
+        <SVGPreview
+          svgContent={svgContent}
+          copySVGText={copySVGText}
+          downloadSVG={downloadSVG}
+        />
       </div>
     </div>
   );
