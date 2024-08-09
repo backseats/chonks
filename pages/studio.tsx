@@ -2,9 +2,10 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import SVGPreview from "@/components/studio/SVGPreview";
 import TextEditor from "@/components/studio/TextEditor";
 import BodyPresets from "@/components/studio/BodyPresets";
-import ResetCanvas from "@/components/studio/ResetCanvas";
+import Menu from "@/components/studio/Menu";
 import SelectColor from "@/components/studio/SelectColor";
 import Canvas from "@/components/studio/Canvas";
+import { parseSvgToBytes } from "@/utils/convertSvgToBytes";
 
 export type Pixel = {
   x: number;
@@ -28,6 +29,7 @@ const Grid: React.FC = () => {
   const [backgroundBody, setBackgroundBody] = useState<string>("lightbody.svg");
   const [gridData, setGridData] = useState<Pixel[]>(generateGrid());
   const [selectedColor, setSelectedColor] = useState<string>("#EFB15E");
+  const [additionalColors, setAdditionalColors] = useState<string[]>([]);
   const [textAreaContent, setTextAreaContent] = useState<string>("");
   const [history, setHistory] = useState<Pixel[][]>([]);
   const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
@@ -40,15 +42,26 @@ const Grid: React.FC = () => {
     y: number;
   } | null>(null);
   const [svgContent, setSvgContent] = useState<string>("");
+  const [miniSvgContent, setMiniSvgContent] = useState<string>("");
+  const [isPickingColor, setIsPickingColor] = useState<boolean>(false);
 
   const gridRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  console.log(history);
-
   useEffect(() => {
     updateTextArea();
   }, [gridData]);
+
+  useEffect(() => {
+    const storedColors = localStorage.getItem("chonksstudio");
+    console.log("storedColors", storedColors);
+    if (storedColors) {
+      setAdditionalColors(JSON.parse(storedColors));
+    } else {
+      localStorage.setItem("chonksstudio", JSON.stringify([]));
+      setAdditionalColors([]);
+    }
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -197,8 +210,11 @@ const Grid: React.FC = () => {
     navigator.clipboard.writeText(svgContent);
   };
 
-  const generateSVG = (gridColors: string[][]): string => {
-    const pixelSize = 10; // Size of each pixel in the SVG
+  const generateSVG = (
+    gridColors: string[][],
+    mini: boolean = false
+  ): string => {
+    const pixelSize = mini ? 1 : 10; // Size of each pixel in the SVG
     const width = gridColors[0].length * pixelSize;
     const height = gridColors.length * pixelSize;
 
@@ -223,13 +239,16 @@ const Grid: React.FC = () => {
       const gridColors = JSON.parse(textAreaContent);
       const newSvgContent = generateSVG(gridColors);
       setSvgContent(newSvgContent);
+
+      const mini = generateSVG(gridColors, true);
+      setMiniSvgContent(mini);
     } catch (error) {
       console.error("Error generating SVG:", error);
     }
   };
 
   const downloadSVG = () => {
-    const blob = new Blob([svgContent], { type: "image/svg+xml" });
+    const blob = new Blob([miniSvgContent], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -240,56 +259,143 @@ const Grid: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleBytes = () => {
+    const bytes = parseSvgToBytes(miniSvgContent);
+    console.log("bytes", bytes);
+    navigator.clipboard.writeText(bytes);
+  };
+
   useEffect(() => {
     updateSVG();
   }, [textAreaContent]);
 
+  const saveColorToPalette = () => {
+    // TODO: ensure it's hex and not rgb
+
+    setAdditionalColors((prevColors) => {
+      let updatedPalette: any[] = [];
+      if (prevColors) {
+        updatedPalette = [...prevColors];
+      }
+
+      if (!updatedPalette.includes(selectedColor)) {
+        updatedPalette.push(selectedColor);
+        localStorage.setItem("chonksstudio", JSON.stringify(updatedPalette));
+      }
+      return updatedPalette;
+    });
+  };
+
+  const resetSavedColors = () => {
+    localStorage.removeItem("chonksstudio");
+    setAdditionalColors([]);
+  };
+
+  const startColorPicker = () => {
+    setIsPickingColor(true);
+  };
+
+  const handleColorPick = useCallback(
+    (event: MouseEvent) => {
+      if (!isPickingColor) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const target = event.target as HTMLElement;
+      const computedStyle = window.getComputedStyle(target);
+      const backgroundColor = computedStyle.backgroundColor;
+
+      const rgbaMatch = backgroundColor.match(
+        /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+(?:\.\d+)?))?\)/
+      );
+      if (rgbaMatch) {
+        const [, r, g, b] = rgbaMatch.map(Number);
+        const hex = `#${((1 << 24) + (r << 16) + (g << 8) + b)
+          .toString(16)
+          .slice(1)}`;
+        console.log("Picked color (hex):", hex);
+        setSelectedColor(hex);
+      } else {
+        console.log("Picked color:", backgroundColor);
+      }
+      setSelectedColor(backgroundColor);
+      setIsPickingColor(false);
+
+      // Remove the event listener after picking the color
+      document.removeEventListener("click", handleColorPick, true);
+    },
+    [isPickingColor, setSelectedColor]
+  );
+
+  useEffect(() => {
+    if (isPickingColor) {
+      // Use capture phase to ensure this listener runs before other click handlers
+      document.addEventListener("click", handleColorPick, true);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleColorPick, true);
+    };
+  }, [isPickingColor, handleColorPick]);
+
   return (
-    <div className="p-4 flex flex-col">
-      {/* Menus and Grid */}
-      <div>
-        {/* Menu bar */}
-        <div className="flex flex-row gap-8">
-          <SelectColor
-            selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
+    <>
+      <div className="text-3xl font-bold p-8 mb-10 border-b border-gray-300">
+        Chonks Studio
+      </div>
+
+      <div className="flex justify-center w-full">
+        <div className="p-4 grid grid-cols-[15%_65%_20%] w-full">
+          <div>
+            <SelectColor
+              additionalColors={additionalColors}
+              hasAdditionalColors={additionalColors?.length > 0}
+              selectedColor={selectedColor}
+              setSelectedColor={setSelectedColor}
+            />
+            <BodyPresets setBackgroundBody={setBackgroundBody} />
+            <Menu
+              resetGrid={resetGrid}
+              saveColorToPalette={saveColorToPalette}
+              selectedColor={selectedColor}
+              resetSavedColors={resetSavedColors}
+              startColorPicker={startColorPicker}
+            />
+          </div>
+
+          <Canvas
+            gridRef={gridRef}
+            gridSize={gridSize}
+            gridData={gridData}
+            backgroundBody={backgroundBody}
+            handleMouseDown={handleMouseDown}
+            handleMouseUp={handleMouseUp}
+            handleMouseMove={handleMouseMove}
+            handlePixelChange={handlePixelChange}
+            setHoveredPixel={setHoveredPixel}
+            hoveredPixel={hoveredPixel}
+            getPixelCoordinates={getPixelCoordinates}
           />
-          <BodyPresets setBackgroundBody={setBackgroundBody} />
-          <ResetCanvas resetGrid={resetGrid} />
+
+          <div className="flex flex-col gap-2 p-x">
+            <TextEditor
+              textareaRef={textareaRef}
+              textAreaContent={textAreaContent}
+              handleTextAreaChange={handleTextAreaChange}
+              copyTextAreaContent={copyTextAreaContent}
+              printGrid={printGrid}
+            />
+            <SVGPreview
+              svgContent={svgContent}
+              copySVGText={copySVGText}
+              downloadSVG={downloadSVG}
+              handleBytes={handleBytes}
+            />
+          </div>
         </div>
-
-        <Canvas
-          gridRef={gridRef}
-          gridSize={gridSize}
-          gridData={gridData}
-          backgroundBody={backgroundBody}
-          handleMouseDown={handleMouseDown}
-          handleMouseUp={handleMouseUp}
-          handleMouseMove={handleMouseMove}
-          handlePixelChange={handlePixelChange}
-          setHoveredPixel={setHoveredPixel}
-          hoveredPixel={hoveredPixel}
-          getPixelCoordinates={getPixelCoordinates}
-        />
       </div>
-
-      {/* Bottom section */}
-      <div className="ml-8 my-8 flex flex-row">
-        <TextEditor
-          textareaRef={textareaRef}
-          textAreaContent={textAreaContent}
-          handleTextAreaChange={handleTextAreaChange}
-          copyTextAreaContent={copyTextAreaContent}
-          printGrid={printGrid}
-        />
-
-        <SVGPreview
-          svgContent={svgContent}
-          copySVGText={copySVGText}
-          downloadSVG={downloadSVG}
-        />
-      </div>
-    </div>
+    </>
   );
 };
 

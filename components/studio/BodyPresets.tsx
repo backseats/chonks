@@ -4,9 +4,10 @@ interface Props {
 
 export default function BodyPresets({ setBackgroundBody }: Props) {
   return (
-    <div className="flex flex-col max-w-1/3">
+    <>
       <h2 className="text-xl font-bold mb-2">Body Presets</h2>
-      <div className="grid grid-cols-2 gap-2">
+
+      <div className="flex flex-col gap-2 px-3 my-4">
         <button
           onClick={() => setBackgroundBody("superlightbody.svg")}
           className="px-4 py-2 bg-[#EAD9D9] text-black rounded hover:brightness-[70%] transition-colors"
@@ -38,6 +39,6 @@ export default function BodyPresets({ setBackgroundBody }: Props) {
           Body With Opacity
         </button>
       </div>
-    </div>
+    </>
   );
 }

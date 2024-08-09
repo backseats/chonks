@@ -1,15 +1,15 @@
-const fs = require('fs');
-const xml2js = require('xml2js');
+// import fs from 'fs';
+import xml2js from 'xml2js';
 
 // Get the file name from command-line arguments
-const svgFilePath = process.argv[2];
-if (!svgFilePath) {
-    console.error('Please provide an SVG file path as an argument.');
-    process.exit(1);
-}
+// const svgFilePath = process.argv[2];
+// if (!svgFilePath) {
+//     console.error('Please provide an SVG file path as an argument.');
+//     process.exit(1);
+// }
 
 // Read SVG content from the file
-const svgInput = fs.readFileSync(svgFilePath, 'utf8');
+// const svgInput = fs.readFileSync(svgFilePath, 'utf8');
 
 function hexToBytes(hex) {
     let bytes = [];
@@ -23,7 +23,7 @@ function bytesToHex(bytes) {
     return bytes.map(byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
-function parseSvgToBytes(svgString) {
+export function parseSvgToBytes(svgString) {
     let bytes = [];
     const parser = new xml2js.Parser();
 
@@ -61,5 +61,5 @@ function parseSvgToBytes(svgString) {
     return bytesToHex(bytes);
 }
 
-const hexString = parseSvgToBytes(svgInput);
-console.log(hexString);
+// const hexString = parseSvgToBytes(svgInput);
+// console.log(hexString);

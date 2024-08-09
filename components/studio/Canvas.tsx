@@ -27,14 +27,18 @@ export default function Canvas({
   setHoveredPixel,
   getPixelCoordinates,
 }: Props) {
+  const size = 30;
+  const gridWidth = gridSize * size + (gridSize - 1);
+  const gridHeight = gridSize * size + (gridSize - 1);
+
   return (
     <div className="relative w-fit mx-auto border border-[#6b7280]">
       {/* Background image */}
       <div
         className="absolute top-0 left-0"
         style={{
-          width: `${gridSize * 30 + (gridSize - 1)}px`,
-          height: `${gridSize * 30 + (gridSize - 1)}px`,
+          width: `${gridWidth}px`,
+          height: `${gridHeight}px`,
         }}
       >
         <img
@@ -52,10 +56,10 @@ export default function Canvas({
         ref={gridRef}
         className="grid gap-px bg-transparent relative z-10"
         style={{
-          gridTemplateColumns: `repeat(${gridSize}, 30px)`,
-          gridTemplateRows: `repeat(${gridSize}, 30px)`,
-          width: `${gridSize * 30 + (gridSize - 1)}px`,
-          height: `${gridSize * 30 + (gridSize - 1)}px`,
+          gridTemplateColumns: `repeat(${gridSize}, ${size}px)`,
+          gridTemplateRows: `repeat(${gridSize}, ${size}px)`,
+          width: `${gridWidth}px`,
+          height: `${gridHeight}px`,
         }}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
@@ -72,13 +76,13 @@ export default function Canvas({
         {gridData.map((pixel, index) => (
           <div
             key={index}
-            className={`pointer w-[30px] h-[30px] cursor-pointer transition-colors duration-300
+            className={`pointer w-[${size}px] h-[${size}px] cursor-pointer transition-colors duration-300
                   ${pixel.color ? "" : "hover:bg-gray-200"}`}
             style={{
-              borderTop: pixel.y === 0 ? "1px solid #6b7280" : "none",
-              borderLeft: pixel.x === 0 ? "1px solid #6b7280" : "none",
-              borderRight: "1px solid #6b7280",
-              borderBottom: "1px solid #6b7280",
+              borderTop: pixel.y === 0 ? "1px solid #8e96a4" : "none",
+              borderLeft: pixel.x === 0 ? "1px solid #8e96a4" : "none",
+              borderRight: "1px solid #8e96a4",
+              borderBottom: "1px solid #8e96a4",
               backgroundColor: pixel.color || "transparent",
               filter: pixel.color ? "hover:brightness(80%)" : undefined,
               outline:
