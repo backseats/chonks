@@ -27,6 +27,14 @@ TK
 
 TODO: update contract addresses in `contract_data.ts`, point ABIs to the proper files in `/contracts/out`.
 
+### Eto Vass Tool
+
+* `cd contracts`
+* run `./start-hot-reload.sh` or the one for traits, same as before
+* Access at `http://localhost:9901/`
+
+Keep this open in a tab to see if we broke anything as we develop and it hot reloads
+
 ## Set up metamask locally if needed
 
 * Set up Metamask for local node if needed (one time)
