@@ -1,0 +1,22 @@
+{
+  "name": "erc6551",
+  "version": "0.3.1",
+  "scripts": {
+    "test": "forge test",
+    "format": "forge fmt",
+    "lint": "solhint -w 0 'contracts/**/*.sol'",
+    "publish-package": "script/publish.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erc6551/reference.git"
+  },
+  "dependencies": {
+    "js-base64": "^3.7.7",
+    "json-colorizer": "^3.0.1",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "solhint": "^3.3.7"
+  }
+}

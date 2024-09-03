@@ -1,0 +1,555 @@
+<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <style> <!-- rect{width:1px; height: 1px;} --> .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); }
+        .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill:
+        transparent; } .closed{ transform: translate(0px, 5px); } .open{ transform: translate(0px,
+        0px); } 
+    
+      
+    </style>
+    <rect class="bg" fill="#0D6E9D"></rect>
+    <g id="main" class="off">
+        <g id="Body 001">
+            
+            
+            <rect class="testRect" x="1" y="1" width="1" height="1" fill="#D700A8"></rect>
+
+            <path fill="#EFB15E"
+                d="M11 23h1v1h-1zM12 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM11 18h1v1h-1z"></path>
+            <path fill="#D69743" d="M12 18h1v1h-1z"></path>
+            <path fill="#EFB15E" d="M14 18h1v1h-1zM15 18h1v1h-1z"></path>
+            <path fill="#D69743" d="M16 18h1v1h-1z"></path>
+            <path fill="#EFB15E"
+                d="M11 19h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 17h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1z"></path>
+            <path fill="#D69743" d="M18 19h1v1h-1zM18 20h1v1h-1z"></path>
+            <path fill="#EFB15E"
+                d="M19 19h1v1h-1zM19 20h1v1h-1zM10 17h1v1h-1zM9 18h1v1H9zM9 19h1v1H9zM9 20h1v1H9z"></path>
+            <path fill="#D69743" d="M10 19h1v1h-1zM10 20h1v1h-1z"></path>
+            <path fill="#EFB15E" d="M10 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1z"></path>
+            <path fill="#D69743"
+                d="M11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1z"></path>
+            <path fill="#EFB15E"
+                d="M15 15h1v1h-1zM16 15h1v1h-1zM11 9h1v1h-1zM14 12h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM12 14h1v1h-1zM19 13h1v1h-1zM19 12h1v1h-1z"></path>
+            <path fill="#D69743" d="M9 12h1v1H9zM9 13h1v1H9z"></path>
+            <path fill="#000" d="M18 12h1v1h-1zM18 13h1v1h-1z"></path>
+            <path fill="#fff" d="M17 13h1v1h-1zM17 12h1v1h-1z"></path>
+            <path fill="#000" d="M13 12h1v1h-1z"></path>
+            <path fill="#fff" d="M12 12h1v1h-1zM12 13h1v1h-1z"></path>
+            <path fill="#000" d="M13 13h1v1h-1z"></path>
+            <path fill="#D69743" d="M15 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1z"></path>
+        </g>
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"
+            fill="none">
+
+            <style>
+                .testRect{
+                    opacity: 0.1;
+                }
+            </style>
+            
+            <rect class="testRect" x="4" y="1" width="1" height="1" fill="#D700A8"></rect>
+
+            <rect x="13" y="5" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="14" y="5" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="15" y="5" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="16" y="5" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="17" y="5" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="18" y="5" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="19" y="5" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="11" y="6" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="12" y="6" width="1" height="1" fill="#C30098"></rect>
+            <rect x="13" y="6" width="1" height="1" fill="#C30098"></rect>
+            <rect x="14" y="6" width="1" height="1" fill="#C30098"></rect>
+            <rect x="15" y="6" width="1" height="1" fill="#C30098"></rect>
+            <rect x="16" y="6" width="1" height="1" fill="#C30098"></rect>
+            <rect x="17" y="6" width="1" height="1" fill="#C30098"></rect>
+            <rect x="18" y="6" width="1" height="1" fill="#C30098"></rect>
+            <rect x="19" y="6" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="20" y="6" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="11" y="7" width="1" height="1" fill="#C30098"></rect>
+            <rect x="12" y="7" width="1" height="1" fill="#C30098"></rect>
+            <rect x="13" y="7" width="1" height="1" fill="#C30098"></rect>
+            <rect x="14" y="7" width="1" height="1" fill="#C30098"></rect>
+            <rect x="15" y="7" width="1" height="1" fill="#C30098"></rect>
+            <rect x="16" y="7" width="1" height="1" fill="#C30098"></rect>
+            <rect x="17" y="7" width="1" height="1" fill="#C30098"></rect>
+            <rect x="18" y="7" width="1" height="1" fill="#C30098"></rect>
+            <rect x="19" y="7" width="1" height="1" fill="#C30098"></rect>
+            <rect x="20" y="7" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="10" y="8" width="1" height="1" fill="#D700A8"></rect>
+            <rect x="11" y="8" width="1" height="1" fill="#C30098"></rect>
+            <rect x="12" y="8" width="1" height="1" fill="#C30098"></rect>
+            <rect x="13" y="8" width="1" height="1" fill="#C30098"></rect>
+            <rect x="14" y="8" width="1" height="1" fill="#C30098"></rect>
+            <rect x="15" y="8" width="1" height="1" fill="#C30098"></rect>
+            <rect x="16" y="8" width="1" height="1" fill="#C30098"></rect>
+            <rect x="17" y="8" width="1" height="1" fill="#C30098"></rect>
+            <rect x="18" y="8" width="1" height="1" fill="#C30098"></rect>
+            <rect x="19" y="8" width="1" height="1" fill="#C30098"></rect>
+            <rect x="10" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="11" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="12" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="13" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="14" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="15" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="16" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="17" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="18" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="19" y="9" width="1" height="1" fill="#C30098"></rect>
+            <rect x="10" y="10" width="1" height="1" fill="#C30098"></rect>
+            <rect x="11" y="10" width="1" height="1" fill="#C30098"></rect>
+            <rect x="10" y="11" width="1" height="1" fill="#C30098"></rect>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"
+            fill="none">
+
+            <style>
+                .testRect{
+                    opacity: 0.9;
+                }
+            </style>
+
+            <rect class="testRect" x="6" y="1" width="1" height="1" fill="#D700A8"></rect>
+
+            <rect x="10" y="17" width="1" height="1" fill="white"></rect>
+            <rect x="11" y="17" width="1" height="1" fill="white"></rect>
+            <rect x="12" y="17" width="1" height="1" fill="white"></rect>
+            <rect x="17" y="17" width="1" height="1" fill="white"></rect>
+            <rect x="18" y="17" width="1" height="1" fill="white"></rect>
+            <rect x="11" y="18" width="1" height="1" fill="white"></rect>
+            <rect x="12" y="18" width="1" height="1" fill="white"></rect>
+            <rect x="13" y="18" width="1" height="1" fill="white"></rect>
+            <rect x="14" y="18" width="1" height="1" fill="white"></rect>
+            <rect x="15" y="18" width="1" height="1" fill="white"></rect>
+            <rect x="16" y="18" width="1" height="1" fill="white"></rect>
+            <rect x="17" y="18" width="1" height="1" fill="white"></rect>
+            <rect x="9" y="19" width="1" height="1" fill="#D4001B"></rect>
+            <rect x="10" y="19" width="1" height="1" fill="#D4001B"></rect>
+            <rect x="11" y="19" width="1" height="1" fill="white"></rect>
+            <rect x="12" y="19" width="1" height="1" fill="white"></rect>
+            <rect x="13" y="19" width="1" height="1" fill="white"></rect>
+            <rect x="14" y="19" width="1" height="1" fill="white"></rect>
+            <rect x="15" y="19" width="1" height="1" fill="white"></rect>
+            <rect x="16" y="19" width="1" height="1" fill="white"></rect>
+            <rect x="17" y="19" width="1" height="1" fill="white"></rect>
+            <rect x="18" y="19" width="1" height="1" fill="#D4001B"></rect>
+            <rect x="19" y="19" width="1" height="1" fill="#D4001B"></rect>
+            <rect x="11" y="20" width="1" height="1" fill="black"></rect>
+            <rect x="12" y="20" width="1" height="1" fill="black"></rect>
+            <rect x="13" y="20" width="1" height="1" fill="black"></rect>
+            <rect x="14" y="20" width="1" height="1" fill="black"></rect>
+            <rect x="15" y="20" width="1" height="1" fill="#D4001B"></rect>
+            <rect x="16" y="20" width="1" height="1" fill="black"></rect>
+            <rect x="17" y="20" width="1" height="1" fill="black"></rect>
+            <rect x="11" y="21" width="1" height="1" fill="white"></rect>
+            <rect x="12" y="21" width="1" height="1" fill="white"></rect>
+            <rect x="13" y="21" width="1" height="1" fill="white"></rect>
+            <rect x="14" y="21" width="1" height="1" fill="#D4001B"></rect>
+            <rect x="15" y="21" width="1" height="1" fill="white"></rect>
+            <rect x="16" y="21" width="1" height="1" fill="#D4001B"></rect>
+            <rect x="17" y="21" width="1" height="1" fill="white"></rect>
+            <rect x="11" y="22" width="1" height="1" fill="white"></rect>
+            <rect x="12" y="22" width="1" height="1" fill="white"></rect>
+            <rect x="13" y="22" width="1" height="1" fill="white"></rect>
+            <rect x="15" y="22" width="1" height="1" fill="white"></rect>
+            <rect x="16" y="22" width="1" height="1" fill="white"></rect>
+            <rect x="17" y="22" width="1" height="1" fill="white"></rect>
+
+            <script type="text/javascript"><![CDATA[
+
+                function fadeInOut(element, duration) {
+                    let opacity = 0; // Initial opacity
+                    let lastTime = null;
+                    let direction = 1; // 1 for fading in, -1 for fading out
+
+                    function animate(time) {
+                        if (lastTime === null) {
+                            lastTime = time;
+                        }
+                        const elapsed = time - lastTime;
+                        
+                        opacity += direction * elapsed * (1 / duration);
+                        
+                        // Reverse direction if limits are reached
+                        if (opacity >= 1) {
+                            opacity = 1;
+                            direction = -1;
+                        } else if (opacity <= 0) {
+                            opacity = 0;
+                            direction = 1;
+                        }
+                        
+                        element.style.opacity = opacity;
+                        lastTime = time;
+                        
+                        requestAnimationFrame(animate);
+                    }
+
+                    requestAnimationFrame(animate);
+                }
+
+                // Select your elements and apply the animation
+                document.querySelectorAll('.testRect').forEach(el => {
+                    fadeInOut(el, 2000); // Duration of 2000 milliseconds (2 seconds)
+                });
+
+            ]]></script>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"
+            fill="none">
+            <rect x="12" y="18" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="12" y="17" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="16" y="18" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="16" y="17" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="11" y="19" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="12" y="19" width="1" height="1" fill="#EECB19"></rect>
+            <rect x="13" y="19" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="14" y="19" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="15" y="19" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="16" y="19" width="1" height="1" fill="#EECB19"></rect>
+            <rect x="17" y="19" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="11" y="20" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="12" y="20" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="13" y="20" width="1" height="1" fill="#2F9641"></rect>
+            <rect x="14" y="20" width="1" height="1" fill="#2F9641"></rect>
+            <rect x="15" y="20" width="1" height="1" fill="#2F9641"></rect>
+            <rect x="16" y="20" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="17" y="20" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="11" y="21" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="12" y="21" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="13" y="21" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="14" y="21" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="15" y="21" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="16" y="21" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="17" y="21" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="11" y="22" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="12" y="22" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="13" y="22" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="15" y="22" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="16" y="22" width="1" height="1" fill="#10B72C"></rect>
+            <rect x="17" y="22" width="1" height="1" fill="#10B72C"></rect>
+        </svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"
+            fill="none">
+            <rect x="11" y="23" width="1" height="1" fill="black"></rect>
+            <rect x="12" y="23" width="1" height="1" fill="#DEDEDE"></rect>
+            <rect x="16" y="23" width="1" height="1" fill="black"></rect>
+            <rect x="17" y="23" width="1" height="1" fill="#DEDEDE"></rect>
+        </svg>
+        <g id="All Traits">
+            <g id="backpack" class="closed">
+                <path d="M 0 30 L 0 27 A 2 2 0 0 1 2 25 H 28 A 2 2 0 0 1 30 27 L 30 30Z"
+                    fill="rgba(0,0,0,0.5)"></path>
+                <svg viewBox="0 -124 150 150">
+                    <g class="g" style="opacity: 25%;">
+                        <g id="Body 001">
+                            <path fill="#EFB15E"
+                                d="M11 23h1v1h-1zM12 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM11 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M12 18h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M14 18h1v1h-1zM15 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M16 18h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M11 19h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 17h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M18 19h1v1h-1zM18 20h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M19 19h1v1h-1zM19 20h1v1h-1zM10 17h1v1h-1zM9 18h1v1H9zM9 19h1v1H9zM9 20h1v1H9z"></path>
+                            <path fill="#D69743" d="M10 19h1v1h-1zM10 20h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M10 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1z"></path>
+                            <path fill="#D69743"
+                                d="M11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M15 15h1v1h-1zM16 15h1v1h-1zM11 9h1v1h-1zM14 12h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM12 14h1v1h-1zM19 13h1v1h-1zM19 12h1v1h-1z"></path>
+                            <path fill="#D69743" d="M9 12h1v1H9zM9 13h1v1H9z"></path>
+                            <path fill="#000" d="M18 12h1v1h-1zM18 13h1v1h-1z"></path>
+                            <path fill="#fff" d="M17 13h1v1h-1zM17 12h1v1h-1z"></path>
+                            <path fill="#000" d="M13 12h1v1h-1z"></path>
+                            <path fill="#fff" d="M12 12h1v1h-1zM12 13h1v1h-1z"></path>
+                            <path fill="#000" d="M13 13h1v1h-1z"></path>
+                            <path fill="#D69743" d="M15 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1z"></path>
+                        </g>
+                    </g>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                        viewBox="0 0 30 30" fill="none">
+                        <rect x="10" y="17" width="1" height="1" fill="white"></rect>
+                        <rect x="11" y="17" width="1" height="1" fill="white"></rect>
+                        <rect x="12" y="17" width="1" height="1" fill="white"></rect>
+                        <rect x="17" y="17" width="1" height="1" fill="white"></rect>
+                        <rect x="18" y="17" width="1" height="1" fill="white"></rect>
+                        <rect x="11" y="18" width="1" height="1" fill="white"></rect>
+                        <rect x="12" y="18" width="1" height="1" fill="white"></rect>
+                        <rect x="13" y="18" width="1" height="1" fill="white"></rect>
+                        <rect x="14" y="18" width="1" height="1" fill="white"></rect>
+                        <rect x="15" y="18" width="1" height="1" fill="white"></rect>
+                        <rect x="16" y="18" width="1" height="1" fill="white"></rect>
+                        <rect x="17" y="18" width="1" height="1" fill="white"></rect>
+                        <rect x="9" y="19" width="1" height="1" fill="#D4001B"></rect>
+                        <rect x="10" y="19" width="1" height="1" fill="#D4001B"></rect>
+                        <rect x="11" y="19" width="1" height="1" fill="white"></rect>
+                        <rect x="12" y="19" width="1" height="1" fill="white"></rect>
+                        <rect x="13" y="19" width="1" height="1" fill="white"></rect>
+                        <rect x="14" y="19" width="1" height="1" fill="white"></rect>
+                        <rect x="15" y="19" width="1" height="1" fill="white"></rect>
+                        <rect x="16" y="19" width="1" height="1" fill="white"></rect>
+                        <rect x="17" y="19" width="1" height="1" fill="white"></rect>
+                        <rect x="18" y="19" width="1" height="1" fill="#D4001B"></rect>
+                        <rect x="19" y="19" width="1" height="1" fill="#D4001B"></rect>
+                        <rect x="11" y="20" width="1" height="1" fill="black"></rect>
+                        <rect x="12" y="20" width="1" height="1" fill="black"></rect>
+                        <rect x="13" y="20" width="1" height="1" fill="black"></rect>
+                        <rect x="14" y="20" width="1" height="1" fill="black"></rect>
+                        <rect x="15" y="20" width="1" height="1" fill="#D4001B"></rect>
+                        <rect x="16" y="20" width="1" height="1" fill="black"></rect>
+                        <rect x="17" y="20" width="1" height="1" fill="black"></rect>
+                        <rect x="11" y="21" width="1" height="1" fill="white"></rect>
+                        <rect x="12" y="21" width="1" height="1" fill="white"></rect>
+                        <rect x="13" y="21" width="1" height="1" fill="white"></rect>
+                        <rect x="14" y="21" width="1" height="1" fill="#D4001B"></rect>
+                        <rect x="15" y="21" width="1" height="1" fill="white"></rect>
+                        <rect x="16" y="21" width="1" height="1" fill="#D4001B"></rect>
+                        <rect x="17" y="21" width="1" height="1" fill="white"></rect>
+                        <rect x="11" y="22" width="1" height="1" fill="white"></rect>
+                        <rect x="12" y="22" width="1" height="1" fill="white"></rect>
+                        <rect x="13" y="22" width="1" height="1" fill="white"></rect>
+                        <rect x="15" y="22" width="1" height="1" fill="white"></rect>
+                        <rect x="16" y="22" width="1" height="1" fill="white"></rect>
+                        <rect x="17" y="22" width="1" height="1" fill="white"></rect>
+                    </svg>
+                </svg>
+                <svg viewBox="-15 -124 150 150">
+                    <g class="g" style="opacity: 25%;">
+                        <g id="Body 001">
+                            <path fill="#EFB15E"
+                                d="M11 23h1v1h-1zM12 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM11 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M12 18h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M14 18h1v1h-1zM15 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M16 18h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M11 19h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 17h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M18 19h1v1h-1zM18 20h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M19 19h1v1h-1zM19 20h1v1h-1zM10 17h1v1h-1zM9 18h1v1H9zM9 19h1v1H9zM9 20h1v1H9z"></path>
+                            <path fill="#D69743" d="M10 19h1v1h-1zM10 20h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M10 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1z"></path>
+                            <path fill="#D69743"
+                                d="M11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M15 15h1v1h-1zM16 15h1v1h-1zM11 9h1v1h-1zM14 12h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM12 14h1v1h-1zM19 13h1v1h-1zM19 12h1v1h-1z"></path>
+                            <path fill="#D69743" d="M9 12h1v1H9zM9 13h1v1H9z"></path>
+                            <path fill="#000" d="M18 12h1v1h-1zM18 13h1v1h-1z"></path>
+                            <path fill="#fff" d="M17 13h1v1h-1zM17 12h1v1h-1z"></path>
+                            <path fill="#000" d="M13 12h1v1h-1z"></path>
+                            <path fill="#fff" d="M12 12h1v1h-1zM12 13h1v1h-1z"></path>
+                            <path fill="#000" d="M13 13h1v1h-1z"></path>
+                            <path fill="#D69743" d="M15 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1z"></path>
+                        </g>
+                    </g>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                        viewBox="0 0 30 30" fill="none">
+                        <rect x="12" y="18" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="12" y="17" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="16" y="18" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="16" y="17" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="11" y="19" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="12" y="19" width="1" height="1" fill="#EECB19"></rect>
+                        <rect x="13" y="19" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="14" y="19" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="15" y="19" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="16" y="19" width="1" height="1" fill="#EECB19"></rect>
+                        <rect x="17" y="19" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="11" y="20" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="12" y="20" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="13" y="20" width="1" height="1" fill="#2F9641"></rect>
+                        <rect x="14" y="20" width="1" height="1" fill="#2F9641"></rect>
+                        <rect x="15" y="20" width="1" height="1" fill="#2F9641"></rect>
+                        <rect x="16" y="20" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="17" y="20" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="11" y="21" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="12" y="21" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="13" y="21" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="14" y="21" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="15" y="21" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="16" y="21" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="17" y="21" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="11" y="22" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="12" y="22" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="13" y="22" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="15" y="22" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="16" y="22" width="1" height="1" fill="#10B72C"></rect>
+                        <rect x="17" y="22" width="1" height="1" fill="#10B72C"></rect>
+                    </svg>
+                </svg>
+                <svg viewBox="-30 -124 150 150">
+                    <g class="g" style="opacity: 25%;">
+                        <g id="Body 001">
+                            <path fill="#EFB15E"
+                                d="M11 23h1v1h-1zM12 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM11 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M12 18h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M14 18h1v1h-1zM15 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M16 18h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M11 19h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 17h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M18 19h1v1h-1zM18 20h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M19 19h1v1h-1zM19 20h1v1h-1zM10 17h1v1h-1zM9 18h1v1H9zM9 19h1v1H9zM9 20h1v1H9z"></path>
+                            <path fill="#D69743" d="M10 19h1v1h-1zM10 20h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M10 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1z"></path>
+                            <path fill="#D69743"
+                                d="M11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M15 15h1v1h-1zM16 15h1v1h-1zM11 9h1v1h-1zM14 12h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM12 14h1v1h-1zM19 13h1v1h-1zM19 12h1v1h-1z"></path>
+                            <path fill="#D69743" d="M9 12h1v1H9zM9 13h1v1H9z"></path>
+                            <path fill="#000" d="M18 12h1v1h-1zM18 13h1v1h-1z"></path>
+                            <path fill="#fff" d="M17 13h1v1h-1zM17 12h1v1h-1z"></path>
+                            <path fill="#000" d="M13 12h1v1h-1z"></path>
+                            <path fill="#fff" d="M12 12h1v1h-1zM12 13h1v1h-1z"></path>
+                            <path fill="#000" d="M13 13h1v1h-1z"></path>
+                            <path fill="#D69743" d="M15 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1z"></path>
+                        </g>
+                    </g>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                        viewBox="0 0 30 30" fill="none">
+                        <rect x="11" y="23" width="1" height="1" fill="black"></rect>
+                        <rect x="12" y="23" width="1" height="1" fill="#DEDEDE"></rect>
+                        <rect x="16" y="23" width="1" height="1" fill="black"></rect>
+                        <rect x="17" y="23" width="1" height="1" fill="#DEDEDE"></rect>
+                    </svg>
+                </svg>
+                <svg viewBox="-45 -124 150 150">
+                    <g class="g" style="opacity: 25%;">
+                        <g id="Body 001">
+                            <path fill="#EFB15E"
+                                d="M11 23h1v1h-1zM12 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM11 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M12 18h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M14 18h1v1h-1zM15 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M16 18h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M11 19h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 17h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M18 19h1v1h-1zM18 20h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M19 19h1v1h-1zM19 20h1v1h-1zM10 17h1v1h-1zM9 18h1v1H9zM9 19h1v1H9zM9 20h1v1H9z"></path>
+                            <path fill="#D69743" d="M10 19h1v1h-1zM10 20h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M10 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1z"></path>
+                            <path fill="#D69743"
+                                d="M11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M15 15h1v1h-1zM16 15h1v1h-1zM11 9h1v1h-1zM14 12h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM12 14h1v1h-1zM19 13h1v1h-1zM19 12h1v1h-1z"></path>
+                            <path fill="#D69743" d="M9 12h1v1H9zM9 13h1v1H9z"></path>
+                            <path fill="#000" d="M18 12h1v1h-1zM18 13h1v1h-1z"></path>
+                            <path fill="#fff" d="M17 13h1v1h-1zM17 12h1v1h-1z"></path>
+                            <path fill="#000" d="M13 12h1v1h-1z"></path>
+                            <path fill="#fff" d="M12 12h1v1h-1zM12 13h1v1h-1z"></path>
+                            <path fill="#000" d="M13 13h1v1h-1z"></path>
+                            <path fill="#D69743" d="M15 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1z"></path>
+                        </g>
+                    </g>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                        viewBox="0 0 30 30" fill="none">
+                        <rect x="13" y="5" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="14" y="5" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="15" y="5" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="16" y="5" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="17" y="5" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="18" y="5" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="19" y="5" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="11" y="6" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="12" y="6" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="13" y="6" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="14" y="6" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="15" y="6" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="16" y="6" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="17" y="6" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="18" y="6" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="19" y="6" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="20" y="6" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="11" y="7" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="12" y="7" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="13" y="7" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="14" y="7" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="15" y="7" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="16" y="7" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="17" y="7" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="18" y="7" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="19" y="7" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="20" y="7" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="10" y="8" width="1" height="1" fill="#D700A8"></rect>
+                        <rect x="11" y="8" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="12" y="8" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="13" y="8" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="14" y="8" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="15" y="8" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="16" y="8" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="17" y="8" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="18" y="8" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="19" y="8" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="10" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="11" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="12" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="13" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="14" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="15" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="16" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="17" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="18" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="19" y="9" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="10" y="10" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="11" y="10" width="1" height="1" fill="#C30098"></rect>
+                        <rect x="10" y="11" width="1" height="1" fill="#C30098"></rect>
+                    </svg>
+                </svg>
+                <svg viewBox="-60 -124 150 150">
+                    <g class="g" style="opacity: 25%;">
+                        <g id="Body 001">
+                            <path fill="#EFB15E"
+                                d="M11 23h1v1h-1zM12 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM11 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M12 18h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M14 18h1v1h-1zM15 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M16 18h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M11 19h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 17h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1z"></path>
+                            <path fill="#D69743" d="M18 19h1v1h-1zM18 20h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M19 19h1v1h-1zM19 20h1v1h-1zM10 17h1v1h-1zM9 18h1v1H9zM9 19h1v1H9zM9 20h1v1H9z"></path>
+                            <path fill="#D69743" d="M10 19h1v1h-1zM10 20h1v1h-1z"></path>
+                            <path fill="#EFB15E" d="M10 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1z"></path>
+                            <path fill="#D69743"
+                                d="M11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1z"></path>
+                            <path fill="#EFB15E"
+                                d="M15 15h1v1h-1zM16 15h1v1h-1zM11 9h1v1h-1zM14 12h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM12 14h1v1h-1zM19 13h1v1h-1zM19 12h1v1h-1z"></path>
+                            <path fill="#D69743" d="M9 12h1v1H9zM9 13h1v1H9z"></path>
+                            <path fill="#000" d="M18 12h1v1h-1zM18 13h1v1h-1z"></path>
+                            <path fill="#fff" d="M17 13h1v1h-1zM17 12h1v1h-1z"></path>
+                            <path fill="#000" d="M13 12h1v1h-1z"></path>
+                            <path fill="#fff" d="M12 12h1v1h-1zM12 13h1v1h-1z"></path>
+                            <path fill="#000" d="M13 13h1v1h-1z"></path>
+                            <path fill="#D69743" d="M15 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1z"></path>
+                        </g>
+                    </g>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30"
+                        viewBox="0 0 30 30" fill="none">
+                        <rect x="11" y="21" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="12" y="21" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="13" y="21" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="14" y="21" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="15" y="21" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="16" y="21" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="17" y="21" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="11" y="22" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="12" y="22" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="13" y="22" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="15" y="22" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="16" y="22" width="1" height="1" fill="#24385D"></rect>
+                        <rect x="17" y="22" width="1" height="1" fill="#24385D"></rect>
+                    </svg>
+                </svg>
+            </g>
+        </g>
+    </g>
+    <rect id="toggleMain" class="button" x="25" y="0" width="5" height="5"></rect>
+    <rect id="toggleBackpack" class="button" x="0" y="0" width="5" height="5"></rect>
+    <script>const mainGroup = document.getElementById("main"); const backpackGroup =
+        document.getElementById("backpack"); document.getElementById("toggleMain").onclick = ()
+        =&gt; { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); };
+        document.getElementById("toggleBackpack").onclick = () =&gt; {
+        backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed");
+        if(mainGroup.classList.contains("on")) { mainGroup.classList.toggle("on");
+        mainGroup.classList.toggle("off"); } }; </script>
+</svg>
