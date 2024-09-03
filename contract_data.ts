@@ -1,4 +1,4 @@
-export const mainContract = "0x09aA69F7d740282c42d6de0D6A087dA1d7A4cFb6";
+export const mainContract = "0x1e11c381420B048d541EE8E648BcAa94472030E7";
 export const traitsContract = "0x526d7fa3F66E0F19A0c7aF3BE4B875E7D6d008D0";
 
 // Main

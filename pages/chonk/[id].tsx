@@ -57,13 +57,13 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
 
-  const { data } = writeContract({
-    address: mainContract,
-    abi: abi,
-    functionName: "mint",
-    args: [],
-    chainId: baseSepolia.id,
-  });
+  // const { data } = writeContract({
+  //   address: mainContract,
+  //   abi: abi,
+  //   functionName: "mint",
+  //   args: [],
+  //   chainId: baseSepolia.id,
+  // });
 
   // Get main body tokenURI
   const { data: tokenURIData } = useReadContract({
@@ -75,7 +75,11 @@ export default function ChonkDetail({ id }: { id: string }) {
   }) as { data: string };
 
   useEffect(() => {
-    if (tokenURIData) decodeAndSetData(tokenURIData, setTokenData);
+    if (tokenURIData) {
+      decodeAndSetData(tokenURIData, setTokenData);
+    } else {
+      console.log("No tokenURI data");
+    }
   }, [tokenURIData]);
 
   // Get the trait ids that are equipped to the body

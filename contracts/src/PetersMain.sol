@@ -38,7 +38,7 @@ import "forge-std/console.sol"; // DEPLOY: remove
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906 {
 
     bool _localDeploy = true; // DEPLOY: remove
-    bool _renderZ = !true; // temp flag control 2d or 3d output // DEPLOY: remove
+    bool _renderZ = false; // temp flag control 2d or 3d output // DEPLOY: remove
 
     // Encodes plain text as a URI-encoded string
     EncodeURI public encodeURIContract;
@@ -107,7 +107,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function mint() public payable { // TODO amount, check price
-        if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
+        // if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
 
         resolveEpochIfNecessary();
 
@@ -118,7 +118,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         address tokenBoundAccountAddress = REGISTRY.createAccount(
             ACCOUNT_PROXY,
             0,
-            84532, // 31337 for local deployment // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia
+            1337, // 31337 for local deployment // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia
             address(this),
             tokenId
         );
@@ -128,19 +128,21 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
-        uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress);
+        // uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress);
 
         // Initialize our Peter
-        StoredPeter storage peter = peterTokens.all[tokenId];
+        // StoredPeter storage peter = peterTokens.all[tokenId];
 
-        peter.epoch = uint32(peterTokens.epoch);
-        // peter.seed = uint16(tokenId);
-        peter.tokenId = uint16(tokenId);
-        peter.shirtId = traitsIds[0]; // shirtId is a trait contract token id
-        peter.pantsId = traitsIds[1]; // same with pants id
-        peter.shoesId = traitsIds[2]; // same with shoes id
-        peter.hairId =  traitsIds[3]; // same with hair id
-        peter.hatId =  traitsIds[4]; // same with hat id
+        // peter.epoch = uint32(peterTokens.epoch);
+        // // peter.seed = uint16(tokenId);
+        // peter.tokenId = uint16(tokenId);
+        // peter.shirtId = traitsIds[0]; // shirtId is a trait contract token id
+        // peter.pantsId = traitsIds[1]; // same with pants id
+        // peter.shoesId = traitsIds[2]; // same with shoes id
+        // peter.hairId =  traitsIds[3]; // same with hair id
+        // peter.hatId =  traitsIds[4]; // same with hat id
+
+        console.log("minted bodyd tokenId:", tokenId);
     }
 
     /// @notice Initializes and closes epochs. Thank you jalil & mouseDev.
@@ -208,114 +210,114 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Equip/Unequip clothing traits
 
-    function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Handheld);
+    // function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+    //     _validateTrait(_traitTokenId, TraitCategory.Name.Handheld);
 
-        peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
-    }
+    //     peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
+    // }
 
-    function unequipAccessory(uint256 _peterTokenId) public {
-        peterTokens.all[_peterTokenId].handheldId = 0;
-    }
+    // function unequipAccessory(uint256 _peterTokenId) public {
+    //     peterTokens.all[_peterTokenId].handheldId = 0;
+    // }
 
-    function equipGlasses(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Glasses);
+    // function equipGlasses(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+    //     _validateTrait(_traitTokenId, TraitCategory.Name.Glasses);
 
-        peterTokens.all[_peterTokenId].glassesId = _traitTokenId;
-    }
+    //     peterTokens.all[_peterTokenId].glassesId = _traitTokenId;
+    // }
 
-    function unequipGlasses(uint256 _peterTokenId) public {
-        peterTokens.all[_peterTokenId].glassesId = 0;
-    }
+    // function unequipGlasses(uint256 _peterTokenId) public {
+    //     peterTokens.all[_peterTokenId].glassesId = 0;
+    // }
 
-    function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Hair);
+    // function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+    //     _validateTrait(_traitTokenId, TraitCategory.Name.Hair);
 
-        peterTokens.all[_peterTokenId].hairId = _traitTokenId;
-    }
+    //     peterTokens.all[_peterTokenId].hairId = _traitTokenId;
+    // }
 
-    function unequipHair(uint256 _peterTokenId) public {
-        peterTokens.all[_peterTokenId].hairId = 0;
-    }
+    // function unequipHair(uint256 _peterTokenId) public {
+    //     peterTokens.all[_peterTokenId].hairId = 0;
+    // }
 
-    function equipHat(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Hat);
+    // function equipHat(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+    //     _validateTrait(_traitTokenId, TraitCategory.Name.Hat);
 
-        peterTokens.all[_peterTokenId].hatId = _traitTokenId;
-    }
+    //     peterTokens.all[_peterTokenId].hatId = _traitTokenId;
+    // }
 
-    function unequipHat(uint256 _peterTokenId) public {
-        peterTokens.all[_peterTokenId].hatId = 0;
-    }
+    // function unequipHat(uint256 _peterTokenId) public {
+    //     peterTokens.all[_peterTokenId].hatId = 0;
+    // }
 
-    function equipShirt(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Shirt);
+    // function equipShirt(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+    //     _validateTrait(_traitTokenId, TraitCategory.Name.Shirt);
 
-        peterTokens.all[_peterTokenId].shirtId = _traitTokenId;
-    }
+    //     peterTokens.all[_peterTokenId].shirtId = _traitTokenId;
+    // }
 
-    function unequipShirt(uint256 _peterTokenId) public {
-        peterTokens.all[_peterTokenId].shirtId = 0;
-    }
+    // function unequipShirt(uint256 _peterTokenId) public {
+    //     peterTokens.all[_peterTokenId].shirtId = 0;
+    // }
 
-    // NOTE: We Might want counterpart view functions that just compile the svg without writing to chain
-    function equipPants(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Pants);
+    // // NOTE: We Might want counterpart view functions that just compile the svg without writing to chain
+    // function equipPants(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+    //     _validateTrait(_traitTokenId, TraitCategory.Name.Pants);
 
-        peterTokens.all[_peterTokenId].pantsId = _traitTokenId;
-    }
+    //     peterTokens.all[_peterTokenId].pantsId = _traitTokenId;
+    // }
 
-    function unequipPants(uint256 _peterTokenId) public {
-        peterTokens.all[_peterTokenId].pantsId = 0;
-    }
+    // function unequipPants(uint256 _peterTokenId) public {
+    //     peterTokens.all[_peterTokenId].pantsId = 0;
+    // }
 
-    function equipShoes(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Shoes);
+    // function equipShoes(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+    //     _validateTrait(_traitTokenId, TraitCategory.Name.Shoes);
 
-        peterTokens.all[_peterTokenId].shoesId = _traitTokenId;
-    }
+    //     peterTokens.all[_peterTokenId].shoesId = _traitTokenId;
+    // }
 
-    function unequipShoes(uint256 _peterTokenId) public {
-        peterTokens.all[_peterTokenId].shoesId = 0;
-    }
+    // function unequipShoes(uint256 _peterTokenId) public {
+    //     peterTokens.all[_peterTokenId].shoesId = 0;
+    // }
 
-    function unequipAll(uint256 _peterTokenId) public {
-        StoredPeter storage peter = peterTokens.all[_peterTokenId];
-        peter.hatId = 0;
-        peter.hairId = 0;
-        peter.glassesId = 0;
-        peter.handheldId = 0;
-        peter.shirtId = 0;
-        peter.pantsId = 0;
-        peter.shoesId = 0;
-    }
+    // function unequipAll(uint256 _peterTokenId) public {
+    //     StoredPeter storage peter = peterTokens.all[_peterTokenId];
+    //     peter.hatId = 0;
+    //     peter.hairId = 0;
+    //     peter.glassesId = 0;
+    //     peter.handheldId = 0;
+    //     peter.shirtId = 0;
+    //     peter.pantsId = 0;
+    //     peter.shoesId = 0;
+    // }
 
-    // If 0, it will ignore
-    function equipAll(
-        uint256 _peterTokenId,
-        uint256 _hatTokenId,
-        uint256 _hairTokenId,
-        uint256 _glassesTokenId,
-        uint256 _handheldTokenId,
-        uint256 _shirtTokenId,
-        uint256 _pantsTokenId,
-        uint256 _shoesTokenId
-    ) public {
-        if (_hatTokenId != 0) equipHat(_peterTokenId, _hatTokenId);
-        if (_hairTokenId != 0) equipHair(_peterTokenId, _hairTokenId);
-        if (_glassesTokenId != 0) equipGlasses(_peterTokenId, _glassesTokenId);
-        if (_handheldTokenId != 0) equipAccessory(_peterTokenId, _handheldTokenId);
-        if (_shirtTokenId != 0) equipShirt(_peterTokenId, _shirtTokenId);
-        if (_pantsTokenId != 0) equipPants(_peterTokenId, _pantsTokenId);
-        if (_shoesTokenId != 0) equipShoes(_peterTokenId, _shoesTokenId);
-    }
+    // // If 0, it will ignore
+    // function equipAll(
+    //     uint256 _peterTokenId,
+    //     uint256 _hatTokenId,
+    //     uint256 _hairTokenId,
+    //     uint256 _glassesTokenId,
+    //     uint256 _handheldTokenId,
+    //     uint256 _shirtTokenId,
+    //     uint256 _pantsTokenId,
+    //     uint256 _shoesTokenId
+    // ) public {
+    //     if (_hatTokenId != 0) equipHat(_peterTokenId, _hatTokenId);
+    //     if (_hairTokenId != 0) equipHair(_peterTokenId, _hairTokenId);
+    //     if (_glassesTokenId != 0) equipGlasses(_peterTokenId, _glassesTokenId);
+    //     if (_handheldTokenId != 0) equipAccessory(_peterTokenId, _handheldTokenId);
+    //     if (_shirtTokenId != 0) equipShirt(_peterTokenId, _shirtTokenId);
+    //     if (_pantsTokenId != 0) equipPants(_peterTokenId, _pantsTokenId);
+    //     if (_shoesTokenId != 0) equipShoes(_peterTokenId, _shoesTokenId);
+    // }
 
     /// Validations
 
@@ -448,131 +450,131 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // return ( bodyIndexToMetadata[storedPeter.bodyIndex].bodyPath,RenderHelper.stringTrait('Body', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName));
     }
 
-    function renderAsDataUriZ(uint256 _tokenId) public view returns (string memory) {
+    // function renderAsDataUriZ(uint256 _tokenId) public view returns (string memory) {
 
-        bytes memory bodyZmap;
-        bytes memory traitZmaps;
-        bytes memory fullZmap;
-        string memory traitsAttributes;
-        string memory bodyAttributes;
-        string memory fullAttributes;
+    //     bytes memory bodyZmap;
+    //     bytes memory traitZmaps;
+    //     bytes memory fullZmap;
+    //     string memory traitsAttributes;
+    //     string memory bodyAttributes;
+    //     string memory fullAttributes;
 
 
-        StoredPeter memory storedPeter = getPeter(_tokenId);
+    //     StoredPeter memory storedPeter = getPeter(_tokenId);
 
-        (bodyZmap, bodyAttributes) = getZmapsAndMetadata(storedPeter);
-        (traitZmaps, traitsAttributes) = traitsContract.getZmapsAndMetadata(storedPeter);
-        fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
+    //     (bodyZmap, bodyAttributes) = getZmapsAndMetadata(storedPeter);
+    //     (traitZmaps, traitsAttributes) = traitsContract.getZmapsAndMetadata(storedPeter);
+    //     fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
 
-        fullZmap = bytes.concat(
-            bodyZmap,
-            traitZmaps
-        );
+    //     fullZmap = bytes.concat(
+    //         bodyZmap,
+    //         traitZmaps
+    //     );
 
-        // html style
-        HTMLTag[] memory headTags = new HTMLTag[](1);
-        headTags[0].tagOpen = "%253Cstyle%253E";
-        headTags[0]
-            .tagContent = "html%257Bheight%253A100%2525%257Dbody%257Bmin-height%253A100%2525%253Bmargin%253A0%253Bpadding%253A0%257Dcanvas%257Bpadding%253A0%253Bmargin%253Aauto%253Bdisplay%253Ablock%253Bposition%253Aabsolute%253Btop%253A0%253Bbottom%253A0%253Bleft%253A0%253Bright%253A0%257D";
-        headTags[0].tagClose = "%253C%252Fstyle%253E";
+    //     // html style
+    //     HTMLTag[] memory headTags = new HTMLTag[](1);
+    //     headTags[0].tagOpen = "%253Cstyle%253E";
+    //     headTags[0]
+    //         .tagContent = "html%257Bheight%253A100%2525%257Dbody%257Bmin-height%253A100%2525%253Bmargin%253A0%253Bpadding%253A0%257Dcanvas%257Bpadding%253A0%253Bmargin%253Aauto%253Bdisplay%253Ablock%253Bposition%253Aabsolute%253Btop%253A0%253Bbottom%253A0%253Bleft%253A0%253Bright%253A0%257D";
+    //     headTags[0].tagClose = "%253C%252Fstyle%253E";
 
-        // Gunzip unzips all the other scripts into the page
-        HTMLTag[] memory bodyTags = new HTMLTag[](10);
-        bodyTags[0].name = "gunzipScripts-0.0.1.js";
-        // <script src="data:text/javascript;base64,[script]"></script>
-        bodyTags[0].tagType = HTMLTagType.scriptBase64DataURI;
-        bodyTags[0].contractAddress = ethfsFileStorageAddress;
+    //     // Gunzip unzips all the other scripts into the page
+    //     HTMLTag[] memory bodyTags = new HTMLTag[](10);
+    //     bodyTags[0].name = "gunzipScripts-0.0.1.js";
+    //     // <script src="data:text/javascript;base64,[script]"></script>
+    //     bodyTags[0].tagType = HTMLTagType.scriptBase64DataURI;
+    //     bodyTags[0].contractAddress = ethfsFileStorageAddress;
 
-        // Helps dynamically load ES modules
-        bodyTags[1].name = "es-module-shims.js.Base64.gz";
-        // <script type="text/javascript+gzip" src="data:text/javascript;base64,[script]"></script>
-        bodyTags[1].tagType = HTMLTagType.scriptGZIPBase64DataURI;
-        bodyTags[1].contractAddress = ethfsFileStorageAddress;
+    //     // Helps dynamically load ES modules
+    //     bodyTags[1].name = "es-module-shims.js.Base64.gz";
+    //     // <script type="text/javascript+gzip" src="data:text/javascript;base64,[script]"></script>
+    //     bodyTags[1].tagType = HTMLTagType.scriptGZIPBase64DataURI;
+    //     bodyTags[1].contractAddress = ethfsFileStorageAddress;
 
-        // fflate is a zip/gzip library for JavaScript
-        bodyTags[2].name = "fflate.module.js.Base64.gz";
-        // double encoded:
-        // - <script>var fflte = "
-        // - "</script>
-        bodyTags[2]
-            .tagOpen = "%253Cscript%253Evar%2520fflte%2520%253D%2520%2522";
-        bodyTags[2].tagClose = "%2522%253C%252Fscript%253E";
-        bodyTags[2].contractAddress = ethfsFileStorageAddress;
+    //     // fflate is a zip/gzip library for JavaScript
+    //     bodyTags[2].name = "fflate.module.js.Base64.gz";
+    //     // double encoded:
+    //     // - <script>var fflte = "
+    //     // - "</script>
+    //     bodyTags[2]
+    //         .tagOpen = "%253Cscript%253Evar%2520fflte%2520%253D%2520%2522";
+    //     bodyTags[2].tagClose = "%2522%253C%252Fscript%253E";
+    //     bodyTags[2].contractAddress = ethfsFileStorageAddress;
 
-         // Three.js is a 3D library for JavaScript
-        bodyTags[3].name = "three-v0.162.0-module.min.js.Base64.gz";
-        // double encoded:
-        // - <script>var t3 = "
-        // - "</script>
-        bodyTags[3].tagOpen = "%253Cscript%253Evar%2520t3%2520%253D%2520%2522";
-        bodyTags[3].tagClose = "%2522%253C%252Fscript%253E";
-        bodyTags[3].contractAddress = ethfsFileStorageAddress;
+    //      // Three.js is a 3D library for JavaScript
+    //     bodyTags[3].name = "three-v0.162.0-module.min.js.Base64.gz";
+    //     // double encoded:
+    //     // - <script>var t3 = "
+    //     // - "</script>
+    //     bodyTags[3].tagOpen = "%253Cscript%253Evar%2520t3%2520%253D%2520%2522";
+    //     bodyTags[3].tagClose = "%2522%253C%252Fscript%253E";
+    //     bodyTags[3].contractAddress = ethfsFileStorageAddress;
 
-        // OrbitControls is a camera control library for Three.js
-        bodyTags[4].name = "three-v0.162.0-OrbitControls.js.Base64.gz";
-        // double encoded:
-        // - <script>var oc = "
-        // - "</script>
-        bodyTags[4].tagOpen = "%253Cscript%253Evar%2520oc%2520%253D%2520%2522";
-        bodyTags[4].tagClose = "%2522%253C%252Fscript%253E";
-        bodyTags[4].contractAddress = ethfsFileStorageAddress;
+    //     // OrbitControls is a camera control library for Three.js
+    //     bodyTags[4].name = "three-v0.162.0-OrbitControls.js.Base64.gz";
+    //     // double encoded:
+    //     // - <script>var oc = "
+    //     // - "</script>
+    //     bodyTags[4].tagOpen = "%253Cscript%253Evar%2520oc%2520%253D%2520%2522";
+    //     bodyTags[4].tagClose = "%2522%253C%252Fscript%253E";
+    //     bodyTags[4].contractAddress = ethfsFileStorageAddress;
 
-        // Import handler for dynamically loading ES modules
-        bodyTags[5].name = "importHandler.js";
-        bodyTags[5].tagType = HTMLTagType.scriptBase64DataURI;
-        bodyTags[5].contractAddress = ethfsFileStorageAddress;
+    //     // Import handler for dynamically loading ES modules
+    //     bodyTags[5].name = "importHandler.js";
+    //     bodyTags[5].tagType = HTMLTagType.scriptBase64DataURI;
+    //     bodyTags[5].contractAddress = ethfsFileStorageAddress;
 
-        bodyTags[6].name = "";
-        // <script>[script]</script>
-        bodyTags[6].tagType = HTMLTagType.script;
-        bodyTags[6]
-            .tagContent = 'injectImportMap([ ["fflate",fflte],   ["three",t3], ["OrbitControls",oc] ],gunzipScripts)';
+    //     bodyTags[6].name = "";
+    //     // <script>[script]</script>
+    //     bodyTags[6].tagType = HTMLTagType.script;
+    //     bodyTags[6]
+    //         .tagContent = 'injectImportMap([ ["fflate",fflte],   ["three",t3], ["OrbitControls",oc] ],gunzipScripts)';
 
-        bodyTags[7].name = "canvas";
-        bodyTags[7].tagOpen = '%253Ccanvas%2520id%253D%2522theCanvas%2522%2520class%253D%2522webgl%2522%253E';
-        bodyTags[7].tagClose = "%253C%252Fcanvas%253E";
+    //     bodyTags[7].name = "canvas";
+    //     bodyTags[7].tagOpen = '%253Ccanvas%2520id%253D%2522theCanvas%2522%2520class%253D%2522webgl%2522%253E';
+    //     bodyTags[7].tagClose = "%253C%252Fcanvas%253E";
 
-        // get the zMap and provide it to the script: <script>var zMapFull = '[zMap]';  </script>
-        bodyTags[8].tagOpen = bytes(
-            string.concat(
-                "%253Cscript%253Evar%2520zMapFull%2520%253D%2527",
-                  encodeURIContract.encodeURI(
-                    encodeURIContract.encodeURI(string(fullZmap))
-                )
-            )
-        );
-        bodyTags[8].tagClose = "%2527%253B%253C%252Fscript%253E";
+    //     // get the zMap and provide it to the script: <script>var zMapFull = '[zMap]';  </script>
+    //     bodyTags[8].tagOpen = bytes(
+    //         string.concat(
+    //             "%253Cscript%253Evar%2520zMapFull%2520%253D%2527",
+    //               encodeURIContract.encodeURI(
+    //                 encodeURIContract.encodeURI(string(fullZmap))
+    //             )
+    //         )
+    //     );
+    //     bodyTags[8].tagClose = "%2527%253B%253C%252Fscript%253E";
 
-        // output the three.js script
-        bodyTags[9]
-            .tagOpen = "%253Cscript%2520type%253D%2522module%2522%2520src%253D%2522data%253Atext%252Fjavascript%253Bbase64%252C";
-        bodyTags[9].tagContent = base64ScriptContent;
-        bodyTags[9].tagClose = "%2522%253E%253C%252Fscript%253E";
+    //     // output the three.js script
+    //     bodyTags[9]
+    //         .tagOpen = "%253Cscript%2520type%253D%2522module%2522%2520src%253D%2522data%253Atext%252Fjavascript%253Bbase64%252C";
+    //     bodyTags[9].tagContent = base64ScriptContent;
+    //     bodyTags[9].tagClose = "%2522%253E%253C%252Fscript%253E";
 
-        // create scripty htmlRequest
-        HTMLRequest memory htmlRequest;
-        htmlRequest.headTags = headTags;
-        htmlRequest.bodyTags = bodyTags;
+    //     // create scripty htmlRequest
+    //     HTMLRequest memory htmlRequest;
+    //     htmlRequest.headTags = headTags;
+    //     htmlRequest.bodyTags = bodyTags;
 
-        // this combines everything into a single output for animation_url
-        bytes memory doubleURLEncodedHTMLDataURI = IScriptyBuilderV2(
-            scriptyBuilderAddress
-        ).getHTMLURLSafe(htmlRequest);
+    //     // this combines everything into a single output for animation_url
+    //     bytes memory doubleURLEncodedHTMLDataURI = IScriptyBuilderV2(
+    //         scriptyBuilderAddress
+    //     ).getHTMLURLSafe(htmlRequest);
 
-        return
-            string(
-                abi.encodePacked(
-                    "data:application/json,",
-                    encodeURIContract.encodeURI('{"name":"Peter #'),
-                    Utils.toString(_tokenId),
-                    encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
-                    encodeURIContract.encodeURI(fullAttributes),
-                    encodeURIContract.encodeURI(',"animation_url":"'),
-                    doubleURLEncodedHTMLDataURI,
-                    encodeURIContract.encodeURI('"}')
-                )
-            );
-    }
+    //     return
+    //         string(
+    //             abi.encodePacked(
+    //                 "data:application/json,",
+    //                 encodeURIContract.encodeURI('{"name":"Peter #'),
+    //                 Utils.toString(_tokenId),
+    //                 encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
+    //                 encodeURIContract.encodeURI(fullAttributes),
+    //                 encodeURIContract.encodeURI(',"animation_url":"'),
+    //                 doubleURLEncodedHTMLDataURI,
+    //                 encodeURIContract.encodeURI('"}')
+    //             )
+    //         );
+    // }
 
     function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
         address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
@@ -613,7 +615,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
 
         backpackSVGs = string.concat(
-            backpackSVGs, 
+            backpackSVGs,
             '</g>',
             '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
         );
@@ -654,7 +656,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // Utils.encode(bytes(combinedHTML)),
             '"'
         );
-        
+
          fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
 
 
@@ -694,7 +696,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
-        return (_renderZ) ? renderAsDataUriZ(_tokenId) : renderAsDataUriSVG(_tokenId);
+        // return (_renderZ) ? renderAsDataUriZ(_tokenId) : renderAsDataUriSVG(_tokenId);
+        return renderAsDataUriSVG(_tokenId);
     }
 
     /// Getters
