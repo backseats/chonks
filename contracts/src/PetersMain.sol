@@ -657,8 +657,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             '"'
         );
 
-         fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
-
+        if (bytes(traitsAttributes).length > 0) {
+            fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
+        } else {
+            fullAttributes = string.concat('"attributes":[', bodyAttributes, ']');
+        }
 
         // TODO: get animation_url back in there
         // string memory combinedHTML = string.concat(
