@@ -59,7 +59,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     // NOTE: This maybe too simplistic but it's okay to start with
     mapping (address => bool) public isMinter;
 
-    bool _localDeploy = true; // DEPLOY: remove
+    bool _localDeploy = false; // DEPLOY: remove
 
     /// Errors
 

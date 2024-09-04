@@ -37,7 +37,7 @@ import "forge-std/console.sol"; // DEPLOY: remove
 // TODO: withdraw or send us the ETH per each txn
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906 {
 
-    bool _localDeploy = true; // DEPLOY: remove
+    bool _localDeploy = false; // DEPLOY: remove
     bool _renderZ = false; // temp flag control 2d or 3d output // DEPLOY: remove
 
     // Encodes plain text as a URI-encoded string
@@ -80,7 +80,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // string constant SVG_BG_MAIN_END = '</g>';
     string constant SVG_G_ENDS = '</g></g></g>';
     string constant SVG_TOGGLE = '<rect id="toggleMain" class="button" x="25" y="0" width="5" height="5" /><rect id="toggleBackpack" class="button" x="0" y="0" width="5" height="5" />';
-    string constant SVG_TOGGLE_SCRIPT = '<script>const mainGroup = document.getElementById("main"); const backpackGroup = document.getElementById("backpack"); const backpackTraits = document.getElementById("backpackTraits"); const leftBtn = document.getElementById("leftBtn"); const rightBtn = document.getElementById("rightBtn"); let curScreen = 0; const numScreens = Math.ceil(numTraits / maxTraitsPerScreen); if (numTraits <= maxTraitsPerScreen) { leftBtn.style.display = "none"; rightBtn.style.display = "none"; } else { leftBtn.style.opacity = 0.1; } leftBtn.onclick = () => { if (curScreen === 0) return; curScreen--; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; rightBtn.style.opacity = 1; if (curScreen === 0) { leftBtn.style.opacity = 0.1; } };  rightBtn.onclick = () => { if (curScreen >= numScreens - 1) return; curScreen++; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; leftBtn.style.opacity = 1; if (curScreen >= numScreens - 1) { rightBtn.style.opacity = 0.1; } }; document.getElementById("toggleMain").onclick = () => {  mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); }; document.getElementById("toggleBackpack").onclick = () => {  backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed"); if (mainGroup.classList.contains("on")) { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); } };  </script>';
+    string constant SVG_TOGGLE_SCRIPT = '<script><![CDATA[ const mainGroup = document.getElementById("main"); const backpackGroup = document.getElementById("backpack"); const backpackTraits = document.getElementById("backpackTraits"); const leftBtn = document.getElementById("leftBtn"); const rightBtn = document.getElementById("rightBtn"); let curScreen = 0; const numScreens = Math.ceil(numTraits / maxTraitsPerScreen); if (numTraits <= maxTraitsPerScreen) { leftBtn.style.display = "none"; rightBtn.style.display = "none"; } else { leftBtn.style.opacity = 0.1; } leftBtn.onclick = () => { if (curScreen === 0) return; curScreen--; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; rightBtn.style.opacity = 1; if (curScreen === 0) { leftBtn.style.opacity = 0.1; } };  rightBtn.onclick = () => { if (curScreen >= numScreens - 1) return; curScreen++; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; leftBtn.style.opacity = 1; if (curScreen >= numScreens - 1) { rightBtn.style.opacity = 0.1; } }; document.getElementById("toggleMain").onclick = () => {  mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); }; document.getElementById("toggleBackpack").onclick = () => {  backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed"); if (mainGroup.classList.contains("on")) { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); } };  ]]></script>';
 
     string constant SVG_END = '</svg> ';
 
@@ -125,6 +125,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         tokenIdToTBAAccountAddress[tokenId] = uint160(tokenBoundAccountAddress);
 
+        console.logAddress(tokenBoundAccountAddress);
+        
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
