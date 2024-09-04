@@ -39,6 +39,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     string private constant SVG_START = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><style>rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} </style><rect class="bg" fill="#0D6E9D"/>';
 
+    // TODO: replace with hex?
     string private constant BODY_001 = '<g id="Body 001"><path fill="#EFB15E" d="M11 23h1v1h-1zM12 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM11 18h1v1h-1z"/><path fill="#D69743" d="M12 18h1v1h-1z"/><path fill="#EFB15E" d="M14 18h1v1h-1zM15 18h1v1h-1z"/><path fill="#D69743" d="M16 18h1v1h-1z"/><path fill="#EFB15E" d="M11 19h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 17h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1z"/><path fill="#D69743" d="M18 19h1v1h-1zM18 20h1v1h-1z"/><path fill="#EFB15E" d="M19 19h1v1h-1zM19 20h1v1h-1zM10 17h1v1h-1zM9 18h1v1H9zM9 19h1v1H9zM9 20h1v1H9z"/><path fill="#D69743" d="M10 19h1v1h-1zM10 20h1v1h-1z"/><path fill="#EFB15E" d="M10 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1z"/><path fill="#D69743" d="M11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1z"/><path fill="#EFB15E" d="M15 15h1v1h-1zM16 15h1v1h-1zM11 9h1v1h-1zM14 12h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM12 14h1v1h-1zM19 13h1v1h-1zM19 12h1v1h-1z"/><path fill="#D69743" d="M9 12h1v1H9zM9 13h1v1H9z"/><path fill="#000" d="M18 12h1v1h-1zM18 13h1v1h-1z"/><path fill="#fff" d="M17 13h1v1h-1zM17 12h1v1h-1z"/><path fill="#000" d="M13 12h1v1h-1z"/><path fill="#fff" d="M12 12h1v1h-1zM12 13h1v1h-1z"/><path fill="#000" d="M13 13h1v1h-1z"/><path fill="#D69743" d="M15 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1z"/></g>';
 
     uint8 private constant INITIAL_TRAIT_NUMBER = 5;
@@ -254,9 +255,9 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         return traitTokens.epoch;
     }
 
-    function getGhostSVG() public pure returns (string memory svg) {
+    function getGhostSVG() public pure returns (string memory) {
         // TODO: PRNG here for different bodies perhaps
-        svg = string.concat(
+        return string.concat(
             '<g class="g" style="opacity: 25%;">',
             BODY_001,
             '</g>'
@@ -330,7 +331,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
             //traitSvg = string.concat(bodyGhostSvg, metadata.traitPath);
 
             traitSvg = string.concat(bodyGhostSvg, getTraitImageSvg(trait.traitIndex));
-
         } else {
             traitSvg = '<svg></svg>';
         }
@@ -424,7 +424,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     // returns traitSvg and traitAttributes
     function getSvgAndMetadataTrait(StoredTrait memory trait, uint256 traitId) public view returns(string memory traitSvg, string memory traitAttributes ) {
-
         if (trait.isRevealed && traitId > 0) {
             TraitMetadata storage metadata = traitIndexToMetadata[trait.traitIndex];
 
@@ -446,22 +445,21 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         }
     }
 
-    function getZmapAndMetadataTrait(StoredTrait memory trait, uint256 traitId) public view returns(bytes memory traitZmap, string memory traitAttributes ) {
+    // function getZmapAndMetadataTrait(StoredTrait memory trait, uint256 traitId) public view returns(bytes memory traitZmap, string memory traitAttributes ) {
+    //     if (trait.isRevealed && traitId > 0) {
+    //         TraitMetadata storage metadata = traitIndexToMetadata[trait.traitIndex];
 
-        if (trait.isRevealed && traitId > 0) {
-            TraitMetadata storage metadata = traitIndexToMetadata[trait.traitIndex];
+    //         traitAttributes = RenderHelper.stringTrait(
+    //             TraitCategory.toString(metadata.traitType),
+    //             metadata.traitName
+    //         );
 
-            traitAttributes = RenderHelper.stringTrait(
-                TraitCategory.toString(metadata.traitType),
-                metadata.traitName
-            );
-
-            traitZmap = traitIndexToMetadata[trait.traitIndex].zMap;
-        } else {
-            traitAttributes = '{}';
-            traitZmap = '';
-        }
-    }
+    //         traitZmap = traitIndexToMetadata[trait.traitIndex].zMap;
+    //     } else {
+    //         traitAttributes = '{}';
+    //         traitZmap = '';
+    //     }
+    // }
 
     // called from PeterMain renderAsDataUriSVG()
     function getSvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view
@@ -630,183 +628,183 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         }
     }
 
-    function getZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (bytes memory traitZMaps, string memory traitsAttributes) {
-        string memory traitAttribute;
-        bytes memory traitZmap;
+    // function getZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (bytes memory traitZMaps, string memory traitsAttributes) {
+    //     string memory traitAttribute;
+    //     bytes memory traitZmap;
 
-        if (!storedPeter.isRevealed) return ("","{}");
+    //     if (!storedPeter.isRevealed) return ("","{}");
 
-        // hat
-        // hair
-        // glasses
-        // handheld
-        // shirt
-        // pants
-        // shoes
+    //     // hat
+    //     // hair
+    //     // glasses
+    //     // handheld
+    //     // shirt
+    //     // pants
+    //     // shoes
 
-        // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
+    //     // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
 
-        if (storedPeter.hatId > 0) {
-            StoredTrait memory storedTrait = getTrait(storedPeter.hatId);
+    //     if (storedPeter.hatId > 0) {
+    //         StoredTrait memory storedTrait = getTrait(storedPeter.hatId);
 
-            (traitZmap, traitAttribute) = getZmapAndMetadataTrait(storedTrait, storedPeter.hatId);
+    //         (traitZmap, traitAttribute) = getZmapAndMetadataTrait(storedTrait, storedPeter.hatId);
 
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
-        }
+    //         if (bytes(traitsAttributes).length == 0) {
+    //             traitsAttributes = traitAttribute;
+    //             traitZMaps = traitZmap;
+    //         } else {
+    //             traitsAttributes = string.concat(
+    //                 traitsAttributes,
+    //                 ',',
+    //                 traitAttribute
+    //             );
+    //             traitZMaps = bytes.concat(
+    //                 traitZMaps,
+    //                 traitZmap
+    //             );
+    //         }
+    //     }
 
-        if (storedPeter.hairId > 0) {
-            StoredTrait memory storedTrait = getTrait(storedPeter.hairId);
+    //     if (storedPeter.hairId > 0) {
+    //         StoredTrait memory storedTrait = getTrait(storedPeter.hairId);
 
-            (traitZmap, traitAttribute) = getZmapAndMetadataTrait(storedTrait, storedPeter.hairId);
+    //         (traitZmap, traitAttribute) = getZmapAndMetadataTrait(storedTrait, storedPeter.hairId);
 
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
-        }
+    //         if (bytes(traitsAttributes).length == 0) {
+    //             traitsAttributes = traitAttribute;
+    //             traitZMaps = traitZmap;
+    //         } else {
+    //             traitsAttributes = string.concat(
+    //                 traitsAttributes,
+    //                 ',',
+    //                 traitAttribute
+    //             );
+    //             traitZMaps = bytes.concat(
+    //                 traitZMaps,
+    //                 traitZmap
+    //             );
+    //         }
+    //     }
 
-        if (storedPeter.shoesId > 0) {
-            StoredTrait memory storedTrait = getTrait(storedPeter.shoesId);
+    //     if (storedPeter.shoesId > 0) {
+    //         StoredTrait memory storedTrait = getTrait(storedPeter.shoesId);
 
-            (traitZmap, traitAttribute) = getZmapAndMetadataTrait(storedTrait, storedPeter.shoesId);
+    //         (traitZmap, traitAttribute) = getZmapAndMetadataTrait(storedTrait, storedPeter.shoesId);
 
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
-        }
+    //         if (bytes(traitsAttributes).length == 0) {
+    //             traitsAttributes = traitAttribute;
+    //             traitZMaps = traitZmap;
+    //         } else {
+    //             traitsAttributes = string.concat(
+    //                 traitsAttributes,
+    //                 ',',
+    //                 traitAttribute
+    //             );
+    //             traitZMaps = bytes.concat(
+    //                 traitZMaps,
+    //                 traitZmap
+    //             );
+    //         }
+    //     }
 
-        if (storedPeter.pantsId > 0) {
-            StoredTrait memory storedTrait = getTrait(storedPeter.pantsId);
+    //     if (storedPeter.pantsId > 0) {
+    //         StoredTrait memory storedTrait = getTrait(storedPeter.pantsId);
 
-            (traitZmap, traitAttribute) = getZmapAndMetadataTrait(storedTrait, storedPeter.pantsId);
+    //         (traitZmap, traitAttribute) = getZmapAndMetadataTrait(storedTrait, storedPeter.pantsId);
 
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
-        }
+    //         if (bytes(traitsAttributes).length == 0) {
+    //             traitsAttributes = traitAttribute;
+    //             traitZMaps = traitZmap;
+    //         } else {
+    //             traitsAttributes = string.concat(
+    //                 traitsAttributes,
+    //                 ',',
+    //                 traitAttribute
+    //             );
+    //             traitZMaps = bytes.concat(
+    //                 traitZMaps,
+    //                 traitZmap
+    //             );
+    //         }
+    //     }
 
-        if (storedPeter.shirtId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory shirtTrait = getTrait(storedPeter.shirtId);
+    //     if (storedPeter.shirtId > 0) {
+    //         // Trait memory hairTrait = getTrait(storedPeter.hairId);
+    //         StoredTrait memory shirtTrait = getTrait(storedPeter.shirtId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[shirtTrait.traitIndex].zMap
-            );
-        }
-    }
+    //         traitZMaps = bytes.concat(
+    //             traitZMaps,
+    //             traitIndexToMetadata[shirtTrait.traitIndex].zMap
+    //         );
+    //     }
+    // }
 
     // called from PeterMain renderAsDataUriZ()
     // a lot of overlap with getSvgAndMetadata so can look to consolidate
-    function getTraitZMaps(IPeterStorage.StoredPeter memory storedPeter) public view returns (bytes memory traitZMaps) {
+    // function getTraitZMaps(IPeterStorage.StoredPeter memory storedPeter) public view returns (bytes memory traitZMaps) {
 
-        if (!storedPeter.isRevealed) return ("");
+    //     if (!storedPeter.isRevealed) return ("");
 
-        // hat
-        // hair
-        // glasses
-        // handheld
-        // shirt
-        // pants
-        // shoes
+    //     // hat
+    //     // hair
+    //     // glasses
+    //     // handheld
+    //     // shirt
+    //     // pants
+    //     // shoes
 
-        // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
+    //     // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
 
-        if (storedPeter.hatId > 0) {
-            // Trait memory hatTrait = getTrait(storedPeter.hatId);
-            StoredTrait memory hatTrait = getTrait(storedPeter.hatId);
+    //     if (storedPeter.hatId > 0) {
+    //         // Trait memory hatTrait = getTrait(storedPeter.hatId);
+    //         StoredTrait memory hatTrait = getTrait(storedPeter.hatId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[hatTrait.traitIndex].zMap
-            );
-        }
+    //         traitZMaps = bytes.concat(
+    //             traitZMaps,
+    //             traitIndexToMetadata[hatTrait.traitIndex].zMap
+    //         );
+    //     }
 
-        if (storedPeter.hairId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory hairTrait = getTrait(storedPeter.hairId);
+    //     if (storedPeter.hairId > 0) {
+    //         // Trait memory hairTrait = getTrait(storedPeter.hairId);
+    //         StoredTrait memory hairTrait = getTrait(storedPeter.hairId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[hairTrait.traitIndex].zMap
-            );
-        }
+    //         traitZMaps = bytes.concat(
+    //             traitZMaps,
+    //             traitIndexToMetadata[hairTrait.traitIndex].zMap
+    //         );
+    //     }
 
-        if (storedPeter.shoesId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory shoesTrait = getTrait(storedPeter.shoesId);
+    //     if (storedPeter.shoesId > 0) {
+    //         // Trait memory hairTrait = getTrait(storedPeter.hairId);
+    //         StoredTrait memory shoesTrait = getTrait(storedPeter.shoesId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[shoesTrait.traitIndex].zMap
-            );
-        }
+    //         traitZMaps = bytes.concat(
+    //             traitZMaps,
+    //             traitIndexToMetadata[shoesTrait.traitIndex].zMap
+    //         );
+    //     }
 
-        if (storedPeter.pantsId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory pantsTrait = getTrait(storedPeter.pantsId);
+    //     if (storedPeter.pantsId > 0) {
+    //         // Trait memory hairTrait = getTrait(storedPeter.hairId);
+    //         StoredTrait memory pantsTrait = getTrait(storedPeter.pantsId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[pantsTrait.traitIndex].zMap
-            );
-        }
+    //         traitZMaps = bytes.concat(
+    //             traitZMaps,
+    //             traitIndexToMetadata[pantsTrait.traitIndex].zMap
+    //         );
+    //     }
 
-        if (storedPeter.shirtId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory shirtTrait = getTrait(storedPeter.shirtId);
+    //     if (storedPeter.shirtId > 0) {
+    //         // Trait memory hairTrait = getTrait(storedPeter.hairId);
+    //         StoredTrait memory shirtTrait = getTrait(storedPeter.shirtId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[shirtTrait.traitIndex].zMap
-            );
-        }
-    }
+    //         traitZMaps = bytes.concat(
+    //             traitZMaps,
+    //             traitIndexToMetadata[shirtTrait.traitIndex].zMap
+    //         );
+    //     }
+    // }
 
     function walletOfOwner(address _owner) public view returns(uint256[] memory) {
         uint256 tokenCount = balanceOf(_owner);
@@ -821,17 +819,17 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     // OnlyOwner
 
-    function addMinter(address _minter) public onlyOwner {
-        isMinter[_minter] = true;
-    }
-
-    function removeMinter(address _minter) public onlyOwner {
-        isMinter[_minter] = false;
-    }
-
-    // function setBodyRenderer(BodyRenderer _bodyRenderer) public onlyOwner {
-    //     bodyRenderer = _bodyRenderer;
+    // function addMinter(address _minter) public onlyOwner {
+    //     isMinter[_minter] = true;
     // }
+
+    // function removeMinter(address _minter) public onlyOwner {
+    //     isMinter[_minter] = false;
+    // }
+
+    function setBodyRenderer(BodyRenderer _bodyRenderer) public onlyOwner {
+        bodyRenderer = _bodyRenderer;
+    }
 
     // TODO: PUT BACK IN
     /*
@@ -851,7 +849,8 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         return super.supportsInterface(interfaceId);
     }
 
-    function onERC721Received(address, address, uint256, bytes calldata) pure external returns (bytes4) { // DEPLOY: remove/just for testing
+    // DEPLOY: remove/just for testing
+    function onERC721Received(address, address, uint256, bytes calldata) pure external returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
     }
 

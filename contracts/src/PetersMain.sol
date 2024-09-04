@@ -80,7 +80,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // string constant SVG_BG_MAIN_END = '</g>';
     string constant SVG_G_ENDS = '</g></g></g>';
     string constant SVG_TOGGLE = '<rect id="toggleMain" class="button" x="25" y="0" width="5" height="5" /><rect id="toggleBackpack" class="button" x="0" y="0" width="5" height="5" />';
-    string constant SVG_TOGGLE_SCRIPT = '<script>const mainGroup = document.getElementById("main"); const backpackGroup = document.getElementById("backpack"); const backpackTraits = document.getElementById("backpackTraits"); const leftBtn = document.getElementById("leftBtn"); const rightBtn = document.getElementById("rightBtn"); let curScreen = 0; const numScreens = Math.ceil(numTraits / maxTraitsPerScreen); if (numTraits <= maxTraitsPerScreen) { leftBtn.style.display = "none"; rightBtn.style.display = "none"; } else { leftBtn.style.opacity = 0.1; } leftBtn.onclick = () => { if (curScreen === 0) return; curScreen--; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; rightBtn.style.opacity = 1; if (curScreen === 0) { leftBtn.style.opacity = 0.1; } };  rightBtn.onclick = () => { if (curScreen >= numScreens - 1) return; curScreen++; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; leftBtn.style.opacity = 1; if (curScreen >= numScreens - 1) { rightBtn.style.opacity = 0.1; } }; document.getElementById("toggleMain").onclick = () => {  mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off");   }; document.getElementById("toggleBackpack").onclick = () => {  backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed"); if (mainGroup.classList.contains("on")) { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); } };  </script>';
+    string constant SVG_TOGGLE_SCRIPT = '<script>const mainGroup = document.getElementById("main"); const backpackGroup = document.getElementById("backpack"); const backpackTraits = document.getElementById("backpackTraits"); const leftBtn = document.getElementById("leftBtn"); const rightBtn = document.getElementById("rightBtn"); let curScreen = 0; const numScreens = Math.ceil(numTraits / maxTraitsPerScreen); if (numTraits <= maxTraitsPerScreen) { leftBtn.style.display = "none"; rightBtn.style.display = "none"; } else { leftBtn.style.opacity = 0.1; } leftBtn.onclick = () => { if (curScreen === 0) return; curScreen--; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; rightBtn.style.opacity = 1; if (curScreen === 0) { leftBtn.style.opacity = 0.1; } };  rightBtn.onclick = () => { if (curScreen >= numScreens - 1) return; curScreen++; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; leftBtn.style.opacity = 1; if (curScreen >= numScreens - 1) { rightBtn.style.opacity = 0.1; } }; document.getElementById("toggleMain").onclick = () => {  mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); }; document.getElementById("toggleBackpack").onclick = () => {  backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed"); if (mainGroup.classList.contains("on")) { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); } };  </script>';
 
     string constant SVG_END = '</svg> ';
 
@@ -107,7 +107,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function mint() public payable { // TODO amount, check price
-        // if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
+        if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
 
         resolveEpochIfNecessary();
 
@@ -118,7 +118,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         address tokenBoundAccountAddress = REGISTRY.createAccount(
             ACCOUNT_PROXY,
             0,
-            1337, // 31337 for local deployment // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia
+            84532, // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia
             address(this),
             tokenId
         );
@@ -128,21 +128,21 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
-        // uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress);
+        uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress);
 
         // Initialize our Peter
-        // StoredPeter storage peter = peterTokens.all[tokenId];
+        StoredPeter storage peter = peterTokens.all[tokenId];
 
-        // peter.epoch = uint32(peterTokens.epoch);
-        // // peter.seed = uint16(tokenId);
-        // peter.tokenId = uint16(tokenId);
-        // peter.shirtId = traitsIds[0]; // shirtId is a trait contract token id
-        // peter.pantsId = traitsIds[1]; // same with pants id
-        // peter.shoesId = traitsIds[2]; // same with shoes id
-        // peter.hairId =  traitsIds[3]; // same with hair id
-        // peter.hatId =  traitsIds[4]; // same with hat id
+        peter.epoch = uint32(peterTokens.epoch);
+        peter.seed = uint16(tokenId);
+        peter.tokenId = uint16(tokenId);
+        peter.shirtId = traitsIds[0]; // shirtId is a trait contract token id
+        peter.pantsId = traitsIds[1]; // same with pants id
+        peter.shoesId = traitsIds[2]; // same with shoes id
+        peter.hairId =  traitsIds[3]; // same with hair id
+        peter.hatId =  traitsIds[4]; // same with hat id
 
-        console.log("minted bodyd tokenId:", tokenId);
+        console.log("minted body tokenId:", tokenId);
     }
 
     /// @notice Initializes and closes epochs. Thank you jalil & mouseDev.
@@ -362,7 +362,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         bytes memory pixels = new bytes(30 * 30 * 5); // 30x30 grid with 5 bytes per pixel
         uint256 pixelCount = length / 5;
 
-        for (uint256 i = 0; i < pixelCount; i++) {
+        for (uint256 i; i < pixelCount; ++i) {
             uint256 offset = i * 5;
 
             uint8 x = uint8(colorMap[offset]);
@@ -652,7 +652,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         string memory image = string.concat(
             '"image":"data:image/svg+xml;base64,',
-            Utils.encode(bytes(  string.concat(fullSvg, SVG_END) )),
+            Utils.encode(bytes(string.concat(fullSvg, SVG_END) )),
             // Utils.encode(bytes(combinedHTML)),
             '"'
         );
@@ -742,6 +742,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         metadata.colorMap = _colorMap;
         metadata.zMap = _zMap;
     }
+
+    // Setters
 
     function setPrice(uint256 _priceInWei) public onlyOwner {
         price = _priceInWei;
