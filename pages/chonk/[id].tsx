@@ -94,25 +94,27 @@ export default function ChonkDetail({ id }: { id: string }) {
   useEffect(() => {
     if (!equipment) return;
 
-    setCurrentChonk({
-      tokenId: parseInt(id),
-      shirt: {
-        tokenId:
-          equipment.stored.shirtId === 0n
-            ? null
-            : parseInt(equipment.stored.shirtId.toString()),
-        category: Category.Shirt,
-        isEquipped: equipment.stored.shirtId !== 0n,
-      },
-      pants: {
-        tokenId:
-          equipment.stored.pantsId === 0n
-            ? null
-            : parseInt(equipment.stored.pantsId.toString()),
-        category: Category.Pants,
-        isEquipped: equipment.stored.pantsId !== 0n,
-      },
-    });
+    console.log("equipment", equipment);
+
+    // setCurrentChonk({
+    //   tokenId: parseInt(id),
+    //   shirt: {
+    //     tokenId:
+    //       equipment.stored.shirtId === 0n
+    //         ? null
+    //         : parseInt(equipment.stored.shirtId.toString()),
+    //     category: Category.Shirt,
+    //     isEquipped: equipment.stored.shirtId !== 0n,
+    //   },
+    //   pants: {
+    //     tokenId:
+    //       equipment.stored.pantsId === 0n
+    //         ? null
+    //         : parseInt(equipment.stored.pantsId.toString()),
+    //     category: Category.Pants,
+    //     isEquipped: equipment.stored.pantsId !== 0n,
+    //   },
+    // });
   }, [equipment]);
 
   const account = tokenboundClient.getAccount({
@@ -129,31 +131,31 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId: baseSepolia.id,
   }) as { data: BigInt[] };
 
-  useEffect(() => {
-    if (!equipment) return;
+  // useEffect(() => {
+  // if (!equipment) return;
 
-    const shirtIdIndex =
-      // @ts-ignore
-      equipment.stored.shirtId === 0n
-        ? null
-        : traitTokenIds.findIndex(
-            (tokenId) => tokenId === equipment.stored.shirtId
-          );
+  // const shirtIdIndex =
+  //   // @ts-ignore
+  //   equipment.stored.shirtId === 0n
+  //     ? null
+  //     : traitTokenIds.findIndex(
+  //         (tokenId) => tokenId === equipment.stored.shirtId
+  //       );
 
-    const pantsIdIndex =
-      // @ts-ignore
-      equipment.stored.pantsId === 0n
-        ? null
-        : traitTokenIds.findIndex(
-            (tokenId) => tokenId === equipment.stored.pantsId
-          );
+  // const pantsIdIndex =
+  //   // @ts-ignore
+  //   equipment.stored.pantsId === 0n
+  //     ? null
+  //     : traitTokenIds.findIndex(
+  //         (tokenId) => tokenId === equipment.stored.pantsId
+  //       );
 
-    const filteredTraitTokenIds = traitTokenIds.filter((tokenId, index) => {
-      return index !== shirtIdIndex && index !== pantsIdIndex;
-    });
+  // const filteredTraitTokenIds = traitTokenIds.filter((tokenId, index) => {
+  //   return index !== shirtIdIndex && index !== pantsIdIndex;
+  // });
 
-    setFilteredTraitTokenIds(filteredTraitTokenIds);
-  }, [traitTokenIds, equipment]);
+  // setFilteredTraitTokenIds(filteredTraitTokenIds);
+  // }, [traitTokenIds, equipment]);
 
   const handleNavigation = (direction: "prev" | "next") => {
     let newId = direction === "prev" ? parseInt(id) - 1 : parseInt(id) + 1;
