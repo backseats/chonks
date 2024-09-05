@@ -29,7 +29,7 @@ contract PetersMainScript is Script {
         // The value below is any private key you grab from your terminal after running `anvil`
         vm.startBroadcast();
 
-        main = new PetersMain();
+        main = new PetersMain(false);
         console.log("PetersMain Address:", address(main));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(main));
 
@@ -94,9 +94,9 @@ contract FirstSeasonRenderMinterAddTraitsScript is Script {
 
         // uncomment, add address and run
         FirstSeasonRenderMinter fsrm = FirstSeasonRenderMinter(0xa76796F2df0A4D26FaA59178CcF0C9E1419871A5); // insert contract address here
-        
+
         // fsrm.addNewTrait(61, "Red", TraitCategory.Name.Shoes,"", hex"0b17d4001b0c17d4001b1017d4001b1117d4001b","0b1705d4001b0c1705d4001b101705d4001b111705d4001b0b1706d4001b0c1706d4001b101706d4001b111706d4001b");
-        
+
         fsrm.addNewTrait(62, "Green", TraitCategory.Name.Shoes,"", hex"0b172a912f0c172a912f10172a912f11172a912f","0b17052a912f0c17052a912f1017052a912f1117052a912f0b17062a912f0c17062a912f1017062a912f1117062a912f");
         fsrm.addNewTrait(63, "Black", TraitCategory.Name.Shoes,"", hex"0b170000000c1700000010170000001117000000","0b17060000000c17060000001017060000001117060000000b17050000000c1705000000101705000000111705000000");
         fsrm.addNewTrait(64, "Brown", TraitCategory.Name.Shoes,"", hex"0b1759381c0c1759381c101759381c111759381c","0b170559381c0c170559381c10170559381c11170559381c0b170659381c0c170659381c10170659381c11170659381c");

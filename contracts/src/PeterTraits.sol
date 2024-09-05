@@ -4,7 +4,7 @@ pragma solidity ^0.8.22;
 // OpenZeppelin Imports
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol"; // TODO: solady
+import { Ownable } from "solady/auth/Ownable.sol";
 import { Utils } from "./common/Utils.sol";
 
 // Renderers
@@ -74,7 +74,10 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         _;
     }
 
-    constructor() ERC721("PeterTraits", "PTR") {} // DEPLOY: Real name
+    // DEPLOY: Real name
+    constructor() ERC721("PeterTraits", "PTR") {
+        _initializeOwner(msg.sender);
+    }
 
     function getTraitIndexToMetadata(uint256 _traitIndex) public view returns (TraitMetadata memory) {
         return traitIndexToMetadata[_traitIndex];

@@ -20,7 +20,7 @@ contract PetersMainRendererTest is AbstractTest {
     function setUp() public {
         address deployer = vm.addr(1);
         vm.startPrank(deployer);
-        main = new PetersMain();
+        main = new PetersMain(true);
         console.log('peter manager address', address(main));
         addBodyTraits();
 

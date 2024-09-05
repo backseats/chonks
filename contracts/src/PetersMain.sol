@@ -37,7 +37,7 @@ import "forge-std/console.sol"; // DEPLOY: remove
 // TODO: withdraw or send us the ETH per each txn
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906 {
 
-    bool _localDeploy = false; // DEPLOY: remove
+    bool _localDeploy; // DEPLOY: remove
     bool _renderZ = false; // temp flag control 2d or 3d output // DEPLOY: remove
 
     // Encodes plain text as a URI-encoded string
@@ -97,8 +97,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error IncorrectTraitType();
     error PeterDoesntExist();
 
-    constructor() ERC721("Peter Test", "PETER") {
+    constructor(bool localDeploy_) ERC721("Peter Test", "PETER") {
         _initializeOwner(msg.sender);
+        _localDeploy = localDeploy_;
     }
 
     // DEPLOY: Remove
@@ -126,7 +127,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         tokenIdToTBAAccountAddress[tokenId] = uint160(tokenBoundAccountAddress);
 
         console.logAddress(tokenBoundAccountAddress);
-        
+
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
