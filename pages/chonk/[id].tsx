@@ -11,7 +11,7 @@ import {
   traitsAbi,
 } from "@/contract_data";
 import { useRouter } from "next/navigation";
-import { EquipmentStorage } from "@/types/Equipment";
+import { Equipment } from "@/types/Equipment";
 import EquipmentContainer from "@/components/EquipmentContainer";
 import EquippedTrait from "@/components/EquippedTrait";
 import { Category } from "@/types/Category";
@@ -89,32 +89,32 @@ export default function ChonkDetail({ id }: { id: string }) {
     functionName: "getPeter",
     args: [BigInt(id)],
     chainId: baseSepolia.id,
-  }) as { data: EquipmentStorage };
+  }) as { data: Equipment };
 
   useEffect(() => {
     if (!equipment) return;
 
     console.log("equipment", equipment);
 
-    // setCurrentChonk({
-    //   tokenId: parseInt(id),
-    //   shirt: {
-    //     tokenId:
-    //       equipment.stored.shirtId === 0n
-    //         ? null
-    //         : parseInt(equipment.stored.shirtId.toString()),
-    //     category: Category.Shirt,
-    //     isEquipped: equipment.stored.shirtId !== 0n,
-    //   },
-    //   pants: {
-    //     tokenId:
-    //       equipment.stored.pantsId === 0n
-    //         ? null
-    //         : parseInt(equipment.stored.pantsId.toString()),
-    //     category: Category.Pants,
-    //     isEquipped: equipment.stored.pantsId !== 0n,
-    //   },
-    // });
+    setCurrentChonk({
+      tokenId: parseInt(id),
+      shirt: {
+        tokenId:
+          equipment.shirtId === 0n
+            ? null
+            : parseInt(equipment.shirtId.toString()),
+        category: Category.Shirt,
+        isEquipped: equipment.shirtId !== 0n,
+      },
+      pants: {
+        tokenId:
+          equipment.pantsId === 0n
+            ? null
+            : parseInt(equipment.pantsId.toString()),
+        category: Category.Pants,
+        isEquipped: equipment.pantsId !== 0n,
+      },
+    });
   }, [equipment]);
 
   const account = tokenboundClient.getAccount({
@@ -131,31 +131,27 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId: baseSepolia.id,
   }) as { data: BigInt[] };
 
-  // useEffect(() => {
-  // if (!equipment) return;
+  useEffect(() => {
+    if (!equipment) return;
 
-  // const shirtIdIndex =
-  //   // @ts-ignore
-  //   equipment.stored.shirtId === 0n
-  //     ? null
-  //     : traitTokenIds.findIndex(
-  //         (tokenId) => tokenId === equipment.stored.shirtId
-  //       );
+    const shirtIdIndex =
+      // @ts-ignore
+      equipment.shirtId === 0n
+        ? null
+        : traitTokenIds.findIndex((tokenId) => tokenId === equipment.shirtId);
 
-  // const pantsIdIndex =
-  //   // @ts-ignore
-  //   equipment.stored.pantsId === 0n
-  //     ? null
-  //     : traitTokenIds.findIndex(
-  //         (tokenId) => tokenId === equipment.stored.pantsId
-  //       );
+    const pantsIdIndex =
+      // @ts-ignore
+      equipment.pantsId === 0n
+        ? null
+        : traitTokenIds.findIndex((tokenId) => tokenId === equipment.pantsId);
 
-  // const filteredTraitTokenIds = traitTokenIds.filter((tokenId, index) => {
-  //   return index !== shirtIdIndex && index !== pantsIdIndex;
-  // });
+    const filteredTraitTokenIds = traitTokenIds.filter((tokenId, index) => {
+      return index !== shirtIdIndex && index !== pantsIdIndex;
+    });
 
-  // setFilteredTraitTokenIds(filteredTraitTokenIds);
-  // }, [traitTokenIds, equipment]);
+    setFilteredTraitTokenIds(filteredTraitTokenIds);
+  }, [traitTokenIds, equipment]);
 
   const handleNavigation = (direction: "prev" | "next") => {
     let newId = direction === "prev" ? parseInt(id) - 1 : parseInt(id) + 1;
@@ -197,11 +193,11 @@ export default function ChonkDetail({ id }: { id: string }) {
           </div>
 
           <div className="flex flex-row mt-2">
-            {equipment?.stored &&
-              Object.keys(equipment.stored).map((key, index) => {
+            {equipment &&
+              Object.keys(equipment).map((key, index) => {
                 if (key === "epoch" || key === "seed") return null;
 
-                const stored = equipment.stored;
+                const stored = equipment;
 
                 // @ts-ignore
                 if (stored[key] == 0n) return null;
