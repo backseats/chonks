@@ -34,7 +34,7 @@ contract PetersMainRendererTest is AbstractTest {
 
         main.setScriptContent(base64ScriptContent);
 
-        traits = new PeterTraits();
+        traits = new PeterTraits(true);
         main.setTraitsContract(traits);
 
         dataContract = new FirstSeasonRenderMinter(traits);

@@ -59,7 +59,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     // NOTE: This maybe too simplistic but it's okay to start with
     mapping (address => bool) public isMinter;
 
-    bool _localDeploy = false; // DEPLOY: remove
+    bool _localDeploy; // DEPLOY: remove
 
     /// Errors
 
@@ -75,8 +75,9 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     }
 
     // DEPLOY: Real name
-    constructor() ERC721("PeterTraits", "PTR") {
+    constructor(bool localDeploy_) ERC721("PeterTraits", "PTR") {
         _initializeOwner(msg.sender);
+        _localDeploy = localDeploy_;
     }
 
     function getTraitIndexToMetadata(uint256 _traitIndex) public view returns (TraitMetadata memory) {

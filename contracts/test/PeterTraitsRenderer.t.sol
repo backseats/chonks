@@ -15,7 +15,7 @@ contract PeterTraitsRendererTest is AbstractTest {
     FirstSeasonRenderMinter public dataContract;
 
     function setUp() public {
-        peterTraits = new PeterTraits();
+        peterTraits = new PeterTraits(true);
         console.log('peter traits address', address(peterTraits));
 
         bodyRenderer = new BodyRenderer();

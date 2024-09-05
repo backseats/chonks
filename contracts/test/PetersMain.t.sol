@@ -19,7 +19,7 @@ contract PetersMainTest is Test {
     function setUp() public {
         vm.startPrank(address(1));
         main = new PetersMain(false);
-        traits = new PeterTraits();
+        traits = new PeterTraits(false);
         firstSeasonMinter = new FirstSeasonRenderMinter(traits);
         firstSeasonMinter.setMinterStatus(address(main), true);
 
