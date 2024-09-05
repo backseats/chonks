@@ -59,7 +59,7 @@ export default function Trait({
 
   const functionNameString = isEquipped
     ? "unequip" + traitType
-    : "equip" + traitType;
+    : "equip " + traitType;
 
   // TODO: fix this, fails if incorrect peter owner
 

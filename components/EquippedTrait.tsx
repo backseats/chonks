@@ -53,7 +53,7 @@ export default function EquippedTrait({
     }
   }, [traitTypeData]);
 
-  const functionNameString = "unequip" + traitType;
+  const functionNameString = "unequip " + traitType;
 
   return traitData ? (
     <div className="relative w-[200px] h-[200px]">
