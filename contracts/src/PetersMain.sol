@@ -16,6 +16,7 @@ import { IRegistry } from  "./interfaces/TBABoilerplate/IRegistry.sol";
 
 // Renderers
 import { RenderHelper } from "./renderers/RenderHelper.sol";
+import { MainRenderer } from "./renderers/MainRenderer.sol";
 
 // The Traits ERC-721 Contract
 import { PeterTraits } from "./PeterTraits.sol";
@@ -73,21 +74,16 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // scale: 200%; transform: translate(-7px, -5px);
 
     uint256 constant MAX_TRAITS_PER_SCREEN = 20;
-    string constant SVG_START = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">';
-    string constant SVG_STYLE = '<style> #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
-    string constant SVG_BG_MAIN_START = '<rect class="bg" fill="#0D6E9D"/><g id="main" class="off">';
     string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
-    // string constant SVG_BG_MAIN_END = '</g>';
-    string constant SVG_G_ENDS = '</g></g></g>';
-    string constant SVG_TOGGLE = '<rect id="toggleMain" class="button" x="25" y="0" width="5" height="5" /><rect id="toggleBackpack" class="button" x="0" y="0" width="5" height="5" />';
-    string constant SVG_TOGGLE_SCRIPT = '<script><![CDATA[ const mainGroup = document.getElementById("main"); const backpackGroup = document.getElementById("backpack"); const backpackTraits = document.getElementById("backpackTraits"); const leftBtn = document.getElementById("leftBtn"); const rightBtn = document.getElementById("rightBtn"); let curScreen = 0; const numScreens = Math.ceil(numTraits / maxTraitsPerScreen); if (numTraits <= maxTraitsPerScreen) { leftBtn.style.display = "none"; rightBtn.style.display = "none"; } else { leftBtn.style.opacity = 0.1; } leftBtn.onclick = () => { if (curScreen === 0) return; curScreen--; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; rightBtn.style.opacity = 1; if (curScreen === 0) { leftBtn.style.opacity = 0.1; } };  rightBtn.onclick = () => { if (curScreen >= numScreens - 1) return; curScreen++; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; leftBtn.style.opacity = 1; if (curScreen >= numScreens - 1) { rightBtn.style.opacity = 0.1; } }; document.getElementById("toggleMain").onclick = () => {  mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); }; document.getElementById("toggleBackpack").onclick = () => {  backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed"); if (mainGroup.classList.contains("on")) { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); } };  ]]></script>';
-
-    string constant SVG_END = '</svg> ';
 
     // Mapping of tokenIds to TBA account addresses
     mapping(uint256 => uint160) public tokenIdToTBAAccountAddress;
 
+    // The contract that handles rendering and minting the first season of traits
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
+
+    // The render contract that handles SVG generation
+    MainRenderer public mainRenderer;
 
     /// Errors
 
@@ -126,8 +122,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         tokenIdToTBAAccountAddress[tokenId] = uint160(tokenBoundAccountAddress);
 
-        console.logAddress(tokenBoundAccountAddress);
-
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
@@ -143,7 +137,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.pantsId = traitsIds[1]; // same with pants id
         peter.shoesId = traitsIds[2]; // same with shoes id
         peter.hairId =  traitsIds[3]; // same with hair id
-        peter.hatId =  traitsIds[4]; // same with hat id
+        peter.hatId  =  traitsIds[4]; // same with hat id
 
         console.log("minted body tokenId:", tokenId);
     }
@@ -213,114 +207,114 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Equip/Unequip clothing traits
 
-    // function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
-    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-    //     _validateTrait(_traitTokenId, TraitCategory.Name.Handheld);
+    function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
+        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+        _validateTrait(_traitTokenId, TraitCategory.Name.Handheld);
 
-    //     peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
-    // }
+        peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
+    }
 
-    // function unequipAccessory(uint256 _peterTokenId) public {
-    //     peterTokens.all[_peterTokenId].handheldId = 0;
-    // }
+    function unequipAccessory(uint256 _peterTokenId) public {
+        peterTokens.all[_peterTokenId].handheldId = 0;
+    }
 
-    // function equipGlasses(uint256 _peterTokenId, uint256 _traitTokenId) public {
-    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-    //     _validateTrait(_traitTokenId, TraitCategory.Name.Glasses);
+    function equipGlasses(uint256 _peterTokenId, uint256 _traitTokenId) public {
+        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+        _validateTrait(_traitTokenId, TraitCategory.Name.Glasses);
 
-    //     peterTokens.all[_peterTokenId].glassesId = _traitTokenId;
-    // }
+        peterTokens.all[_peterTokenId].glassesId = _traitTokenId;
+    }
 
-    // function unequipGlasses(uint256 _peterTokenId) public {
-    //     peterTokens.all[_peterTokenId].glassesId = 0;
-    // }
+    function unequipGlasses(uint256 _peterTokenId) public {
+        peterTokens.all[_peterTokenId].glassesId = 0;
+    }
 
-    // function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public {
-    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-    //     _validateTrait(_traitTokenId, TraitCategory.Name.Hair);
+    function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public {
+        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+        _validateTrait(_traitTokenId, TraitCategory.Name.Hair);
 
-    //     peterTokens.all[_peterTokenId].hairId = _traitTokenId;
-    // }
+        peterTokens.all[_peterTokenId].hairId = _traitTokenId;
+    }
 
-    // function unequipHair(uint256 _peterTokenId) public {
-    //     peterTokens.all[_peterTokenId].hairId = 0;
-    // }
+    function unequipHair(uint256 _peterTokenId) public {
+        peterTokens.all[_peterTokenId].hairId = 0;
+    }
 
-    // function equipHat(uint256 _peterTokenId, uint256 _traitTokenId) public {
-    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-    //     _validateTrait(_traitTokenId, TraitCategory.Name.Hat);
+    function equipHat(uint256 _peterTokenId, uint256 _traitTokenId) public {
+        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+        _validateTrait(_traitTokenId, TraitCategory.Name.Hat);
 
-    //     peterTokens.all[_peterTokenId].hatId = _traitTokenId;
-    // }
+        peterTokens.all[_peterTokenId].hatId = _traitTokenId;
+    }
 
-    // function unequipHat(uint256 _peterTokenId) public {
-    //     peterTokens.all[_peterTokenId].hatId = 0;
-    // }
+    function unequipHat(uint256 _peterTokenId) public {
+        peterTokens.all[_peterTokenId].hatId = 0;
+    }
 
-    // function equipShirt(uint256 _peterTokenId, uint256 _traitTokenId) public {
-    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-    //     _validateTrait(_traitTokenId, TraitCategory.Name.Shirt);
+    function equipShirt(uint256 _peterTokenId, uint256 _traitTokenId) public {
+        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+        _validateTrait(_traitTokenId, TraitCategory.Name.Shirt);
 
-    //     peterTokens.all[_peterTokenId].shirtId = _traitTokenId;
-    // }
+        peterTokens.all[_peterTokenId].shirtId = _traitTokenId;
+    }
 
-    // function unequipShirt(uint256 _peterTokenId) public {
-    //     peterTokens.all[_peterTokenId].shirtId = 0;
-    // }
+    function unequipShirt(uint256 _peterTokenId) public {
+        peterTokens.all[_peterTokenId].shirtId = 0;
+    }
 
-    // // NOTE: We Might want counterpart view functions that just compile the svg without writing to chain
-    // function equipPants(uint256 _peterTokenId, uint256 _traitTokenId) public {
-    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-    //     _validateTrait(_traitTokenId, TraitCategory.Name.Pants);
+    // NOTE: We Might want counterpart view functions that just compile the svg without writing to chain
+    function equipPants(uint256 _peterTokenId, uint256 _traitTokenId) public {
+        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+        _validateTrait(_traitTokenId, TraitCategory.Name.Pants);
 
-    //     peterTokens.all[_peterTokenId].pantsId = _traitTokenId;
-    // }
+        peterTokens.all[_peterTokenId].pantsId = _traitTokenId;
+    }
 
-    // function unequipPants(uint256 _peterTokenId) public {
-    //     peterTokens.all[_peterTokenId].pantsId = 0;
-    // }
+    function unequipPants(uint256 _peterTokenId) public {
+        peterTokens.all[_peterTokenId].pantsId = 0;
+    }
 
-    // function equipShoes(uint256 _peterTokenId, uint256 _traitTokenId) public {
-    //     // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-    //     _validateTrait(_traitTokenId, TraitCategory.Name.Shoes);
+    function equipShoes(uint256 _peterTokenId, uint256 _traitTokenId) public {
+        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+        _validateTrait(_traitTokenId, TraitCategory.Name.Shoes);
 
-    //     peterTokens.all[_peterTokenId].shoesId = _traitTokenId;
-    // }
+        peterTokens.all[_peterTokenId].shoesId = _traitTokenId;
+    }
 
-    // function unequipShoes(uint256 _peterTokenId) public {
-    //     peterTokens.all[_peterTokenId].shoesId = 0;
-    // }
+    function unequipShoes(uint256 _peterTokenId) public {
+        peterTokens.all[_peterTokenId].shoesId = 0;
+    }
 
-    // function unequipAll(uint256 _peterTokenId) public {
-    //     StoredPeter storage peter = peterTokens.all[_peterTokenId];
-    //     peter.hatId = 0;
-    //     peter.hairId = 0;
-    //     peter.glassesId = 0;
-    //     peter.handheldId = 0;
-    //     peter.shirtId = 0;
-    //     peter.pantsId = 0;
-    //     peter.shoesId = 0;
-    // }
+    function unequipAll(uint256 _peterTokenId) public {
+        StoredPeter storage peter = peterTokens.all[_peterTokenId];
+        peter.hatId = 0;
+        peter.hairId = 0;
+        peter.glassesId = 0;
+        peter.handheldId = 0;
+        peter.shirtId = 0;
+        peter.pantsId = 0;
+        peter.shoesId = 0;
+    }
 
-    // // If 0, it will ignore
-    // function equipAll(
-    //     uint256 _peterTokenId,
-    //     uint256 _hatTokenId,
-    //     uint256 _hairTokenId,
-    //     uint256 _glassesTokenId,
-    //     uint256 _handheldTokenId,
-    //     uint256 _shirtTokenId,
-    //     uint256 _pantsTokenId,
-    //     uint256 _shoesTokenId
-    // ) public {
-    //     if (_hatTokenId != 0) equipHat(_peterTokenId, _hatTokenId);
-    //     if (_hairTokenId != 0) equipHair(_peterTokenId, _hairTokenId);
-    //     if (_glassesTokenId != 0) equipGlasses(_peterTokenId, _glassesTokenId);
-    //     if (_handheldTokenId != 0) equipAccessory(_peterTokenId, _handheldTokenId);
-    //     if (_shirtTokenId != 0) equipShirt(_peterTokenId, _shirtTokenId);
-    //     if (_pantsTokenId != 0) equipPants(_peterTokenId, _pantsTokenId);
-    //     if (_shoesTokenId != 0) equipShoes(_peterTokenId, _shoesTokenId);
-    // }
+    // If 0, it will ignore
+    function equipAll(
+        uint256 _peterTokenId,
+        uint256 _hatTokenId,
+        uint256 _hairTokenId,
+        uint256 _glassesTokenId,
+        uint256 _handheldTokenId,
+        uint256 _shirtTokenId,
+        uint256 _pantsTokenId,
+        uint256 _shoesTokenId
+    ) public {
+        if (_hatTokenId != 0) equipHat(_peterTokenId, _hatTokenId);
+        if (_hairTokenId != 0) equipHair(_peterTokenId, _hairTokenId);
+        if (_glassesTokenId != 0) equipGlasses(_peterTokenId, _glassesTokenId);
+        if (_handheldTokenId != 0) equipAccessory(_peterTokenId, _handheldTokenId);
+        if (_shirtTokenId != 0) equipShirt(_peterTokenId, _shirtTokenId);
+        if (_pantsTokenId != 0) equipPants(_peterTokenId, _pantsTokenId);
+        if (_shoesTokenId != 0) equipShoes(_peterTokenId, _shoesTokenId);
+    }
 
     /// Validations
 
@@ -386,38 +380,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // outputs svg for a provided body index
-    function getBodyImageSvg(uint256 index) public view returns (string memory svg) {
-        // optimised for hex and set 30 coords
-        string[16] memory hexSymbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
-        string[30] memory coords = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"];
-
-        bytes memory pixels = getBodyImage(bodyIndexToMetadata[index].colorMap);
-        bytes memory svgParts;
-
-        for (uint i; i < 4500; i += 5) {
-            if (pixels[i] > 0) {
-                uint x = (i / 5) % 30;
-                uint y = (i / 5) / 30;
-
-                bytes memory color = abi.encodePacked(
-                    hexSymbols[uint8(pixels[i + 2]) >> 4],
-                    hexSymbols[uint8(pixels[i + 2]) & 0xf],
-                    hexSymbols[uint8(pixels[i + 3]) >> 4],
-                    hexSymbols[uint8(pixels[i + 3]) & 0xf],
-                    hexSymbols[uint8(pixels[i + 4]) >> 4],
-                    hexSymbols[uint8(pixels[i + 4]) & 0xf]
-                );
-
-                svgParts = abi.encodePacked(
-                    svgParts,
-                    '<rect x="', coords[x],
-                    '" y="', coords[y],
-                    '" width="1" height="1" fill="#', color, '"/>'
-                );
-            }
-        }
-
-        return string(abi.encodePacked('<g id="Body">', svgParts, '</g>'));
+    function getBodyImageSvg(uint256 _index) public view returns (string memory svg) {
+        bytes memory colorMap = getBodyImage(bodyIndexToMetadata[_index].colorMap);
+        return mainRenderer.getBodyImageSvg(colorMap);
     }
 
     function getZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (bytes memory traitZMaps, string memory traitsAttributes) {
@@ -626,79 +591,24 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function renderAsDataUriSVG(uint256 _tokenId) public view returns (string memory) {
         string memory bodySvg;
-        string memory traitsSvg;
-        string memory fullSvg;
         string memory bodyAttributes;
+        string memory traitsSvg;
         string memory traitsAttributes;
-        string memory fullAttributes;
+        string memory backpackSVGs;
 
-        // Peter memory peter = getPeter(_tokenId);
         StoredPeter memory storedPeter = getPeter(_tokenId);
-
         (bodySvg, bodyAttributes) = getBodySvgAndMetadata(storedPeter);
-
         (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedPeter);
+        backpackSVGs = getBackpackSVGs(_tokenId);
 
-        fullSvg = string.concat(
-            SVG_START,
-            SVG_STYLE,
-            SVG_BG_MAIN_START,
+        return mainRenderer.renderAsDataUriSVG(
+            _tokenId,
             bodySvg,
+            bodyAttributes,
             traitsSvg,
-            getBackpackSVGs(_tokenId),
-            SVG_G_ENDS,
-            SVG_TOGGLE,  // uncomment this when deploying
-            SVG_TOGGLE_SCRIPT // uncomment this when deploying
+            traitsAttributes,
+            backpackSVGs
         );
-
-        // fullSvg = string.concat(fullSvg, SVG_END);
-
-        string memory image = string.concat(
-            '"image":"data:image/svg+xml;base64,',
-            Utils.encode(bytes(string.concat(fullSvg, SVG_END) )),
-            // Utils.encode(bytes(combinedHTML)),
-            '"'
-        );
-
-        if (bytes(traitsAttributes).length > 0) {
-            fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
-        } else {
-            fullAttributes = string.concat('"attributes":[', bodyAttributes, ']');
-        }
-
-        // TODO: get animation_url back in there
-        // string memory combinedHTML = string.concat(
-        //     '<!DOCTYPE html>',
-        //     '<html>',
-        //     '<head>',
-        //     SVG_STYLE,
-        //     '</head>',
-        //     '<body style="background: #0D6E9D; overflow: hidden; margin: 0;">',
-        //     fullSvg,
-        //     SVG_TOGGLE,
-        //     SVG_TOGGLE_SCRIPT,
-        //     SVG_END,
-        //     '</body>',
-        //     '</html>'
-        // );
-
-        // string memory animationURL = string.concat(
-        //     '"animation_url":"data:text/html;base64,',
-        //     Utils.encode(bytes(combinedHTML)),
-        //     '"'
-        // );
-
-        string memory json = string.concat(
-            '{"name":"Peter #',
-                Utils.toString(_tokenId),
-             '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
-                fullAttributes,
-            ',', image,
-            // ',', animationURL,
-            '}'
-        );
-
-        return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
     }
 
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
@@ -766,6 +676,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function setScriptContent(bytes calldata _base64EncodedString) public onlyOwner {
         base64ScriptContent = _base64EncodedString;
+    }
+
+    function setMainRenderer(address _mainRenderer) public onlyOwner {
+        mainRenderer = MainRenderer(_mainRenderer);
     }
 
     // Boilerplate

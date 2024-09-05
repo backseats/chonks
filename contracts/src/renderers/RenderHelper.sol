@@ -3,6 +3,7 @@ pragma solidity ^0.8.22;
 
 import { Utils } from '../common/Utils.sol';
 
+// TOOD: rename
 library RenderHelper {
 
     function getTraitAsJson(string memory traitName, string memory traitValue) internal pure returns (string memory) {

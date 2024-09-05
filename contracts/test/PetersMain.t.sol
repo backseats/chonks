@@ -5,6 +5,7 @@ import { PetersMain } from '../src/PetersMain.sol';
 import { PeterTraits } from "../src/PeterTraits.sol";
 import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
 import { IPeterStorage } from '../src/interfaces/IPeterStorage.sol';
+import { MainRenderer } from '../src/renderers/MainRenderer.sol';
 
 import { Test, console } from 'forge-std/Test.sol';
 
@@ -13,6 +14,7 @@ contract PetersMainTest is Test {
     PetersMain public main;
     PeterTraits public traits;
     FirstSeasonRenderMinter public firstSeasonMinter;
+    MainRenderer public mainRenderer;
 
     error Unauthorized();
 
@@ -22,6 +24,9 @@ contract PetersMainTest is Test {
         traits = new PeterTraits(false);
         firstSeasonMinter = new FirstSeasonRenderMinter(traits);
         firstSeasonMinter.setMinterStatus(address(main), true);
+
+        mainRenderer = new MainRenderer();
+        main.setMainRenderer(address(mainRenderer));
 
         // main.setTraitsContract(traits);
         // main.setFirstSeasonRenderMinter(address(firstSeasonMinter));

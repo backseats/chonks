@@ -25,7 +25,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
     uint256[] public shirts = [51, 52, 53, 54, 55, 56, 57, 58, 59, 60];
     uint256[] public shoes = [61, 62, 63, 64, 65, 66, 67, 68, 69, 70];
 
-    bool _localDeploy = false; // DEPLOY: remove
+    bool _localDeploy = true; // DEPLOY: remove
 
     PeterTraits public peterTraits;
 

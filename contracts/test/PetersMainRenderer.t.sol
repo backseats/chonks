@@ -6,7 +6,7 @@ import { PeterTraits } from "../src/PeterTraits.sol";
 import { PetersMain } from '../src/PetersMain.sol';
 import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
 import { EncodeURI } from '../src/EncodeURI.sol';
-
+import { MainRenderer } from '../src/renderers/MainRenderer.sol';
 import "forge-std/console.sol"; // DEPLOY: remove
 
 contract PetersMainRendererTest is AbstractTest {
@@ -14,14 +14,20 @@ contract PetersMainRendererTest is AbstractTest {
     PetersMain public main;
     PeterTraits public traits;
     FirstSeasonRenderMinter public dataContract;
+    MainRenderer public mainRenderer;
     EncodeURI public encodeURIContract;
     bytes public base64ScriptContent;
 
     function setUp() public {
         address deployer = vm.addr(1);
         vm.startPrank(deployer);
+
         main = new PetersMain(true);
         console.log('peter manager address', address(main));
+
+        mainRenderer = new MainRenderer();
+        main.setMainRenderer(address(mainRenderer));
+
         addBodyTraits();
 
         encodeURIContract = new EncodeURI();
