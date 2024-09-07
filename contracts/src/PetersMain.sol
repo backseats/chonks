@@ -544,6 +544,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     //         );
     // }
 
+    // old svg placement way - 286m gas for 45 traits
+    /*
     function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
         address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
         uint256[] memory traitTokens = getTraitTokens(tbaAddress);
@@ -587,6 +589,98 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             '</g>',
             '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
         );
+    }
+    */
+
+/*
+   function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
+        address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
+        uint256[] memory traitTokens = getTraitTokens(tbaAddress);
+
+        backpackSVGs = string.concat(
+            SVG_BACKPACK,
+            '<g id="backpackTraits">'
+        );
+
+        // just dump them all out instead, based on the number of traitTokens
+        uint256 numTraits = traitTokens.length;
+        for (uint256 i = 0; i < numTraits; ++i) {
+            string memory traitSvg = traitsContract.getSvgForTokenId(traitTokens[i]);
+            backpackSVGs = string.concat(
+                backpackSVGs,
+                // '<svg viewBox="', Utils.toString(xPosition), ' ', Utils.toString(yPosition), ' 150 150">', traitSvg, '</svg>'
+                '<svg viewBox="30 30">', traitSvg, '</svg>'
+            );
+        }
+
+        backpackSVGs = string.concat(
+            backpackSVGs,
+            '</g>',
+            '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
+        );
+    }
+    */
+
+   /*
+    function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
+        address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
+        uint256[] memory traitTokens = getTraitTokens(tbaAddress);
+
+        bytes memory backpackSVGsBytes = abi.encodePacked(
+                SVG_BACKPACK,
+                '<g id="backpackTraits">'
+        );
+
+        uint256 numTraits = traitTokens.length;
+        for (uint256 i = 0; i < numTraits; ++i) {
+                string memory traitSvg = traitsContract.getSvgForTokenId(traitTokens[i]);
+                backpackSVGsBytes = abi.encodePacked(
+                        backpackSVGsBytes,
+                        '<svg viewBox="30 30">', traitSvg, '</svg>'
+                );
+        }
+
+        backpackSVGsBytes = abi.encodePacked(
+                backpackSVGsBytes,
+                '</g>',
+                '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
+        );
+
+        backpackSVGs = string(backpackSVGsBytes);
+    }
+    */
+
+    function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
+        address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
+        uint256[] memory traitTokens = getTraitTokens(tbaAddress);
+
+        string memory baseSvgPart = '<svg viewBox="30 30">';
+        string memory closeSvgTag = '</svg>';
+        bytes memory buffer;
+
+        uint256 numTraits = traitTokens.length;
+        buffer = abi.encodePacked(
+            SVG_BACKPACK,
+            '<g id="backpackTraits">'
+        );
+
+        for (uint256 i = 0; i < numTraits; ++i) {
+            string memory traitSvg = traitsContract.getSvgForTokenId(traitTokens[i]);
+            buffer = abi.encodePacked(
+                buffer,
+                baseSvgPart,
+                traitSvg,
+                closeSvgTag
+            );
+        }
+
+        buffer = abi.encodePacked(
+            buffer,
+            '</g>',
+            '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
+        );
+
+        backpackSVGs = string(buffer);
     }
 
     function renderAsDataUriSVG(uint256 _tokenId) public view returns (string memory) {

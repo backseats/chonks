@@ -325,6 +325,18 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     }
 
     function getSvgForTokenId(uint256 _tokenId) public view returns (string memory traitSvg) {
+        
+        // don't get the ghost here for now
+
+        StoredTrait memory trait = getTrait(_tokenId);
+
+        if (trait.isRevealed) {
+            traitSvg = getTraitImageSvg(trait.traitIndex);
+        } else {
+            traitSvg = '<svg></svg>';
+        }
+
+        /*
         string memory bodyGhostSvg = getGhostSVG();
 
         // Trait memory trait = getTrait(_tokenId);
@@ -338,6 +350,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         } else {
             traitSvg = '<svg></svg>';
         }
+        */
     }
 
     /*

@@ -29,7 +29,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
     PeterTraits public peterTraits;
 
-    uint8 private constant INITIAL_TRAIT_NUMBER = 40;
+    uint8 private constant INITIAL_TRAIT_NUMBER = 69;
 
     mapping (address => bool) public minters;
 
