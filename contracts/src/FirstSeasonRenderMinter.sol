@@ -29,7 +29,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
     PeterTraits public peterTraits;
 
-    uint8 private constant INITIAL_TRAIT_NUMBER = 69;
+    uint8 private constant INITIAL_TRAIT_NUMBER = 69; // NOTE, if 4 or less, "panic: array out-of-bounds access" error
 
     mapping (address => bool) public minters;
 
