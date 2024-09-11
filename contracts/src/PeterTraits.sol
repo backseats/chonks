@@ -199,28 +199,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         metadata.animations = _animations;
         metadata.renderMinterContract = _renderMinterContract;
     }
-
-    /*
-    function getTrait(uint256 _tokenId) public view returns (ITraitStorage.Trait memory) {
-        console.log('a');
-        ITraitStorage.StoredTrait memory storedTrait = traitTokens.all[_tokenId];
-        console.log('b');
-
-        uint128 randomness = traitTokens.epochs[storedTrait.epoch].randomness;
-        console.log('c');
-        RenderMinterV1 dataContract = RenderMinterV1(storedTrait.renderMinterContract);
-        console.log('d');
-        console.log(storedTrait.renderMinterContract);
-        // console.log(storedTrait.traitType);
-        console.log(storedTrait.seed);
-
-        if (storedTrait.renderMinterContract == address(0) && storedTrait.seed == 0)
-            revert TraitNotFound(_tokenId);
-
-        return dataContract.explainTrait(localDeploy, storedTrait, randomness);
-    }
-    */
-
+    
     function getTrait(uint256 _tokenId) public view returns (ITraitStorage.StoredTrait memory) {
         ITraitStorage.StoredTrait memory storedTrait = traitTokens.all[_tokenId];
         uint128 randomness = traitTokens.epochs[storedTrait.epoch].randomness;
@@ -268,6 +247,10 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         );
     }
 
+    function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
+        return '';
+    }
+    /*
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
         string memory fullSvg;
         string memory traitSvg;
@@ -323,6 +306,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
         return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
     }
+    */
 
     function getSvgForTokenId(uint256 _tokenId) public view returns (string memory traitSvg) {
         

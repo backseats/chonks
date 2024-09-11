@@ -546,54 +546,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     //         );
     // }
 
-    // old svg placement way - 286m gas for 45 traits
-    /*
-    function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
-        address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
-        uint256[] memory traitTokens = getTraitTokens(tbaAddress);
-
-        backpackSVGs = string.concat(
-            SVG_BACKPACK,
-            '<g id="backpackTraits">'
-        );
-
-        uint256 numScreens = traitTokens.length / MAX_TRAITS_PER_SCREEN + 1;
-        uint256 numTraitsOnLastScreen = traitTokens.length % MAX_TRAITS_PER_SCREEN;
-
-        for (uint256 screenIndex = 0; screenIndex < numScreens; ++screenIndex) {
-                uint256 startIndex = screenIndex * MAX_TRAITS_PER_SCREEN;
-                backpackSVGs = string.concat(
-                        backpackSVGs,
-                        '<g transform="translate(', Utils.toString(screenIndex * 30), ' 0)">'
-                );
-
-                uint256 endIndex = startIndex + MAX_TRAITS_PER_SCREEN;
-                if (screenIndex == numScreens - 1) {
-                        endIndex = startIndex + numTraitsOnLastScreen;
-                }
-
-                for (uint256 traitIndex = startIndex; traitIndex < endIndex; ++traitIndex) {
-                        uint256 gridIndex = traitIndex % MAX_TRAITS_PER_SCREEN;
-                        int256 xPosition = -(int256(gridIndex % 5) * 30);
-                        int256 yPosition = -(int256(gridIndex / 5) * 30) - 14;
-                        string memory traitSvg = traitsContract.getSvgForTokenId(traitTokens[traitIndex]);
-                        backpackSVGs = string.concat(
-                                backpackSVGs,
-                                '<svg viewBox="', Utils.toString(xPosition), ' ', Utils.toString(yPosition), ' 150 150">', traitSvg, '</svg>'
-                        );
-                }
-
-                backpackSVGs = string.concat(backpackSVGs, '</g>');
-        }
-
-        backpackSVGs = string.concat(
-            backpackSVGs,
-            '</g>',
-            '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
-        );
-    }
-    */
-
     function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
         address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
         uint256[] memory traitTokens = getTraitTokens(tbaAddress);

@@ -34,10 +34,11 @@ contract MainRenderer {
             SVG_BG_MAIN_START,
             _bodySvg,
             _traitsSvg,
-            _backpackSVGs,
-            SVG_G_ENDS,
-            SVG_TOGGLE,  // uncomment this when deploying
-            SVG_TOGGLE_SCRIPT // uncomment this when deploying
+            // _backpackSVGs,
+            // SVG_G_ENDS
+            '</g>'
+            // SVG_TOGGLE,  // uncomment this when deploying
+            // SVG_TOGGLE_SCRIPT // uncomment this when deploying
         );
 
         // fullSvg = string.concat(fullSvg, SVG_END);
@@ -55,7 +56,22 @@ contract MainRenderer {
             fullAttributes = string.concat('"attributes":[', _bodyAttributes, ']');
         }
 
-        // TODO: get animation_url back in there
+        string memory combinedHTML = string.concat(
+            '<!DOCTYPE html><html><head>',
+            SVG_STYLE,
+            '</head><body style="background: #0D6E9D; overflow: hidden; margin: 0;">',
+            SVG_START,
+            SVG_BG_MAIN_START,
+            _bodySvg,
+            _traitsSvg,
+            _backpackSVGs,
+            SVG_G_ENDS,
+            SVG_TOGGLE,  // uncomment this when deploying
+            SVG_TOGGLE_SCRIPT, // uncomment this when deploying
+            '</body></html>'
+        );
+
+        // Old way
         // string memory combinedHTML = string.concat(
         //     '<!DOCTYPE html>',
         //     '<html>',
@@ -71,11 +87,11 @@ contract MainRenderer {
         //     '</html>'
         // );
 
-        // string memory animationURL = string.concat(
-        //     '"animation_url":"data:text/html;base64,',
-        //     Utils.encode(bytes(combinedHTML)),
-        //     '"'
-        // );
+        string memory animationURL = string.concat(
+            '"animation_url":"data:text/html;base64,',
+            Utils.encode(bytes(combinedHTML)),
+            '"'
+        );
 
         string memory json = string.concat(
             '{"name":"Peter #',
@@ -83,7 +99,7 @@ contract MainRenderer {
              '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
                 fullAttributes,
             ',', image,
-            // ',', animationURL,
+            ',', animationURL,
             '}'
         );
 
