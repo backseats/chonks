@@ -913,6 +913,13 @@
             document.getElementById("toggleMain").onclick = () => {
                     mainGroup.classList.toggle("on");
                     mainGroup.classList.toggle("off");
+
+                    if (backpackGroup.classList.contains("open")) {
+                        backpackGroup.classList.toggle("open");
+                        backpackGroup.classList.toggle("closed");
+                    }
+
+
             };
 
             // Toggle backpack group visibility and ensure main group is off when backpack is open

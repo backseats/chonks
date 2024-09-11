@@ -73,7 +73,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // transform="scale(2) translate(-7,-5)"
     // scale: 200%; transform: translate(-7px, -5px);
 
-    uint256 constant MAX_TRAITS_PER_SCREEN = 20;
+    // uint256 constant MAX_TRAITS_PER_SCREEN = 20;
+    uint256 public MAX_TRAITS_TO_OUTPUT = 69;
+
     string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
 
     // Mapping of tokenIds to TBA account addresses
@@ -602,7 +604,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         string memory bodyGhostSvg = traitsContract.getGhostSVG();
 
-        uint256 numTraits = traitTokens.length;
+        uint256 numTraits = traitTokens.length < MAX_TRAITS_TO_OUTPUT ? traitTokens.length : MAX_TRAITS_TO_OUTPUT;
+
         buffer = abi.encodePacked(
             SVG_BACKPACK,
             bodyGhostSvg,
@@ -621,8 +624,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         buffer = abi.encodePacked(
             buffer,
-            '</g>',
-            '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
+            '</g>'
+            // '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
         );
 
         backpackSVGs = string(buffer);
@@ -697,9 +700,14 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // Setters
 
+    function setMaxTraitsToOutput(uint256 _maxTraitsToOutput) public onlyOwner {
+        MAX_TRAITS_TO_OUTPUT = _maxTraitsToOutput;
+    }
+
     function setPrice(uint256 _priceInWei) public onlyOwner {
         price = _priceInWei;
     }
+    
 
     function setTraitsContract(PeterTraits _address) public onlyOwner {
         traitsContract = _address;
