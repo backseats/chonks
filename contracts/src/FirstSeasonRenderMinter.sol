@@ -199,7 +199,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
             } else if (i == 3) {
                 trait.traitType = TraitCategory.Name.Hair;
             }  else if (i == 4) {
-                trait.traitType = TraitCategory.Name.Hat;
+                trait.traitType = TraitCategory.Name.Handheld;
             }
             // else {
             //     // Randomly assign the last trait

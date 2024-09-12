@@ -7,7 +7,7 @@ import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extension
 import { Ownable } from "solady/auth/Ownable.sol";
 import { IERC165 } from  "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { Utils } from "./common/Utils.sol";
-import { EncodeURI } from "./EncodeURI.sol";
+// import { EncodeURI } from "./EncodeURI.sol";
 
 // ERC-6551 Imports
 import { IAccountImplementation } from "./interfaces/TBABoilerplate/IAccountImplementation.sol";
@@ -17,6 +17,7 @@ import { IRegistry } from  "./interfaces/TBABoilerplate/IRegistry.sol";
 // Renderers
 import { RenderHelper } from "./renderers/RenderHelper.sol";
 import { MainRenderer } from "./renderers/MainRenderer.sol";
+import { ZRenderer } from "./renderers/ZRenderer.sol";
 
 // The Traits ERC-721 Contract
 import { PeterTraits } from "./PeterTraits.sol";
@@ -31,7 +32,7 @@ import { CommitReveal } from "./common/CommitReveal.sol";
 import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
 // Scripty for 3D rendering
-import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../lib/scripty/interfaces/IScriptyBuilderV2.sol";
+// import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../lib/scripty/interfaces/IScriptyBuilderV2.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
@@ -39,18 +40,18 @@ import "forge-std/console.sol"; // DEPLOY: remove
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906 {
 
     bool _localDeploy; // DEPLOY: remove
-    bool _renderZ = false; // temp flag control 2d or 3d output // DEPLOY: remove
+    // bool _renderZ = false; // temp flag control 2d or 3d output // DEPLOY: remove
 
     // Encodes plain text as a URI-encoded string
-    EncodeURI public encodeURIContract;
+    // EncodeURI public encodeURIContract;
 
     // Scripty & EthFS for 3D rendering
-    address immutable scriptyBuilderAddress = 0xD7587F110E08F4D120A231bA97d3B577A81Df022;
-    address immutable scriptyStorageAddress = 0xbD11994aABB55Da86DC246EBB17C1Be0af5b7699;
-    address immutable ethfsFileStorageAddress = 0x8FAA1AAb9DA8c75917C43Fb24fDdb513edDC3245;
+    // address immutable scriptyBuilderAddress = 0xD7587F110E08F4D120A231bA97d3B577A81Df022;
+    // address immutable scriptyStorageAddress = 0xbD11994aABB55Da86DC246EBB17C1Be0af5b7699;
+    // address immutable ethfsFileStorageAddress = 0x8FAA1AAb9DA8c75917C43Fb24fDdb513edDC3245;
 
     // Three.js script for 3D rendering
-    bytes public base64ScriptContent;
+    // bytes public base64ScriptContent;
 
     /// @dev We use this database for persistent storage.
     Peters peterTokens;
@@ -87,6 +88,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // The render contract that handles SVG generation
     MainRenderer public mainRenderer;
 
+     // The render contract that handles 3d generation
+    ZRenderer public zRenderer;
+
     /// Errors
 
     error FirstSeasonRenderMinterNotSet();
@@ -102,7 +106,19 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
-        if (_localDeploy) for (uint i; i < 10; ++i) mint(); // Mints N bodies/tokens
+        if (_localDeploy) {
+            for (uint i; i < 10; ++i) {
+                mint(); // Mints N bodies/tokens
+            }
+            // setting random colors for now
+            setBackgroundColor(1, "333333");
+            setBackgroundColor(3, "27b143");
+            setBackgroundColor(4, "eb068d");
+            setBackgroundColor(8, "F2C304");
+
+            setRenderZ(5, true);
+            setRenderZ(6, true);
+        }
     }
 
     function mint() public payable { // TODO amount, check price
@@ -139,7 +155,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.pantsId = traitsIds[1]; // same with pants id
         peter.shoesId = traitsIds[2]; // same with shoes id
         peter.hairId =  traitsIds[3]; // same with hair id
-        peter.hatId  =  traitsIds[4]; // same with hat id
+        peter.handheldId  =  traitsIds[4]; // same with hat id
+    
+        // set default renderer to 2D
+        peter.renderZ = false;
+
+        // set default background color
+        peter.backgroundColor = "0D6E9D";
 
         console.log("minted body tokenId:", tokenId);
     }
@@ -387,15 +409,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return mainRenderer.getBodyImageSvg(colorMap);
     }
 
-    function getZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (bytes memory traitZMaps, string memory traitsAttributes) {
+    function getBodySVGZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory, bytes memory , string memory ) {
         if (!storedPeter.isRevealed) {
             return (
+                '<svg><text x="8" y="15" style="font: normal 2px sans-serif; fill: black;">Coming Soon...</text></svg>',
                 '',
                 '{}'
             );
         }
 
         return (
+            getBodyImageSvg(storedPeter.bodyIndex),
             bodyIndexToMetadata[storedPeter.bodyIndex].zMap,
             RenderHelper.stringTrait('Body', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
         );
@@ -410,14 +434,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             );
         }
 
-        // new bytes way - 11.1 million gas
         return (
             getBodyImageSvg(storedPeter.bodyIndex),
             RenderHelper.stringTrait('Body', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
         );
 
-        // old bodyPath svg way - 7.84 million gas
-        // return ( bodyIndexToMetadata[storedPeter.bodyIndex].bodyPath,RenderHelper.stringTrait('Body', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName));
     }
 
     // function renderAsDataUriZ(uint256 _tokenId) public view returns (string memory) {
@@ -589,11 +610,20 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         string memory traitsSvg;
         string memory traitsAttributes;
         string memory backpackSVGs;
+        string memory backgroundColorStyles;
 
         StoredPeter memory storedPeter = getPeter(_tokenId);
         (bodySvg, bodyAttributes) = getBodySvgAndMetadata(storedPeter);
         (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedPeter);
         backpackSVGs = getBackpackSVGs(_tokenId);
+
+        backgroundColorStyles  = string.concat(
+            '<style>',
+            'body, svg{ background: #', storedPeter.backgroundColor, '; }'
+            '.bg { fill: #', storedPeter.backgroundColor, '; }',
+            '</style>'
+        );
+
 
         return mainRenderer.renderAsDataUriSVG(
             _tokenId,
@@ -601,13 +631,56 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             bodyAttributes,
             traitsSvg,
             traitsAttributes,
-            backpackSVGs
+            backpackSVGs,
+            backgroundColorStyles
+        );
+    }
+
+    function renderAsDataUriZ(uint256 _tokenId) public view returns (string memory) {
+        string memory bodySvg;
+        string memory traitsSvg;
+        bytes memory bodyZmap;
+        bytes memory traitZmaps;
+        bytes memory fullZmap;
+        string memory traitsAttributes;
+        string memory bodyAttributes;
+        string memory fullAttributes;
+        string memory backgroundColorStyles;
+
+        StoredPeter memory storedPeter = getPeter(_tokenId);
+        
+        (bodySvg, bodyZmap, bodyAttributes) = getBodySVGZmapsAndMetadata(storedPeter);
+        (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getZmapsAndMetadata(storedPeter);
+        fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
+
+        fullZmap = bytes.concat(
+            bodyZmap,
+            traitZmaps
+        );
+
+        backgroundColorStyles  = string.concat(
+            '<style>',
+            'body, svg{ background: #', storedPeter.backgroundColor, '; }'
+            '.bg { fill: #', storedPeter.backgroundColor, '; }',
+            '</style>'
+        );
+
+
+        return zRenderer.renderAsDataUriZ(
+            _tokenId,
+            bodySvg,
+            bodyAttributes,
+            traitsSvg,
+            traitsAttributes,
+            fullZmap,
+            backgroundColorStyles
         );
     }
 
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
-        // return (_renderZ) ? renderAsDataUriZ(_tokenId) : renderAsDataUriSVG(_tokenId);
-        return renderAsDataUriSVG(_tokenId);
+        StoredPeter memory storedPeter = getPeter(_tokenId);
+        return (storedPeter.renderZ) ? renderAsDataUriZ(_tokenId) : renderAsDataUriSVG(_tokenId);
+        // return renderAsDataUriSVG(_tokenId);
     }
 
     /// Getters
@@ -669,16 +742,31 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         firstSeasonRenderMinter = FirstSeasonRenderMinter(_dataContract);
     }
 
-    function setEncodeURI(address _encodeURIAddress) public onlyOwner {
-        encodeURIContract = EncodeURI(_encodeURIAddress);
-    }
+    // function setEncodeURI(address _encodeURIAddress) public onlyOwner {
+    //     encodeURIContract = EncodeURI(_encodeURIAddress);
+    // }
 
-    function setScriptContent(bytes calldata _base64EncodedString) public onlyOwner {
-        base64ScriptContent = _base64EncodedString;
-    }
+    // function setScriptContent(bytes calldata _base64EncodedString) public onlyOwner {
+    //     base64ScriptContent = _base64EncodedString;
+    // }
 
     function setMainRenderer(address _mainRenderer) public onlyOwner {
         mainRenderer = MainRenderer(_mainRenderer);
+    }
+
+    function setZRenderer(address _zRenderer) public onlyOwner {
+        zRenderer = ZRenderer(_zRenderer);
+    }
+
+    // todo: user setter ... should only be done by token holder
+    function setBackgroundColor(uint256 _peterTokenId, string memory _color) public {
+        // error checking for #RRGGBB... might want more here
+        if (bytes(_color).length != 6) revert("Invalid color");
+        peterTokens.all[_peterTokenId].backgroundColor = _color;
+    }
+
+    function setRenderZ(uint256 _peterTokenId, bool _renderZ) public {
+        peterTokens.all[_peterTokenId].renderZ = _renderZ;
     }
 
     // Boilerplate

@@ -43,6 +43,12 @@ interface IPeterStorage {
 
          // This is the seed that's calculuated in getPeter based on randomness + stored.seed
         uint256 seed;
+
+        // RRGGBB colour of the background, default blue #0D6E9D set in PetersMain.sol mint(), and setBackgroundColor() 
+        string backgroundColor;
+    
+        // bool to determine whether to render 3D or not
+        bool renderZ;
     }
 
     struct Peters {
