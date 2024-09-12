@@ -632,7 +632,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         }
     }
 
-    function getZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
+    function getSvgZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
         string memory traitSvg;
         string memory traitAttribute;
         bytes memory traitZmap;
@@ -792,6 +792,10 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
                 traitsAttributes = traitAttribute;
                 traitZMaps = traitZmap;
             } else {
+                traitsSvg = string.concat(
+                    traitsSvg,
+                    traitSvg
+                );
                 traitsAttributes = string.concat(
                     traitsAttributes,
                     ',',

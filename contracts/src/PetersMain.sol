@@ -650,7 +650,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         StoredPeter memory storedPeter = getPeter(_tokenId);
         
         (bodySvg, bodyZmap, bodyAttributes) = getBodySVGZmapsAndMetadata(storedPeter);
-        (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getZmapsAndMetadata(storedPeter);
+        (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedPeter);
         fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
 
         fullZmap = bytes.concat(
