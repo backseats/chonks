@@ -24,14 +24,32 @@ contract ZRenderer {
     // Three.js script for 3D rendering
     bytes public base64ScriptContent;
 
-    string private constant SVG_START = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">';
-    string private constant SVG_STYLE = '<style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
+    // string private constant SVG_START = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">';
+    // string private constant SVG_STYLE = '<style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
+
+    string private constant SVG_START_STYLE = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
     string private constant SVG_BG_MAIN_START = '<rect class="bg"/><g id="main" class="off">';
-    string private constant SVG_TOGGLE = '<rect id="toggleMain" class="button" x="25" y="0" width="5" height="5" /><rect id="toggleBackpack" class="button" x="0" y="0" width="5" height="5" />';
-    string private constant SVG_TOGGLE_SCRIPT = '<script><![CDATA[  const maxTraitsPerScreen = 20; const mainGroup = document.getElementById("main"); const backpackGroup = document.getElementById("backpack"); const backpackTraits = document.getElementById("backpackTraits"); const backpackTraitsSvgs = Array.from(backpackTraits.getElementsByTagName("svg"));  const ghostGroup = document.getElementById("ghost"); const leftBtn = document.getElementById("leftBtn"); const rightBtn = document.getElementById("rightBtn"); let curScreen = 0; const numScreens = Math.ceil(backpackTraitsSvgs.length / maxTraitsPerScreen); while (backpackTraits.firstChild) { backpackTraits.removeChild(backpackTraits.firstChild);} const ghostClone = ghostGroup.outerHTML; for (let i = 0; i < backpackTraitsSvgs.length; i += maxTraitsPerScreen) {  const gElement = document.createElementNS("http://www.w3.org/2000/svg", "g"); gElement.setAttribute("transform", `translate(${(i / maxTraitsPerScreen) * 30} 0)`); for (let j = 0; j < maxTraitsPerScreen && i + j < backpackTraitsSvgs.length; ++j) { const svg = backpackTraitsSvgs[i + j]; const x = -(j % 5) * 30; const y = -(Math.floor(j / 5) * 30) - 10; svg.setAttribute("viewBox", `${x} ${y} 150 150`); svg.innerHTML = ghostClone + svg.innerHTML; gElement.appendChild(svg);} backpackTraits.appendChild(gElement); } ghostGroup.remove(); if (backpackTraitsSvgs.length <= maxTraitsPerScreen) { leftBtn.style.display = "none"; rightBtn.style.display = "none";} else {leftBtn.style.opacity = 0.1;} leftBtn.onclick = () => { if (curScreen === 0) return; curScreen--; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; rightBtn.style.opacity = 1; if (curScreen === 0) { leftBtn.style.opacity = 0.1;} }; rightBtn.onclick = () => { if (curScreen >= numScreens - 1) return; curScreen++; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`;leftBtn.style.opacity = 1;if (curScreen >= numScreens - 1) { rightBtn.style.opacity = 0.1; }}; document.getElementById("toggleMain").onclick = () => { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); if (backpackGroup.classList.contains("open")) { backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed");}}; document.getElementById("toggleBackpack").onclick = () => {  console.log("toggleBackpack"); backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed"); if (mainGroup.classList.contains("on")) { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); } };  ]]></script>';
+    // string private constant SVG_END = '</svg> ';
 
 
-    string private constant SVG_END = '</svg> ';
+    function generateFullSvg( string memory _bodySvg, string memory _traitsSvg, string memory _backgroundColorStyles) internal pure returns (string memory image) {
+        string memory fullSvg = string.concat(
+            SVG_START_STYLE,
+            _backgroundColorStyles,
+            '<g id="body">',
+            _bodySvg,
+            '</g>',
+            '<g id="traits">',
+            _traitsSvg,
+            '</g></svg>'
+        );
+
+        image = string.concat(
+            '"image":"data:image/svg+xml;base64,',
+            Utils.encode(bytes(fullSvg )),
+            '"'
+        );
+    }
 
     function renderAsDataUriZ(
         uint256 _tokenId,
@@ -43,25 +61,25 @@ contract ZRenderer {
         string memory _backgroundColorStyles
     ) public view returns (string memory) {
 
-        string memory fullSvg;
+        // string memory fullSvg;
         string memory fullAttributes;
 
-        fullSvg = string.concat(
-            SVG_START,
-            SVG_STYLE,
-            _backgroundColorStyles,
-            SVG_BG_MAIN_START,
-            _bodySvg,
-            _traitsSvg,
-            '</g>'
-        );
+        // fullSvg = string.concat(
+        //     SVG_START_STYLE,
+        //     _backgroundColorStyles,
+        //     SVG_BG_MAIN_START,
+        //     _bodySvg,
+        //     _traitsSvg,
+        //     '</g></svg>'
+        // );
 
         // string memory image = string.concat(
         //     '"image":"data:image/svg+xml;base64,',
-        //     Utils.encode(bytes(string.concat(fullSvg, SVG_END) )),
-        //     // Utils.encode(bytes(combinedHTML)),
+        //     Utils.encode(bytes(fullSvg )),
         //     '"'
         // );
+
+        string memory image = generateFullSvg( _bodySvg, _traitsSvg, _backgroundColorStyles);
 
         if (bytes(_traitsAttributes).length > 0) {
             fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
@@ -168,6 +186,8 @@ contract ZRenderer {
                     Utils.toString(_tokenId),
                     encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
                     encodeURIContract.encodeURI(fullAttributes),
+                    encodeURIContract.encodeURI(','),
+                    encodeURIContract.encodeURI(image),
                     encodeURIContract.encodeURI(',"animation_url":"'),
                     doubleURLEncodedHTMLDataURI,
                     encodeURIContract.encodeURI('"}')
