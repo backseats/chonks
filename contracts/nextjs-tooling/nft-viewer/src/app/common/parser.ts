@@ -139,8 +139,8 @@ function renderContent(content: string, contentType: ContentType) {
             <div id="iframeContainer"></div>
             <script>
                 (function() {
-                    const encodedData = "${content}";
-                    const decodedData = decodeURIComponent(encodedData);
+                    // const encodedData = "${content}";
+                    const decodedData = decodeURIComponent(${content});
                     const container = document.getElementById('iframeContainer');
                     const iframe = document.createElement('iframe');
                     iframe.style.width = '100%';
