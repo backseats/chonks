@@ -8,7 +8,7 @@ import { Utils } from "../common/Utils.sol";
 contract MainRenderer {
 
     string private constant SVG_START = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">';
-    string private constant SVG_STYLE = '<style> #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
+    string private constant SVG_STYLE = '<style> svg{ max-width: 100vw; max-height: 100vh; width: 100%; } #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
     string private constant SVG_BG_MAIN_START = '<rect class="bg" fill="#0D6E9D"/><g id="main" class="off">';
     string private constant SVG_G_ENDS = '</g></g></g>';
     string private constant SVG_TOGGLE = '<rect id="toggleMain" class="button" x="25" y="0" width="5" height="5" /><rect id="toggleBackpack" class="button" x="0" y="0" width="5" height="5" />';
@@ -67,7 +67,7 @@ contract MainRenderer {
             _backpackSVGs,
             SVG_G_ENDS,
             SVG_TOGGLE,  // uncomment this when deploying
-            // SVG_TOGGLE_SCRIPT, // uncomment this when deploying
+            SVG_TOGGLE_SCRIPT, // uncomment this when deploying
             '</body></html>'
         );
 
