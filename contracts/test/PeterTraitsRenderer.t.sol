@@ -14,6 +14,8 @@ contract PeterTraitsRendererTest is AbstractTest {
     PeterTraits public peterTraits;
     FirstSeasonRenderMinter public dataContract;
 
+    bool constant localDeploy = true;
+
     function setUp() public {
         peterTraits = new PeterTraits(true);
         console.log('peter traits address', address(peterTraits));
@@ -21,7 +23,7 @@ contract PeterTraitsRendererTest is AbstractTest {
         bodyRenderer = new BodyRenderer();
         // peterTraits.setBodyRenderer(bodyRenderer);
 
-        dataContract = new FirstSeasonRenderMinter(peterTraits);
+        dataContract = new FirstSeasonRenderMinter(peterTraits, localDeploy);
         dataContract._debugPostConstructorMint(address(peterTraits));
     }
 

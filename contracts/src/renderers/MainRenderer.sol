@@ -67,7 +67,7 @@ contract MainRenderer {
             _backpackSVGs,
             SVG_G_ENDS,
             SVG_TOGGLE,  // uncomment this when deploying
-            SVG_TOGGLE_SCRIPT, // uncomment this when deploying
+            // SVG_TOGGLE_SCRIPT, // uncomment this when deploying
             '</body></html>'
         );
 

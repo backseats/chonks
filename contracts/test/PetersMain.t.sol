@@ -16,13 +16,15 @@ contract PetersMainTest is Test {
     FirstSeasonRenderMinter public firstSeasonMinter;
     MainRenderer public mainRenderer;
 
+    bool constant localDeploy = true;
+
     error Unauthorized();
 
     function setUp() public {
         vm.startPrank(address(1));
         main = new PetersMain(false);
         traits = new PeterTraits(false);
-        firstSeasonMinter = new FirstSeasonRenderMinter(traits);
+        firstSeasonMinter = new FirstSeasonRenderMinter(traits, localDeploy);
         firstSeasonMinter.setMinterStatus(address(main), true);
 
         mainRenderer = new MainRenderer();

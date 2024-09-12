@@ -24,7 +24,7 @@ contract PetersMainScript is Script {
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
     MainRenderer public mainRenderer;
 
-    bool constant localDeploy = false;
+    bool constant localDeploy = true;
 
     // NOTE: This is the main deploy script, it deploys PetersMain and all associated contracts
     // @dev before you run, make sure localDeploy is set to `false` in both contracts
@@ -56,7 +56,7 @@ contract PetersMainScript is Script {
         traits.setBodyRenderer(bodyRenderer);
 
         // Attach the data contract to PeterTraits
-        firstSeasonRenderMinter = new FirstSeasonRenderMinter(traits);
+        firstSeasonRenderMinter = new FirstSeasonRenderMinter(traits, localDeploy);
         main.setFirstSeasonRenderMinter(address(firstSeasonRenderMinter));
 
         console.log('setup done. minting...');
@@ -111,7 +111,7 @@ contract PetersTraitsRenderersScript is Script {
     PeterTraits public traits;
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
     
-    bool constant localDeploy = false;
+    bool constant localDeploy = true;
 
     function run() external {
         // The value below is any private key you grab from your terminal after running `anvil`
@@ -132,7 +132,7 @@ contract PetersTraitsRenderersScript is Script {
         traits.setBodyRenderer(bodyRenderer);
 
         // Attach the data contract to PeterTraits
-        firstSeasonRenderMinter = new FirstSeasonRenderMinter(traits);
+        firstSeasonRenderMinter = new FirstSeasonRenderMinter(traits, localDeploy);
         main.setFirstSeasonRenderMinter(address(firstSeasonRenderMinter));
 
         console.log('setup done. minting...');

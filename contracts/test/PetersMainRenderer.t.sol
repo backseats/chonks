@@ -18,6 +18,8 @@ contract PetersMainRendererTest is AbstractTest {
     EncodeURI public encodeURIContract;
     bytes public base64ScriptContent;
 
+    bool constant localDeploy = true;
+
     function setUp() public {
         address deployer = vm.addr(1);
         vm.startPrank(deployer);
@@ -43,7 +45,7 @@ contract PetersMainRendererTest is AbstractTest {
         traits = new PeterTraits(true);
         main.setTraitsContract(traits);
 
-        dataContract = new FirstSeasonRenderMinter(traits);
+        dataContract = new FirstSeasonRenderMinter(traits, localDeploy);
         dataContract.setMinterStatus(address(main), true);
 
         main.setFirstSeasonRenderMinter(address(dataContract));
