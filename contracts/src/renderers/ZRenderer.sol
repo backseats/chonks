@@ -61,23 +61,7 @@ contract ZRenderer {
         string memory _backgroundColorStyles
     ) public view returns (string memory) {
 
-        // string memory fullSvg;
         string memory fullAttributes;
-
-        // fullSvg = string.concat(
-        //     SVG_START_STYLE,
-        //     _backgroundColorStyles,
-        //     SVG_BG_MAIN_START,
-        //     _bodySvg,
-        //     _traitsSvg,
-        //     '</g></svg>'
-        // );
-
-        // string memory image = string.concat(
-        //     '"image":"data:image/svg+xml;base64,',
-        //     Utils.encode(bytes(fullSvg )),
-        //     '"'
-        // );
 
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _backgroundColorStyles);
 
@@ -96,7 +80,7 @@ contract ZRenderer {
         headTags[0].tagClose = "%253C%252Fstyle%253E";
 
         // Gunzip unzips all the other scripts into the page
-        HTMLTag[] memory bodyTags = new HTMLTag[](10);
+        HTMLTag[] memory bodyTags = new HTMLTag[](11);
         bodyTags[0].name = "gunzipScripts-0.0.1.js";
         // <script src="data:text/javascript;base64,[script]"></script>
         bodyTags[0].tagType = HTMLTagType.scriptBase64DataURI;
@@ -154,13 +138,25 @@ contract ZRenderer {
         // get the zMap and provide it to the script: <script>var zMapFull = '[zMap]';  </script>
         bodyTags[8].tagOpen = bytes(
             string.concat(
-                "%253Cscript%253Evar%2520zMapFull%2520%253D%2527",
+                "%253Cscript%253Evar%2520zMapFull%2520%253D%2527", // <script>var zMapFull ='
                   encodeURIContract.encodeURI(
                     encodeURIContract.encodeURI(string(_fullZmap))
                 )
             )
         );
-        bodyTags[8].tagClose = "%2527%253B%253C%252Fscript%253E";
+        bodyTags[8].tagClose = "%2527%253B%253C%252Fscript%253E"; // ';</script>
+
+        // bodyTags[9].tagOpen = bytes(
+        //     string.concat(
+        //         "%253Cscript%253Evar%2520bgColor%2520%253D%2527", // <script>var bgColor ='
+        //           encodeURIContract.encodeURI(
+        //             encodeURIContract.encodeURI(string('#OOFF00'))
+        //         )
+        //     )
+        // );
+        // bodyTags[9].tagClose = "%2527%253B%253C%252Fscript%253E"; // ';</script>
+
+
 
         // output the three.js script
         bodyTags[9]
