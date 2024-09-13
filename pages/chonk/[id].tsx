@@ -72,6 +72,12 @@ type CurrentChonk = {
 };
 
 export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
+  // const decodedContent = decodeURIComponent(data);
+  // const base64String = decodedContent.split("data:application/json,")[1];
+  // // Parse as JSON and stringify with proper formatting
+  // const jsonData = JSON.parse(base64String);
+
+  // console.log(jsonData);
   const base64String = data.split(",")[1];
   const jsonString = atob(base64String);
   const jsonData = JSON.parse(jsonString) as Chonk;
@@ -406,7 +412,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             <div className="flex justify-center mt-8">
               {/* Unequipped stuff grid */}
               {/* TODO: update back to filteredTraitTokenIds */}
-              {traitTokenIds && traitTokenIds.length > 0 && (
+              {filteredTraitTokenIds && traitTokenIds.length > 0 && (
                 <EquipmentContainer
                   chonkId={id.toString()}
                   traitTokenIds={traitTokenIds}

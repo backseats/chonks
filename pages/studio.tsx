@@ -44,6 +44,7 @@ const Grid: React.FC = () => {
   const [svgContent, setSvgContent] = useState<string>("");
   const [miniSvgContent, setMiniSvgContent] = useState<string>("");
   const [isPickingColor, setIsPickingColor] = useState<boolean>(false);
+  const [showGrid, setShowGrid] = useState<boolean>(true);
 
   const gridRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -193,6 +194,10 @@ const Grid: React.FC = () => {
 
   const printGrid = () => {
     console.log(textAreaContent);
+  };
+
+  const toggleGrid = () => {
+    setShowGrid(!showGrid);
   };
 
   const copyTextAreaContent = () => {
@@ -361,6 +366,7 @@ const Grid: React.FC = () => {
               selectedColor={selectedColor}
               resetSavedColors={resetSavedColors}
               startColorPicker={startColorPicker}
+              toggleGrid={toggleGrid}
             />
           </div>
 
@@ -376,6 +382,7 @@ const Grid: React.FC = () => {
             setHoveredPixel={setHoveredPixel}
             hoveredPixel={hoveredPixel}
             getPixelCoordinates={getPixelCoordinates}
+            showGrid={showGrid}
           />
 
           <div className="flex flex-col gap-2 p-x">

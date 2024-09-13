@@ -6,6 +6,7 @@ interface Props {
   saveColorToPalette: () => void;
   resetSavedColors: () => void;
   startColorPicker: () => void;
+  toggleGrid: () => void;
 }
 
 export default function Menu({
@@ -14,6 +15,7 @@ export default function Menu({
   resetSavedColors,
   selectedColor,
   startColorPicker,
+  toggleGrid,
 }: Props) {
   const [buttonText, setButtonText] = useState("Save Color To Palette");
 
@@ -31,8 +33,15 @@ export default function Menu({
 
       <div className="px-3">
         <button
+          onClick={toggleGrid}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-600 transition-colors w-full"
+        >
+          Toggle Grid
+        </button>
+
+        <button
           onClick={resetGrid}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-600 transition-colors w-full"
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-600 transition-colors w-full mt-2"
         >
           Reset Canvas
         </button>
