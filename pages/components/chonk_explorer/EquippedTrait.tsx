@@ -2,8 +2,8 @@ import { useReadContract, useWriteContract } from "wagmi";
 import { Chonk } from "@/types/Chonk";
 import { useState, useEffect } from "react";
 import {
-  abi,
-  traitsAbi,
+  mainABI,
+  traitsABI,
   mainContract,
   traitsContract,
   tokenURIABI,
@@ -17,9 +17,11 @@ export const categoryList = Object.values(Category);
 export default function EquippedTrait({
   chonkId,
   traitTokenId,
+  category,
 }: {
   chonkId: string;
   traitTokenId: string;
+  category: Category;
 }) {
   const { writeContract } = useWriteContract();
 
@@ -44,7 +46,7 @@ export default function EquippedTrait({
 
   const { data: traitTypeData } = useReadContract({
     address: traitsContract,
-    abi: traitsAbi,
+    abi: traitsABI,
     functionName: "getTraitType",
     args: [traitTokenId],
     chainId: baseSepolia.id,
@@ -67,7 +69,7 @@ export default function EquippedTrait({
         onClick={() =>
           writeContract({
             address: mainContract,
-            abi,
+            abi: mainABI,
             functionName: functionNameString,
             args: [chonkId],
             chainId: baseSepolia.id,

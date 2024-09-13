@@ -16,6 +16,7 @@ import { Category } from "@/types/Category";
 import MenuBar from "@/pages/components/chonk_explorer/MenuBar";
 import MainChonkImage from "@/pages/components/chonk_explorer/MainChonkImage";
 import OwnershipSection from "@/pages/components/chonk_explorer/OwnershipSection";
+import EquippedTrait from "@/pages/components/chonk_explorer/EquippedTrait";
 
 type CurrentChonk = {
   tokenId: number;
@@ -333,53 +334,53 @@ export default function ChonkDetail({ id }: { id: string }) {
               <div>
                 <p className="text-2xl font-bold mt-4">Equipped Traits</p>
 
-                <div className="flex justify-center mt-8">
-                  {/* Unequipped stuff grid  -- is this right?*/}
-                  {filteredTraitTokenIds &&
-                    allTraitTokenIds &&
-                    allTraitTokenIds.length > 0 && (
-                      <EquipmentContainer
-                        chonkId={id.toString()}
-                        traitTokenIds={allTraitTokenIds}
-                      />
-                    )}
+                <div className="flex flex-row mt-2">
+                  {currentChonk &&
+                    Object.keys(currentChonk).map((key, index) => {
+                      if (
+                        key === "epoch" ||
+                        key === "seed" ||
+                        key === "isRevealed" ||
+                        key === "bodyIndex" ||
+                        key === "tokenId"
+                      )
+                        return null;
+
+                      const stored = currentChonk;
+
+                      // @ts-ignore
+                      if (stored[key].tokenId == 0) return null;
+
+                      // console.log(stored[key].toString());
+
+                      return (
+                        <div key={index}>
+                          <EquippedTrait
+                            chonkId={id}
+                            // @ts-ignore
+                            traitTokenId={stored[key].tokenId.toString()}
+                            // @ts-ignore
+                            category={stored[key].category}
+                          />
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
 
               <div>
                 <p className="text-2xl font-bold mt-4">Unequipped Traits</p>
+
+                <div className="flex justify-center mt-8">
+                  {filteredTraitTokenIds && (
+                    <EquipmentContainer
+                      chonkId={id.toString()}
+                      traitTokenIds={filteredTraitTokenIds}
+                    />
+                  )}
+                </div>
               </div>
             </div>
-
-            {/* <div className="flex flex-row mt-2">
-            {equipment &&
-              Object.keys(equipment).map((key, index) => {
-                if (
-                  key === "epoch" ||
-                  key === "seed" ||
-                  key === "isRevealed" ||
-                  key === "bodyIndex"
-                )
-                  return null;
-
-                const stored = equipment;
-
-                // @ts-ignore
-                if (stored[key] == 0n) return null;
-
-                // console.log(stored[key].toString());
-
-                return (
-                  <div key={index}>
-                    <EquippedTrait
-                      chonkId={id}
-                      // @ts-ignore
-                      traitTokenId={stored[key].toString()}
-                    />
-                  </div>
-                );
-              })}
-          </div> */}
           </div>
         ) : (
           <p>Loading...</p>
