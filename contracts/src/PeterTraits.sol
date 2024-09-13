@@ -40,7 +40,14 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     string private constant SVG_START = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><style>rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} </style><rect class="bg" fill="#0D6E9D"/>';
 
     // TODO: replace with hex?
-    string private constant BODY_001 = '<g id="Body 001"><path fill="#EFB15E" d="M11 23h1v1h-1zM12 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM11 18h1v1h-1z"/><path fill="#D69743" d="M12 18h1v1h-1z"/><path fill="#EFB15E" d="M14 18h1v1h-1zM15 18h1v1h-1z"/><path fill="#D69743" d="M16 18h1v1h-1z"/><path fill="#EFB15E" d="M11 19h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 17h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1z"/><path fill="#D69743" d="M18 19h1v1h-1zM18 20h1v1h-1z"/><path fill="#EFB15E" d="M19 19h1v1h-1zM19 20h1v1h-1zM10 17h1v1h-1zM9 18h1v1H9zM9 19h1v1H9zM9 20h1v1H9z"/><path fill="#D69743" d="M10 19h1v1h-1zM10 20h1v1h-1z"/><path fill="#EFB15E" d="M10 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1z"/><path fill="#D69743" d="M11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1z"/><path fill="#EFB15E" d="M15 15h1v1h-1zM16 15h1v1h-1zM11 9h1v1h-1zM14 12h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM12 14h1v1h-1zM19 13h1v1h-1zM19 12h1v1h-1z"/><path fill="#D69743" d="M9 12h1v1H9zM9 13h1v1H9z"/><path fill="#000" d="M18 12h1v1h-1zM18 13h1v1h-1z"/><path fill="#fff" d="M17 13h1v1h-1zM17 12h1v1h-1z"/><path fill="#000" d="M13 12h1v1h-1z"/><path fill="#fff" d="M12 12h1v1h-1zM12 13h1v1h-1z"/><path fill="#000" d="M13 13h1v1h-1z"/><path fill="#D69743" d="M15 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1z"/></g>';
+    // string private constant BODY_001 = '<g id="Body 001"><path fill="#EFB15E" d="M11 23h1v1h-1zM12 23h1v1h-1zM16 23h1v1h-1zM17 23h1v1h-1zM11 21h1v1h-1zM12 21h1v1h-1zM13 21h1v1h-1zM14 21h1v1h-1zM15 21h1v1h-1zM16 21h1v1h-1zM17 21h1v1h-1zM11 22h1v1h-1zM12 22h1v1h-1zM13 22h1v1h-1zM15 22h1v1h-1zM16 22h1v1h-1zM17 22h1v1h-1zM11 17h1v1h-1zM12 17h1v1h-1zM13 17h1v1h-1zM14 17h1v1h-1zM15 17h1v1h-1zM16 17h1v1h-1zM17 17h1v1h-1zM11 18h1v1h-1z"/><path fill="#D69743" d="M12 18h1v1h-1z"/><path fill="#EFB15E" d="M14 18h1v1h-1zM15 18h1v1h-1z"/><path fill="#D69743" d="M16 18h1v1h-1z"/><path fill="#EFB15E" d="M11 19h1v1h-1zM11 20h1v1h-1zM12 20h1v1h-1zM13 20h1v1h-1zM14 20h1v1h-1zM15 20h1v1h-1zM16 20h1v1h-1zM17 20h1v1h-1zM12 19h1v1h-1zM13 19h1v1h-1zM14 19h1v1h-1zM15 19h1v1h-1zM16 19h1v1h-1zM17 19h1v1h-1zM18 17h1v1h-1zM18 18h1v1h-1zM19 18h1v1h-1z"/><path fill="#D69743" d="M18 19h1v1h-1zM18 20h1v1h-1z"/><path fill="#EFB15E" d="M19 19h1v1h-1zM19 20h1v1h-1zM10 17h1v1h-1zM9 18h1v1H9zM9 19h1v1H9zM9 20h1v1H9z"/><path fill="#D69743" d="M10 19h1v1h-1zM10 20h1v1h-1z"/><path fill="#EFB15E" d="M10 18h1v1h-1zM13 18h1v1h-1zM17 18h1v1h-1z"/><path fill="#D69743" d="M11 16h1v1h-1zM12 16h1v1h-1zM13 16h1v1h-1zM14 16h1v1h-1zM15 16h1v1h-1zM16 16h1v1h-1zM17 16h1v1h-1z"/><path fill="#EFB15E" d="M15 15h1v1h-1zM16 15h1v1h-1zM11 9h1v1h-1zM14 12h1v1h-1zM12 9h1v1h-1zM13 9h1v1h-1zM14 9h1v1h-1zM15 9h1v1h-1zM16 9h1v1h-1zM17 9h1v1h-1zM18 9h1v1h-1zM10 10h1v1h-1zM11 10h1v1h-1zM12 10h1v1h-1zM13 10h1v1h-1zM14 10h1v1h-1zM15 10h1v1h-1zM16 10h1v1h-1zM17 10h1v1h-1zM18 10h1v1h-1zM19 10h1v1h-1zM10 11h1v1h-1zM11 11h1v1h-1zM12 11h1v1h-1zM13 11h1v1h-1zM14 11h1v1h-1zM15 11h1v1h-1zM16 11h1v1h-1zM17 11h1v1h-1zM18 11h1v1h-1zM19 11h1v1h-1zM10 12h1v1h-1zM11 12h1v1h-1zM15 12h1v1h-1zM16 12h1v1h-1zM10 13h1v1h-1zM11 13h1v1h-1zM10 14h1v1h-1zM11 14h1v1h-1zM13 14h1v1h-1zM14 14h1v1h-1zM15 14h1v1h-1zM16 14h1v1h-1zM17 14h1v1h-1zM18 14h1v1h-1zM19 14h1v1h-1zM11 15h1v1h-1zM12 15h1v1h-1zM13 15h1v1h-1zM14 15h1v1h-1zM17 15h1v1h-1zM18 15h1v1h-1zM12 14h1v1h-1zM19 13h1v1h-1zM19 12h1v1h-1z"/><path fill="#D69743" d="M9 12h1v1H9zM9 13h1v1H9z"/><path fill="#000" d="M18 12h1v1h-1zM18 13h1v1h-1z"/><path fill="#fff" d="M17 13h1v1h-1zM17 12h1v1h-1z"/><path fill="#000" d="M13 12h1v1h-1z"/><path fill="#fff" d="M12 12h1v1h-1zM12 13h1v1h-1z"/><path fill="#000" d="M13 13h1v1h-1z"/><path fill="#D69743" d="M15 13h1v1h-1zM14 13h1v1h-1zM16 13h1v1h-1z"/></g>';
+
+    struct Ghost {
+        bytes colorMap;
+        bytes zMap;
+    }
+
+    Ghost public ghost;
 
     // uint8 private constant INITIAL_TRAIT_NUMBER = 25; // moved to firstSeasonRenderMinter
 
@@ -238,13 +245,21 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         return traitTokens.epoch;
     }
 
+    /*
     function getGhostSVG() public pure returns (string memory) {
         // TODO: PRNG here for different bodies perhaps
         return string.concat(
             '<g id="ghost" class="g" style="opacity: 25%;">',
-            BODY_001,
+            // BODY_001,
+            // get colorMap from ghost, converted
             '</g>'
         );
+    }
+    */
+
+    function addGhostMaps(bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
+        ghost.colorMap = _colorMap;
+        ghost.zMap = _zMap;
     }
 
     // If we need to deploy and hit size issues...
@@ -257,7 +272,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         string memory traitSvg;
         string memory attributes;
 
-        string memory bodyGhostSvg = getGhostSVG();
+        string memory bodyGhostSvg = getGhostSvg();
 
         // Trait memory trait = getTrait(_tokenId);
         StoredTrait memory trait = getTrait(_tokenId);
@@ -390,25 +405,37 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     // outputs svg for a provided trait index
     function getTraitImageSvg(uint256 index) public view returns (string memory svg) {
         // optimised for hex and set 30 coords
+        bytes memory pixels = getTraitImage(traitIndexToMetadata[index].colorMap);
+        bytes memory svgParts = createSvgFromPixels(pixels);
+        return string(abi.encodePacked('<g id="Trait">', svgParts, '</g>'));
+    }
+
+    function getGhostSvg() public view returns (string memory svg) {
+        bytes memory pixels = getTraitImage(ghost.colorMap);
+        bytes memory svgParts = createSvgFromPixels(pixels);
+
+        return string(abi.encodePacked('<g id="ghost" class="g" style="opacity: 25%;">', svgParts, '</g>'));
+    }
+
+    function createSvgFromPixels(bytes memory _pixels) public pure returns (bytes memory svgParts) {
+        
         string[16] memory hexSymbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
         string[30] memory coords = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"];
 
-        // bytes memory pixels = new bytes(30 * 30 * 5);
-        bytes memory pixels = getTraitImage(traitIndexToMetadata[index].colorMap);
-        bytes memory svgParts = "";
+        // bytes memory svgParts = "";
 
         for (uint i = 0; i < 4500; i += 5) {
-            if (pixels[i] > 0) {
+            if (_pixels[i] > 0) {
                 uint x = (i / 5) % 30;
                 uint y = (i / 5) / 30;
 
                 bytes memory color = abi.encodePacked(
-                    hexSymbols[uint8(pixels[i + 2]) >> 4],
-                    hexSymbols[uint8(pixels[i + 2]) & 0xf],
-                    hexSymbols[uint8(pixels[i + 3]) >> 4],
-                    hexSymbols[uint8(pixels[i + 3]) & 0xf],
-                    hexSymbols[uint8(pixels[i + 4]) >> 4],
-                    hexSymbols[uint8(pixels[i + 4]) & 0xf]
+                    hexSymbols[uint8(_pixels[i + 2]) >> 4],
+                    hexSymbols[uint8(_pixels[i + 2]) & 0xf],
+                    hexSymbols[uint8(_pixels[i + 3]) >> 4],
+                    hexSymbols[uint8(_pixels[i + 3]) & 0xf],
+                    hexSymbols[uint8(_pixels[i + 4]) >> 4],
+                    hexSymbols[uint8(_pixels[i + 4]) & 0xf]
                 );
 
                 svgParts = abi.encodePacked(
@@ -419,8 +446,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
                 );
             }
         }
-
-        return string(abi.encodePacked('<g id="Trait">', svgParts, '</g>'));
+    
     }
 
     // returns traitSvg and traitAttributes

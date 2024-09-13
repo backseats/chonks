@@ -107,17 +107,18 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
         if (_localDeploy) {
-            for (uint i; i < 10; ++i) {
+            for (uint i; i < 20; ++i) {
                 mint(); // Mints N bodies/tokens
+                 setBackgroundColor(i, "27b143");
             }
             // setting random colors for now
-            setBackgroundColor(1, "333333");
-            setBackgroundColor(3, "27b143");
-            setBackgroundColor(4, "eb068d");
-            setBackgroundColor(8, "F2C304");
+            // setBackgroundColor(1, "333333");
+            // setBackgroundColor(3, "27b143");
+            // setBackgroundColor(4, "eb068d");
+            // setBackgroundColor(8, "F2C304");
 
-            setRenderZ(5, true);
-            setRenderZ(6, true);
+            // setRenderZ(5, true);
+            // setRenderZ(6, true);
         }
     }
 
@@ -575,7 +576,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         string memory closeSvgTag = '</svg>';
         bytes memory buffer;
 
-        string memory bodyGhostSvg = traitsContract.getGhostSVG();
+        string memory bodyGhostSvg = traitsContract.getGhostSvg();
 
         uint256 numTraits = traitTokens.length < MAX_TRAITS_TO_OUTPUT ? traitTokens.length : MAX_TRAITS_TO_OUTPUT;
 
