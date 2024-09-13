@@ -185,6 +185,28 @@ contract PetersRenderersScript is Script {
 
 }
 
+contract PetersZScript is Script {
+
+    ZRenderer public zRenderer;
+
+    function run() external {
+        // The value below is any private key you grab from your terminal after running `anvil`
+        vm.startBroadcast();
+
+        // uncomment, add address and run
+        PetersMain main = PetersMain(0x01A64b215115Ddebb3c6400b46298e028280f242); // insert contract address here
+      
+        zRenderer = new ZRenderer();
+        main.setZRenderer(address(zRenderer));
+
+        main.setRenderZ(1, true);
+
+      
+        vm.stopBroadcast();
+    }
+
+}
+
 
 
 
