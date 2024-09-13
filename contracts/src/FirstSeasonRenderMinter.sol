@@ -39,6 +39,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
         peterTraits = _peterTraits;
         _localDeploy = localDeploy_;
 
+        /*
         if (_localDeploy) {
 
             //red cape:
@@ -145,16 +146,9 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
             addNewTrait(69, "Wings Midngiht", TraitCategory.Name.Shoes,"", hex"0b170000000c173f3f3f101700000011173f3f3f","0b17050000000c17053f3f3f1017050000001117053f3f3f0b17060000001017060000000c17063f3f3f1117063f3f3f");
 
             addNewTrait(70, "Baby Blue", TraitCategory.Name.Shoes,"", hex"0b174591e30c174591e310174591e311174591e3","0b17054591e30c17054591e31017054591e31117054591e31117064591e31017064591e30b17064591e30c17064591e3");
-            /*
-            accessories 1-5
-            glasses 11-14
-            hair 21-26
-            hats 31-34
-            pants 41-45
-            shirts 51-60
-            shoes 61-70
-            */
+           
         }
+        */
     }
 
     // DEPLOY: Remove
