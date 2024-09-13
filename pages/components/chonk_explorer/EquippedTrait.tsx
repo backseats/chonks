@@ -35,7 +35,11 @@ export default function EquippedTrait({
   }) as { data: string };
 
   useEffect(() => {
-    if (traitTokenURIData) decodeAndSetData(traitTokenURIData, setTraitData);
+    if (traitTokenURIData) {
+      decodeAndSetData(traitTokenURIData, setTraitData);
+    } else {
+      console.log("no trait data for", traitTokenId);
+    }
   }, [traitTokenURIData]);
 
   const { data: traitTypeData } = useReadContract({

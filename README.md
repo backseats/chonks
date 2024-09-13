@@ -29,6 +29,7 @@ TODO: update contract addresses in `contract_data.ts`, point ABIs to the proper 
 ### Eto Vass Tool
 
 * `cd contracts`
+* run `anvil --fork-url $BASE_SEPOLIA_RPC_URL --fork-block-number 10374000 --chain-id 84532` (deploys to local node mocked as Base Sepolia)
 * run `./start-hot-reload.sh` or the one for traits, same as before
 * Access at `http://localhost:9901/`
 

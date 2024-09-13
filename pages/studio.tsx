@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import SVGPreview from "@/components/studio/SVGPreview";
-import TextEditor from "@/components/studio/TextEditor";
-import BodyPresets from "@/components/studio/BodyPresets";
-import Menu from "@/components/studio/Menu";
-import SelectColor from "@/components/studio/SelectColor";
-import Canvas from "@/components/studio/Canvas";
+import SVGPreview from "@/pages/components/studio/SVGPreview";
+import TextEditor from "@/pages/components/studio/TextEditor";
+import BodyPresets from "@/pages/components/studio/BodyPresets";
+import Menu from "@/pages/components/studio/Menu";
+import SelectColor from "@/pages/components/studio/SelectColor";
+import Canvas from "@/pages/components/studio/Canvas";
 import { parseSvgToBytes } from "@/utils/convertSvgToBytes";
 
 export type Pixel = {
