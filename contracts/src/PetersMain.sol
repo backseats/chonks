@@ -117,8 +117,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // setBackgroundColor(4, "eb068d");
             // setBackgroundColor(8, "F2C304");
 
-            // setRenderZ(5, true);
-            // setRenderZ(6, true);
+            setRenderZ(5, true);
+            setRenderZ(6, true);
         }
     }
 

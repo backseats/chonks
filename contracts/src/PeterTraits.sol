@@ -9,7 +9,7 @@ import { Utils } from "./common/Utils.sol";
 
 // Renderers
 import { RenderHelper } from "./renderers/RenderHelper.sol";
-import { BodyRenderer } from "./renderers/BodyRenderer.sol";
+// import { BodyRenderer } from "./renderers/BodyRenderer.sol";
 
 // Associated Interfaces and Libraries
 import { ITraitStorage } from "./interfaces/ITraitStorage.sol";
@@ -22,7 +22,7 @@ import { IRenderMinterV1 } from "./interfaces/IRenderMinterV1.sol";
 
 import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol"; // DEPLOY: remove, this is just for testing
 
-import "forge-std/console.sol"; // DEPLOY: remove
+// import "forge-std/console.sol"; // DEPLOY: remove
 
 // modifier onlyAuthorizedMinter() {
 //     require(authorizedMinters[msg.sender], "Caller is not an authorized minter");
@@ -32,7 +32,7 @@ import "forge-std/console.sol"; // DEPLOY: remove
 
 contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4906, IERC721Receiver {
 
-    BodyRenderer public bodyRenderer;
+    // BodyRenderer public bodyRenderer;
 
     /// @dev We use this database for persistent storage
     Traits public traitTokens;
@@ -102,7 +102,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     function safeMint(address _to) public returns (uint256) { // TODO: add onlyMinter modifier | rename to initial mint or something?
         // TODO: check supply?
 
-        resolveEpochIfNecessary();
+        // resolveEpochIfNecessary();
 
         uint tokenId = totalSupply() + 1;
         _safeMint(_to, tokenId); // creates a token without any kind of info, info is filled in in the render contract
@@ -119,6 +119,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     /// @notice Initializes and closes epochs. Thank you jalil & mouseDev.
     /// @dev Based on the commit-reveal scheme proposed by MouseDev.
+    /*
     function resolveEpochIfNecessary() public {
         CommitReveal.Epoch storage currentEpoch = traitTokens.epochs[traitTokens.epoch];
 
@@ -158,6 +159,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
             resolveEpochIfNecessary();
         }
     }
+    */
 
     /// @notice The identifier of the current epoch
     function getEpoch() view public returns(uint256) {
@@ -257,7 +259,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     }
     */
 
-    function addGhostMaps(bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
+    function setGhostMaps(bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
         ghost.colorMap = _colorMap;
         ghost.zMap = _zMap;
     }
@@ -268,6 +270,8 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     // }
     
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
+        return '';
+        /*
         string memory fullSvg;
         string memory traitSvg;
         string memory attributes;
@@ -276,7 +280,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
         // Trait memory trait = getTrait(_tokenId);
         StoredTrait memory trait = getTrait(_tokenId);
-        console.log('trait index', trait.traitIndex);
+        // console.log('trait index', trait.traitIndex);
 
         if (trait.isRevealed) {
             TraitMetadata memory metadata = traitIndexToMetadata[trait.traitIndex];
@@ -321,6 +325,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         );
 
         return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
+        */
     }
     
     function getSvgForTokenId(uint256 _tokenId) public view returns (string memory traitSvg) {
@@ -495,343 +500,89 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     function getSvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view
         returns (string memory traitsSvg, string memory traitsAttributes)
     {
-        string memory traitAttribute;
-        string memory traitSvg;
 
         if (!storedPeter.isRevealed) return ("", "{}");
 
-        // hat
-        // hair
-        // glasses
-        // handheld
-        // shirt
-        // pants
-        // shoes
-
         // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
+        if (storedPeter.hatId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hatId, traitsSvg, traitsAttributes);
+        if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes);
+        if (storedPeter.glassesId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.glassesId, traitsSvg, traitsAttributes);
+        if (storedPeter.handheldId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.handheldId, traitsSvg, traitsAttributes);
+        if (storedPeter.shirtId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.shirtId, traitsSvg, traitsAttributes);
+        if (storedPeter.pantsId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.pantsId, traitsSvg, traitsAttributes);
+        if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.shoesId, traitsSvg, traitsAttributes);
 
-        if (storedPeter.hatId > 0) {
-            // Trait memory hatTrait = getTrait(storedPeter.hatId);
-            StoredTrait memory hatTrait = getTrait(storedPeter.hatId);
-            (traitSvg, traitAttribute) = getSvgAndMetadataTrait(hatTrait, storedPeter.hatId);
+    }
 
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitsSvg = traitSvg;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-            }
+    function callGetSvgAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes ) public view returns (string memory traitsSvg, string memory traitsAttributes) {
+        string memory traitAttribute;
+        string memory traitSvg;
+
+        StoredTrait memory storedTrait = getTrait(_traitId);
+
+        (traitSvg, traitAttribute) = getSvgAndMetadataTrait(storedTrait, _traitId);
+
+        if (bytes(_traitsAttributes).length == 0) {
+            traitsSvg = traitSvg;
+            traitsAttributes = traitAttribute;
+           
+        } else {
+            traitsSvg = string.concat(
+                _traitsSvg,
+                traitSvg
+            );
+            traitsAttributes = string.concat(
+                _traitsAttributes,
+                ',',
+                traitAttribute
+            );
+            
         }
 
-        if (storedPeter.hairId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory hairTrait = getTrait(storedPeter.hairId);
-            (traitSvg, traitAttribute) = getSvgAndMetadataTrait(hairTrait, storedPeter.hairId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitsSvg = traitSvg;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-            }
-        }
-
-        if (storedPeter.glassesId > 0) {
-            // Trait memory glassesTrait = getTrait(storedPeter.glassesId);
-            StoredTrait memory glassesTrait = getTrait(storedPeter.glassesId);
-            (traitSvg, traitAttribute) = getSvgAndMetadataTrait(glassesTrait, storedPeter.glassesId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitsSvg = traitSvg;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-            }
-        }
-
-        if (storedPeter.handheldId > 0) {
-            // Trait memory handheldTrait = getTrait(storedPeter.handheldId);
-            StoredTrait memory handheldTrait = getTrait(storedPeter.handheldId);
-            (traitSvg, traitAttribute) = getSvgAndMetadataTrait(handheldTrait, storedPeter.handheldId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitsSvg = traitSvg;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-            }
-        }
-
-        if (storedPeter.shirtId > 0) {
-            // Trait memory shirtTrait = getTrait(storedPeter.shirtId);
-            StoredTrait memory shirtTrait = getTrait(storedPeter.shirtId);
-            (traitSvg, traitAttribute) = getSvgAndMetadataTrait(shirtTrait, storedPeter.shirtId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitsSvg = traitSvg;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-            }
-        }
-
-        if (storedPeter.pantsId > 0) {
-            // Trait memory pantsTrait = getTrait(storedPeter.pantsId);
-            StoredTrait memory pantsTrait = getTrait(storedPeter.pantsId);
-            (traitSvg, traitAttribute) = getSvgAndMetadataTrait(pantsTrait, storedPeter.pantsId);
-
-           if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitsSvg = traitSvg;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-            }
-        }
-
-        if (storedPeter.shoesId > 0) {
-            // Trait memory shoesTrait = getTrait(storedPeter.shoesId);
-            StoredTrait memory shoesTrait = getTrait(storedPeter.shoesId);
-            (traitSvg, traitAttribute) = getSvgAndMetadataTrait(shoesTrait, storedPeter.shoesId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsAttributes = traitAttribute;
-                traitsSvg = traitSvg;
-            } else {
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-            }
-        }
     }
 
     function getSvgZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
-        string memory traitSvg;
-        string memory traitAttribute;
-        bytes memory traitZmap;
 
         if (!storedPeter.isRevealed) return ("","","{}");
 
-        // hat
-        // hair
-        // glasses
-        // handheld
-        // shirt
-        // pants
-        // shoes
-
         // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
+        if (storedPeter.hatId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.hatId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.shoesId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.pantsId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.pantsId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.shirtId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.shirtId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.handheldId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.handheldId, traitsSvg, traitsAttributes, traitZMaps);
+    }
 
-        if (storedPeter.hatId > 0) {
-            StoredTrait memory storedTrait = getTrait(storedPeter.hatId);
+    function callGetSVGZmapAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes, bytes memory _traitZMaps ) public view returns (string memory traitsSvg, string memory traitsAttributes, bytes memory traitZMaps) {
+        string memory traitAttribute;
+        string memory traitSvg;
+        bytes memory traitZMap;
 
-            (traitSvg, traitZmap, traitAttribute) = getSVGZmapAndMetadataTrait(storedTrait, storedPeter.hatId);
+        StoredTrait memory storedTrait = getTrait(_traitId);
 
-            if (bytes(traitsAttributes).length == 0) {
-                traitsSvg = traitSvg;
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
-        }
+        (traitSvg, traitZMap, traitAttribute) = getSVGZmapAndMetadataTrait(storedTrait, _traitId);
 
-        if (storedPeter.hairId > 0) {
-            StoredTrait memory storedTrait = getTrait(storedPeter.hairId);
-
-            (traitSvg, traitZmap, traitAttribute) = getSVGZmapAndMetadataTrait(storedTrait, storedPeter.hairId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsSvg = traitSvg;
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
-        }
-
-        if (storedPeter.shoesId > 0) {
-            StoredTrait memory storedTrait = getTrait(storedPeter.shoesId);
-
-            (traitSvg, traitZmap, traitAttribute) = getSVGZmapAndMetadataTrait(storedTrait, storedPeter.shoesId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsSvg = traitSvg;
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
-        }
-
-        if (storedPeter.pantsId > 0) {
-            StoredTrait memory storedTrait = getTrait(storedPeter.pantsId);
-
-            (traitSvg, traitZmap, traitAttribute) = getSVGZmapAndMetadataTrait(storedTrait, storedPeter.pantsId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsSvg = traitSvg;
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
-        }
-
-        if (storedPeter.shirtId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory storedTrait = getTrait(storedPeter.shirtId);
-
-            (traitSvg, traitZmap, traitAttribute) = getSVGZmapAndMetadataTrait(storedTrait, storedPeter.shirtId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsSvg = traitSvg;
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
-        }
-
-
-        if (storedPeter.handheldId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory storedTrait = getTrait(storedPeter.handheldId);
-
-            (traitSvg, traitZmap, traitAttribute) = getSVGZmapAndMetadataTrait(storedTrait, storedPeter.handheldId);
-
-            if (bytes(traitsAttributes).length == 0) {
-                traitsSvg = traitSvg;
-                traitsAttributes = traitAttribute;
-                traitZMaps = traitZmap;
-            } else {
-                traitsSvg = string.concat(
-                    traitsSvg,
-                    traitSvg
-                );
-                traitsAttributes = string.concat(
-                    traitsAttributes,
-                    ',',
-                    traitAttribute
-                );
-                traitZMaps = bytes.concat(
-                    traitZMaps,
-                    traitZmap
-                );
-            }
+        if (bytes(_traitsAttributes).length == 0) {
+            traitsSvg = traitSvg;
+            traitsAttributes = traitAttribute;
+            traitZMaps = traitZMap;
+           
+        } else {
+            traitsSvg = string.concat(
+                _traitsSvg,
+                traitSvg
+            );
+            traitsAttributes = string.concat(
+                _traitsAttributes,
+                ',',
+                traitAttribute
+            );
+            traitZMaps = bytes.concat(
+                _traitZMaps,
+                traitZMap
+            );
+            
         }
     }
 
@@ -853,53 +604,68 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
         if (storedPeter.hatId > 0) {
             // Trait memory hatTrait = getTrait(storedPeter.hatId);
-            StoredTrait memory hatTrait = getTrait(storedPeter.hatId);
+            // StoredTrait memory hatTrait = getTrait(storedPeter.hatId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[hatTrait.traitIndex].zMap
-            );
+            // traitZMaps = bytes.concat(
+            //     traitZMaps,
+            //     traitIndexToMetadata[hatTrait.traitIndex].zMap
+            // );
+
+            traitZMaps = callGetTraitZMap(storedPeter.hatId);
         }
 
         if (storedPeter.hairId > 0) {
             // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory hairTrait = getTrait(storedPeter.hairId);
+            // StoredTrait memory hairTrait = getTrait(storedPeter.hairId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[hairTrait.traitIndex].zMap
-            );
+            // traitZMaps = bytes.concat(
+            //     traitZMaps,
+            //     traitIndexToMetadata[hairTrait.traitIndex].zMap
+            // );
+            traitZMaps = callGetTraitZMap(storedPeter.hairId);
+
         }
 
         if (storedPeter.shoesId > 0) {
             // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory shoesTrait = getTrait(storedPeter.shoesId);
+            // StoredTrait memory shoesTrait = getTrait(storedPeter.shoesId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[shoesTrait.traitIndex].zMap
-            );
+            // traitZMaps = bytes.concat(
+            //     traitZMaps,
+            //     traitIndexToMetadata[shoesTrait.traitIndex].zMap
+            // );
+            traitZMaps = callGetTraitZMap(storedPeter.shoesId);
         }
 
         if (storedPeter.pantsId > 0) {
             // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory pantsTrait = getTrait(storedPeter.pantsId);
+            // StoredTrait memory pantsTrait = getTrait(storedPeter.pantsId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[pantsTrait.traitIndex].zMap
-            );
+            // traitZMaps = bytes.concat(
+            //     traitZMaps,
+            //     traitIndexToMetadata[pantsTrait.traitIndex].zMap
+            // );
+            traitZMaps = callGetTraitZMap(storedPeter.pantsId);
         }
 
         if (storedPeter.shirtId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            StoredTrait memory shirtTrait = getTrait(storedPeter.shirtId);
 
-            traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[shirtTrait.traitIndex].zMap
-            );
+            // StoredTrait memory shirtTrait = getTrait(storedPeter.shirtId);
+
+            // traitZMaps = bytes.concat(
+            //     traitZMaps,
+            //     traitIndexToMetadata[shirtTrait.traitIndex].zMap
+            // );
+            traitZMaps = callGetTraitZMap(storedPeter.shirtId);
         }
+    }
+
+    function callGetTraitZMap(uint256 _traitIndex) public view returns (bytes memory traitZMaps) {
+        StoredTrait memory storedTrait = getTrait(_traitIndex);
+        traitZMaps = bytes.concat(
+                traitZMaps,
+                traitIndexToMetadata[storedTrait.traitIndex].zMap
+        );
     }
 
     function walletOfOwner(address _owner) public view returns(uint256[] memory) {
@@ -923,9 +689,9 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     //     isMinter[_minter] = false;
     // }
 
-    function setBodyRenderer(BodyRenderer _bodyRenderer) public onlyOwner {
-        bodyRenderer = _bodyRenderer;
-    }
+    // function setBodyRenderer(BodyRenderer _bodyRenderer) public onlyOwner {
+    //     bodyRenderer = _bodyRenderer;
+    // }
 
     // TODO: PUT BACK IN
     /*
