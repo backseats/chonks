@@ -102,7 +102,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     function safeMint(address _to) public returns (uint256) { // TODO: add onlyMinter modifier | rename to initial mint or something?
         // TODO: check supply?
 
-        // resolveEpochIfNecessary();
+        resolveEpochIfNecessary();
 
         uint tokenId = totalSupply() + 1;
         _safeMint(_to, tokenId); // creates a token without any kind of info, info is filled in in the render contract
@@ -119,7 +119,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     /// @notice Initializes and closes epochs. Thank you jalil & mouseDev.
     /// @dev Based on the commit-reveal scheme proposed by MouseDev.
-    /*
+    
     function resolveEpochIfNecessary() public {
         CommitReveal.Epoch storage currentEpoch = traitTokens.epochs[traitTokens.epoch];
 
@@ -159,7 +159,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
             resolveEpochIfNecessary();
         }
     }
-    */
 
     /// @notice The identifier of the current epoch
     function getEpoch() view public returns(uint256) {
@@ -270,8 +269,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     // }
     
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
-        return '';
-        /*
         string memory fullSvg;
         string memory traitSvg;
         string memory attributes;
@@ -325,7 +322,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         );
 
         return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
-        */
     }
     
     function getSvgForTokenId(uint256 _tokenId) public view returns (string memory traitSvg) {
