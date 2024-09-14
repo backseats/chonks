@@ -330,11 +330,13 @@ export default function ChonkDetail({ id }: { id: string }) {
               address={address}
             />
 
-            <div className="flex flex-col">
+            <div className="flex flex-col mt-12">
               <div>
-                <p className="text-2xl font-bold mt-4">Equipped Traits</p>
+                <p className="text-2xl font-bold pb-2 ml-12">
+                  Your Chonk Is Wearing
+                </p>
 
-                <div className="flex flex-row mt-2">
+                <div className="flex flex-row mt-2 gap-4 justify-center">
                   {currentChonk &&
                     Object.keys(currentChonk).map((key, index) => {
                       if (
@@ -369,7 +371,7 @@ export default function ChonkDetail({ id }: { id: string }) {
               </div>
 
               <div>
-                <p className="text-2xl font-bold mt-4">Unequipped Traits</p>
+                <p className="text-2xl font-bold mt-12 ml-12">In Your Pack</p>
 
                 <div className="flex justify-center mt-8">
                   {filteredTraitTokenIds && (

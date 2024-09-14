@@ -27,6 +27,7 @@ export default function EquippedTrait({
 
   const [traitData, setTraitData] = useState<Chonk | null>(null);
   const [traitType, setTraitType] = useState<Category | null>(null);
+  const [traitName, setTraitName] = useState<string | null>(null);
 
   const { data: traitTokenURIData } = useReadContract({
     address: traitsContract,
@@ -52,6 +53,14 @@ export default function EquippedTrait({
     chainId: baseSepolia.id,
   }) as { data: string };
 
+  const { data: traitMetaData } = useReadContract({
+    address: traitsContract,
+    abi: traitsABI,
+    functionName: "getTraitMetadata",
+    args: [traitTokenId],
+    chainId: baseSepolia.id,
+  }) as { data: { traitName: string } };
+
   useEffect(() => {
     if (traitTypeData) {
       const traitTypeString = categoryList[parseInt(traitTypeData)];
@@ -59,15 +68,21 @@ export default function EquippedTrait({
     }
   }, [traitTypeData]);
 
-  const functionNameString = "unequip " + traitType;
-  const text = "Unequip " + traitType;
+  useEffect(() => {
+    if (traitMetaData) {
+      setTraitName(traitMetaData.traitName);
+    }
+  }, [traitMetaData]);
 
+  const functionNameString = "unequip" + traitType;
+
+  // This doesn't seem to be working
   const unequip = () => {
     writeContract({
       address: mainContract,
       abi: mainABI,
       functionName: functionNameString,
-      args: [chonkId],
+      args: [traitTokenId],
       chainId: baseSepolia.id,
     });
   };
@@ -79,7 +94,7 @@ export default function EquippedTrait({
         className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2"
         onClick={unequip}
       >
-        {text}
+        Unequip {traitName}
       </button>
     </div>
   ) : null;
