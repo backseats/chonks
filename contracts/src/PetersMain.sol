@@ -157,7 +157,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.shoesId = traitsIds[2]; // same with shoes id
         peter.hairId =  traitsIds[3]; // same with hair id
         peter.handheldId  =  traitsIds[4]; // same with hat id
-    
+
         // set default renderer to 2D
         peter.renderZ = false;
 
@@ -296,6 +296,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function unequipPants(uint256 _peterTokenId) public {
+        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
         peterTokens.all[_peterTokenId].pantsId = 0;
     }
 
@@ -649,7 +650,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         string memory backgroundColorStyles;
 
         StoredPeter memory storedPeter = getPeter(_tokenId);
-        
+
         (bodySvg, bodyZmap, bodyAttributes) = getBodySVGZmapsAndMetadata(storedPeter);
         (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedPeter);
         fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
@@ -733,7 +734,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setPrice(uint256 _priceInWei) public onlyOwner {
         price = _priceInWei;
     }
-    
+
 
     function setTraitsContract(PeterTraits _address) public onlyOwner {
         traitsContract = _address;
