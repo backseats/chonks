@@ -5,9 +5,13 @@ import { EncodeURI } from "../EncodeURI.sol";
 
 import { IPeterStorage } from "../interfaces/IPeterStorage.sol";
 import { Utils } from "../common/Utils.sol";
+// import { Base64 } from "solady/utils/Base64.sol";
 
 // Scripty for 3D rendering
 import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../../lib/scripty/interfaces/IScriptyBuilderV2.sol";
+
+// import { console2 } from 'forge-std/console2.sol';
+import "forge-std/console.sol"; // DEPLOY: remove
 
 
 // I don't think this should know about any kind of contracts. It should just get data and render it.
@@ -28,7 +32,7 @@ contract ZRenderer {
     // string private constant SVG_STYLE = '<style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
 
     string private constant SVG_START_STYLE = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
-    string private constant SVG_BG_MAIN_START = '<rect class="bg"/><g id="main" class="off">';
+    // string private constant SVG_BG_MAIN_START = '<rect class="bg"/><g id="main" class="off">';
     // string private constant SVG_END = '</svg> ';
 
 
@@ -174,7 +178,20 @@ contract ZRenderer {
             scriptyBuilderAddress
         ).getHTMLURLSafe(htmlRequest);
 
-        return
+        // bytes memory base64EncodedHTMLDataURI = IScriptyBuilderV2(
+        //     scriptyBuilderAddress
+        // ).getEncodedHTML(htmlRequest); 
+
+        // console2.log('doubleURLEncodedHTMLDataURI', doubleURLEncodedHTMLDataURI);
+
+        // string memory doubleURLEncodedHTMLDataURI = IScriptyBuilderV2(
+        //     scriptyBuilderAddress
+        // ).getHTMLString(htmlRequest); 
+
+        // console2.log('doubleURLEncodedHTMLDataURI', doubleURLEncodedHTMLDataURI);  
+
+        // this works but doesn't have base64 encoding:
+        return 
             string(
                 abi.encodePacked(
                     "data:application/json,",
@@ -189,40 +206,99 @@ contract ZRenderer {
                     encodeURIContract.encodeURI('"}')
                 )
             );
+
+         // this outputs valid json but the animation_url is broken
+        // return base64AndEncodeJson(_tokenId, fullAttributes, image, base64EncodedHTMLDataURI);
     }
 
-    function getBodyImageSvg(bytes memory _pixels) public pure returns (string memory) {
-        // optimised for hex and set 30 coords
-        string[16] memory hexSymbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
-        string[30] memory coords = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"];
+    /*
+    function base64AndEncodeJson(uint256 _tokenId, string memory _fullAttributes, string memory _image, bytes memory _doubleURLEncodedHTMLDataURI) internal pure returns (string memory) {
 
-        bytes memory svgParts;
+        string memory json = 
+            string(
+                abi.encodePacked(
+                    // "data:application/json,",
+                    '{"name":"Peter #', // encodeURIContract.encodeURI('{"name":"Peter #'),
+                    Utils.toString(_tokenId),
+                    '", "description":"Click/tap top left to open your backpack, top right for PFP mode ",', //encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
+                    // encodeURIContract.encodeURI(_fullAttributes),
+                    _fullAttributes,
+                    ',', // encodeURIContract.encodeURI(','),
+                    _image, // encodeURIContract.encodeURI(_image),
+                    ',"animation_url":"', // encodeURIContract.encodeURI(',"animation_url":"'),
+                    // Utils.encode(_doubleURLEncodedHTMLDataURI),
+                    _doubleURLEncodedHTMLDataURI,
+                    '"}' // encodeURIContract.encodeURI('"}')
+                )
+            );
 
-        for (uint i; i < 4500; i += 5) {
-            if (_pixels[i] > 0) {
-                uint x = (i / 5) % 30;
-                uint y = (i / 5) / 30;
-
-                bytes memory color = abi.encodePacked(
-                    hexSymbols[uint8(_pixels[i + 2]) >> 4],
-                    hexSymbols[uint8(_pixels[i + 2]) & 0xf],
-                    hexSymbols[uint8(_pixels[i + 3]) >> 4],
-                    hexSymbols[uint8(_pixels[i + 3]) & 0xf],
-                    hexSymbols[uint8(_pixels[i + 4]) >> 4],
-                    hexSymbols[uint8(_pixels[i + 4]) & 0xf]
-                );
-
-                svgParts = abi.encodePacked(
-                    svgParts,
-                    '<rect x="', coords[x],
-                    '" y="', coords[y],
-                    '" width="1" height="1" fill="#', color, '"/>'
-                );
-            }
-        }
-
-        return string(abi.encodePacked('<g id="Body">', svgParts, '</g>'));
+        return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
     }
+    */
+
+
+    function base64AndEncodeJson(uint256 tokenId, string memory fullAttributes, string memory image, bytes memory base64EncodedHTMLDataURI) pure internal returns (string memory) {
+
+        // bytes memory metadata = abi.encodePacked(
+        //     '{"name":"Peter #',
+        //         Utils.toString(tokenId),
+        //      '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
+        //         fullAttributes,
+        //     ',', image,
+        //     ',"animation_url":"',
+        //     base64EncodedHTMLDataURI,
+        //     '"}'
+        // );
+
+        bytes memory metadata = abi.encodePacked(
+            '{"name":"Peters","animation_url":"',
+            base64EncodedHTMLDataURI,
+            '"}'
+        );
+
+        // return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
+
+        return
+            string(
+                abi.encodePacked(
+                    "data:application/json;base64,",
+                    Utils.encode(metadata)
+                )
+            );
+    }
+
+    // function getBodyImageSvg(bytes memory _pixels) public pure returns (string memory) {
+    //     // optimised for hex and set 30 coords
+    //     string[16] memory hexSymbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
+    //     string[30] memory coords = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"];
+
+    //     bytes memory svgParts;
+
+    //     for (uint i; i < 4500; i += 5) {
+    //         if (_pixels[i] > 0) {
+    //             uint x = (i / 5) % 30;
+    //             uint y = (i / 5) / 30;
+
+    //             bytes memory color = abi.encodePacked(
+    //                 hexSymbols[uint8(_pixels[i + 2]) >> 4],
+    //                 hexSymbols[uint8(_pixels[i + 2]) & 0xf],
+    //                 hexSymbols[uint8(_pixels[i + 3]) >> 4],
+    //                 hexSymbols[uint8(_pixels[i + 3]) & 0xf],
+    //                 hexSymbols[uint8(_pixels[i + 4]) >> 4],
+    //                 hexSymbols[uint8(_pixels[i + 4]) & 0xf]
+    //             );
+
+    //             svgParts = abi.encodePacked(
+    //                 svgParts,
+    //                 '<rect x="', coords[x],
+    //                 '" y="', coords[y],
+    //                 '" width="1" height="1" fill="#', color, '"/>'
+    //             );
+    //         }
+    //     }
+
+    //     return string(abi.encodePacked('<g id="Body">', svgParts, '</g>'));
+    // }
 
     // TODO: put in onlyOwner here? or call this from PetersMain?
     function setEncodeURI(address _encodeURIAddress) public  {

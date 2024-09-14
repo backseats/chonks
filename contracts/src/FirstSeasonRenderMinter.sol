@@ -39,7 +39,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
         peterTraits = _peterTraits;
         _localDeploy = localDeploy_;
 
-        /*
+        
         if (_localDeploy) {
 
             //red cape:
@@ -148,7 +148,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
             addNewTrait(70, "Baby Blue", TraitCategory.Name.Shoes,"", hex"0b174591e30c174591e310174591e311174591e3","0b17054591e30c17054591e31017054591e31117054591e31117064591e31017064591e30b17064591e30c17064591e3");
            
         }
-        */
+        
     }
 
     // DEPLOY: Remove
