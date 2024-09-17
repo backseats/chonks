@@ -135,18 +135,36 @@ function renderContent(content: string, contentType: ContentType) {
     // } 
 
     if (contentType == ContentType.HTML) {
-        const iframeHTML = `
-            <div id="iframeContainer"></div>
+
+        // return content;
+        // const iframeHTML = `
+        //     <div id="iframeContainer"></div>
+        //     <script>
+        //         (function() {
+        //             // const encodedData = "${content}";
+        //             const decodedData = decodeURIComponent(${content});
+        //             const container = document.getElementById('iframeContainer');
+        //             const iframe = document.createElement('iframe');
+        //             iframe.style.width = '100%';
+        //             iframe.style.height = '1000px';
+        //             iframe.srcdoc = decodedData;
+        //             container.appendChild(iframe);
+        //         })();
+        //     </script>
+        // `;
+
+         const iframeHTML = `
+            <div id="iframeContainer"><iframe id="myFrame" style="width: 100%; height: 50vh; border: none;"></iframe></div>
             <script>
                 (function() {
                     // const encodedData = "${content}";
-                    const decodedData = decodeURIComponent(${content});
-                    const container = document.getElementById('iframeContainer');
-                    const iframe = document.createElement('iframe');
-                    iframe.style.width = '100%';
-                    iframe.style.height = '1000px';
-                    iframe.srcdoc = decodedData;
-                    container.appendChild(iframe);
+                  
+                    const decodedHtml = decodeURIComponent('${content}');
+                    const blob = new Blob([decodedHtml], { type: 'text/html' })
+                    const url = URL.createObjectURL(blob);
+
+                    document.getElementById('myFrame').src = url;
+
                 })();
             </script>
         `;
