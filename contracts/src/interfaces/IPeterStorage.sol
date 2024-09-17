@@ -79,4 +79,9 @@ interface IPeterStorage {
         bytes zMap;
     }
 
+    struct BackgroundStuff {
+        string backgroundColor;
+        string backgroundStyles;
+    }
+
 }

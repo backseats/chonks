@@ -14,6 +14,7 @@ import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../../lib/
 import "forge-std/console.sol"; // DEPLOY: remove
 
 
+
 // I don't think this should know about any kind of contracts. It should just get data and render it.
 contract ZRenderer {
 
@@ -62,12 +63,14 @@ contract ZRenderer {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         bytes memory _fullZmap,
-        string memory _backgroundColorStyles
+        IPeterStorage.BackgroundStuff memory _backgroundStuff
+        // string memory _backgroundColorStyles
+        // string memory _backgroundColor
     ) public view returns (string memory) {
 
         string memory fullAttributes;
 
-        string memory image = generateFullSvg( _bodySvg, _traitsSvg, _backgroundColorStyles);
+        string memory image = generateFullSvg( _bodySvg, _traitsSvg, _backgroundStuff.backgroundStyles);
 
         if (bytes(_traitsAttributes).length > 0) {
             fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
@@ -84,7 +87,7 @@ contract ZRenderer {
         headTags[0].tagClose = "%253C%252Fstyle%253E";
 
         // Gunzip unzips all the other scripts into the page
-        HTMLTag[] memory bodyTags = new HTMLTag[](11);
+        HTMLTag[] memory bodyTags = new HTMLTag[](12);
         bodyTags[0].name = "gunzipScripts-0.0.1.js";
         // <script src="data:text/javascript;base64,[script]"></script>
         bodyTags[0].tagType = HTMLTagType.scriptBase64DataURI;
@@ -150,23 +153,23 @@ contract ZRenderer {
         );
         bodyTags[8].tagClose = "%2527%253B%253C%252Fscript%253E"; // ';</script>
 
-        // bodyTags[9].tagOpen = bytes(
-        //     string.concat(
-        //         "%253Cscript%253Evar%2520bgColor%2520%253D%2527", // <script>var bgColor ='
-        //           encodeURIContract.encodeURI(
-        //             encodeURIContract.encodeURI(string('#OOFF00'))
-        //         )
-        //     )
-        // );
-        // bodyTags[9].tagClose = "%2527%253B%253C%252Fscript%253E"; // ';</script>
+        bodyTags[9].tagOpen = bytes(
+            string.concat(
+                "%253Cscript%253Evar%2520bgColor%2520%253D%2527", // <script>var bgColor ='
+                  encodeURIContract.encodeURI(
+                    encodeURIContract.encodeURI(string.concat("#", _backgroundStuff.backgroundColor))
+                )
+            )
+        );
+        bodyTags[9].tagClose = "%2527%253B%253C%252Fscript%253E"; // ';</script>
 
 
 
         // output the three.js script
-        bodyTags[9]
+        bodyTags[10]
             .tagOpen = "%253Cscript%2520type%253D%2522module%2522%2520src%253D%2522data%253Atext%252Fjavascript%253Bbase64%252C";
-        bodyTags[9].tagContent = base64ScriptContent;
-        bodyTags[9].tagClose = "%2522%253E%253C%252Fscript%253E";
+        bodyTags[10].tagContent = base64ScriptContent;
+        bodyTags[10].tagClose = "%2522%253E%253C%252Fscript%253E";
 
         // create scripty htmlRequest
         HTMLRequest memory htmlRequest;

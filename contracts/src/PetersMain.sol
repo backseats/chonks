@@ -109,13 +109,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_localDeploy) {
             for (uint i; i < 20; ++i) {
                 mint(); // Mints N bodies/tokens
-                 setBackgroundColor(i, "27b143");
+                //  setBackgroundColor(i, "27b143");
             }
             // setting random colors for now
-            // setBackgroundColor(1, "333333");
-            // setBackgroundColor(3, "27b143");
-            // setBackgroundColor(4, "eb068d");
-            // setBackgroundColor(8, "F2C304");
+            setBackgroundColor(1, "333333");
+            setBackgroundColor(3, "27b143");
+            setBackgroundColor(4, "eb068d");
+            setBackgroundColor(8, "F2C304");
 
             setRenderZ(1, true);
             setRenderZ(5, true);
@@ -668,6 +668,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             '</style>'
         );
 
+        BackgroundStuff memory backgroundStuff; 
+
+        // todo, verify one doesn't exist
+
+        backgroundStuff.backgroundColor = storedPeter.backgroundColor;  
+        backgroundStuff.backgroundStyles = backgroundColorStyles;
+
 
         return zRenderer.renderAsDataUriZ(
             _tokenId,
@@ -676,7 +683,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitsSvg,
             traitsAttributes,
             fullZmap,
-            backgroundColorStyles
+            backgroundStuff
+            // storedPeter.backgroundColor // look to combined these perhaps?
         );
     }
 
