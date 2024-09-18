@@ -5,7 +5,7 @@ pragma solidity ^0.8.13;
 import "forge-std/Script.sol";
 import "../src/PetersMain.sol";
 
-import { BodyRenderer } from "../src/renderers/BodyRenderer.sol";
+// import { BodyRenderer } from "../src/renderers/BodyRenderer.sol";
 import { PeterTraits } from "../src/PeterTraits.sol";
 import { FirstSeasonRenderMinter } from "../src/FirstSeasonRenderMinter.sol";
 import { MainRenderer } from "../src/renderers/MainRenderer.sol";
@@ -22,7 +22,7 @@ import { EncodeURI } from '../src/EncodeURI.sol';
 contract PetersMainScript is Script {
 
     PetersMain public main;
-    BodyRenderer public bodyRenderer;
+    // BodyRenderer public bodyRenderer;
     PeterTraits public traits;
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
     MainRenderer public mainRenderer;
@@ -54,7 +54,7 @@ contract PetersMainScript is Script {
         main.setTraitsContract(traits);
 
         // Set the body renderer on both contracts
-        bodyRenderer = new BodyRenderer();
+        // bodyRenderer = new BodyRenderer();
         // main.setBodyRenderer(bodyRenderer);
         // traits.setBodyRenderer(bodyRenderer);
 
@@ -78,7 +78,7 @@ contract PetersMainScript is Script {
 contract PetersMainBodyAndRenderderScript is Script {
 
     PetersMain public main;
-    BodyRenderer public bodyRenderer;
+    // BodyRenderer public bodyRenderer;
     PeterTraits public traits;
     // FirstSeasonRenderMinter public firstSeasonRenderMinter;
     MainRenderer public mainRenderer;
@@ -110,7 +110,7 @@ contract PetersMainBodyAndRenderderScript is Script {
 
 contract PetersTraitsScript is Script {
 
-    BodyRenderer public bodyRenderer;
+    // BodyRenderer public bodyRenderer;
     PeterTraits public traits;
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
     

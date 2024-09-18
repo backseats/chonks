@@ -22,7 +22,7 @@ import { IRenderMinterV1 } from "./interfaces/IRenderMinterV1.sol";
 
 import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol"; // DEPLOY: remove, this is just for testing
 
-// import "forge-std/console.sol"; // DEPLOY: remove
+import "forge-std/console.sol"; // DEPLOY: remove
 
 // modifier onlyAuthorizedMinter() {
 //     require(authorizedMinters[msg.sender], "Caller is not an authorized minter");
@@ -177,6 +177,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         return renderAsDataUri(_tokenId);
     }
 
+    /*
     // TODO: Put back in onlyOwner
     function addNewTrait(
         uint256 _traitIndex,
@@ -192,14 +193,14 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         // trait 4 is Blue Shirt, get existing metadata, should be empty struct, then set below. not associated with any token ids yet
         TraitMetadata storage metadata = traitIndexToMetadata[_traitIndex];
 
-        /*
+        
         // commenting out for now
         // todo: add checks of some kind
         // Check if we already have it
-        if (keccak256(bytes(metadata.traitName)) != keccak256(bytes(''))) {
-            revert('Trait already exists');
-        }
-        */
+        // if (keccak256(bytes(metadata.traitName)) != keccak256(bytes(''))) {
+        //     revert('Trait already exists');
+        // }
+        
         metadata.traitIndex = _traitIndex;
         metadata.traitName = _traitName;
         metadata.traitType = _traitType;
@@ -207,11 +208,17 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         metadata.animations = _animations;
         metadata.renderMinterContract = _renderMinterContract;
     }
+
+    */
     
     function getTrait(uint256 _tokenId) public view returns (ITraitStorage.StoredTrait memory) {
         ITraitStorage.StoredTrait memory storedTrait = traitTokens.all[_tokenId];
         uint128 randomness = traitTokens.epochs[storedTrait.epoch].randomness;
         IRenderMinterV1 dataContract = IRenderMinterV1(storedTrait.renderMinterContract);
+
+        console.log('PeterTraits:getTrait for :', _tokenId);
+        console.log("storedTrait.renderMinterContract:", storedTrait.renderMinterContract);
+        console.log("storedTrait.seed", storedTrait.seed);
 
         if (storedTrait.renderMinterContract == address(0) && storedTrait.seed == 0)
             revert TraitNotFound(_tokenId);

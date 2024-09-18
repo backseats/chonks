@@ -155,11 +155,13 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
     }
 
     // DEPLOY: Remove
-    function _debugPostConstructorMint(address _traits) public {
+    function _debugPostConstructorMint() public {
         if (_localDeploy) {
-            for (uint i; i < 5; ++i) { // DEPLOY: remove
-                safeMint(_traits); // Mints 3 sets of traits
-            }
+            // for (uint i; i < 5; ++i) { // DEPLOY: remove
+            //     safeMint(_traits); // Mints 3 sets of traits
+            // }
+
+            safeMintMany(msg.sender);
         }
     }
 
