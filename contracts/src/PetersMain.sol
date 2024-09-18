@@ -110,6 +110,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             for (uint i; i < 20; ++i) {
                 mint(); // Mints N bodies/tokens
                 //  setBackgroundColor(i, "27b143");
+                setRenderZ(i, true);
             }
             // setting random colors for now
             setBackgroundColor(1, "333333");
@@ -117,9 +118,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             setBackgroundColor(4, "eb068d");
             setBackgroundColor(8, "F2C304");
 
-            setRenderZ(1, true);
-            setRenderZ(5, true);
-            setRenderZ(6, true);
+            // setRenderZ(1, true);
+            // setRenderZ(5, true);
+            // setRenderZ(6, true);
         }
     }
 
