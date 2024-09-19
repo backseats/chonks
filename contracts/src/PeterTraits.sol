@@ -176,40 +176,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
         return renderAsDataUri(_tokenId);
     }
-
-    /*
-    // TODO: Put back in onlyOwner
-    function addNewTrait(
-        uint256 _traitIndex,
-        string memory _traitName,
-        TraitCategory.Name _traitType,
-        // string memory _traitPath,
-        string memory _animations,
-        address _renderMinterContract
-    ) public {
-        // maybe check if a trait already exists for _traitIndex so we don't override
-        // alternatively there should be a time period beyond which we can't "edit" existing traits. it would act as a temporary safeguard
-
-        // trait 4 is Blue Shirt, get existing metadata, should be empty struct, then set below. not associated with any token ids yet
-        TraitMetadata storage metadata = traitIndexToMetadata[_traitIndex];
-
-        
-        // commenting out for now
-        // todo: add checks of some kind
-        // Check if we already have it
-        // if (keccak256(bytes(metadata.traitName)) != keccak256(bytes(''))) {
-        //     revert('Trait already exists');
-        // }
-        
-        metadata.traitIndex = _traitIndex;
-        metadata.traitName = _traitName;
-        metadata.traitType = _traitType;
-        // metadata.traitPath = _traitPath;
-        metadata.animations = _animations;
-        metadata.renderMinterContract = _renderMinterContract;
-    }
-
-    */
     
     function getTrait(uint256 _tokenId) public view returns (ITraitStorage.StoredTrait memory) {
         ITraitStorage.StoredTrait memory storedTrait = traitTokens.all[_tokenId];
@@ -253,18 +219,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         return traitTokens.epoch;
     }
 
-    /*
-    function getGhostSVG() public pure returns (string memory) {
-        // TODO: PRNG here for different bodies perhaps
-        return string.concat(
-            '<g id="ghost" class="g" style="opacity: 25%;">',
-            // BODY_001,
-            // get colorMap from ghost, converted
-            '</g>'
-        );
-    }
-    */
-
     function setGhostMaps(bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
         ghost.colorMap = _colorMap;
         ghost.zMap = _zMap;
@@ -288,7 +242,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
         if (trait.isRevealed) {
             TraitMetadata memory metadata = traitIndexToMetadata[trait.traitIndex];
-            // traitSvg = metadata.traitPath;
+
             traitSvg = getTraitImageSvg(trait.traitIndex);
 
             attributes = string.concat(
@@ -334,7 +288,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     function getSvgForTokenId(uint256 _tokenId) public view returns (string memory traitSvg) {
         
         // don't get the ghost here for now
-
         StoredTrait memory trait = getTrait(_tokenId);
 
         if (trait.isRevealed) {
@@ -342,43 +295,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         } else {
             traitSvg = '<svg></svg>';
         }
-
-        /*
-        string memory bodyGhostSvg = getGhostSVG();
-
-        // Trait memory trait = getTrait(_tokenId);
-        StoredTrait memory trait = getTrait(_tokenId);
-
-        if (trait.isRevealed) {
-            // TraitMetadata memory metadata = traitIndexToMetadata[trait.traitIndex];
-            //traitSvg = string.concat(bodyGhostSvg, metadata.traitPath);
-
-            traitSvg = string.concat(bodyGhostSvg, getTraitImageSvg(trait.traitIndex));
-        } else {
-            traitSvg = '<svg></svg>';
-        }
-        */
     }
-
-    /*
-    function getSvgAndMetadataTrait(Trait memory trait, uint256 traitId) public view returns(string memory traitSvg, string memory traitAttributes ) {
-        if (trait.isRevealed && traitId > 0) {
-            TraitMetadata storage metadata = traitIndexToMetadata[trait.traitIndex];
-
-            traitAttributes = RenderHelper.stringTrait(
-                TraitCategory.toString(metadata.traitType),
-                metadata.traitName
-            );
-
-            // Combine the traits
-            // NOTE: here we can add an svg path for something that isn't equipped (ie and empty string and it shouldnt affect the render)
-            traitSvg = metadata.traitPath;
-        } else {
-            traitAttributes = '{}';
-            traitSvg = '<svg></svg>';
-        }
-    }
-    */
 
     // effectively the same as getBodyImageSvg so maybe put in a library or contract
     // receives body colorMap, puts it into a 30x30 grid, with 5 bytes row-major byte array
@@ -500,8 +417,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     }
 
     // called from PeterMain renderAsDataUriSVG()
-    function getSvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view
-        returns (string memory traitsSvg, string memory traitsAttributes)
+    function getSvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, string memory traitsAttributes)
     {
 
         if (!storedPeter.isRevealed) return ("", "{}");
@@ -587,88 +503,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
             );
             
         }
-    }
-
-    // called from PeterMain renderAsDataUriZ()
-    // a lot of overlap with getSvgAndMetadata so can look to consolidate
-    function getTraitZMaps(IPeterStorage.StoredPeter memory storedPeter) public view returns (bytes memory traitZMaps) {
-
-        if (!storedPeter.isRevealed) return ("");
-
-        // hat
-        // hair
-        // glasses
-        // handheld
-        // shirt
-        // pants
-        // shoes
-
-        // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
-
-        if (storedPeter.hatId > 0) {
-            // Trait memory hatTrait = getTrait(storedPeter.hatId);
-            // StoredTrait memory hatTrait = getTrait(storedPeter.hatId);
-
-            // traitZMaps = bytes.concat(
-            //     traitZMaps,
-            //     traitIndexToMetadata[hatTrait.traitIndex].zMap
-            // );
-
-            traitZMaps = callGetTraitZMap(storedPeter.hatId);
-        }
-
-        if (storedPeter.hairId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            // StoredTrait memory hairTrait = getTrait(storedPeter.hairId);
-
-            // traitZMaps = bytes.concat(
-            //     traitZMaps,
-            //     traitIndexToMetadata[hairTrait.traitIndex].zMap
-            // );
-            traitZMaps = callGetTraitZMap(storedPeter.hairId);
-
-        }
-
-        if (storedPeter.shoesId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            // StoredTrait memory shoesTrait = getTrait(storedPeter.shoesId);
-
-            // traitZMaps = bytes.concat(
-            //     traitZMaps,
-            //     traitIndexToMetadata[shoesTrait.traitIndex].zMap
-            // );
-            traitZMaps = callGetTraitZMap(storedPeter.shoesId);
-        }
-
-        if (storedPeter.pantsId > 0) {
-            // Trait memory hairTrait = getTrait(storedPeter.hairId);
-            // StoredTrait memory pantsTrait = getTrait(storedPeter.pantsId);
-
-            // traitZMaps = bytes.concat(
-            //     traitZMaps,
-            //     traitIndexToMetadata[pantsTrait.traitIndex].zMap
-            // );
-            traitZMaps = callGetTraitZMap(storedPeter.pantsId);
-        }
-
-        if (storedPeter.shirtId > 0) {
-
-            // StoredTrait memory shirtTrait = getTrait(storedPeter.shirtId);
-
-            // traitZMaps = bytes.concat(
-            //     traitZMaps,
-            //     traitIndexToMetadata[shirtTrait.traitIndex].zMap
-            // );
-            traitZMaps = callGetTraitZMap(storedPeter.shirtId);
-        }
-    }
-
-    function callGetTraitZMap(uint256 _traitIndex) public view returns (bytes memory traitZMaps) {
-        StoredTrait memory storedTrait = getTrait(_traitIndex);
-        traitZMaps = bytes.concat(
-                traitZMaps,
-                traitIndexToMetadata[storedTrait.traitIndex].zMap
-        );
     }
 
     function walletOfOwner(address _owner) public view returns(uint256[] memory) {

@@ -7,7 +7,6 @@ import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extension
 import { Ownable } from "solady/auth/Ownable.sol";
 import { IERC165 } from  "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { Utils } from "./common/Utils.sol";
-// import { EncodeURI } from "./EncodeURI.sol";
 
 // ERC-6551 Imports
 import { IAccountImplementation } from "./interfaces/TBABoilerplate/IAccountImplementation.sol";
@@ -40,18 +39,6 @@ import "forge-std/console.sol"; // DEPLOY: remove
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906 {
 
     bool _localDeploy; // DEPLOY: remove
-    // bool _renderZ = false; // temp flag control 2d or 3d output // DEPLOY: remove
-
-    // Encodes plain text as a URI-encoded string
-    // EncodeURI public encodeURIContract;
-
-    // Scripty & EthFS for 3D rendering
-    // address immutable scriptyBuilderAddress = 0xD7587F110E08F4D120A231bA97d3B577A81Df022;
-    // address immutable scriptyStorageAddress = 0xbD11994aABB55Da86DC246EBB17C1Be0af5b7699;
-    // address immutable ethfsFileStorageAddress = 0x8FAA1AAb9DA8c75917C43Fb24fDdb513edDC3245;
-
-    // Three.js script for 3D rendering
-    // bytes public base64ScriptContent;
 
     /// @dev We use this database for persistent storage.
     Peters peterTokens;
@@ -71,12 +58,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     address constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
     address constant ACCOUNT_IMPLEMENTATION = 0x41C8f39463A868d3A88af00cd0fe7102F30E44eC;
 
-    // transform="scale(2) translate(-7,-5)"
-    // scale: 200%; transform: translate(-7px, -5px);
-
-    // uint256 constant MAX_TRAITS_PER_SCREEN = 20;
+    // Backpack stuff
     uint256 public MAX_TRAITS_TO_OUTPUT = 69;
-
     string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
 
     // Mapping of tokenIds to TBA account addresses
@@ -445,134 +428,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             getBodyImageSvg(storedPeter.bodyIndex),
             RenderHelper.stringTrait('Body', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
         );
-
     }
-
-    // function renderAsDataUriZ(uint256 _tokenId) public view returns (string memory) {
-
-    //     bytes memory bodyZmap;
-    //     bytes memory traitZmaps;
-    //     bytes memory fullZmap;
-    //     string memory traitsAttributes;
-    //     string memory bodyAttributes;
-    //     string memory fullAttributes;
-
-
-    //     StoredPeter memory storedPeter = getPeter(_tokenId);
-
-    //     (bodyZmap, bodyAttributes) = getZmapsAndMetadata(storedPeter);
-    //     (traitZmaps, traitsAttributes) = traitsContract.getZmapsAndMetadata(storedPeter);
-    //     fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
-
-    //     fullZmap = bytes.concat(
-    //         bodyZmap,
-    //         traitZmaps
-    //     );
-
-    //     // html style
-    //     HTMLTag[] memory headTags = new HTMLTag[](1);
-    //     headTags[0].tagOpen = "%253Cstyle%253E";
-    //     headTags[0]
-    //         .tagContent = "html%257Bheight%253A100%2525%257Dbody%257Bmin-height%253A100%2525%253Bmargin%253A0%253Bpadding%253A0%257Dcanvas%257Bpadding%253A0%253Bmargin%253Aauto%253Bdisplay%253Ablock%253Bposition%253Aabsolute%253Btop%253A0%253Bbottom%253A0%253Bleft%253A0%253Bright%253A0%257D";
-    //     headTags[0].tagClose = "%253C%252Fstyle%253E";
-
-    //     // Gunzip unzips all the other scripts into the page
-    //     HTMLTag[] memory bodyTags = new HTMLTag[](10);
-    //     bodyTags[0].name = "gunzipScripts-0.0.1.js";
-    //     // <script src="data:text/javascript;base64,[script]"></script>
-    //     bodyTags[0].tagType = HTMLTagType.scriptBase64DataURI;
-    //     bodyTags[0].contractAddress = ethfsFileStorageAddress;
-
-    //     // Helps dynamically load ES modules
-    //     bodyTags[1].name = "es-module-shims.js.Base64.gz";
-    //     // <script type="text/javascript+gzip" src="data:text/javascript;base64,[script]"></script>
-    //     bodyTags[1].tagType = HTMLTagType.scriptGZIPBase64DataURI;
-    //     bodyTags[1].contractAddress = ethfsFileStorageAddress;
-
-    //     // fflate is a zip/gzip library for JavaScript
-    //     bodyTags[2].name = "fflate.module.js.Base64.gz";
-    //     // double encoded:
-    //     // - <script>var fflte = "
-    //     // - "</script>
-    //     bodyTags[2]
-    //         .tagOpen = "%253Cscript%253Evar%2520fflte%2520%253D%2520%2522";
-    //     bodyTags[2].tagClose = "%2522%253C%252Fscript%253E";
-    //     bodyTags[2].contractAddress = ethfsFileStorageAddress;
-
-    //      // Three.js is a 3D library for JavaScript
-    //     bodyTags[3].name = "three-v0.162.0-module.min.js.Base64.gz";
-    //     // double encoded:
-    //     // - <script>var t3 = "
-    //     // - "</script>
-    //     bodyTags[3].tagOpen = "%253Cscript%253Evar%2520t3%2520%253D%2520%2522";
-    //     bodyTags[3].tagClose = "%2522%253C%252Fscript%253E";
-    //     bodyTags[3].contractAddress = ethfsFileStorageAddress;
-
-    //     // OrbitControls is a camera control library for Three.js
-    //     bodyTags[4].name = "three-v0.162.0-OrbitControls.js.Base64.gz";
-    //     // double encoded:
-    //     // - <script>var oc = "
-    //     // - "</script>
-    //     bodyTags[4].tagOpen = "%253Cscript%253Evar%2520oc%2520%253D%2520%2522";
-    //     bodyTags[4].tagClose = "%2522%253C%252Fscript%253E";
-    //     bodyTags[4].contractAddress = ethfsFileStorageAddress;
-
-    //     // Import handler for dynamically loading ES modules
-    //     bodyTags[5].name = "importHandler.js";
-    //     bodyTags[5].tagType = HTMLTagType.scriptBase64DataURI;
-    //     bodyTags[5].contractAddress = ethfsFileStorageAddress;
-
-    //     bodyTags[6].name = "";
-    //     // <script>[script]</script>
-    //     bodyTags[6].tagType = HTMLTagType.script;
-    //     bodyTags[6]
-    //         .tagContent = 'injectImportMap([ ["fflate",fflte],   ["three",t3], ["OrbitControls",oc] ],gunzipScripts)';
-
-    //     bodyTags[7].name = "canvas";
-    //     bodyTags[7].tagOpen = '%253Ccanvas%2520id%253D%2522theCanvas%2522%2520class%253D%2522webgl%2522%253E';
-    //     bodyTags[7].tagClose = "%253C%252Fcanvas%253E";
-
-    //     // get the zMap and provide it to the script: <script>var zMapFull = '[zMap]';  </script>
-    //     bodyTags[8].tagOpen = bytes(
-    //         string.concat(
-    //             "%253Cscript%253Evar%2520zMapFull%2520%253D%2527",
-    //               encodeURIContract.encodeURI(
-    //                 encodeURIContract.encodeURI(string(fullZmap))
-    //             )
-    //         )
-    //     );
-    //     bodyTags[8].tagClose = "%2527%253B%253C%252Fscript%253E";
-
-    //     // output the three.js script
-    //     bodyTags[9]
-    //         .tagOpen = "%253Cscript%2520type%253D%2522module%2522%2520src%253D%2522data%253Atext%252Fjavascript%253Bbase64%252C";
-    //     bodyTags[9].tagContent = base64ScriptContent;
-    //     bodyTags[9].tagClose = "%2522%253E%253C%252Fscript%253E";
-
-    //     // create scripty htmlRequest
-    //     HTMLRequest memory htmlRequest;
-    //     htmlRequest.headTags = headTags;
-    //     htmlRequest.bodyTags = bodyTags;
-
-    //     // this combines everything into a single output for animation_url
-    //     bytes memory doubleURLEncodedHTMLDataURI = IScriptyBuilderV2(
-    //         scriptyBuilderAddress
-    //     ).getHTMLURLSafe(htmlRequest);
-
-    //     return
-    //         string(
-    //             abi.encodePacked(
-    //                 "data:application/json,",
-    //                 encodeURIContract.encodeURI('{"name":"Peter #'),
-    //                 Utils.toString(_tokenId),
-    //                 encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
-    //                 encodeURIContract.encodeURI(fullAttributes),
-    //                 encodeURIContract.encodeURI(',"animation_url":"'),
-    //                 doubleURLEncodedHTMLDataURI,
-    //                 encodeURIContract.encodeURI('"}')
-    //             )
-    //         );
-    // }
 
     function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
         address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
@@ -755,14 +611,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setFirstSeasonRenderMinter(address _dataContract) public onlyOwner {
         firstSeasonRenderMinter = FirstSeasonRenderMinter(_dataContract);
     }
-
-    // function setEncodeURI(address _encodeURIAddress) public onlyOwner {
-    //     encodeURIContract = EncodeURI(_encodeURIAddress);
-    // }
-
-    // function setScriptContent(bytes calldata _base64EncodedString) public onlyOwner {
-    //     base64ScriptContent = _base64EncodedString;
-    // }
 
     function setMainRenderer(address _mainRenderer) public onlyOwner {
         mainRenderer = MainRenderer(_mainRenderer);

@@ -251,55 +251,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
     }
 
     // TODO add trait rarity
-
-    /*
     function explainTrait(
-        bool localDeploy,
-        ITraitStorage.StoredTrait calldata storedTrait,
-        uint128 randomness
-    ) view pu (ITraitStorage.Trait memory) {
-        ITraitStorage.Trait memory trait;
-
-        trait.stored = storedTrait;
-        trait.seed = uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % type(uint256).max;
-        trait.isRevealed = localDeploy == true ? true : randomness > 0; // if randomness is > 0, epoch & hence peter is revealed
-
-        // NOTE: These also assume an even distribution of traits which won't be accurate but it's a starting place
-
-        // ok, so normally we know how many gradients/colors we have, and then either set an even chance for any, or define probabilities
-        if (storedTrait.traitType == TraitCategory.Name.Handheld) {
-            trait.traitIndex = uint256(1 + (trait.seed % accessories.length));
-        }
-
-        if (storedTrait.traitType == TraitCategory.Name.Glasses) {
-            trait.traitIndex = uint256(11 + (trait.seed % glasses.length));
-        }
-
-        if (storedTrait.traitType == TraitCategory.Name.Hair) {
-            trait.traitIndex = uint256(21 + (trait.seed % hair.length));
-        }
-
-        if (storedTrait.traitType == TraitCategory.Name.Hat) {
-            trait.traitIndex = uint256(31 + (trait.seed % hats.length));
-        }
-
-        if (storedTrait.traitType == TraitCategory.Name.Pants) {
-            trait.traitIndex = uint256(41 + (trait.seed % pants.length));
-        }
-
-        if (storedTrait.traitType == TraitCategory.Name.Shirt) {
-            trait.traitIndex = uint256(51 + (trait.seed % shirts.length));
-        }
-
-        if (storedTrait.traitType == TraitCategory.Name.Shoes) {
-            trait.traitIndex = uint256(61 + (trait.seed % shoes.length));
-        }
-
-        return trait;
-    }
-    */
-
-   function explainTrait(
         bool localDeploy,
         ITraitStorage.StoredTrait memory storedTrait,
         uint128 randomness
