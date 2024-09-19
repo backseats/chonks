@@ -119,7 +119,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     /// @notice Initializes and closes epochs. Thank you jalil & mouseDev.
     /// @dev Based on the commit-reveal scheme proposed by MouseDev.
-    
+
     function resolveEpochIfNecessary() public {
         CommitReveal.Epoch storage currentEpoch = traitTokens.epochs[traitTokens.epoch];
 
@@ -176,15 +176,11 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
         return renderAsDataUri(_tokenId);
     }
-    
+
     function getTrait(uint256 _tokenId) public view returns (ITraitStorage.StoredTrait memory) {
         ITraitStorage.StoredTrait memory storedTrait = traitTokens.all[_tokenId];
         uint128 randomness = traitTokens.epochs[storedTrait.epoch].randomness;
         IRenderMinterV1 dataContract = IRenderMinterV1(storedTrait.renderMinterContract);
-
-        console.log('PeterTraits:getTrait for :', _tokenId);
-        console.log("storedTrait.renderMinterContract:", storedTrait.renderMinterContract);
-        console.log("storedTrait.seed", storedTrait.seed);
 
         if (storedTrait.renderMinterContract == address(0) && storedTrait.seed == 0)
             revert TraitNotFound(_tokenId);
@@ -193,7 +189,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     }
 
     function getTraitType(uint256 _tokenId) public view returns (TraitCategory.Name) {
-        // Trait memory trait = getTrait(_tokenId);
         StoredTrait memory trait = getTrait(_tokenId);
         TraitMetadata memory metadata = traitIndexToMetadata[trait.traitIndex];
 
@@ -201,12 +196,11 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     }
 
     function getTraitMetadata(uint256 _tokenId) public view returns (TraitMetadata memory) {
-        // Trait memory trait = getTrait(_tokenId);
         StoredTrait memory trait = getTrait(_tokenId);
         return traitIndexToMetadata[trait.traitIndex];
     }
 
-        function getStoredTraitForTokenId(uint256 _tokenId) public view returns (ITraitStorage.StoredTrait memory) {
+    function getStoredTraitForTokenId(uint256 _tokenId) public view returns (ITraitStorage.StoredTrait memory) {
         return traitTokens.all[_tokenId];
     }
 
@@ -224,11 +218,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         ghost.zMap = _zMap;
     }
 
-    // If we need to deploy and hit size issues...
-    // function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
-    //     return '';
-    // }
-    
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
         string memory fullSvg;
         string memory traitSvg;
@@ -284,9 +273,9 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
         return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
     }
-    
+
     function getSvgForTokenId(uint256 _tokenId) public view returns (string memory traitSvg) {
-        
+
         // don't get the ghost here for now
         StoredTrait memory trait = getTrait(_tokenId);
 
@@ -339,11 +328,11 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         bytes memory pixels = getTraitImage(ghost.colorMap);
         bytes memory svgParts = createSvgFromPixels(pixels);
 
-        return string(abi.encodePacked('<g id="ghost" class="g" style="opacity: 25%;">', svgParts, '</g>'));
+        return string(abi.encodePacked('<g id="ghost" class="g" style="opacity: 50%;">', svgParts, '</g>'));
     }
 
     function createSvgFromPixels(bytes memory _pixels) public pure returns (bytes memory svgParts) {
-        
+
         string[16] memory hexSymbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
         string[30] memory coords = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"];
 
@@ -371,7 +360,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
                 );
             }
         }
-    
+
     }
 
     // returns traitSvg and traitAttributes
@@ -444,7 +433,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         if (bytes(_traitsAttributes).length == 0) {
             traitsSvg = traitSvg;
             traitsAttributes = traitAttribute;
-           
+
         } else {
             traitsSvg = string.concat(
                 _traitsSvg,
@@ -455,7 +444,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
                 ',',
                 traitAttribute
             );
-            
+
         }
 
     }
@@ -486,7 +475,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
             traitsSvg = traitSvg;
             traitsAttributes = traitAttribute;
             traitZMaps = traitZMap;
-           
+
         } else {
             traitsSvg = string.concat(
                 _traitsSvg,
@@ -501,7 +490,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
                 _traitZMaps,
                 traitZMap
             );
-            
+
         }
     }
 

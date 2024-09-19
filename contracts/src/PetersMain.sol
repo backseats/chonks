@@ -219,85 +219,94 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     /// Equip/Unequip clothing traits
 
     function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Handheld);
+        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Handheld);
 
         peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
     }
 
     function unequipAccessory(uint256 _peterTokenId) public {
+        _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].handheldId = 0;
     }
 
     function equipGlasses(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Glasses);
+        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Glasses);
 
         peterTokens.all[_peterTokenId].glassesId = _traitTokenId;
     }
 
     function unequipGlasses(uint256 _peterTokenId) public {
+        _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].glassesId = 0;
     }
 
     function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Hair);
+        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Hair);
 
         peterTokens.all[_peterTokenId].hairId = _traitTokenId;
     }
 
     function unequipHair(uint256 _peterTokenId) public {
+        _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].hairId = 0;
     }
 
     function equipHat(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Hat);
+        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Hat);
 
         peterTokens.all[_peterTokenId].hatId = _traitTokenId;
     }
 
     function unequipHat(uint256 _peterTokenId) public {
+        _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].hatId = 0;
     }
 
     function equipShirt(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        // _validateTrait(_traitTokenId, TraitCategory.Name.Shirt); // TODO: fix
+        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Shirt); // TODO: fix
 
         peterTokens.all[_peterTokenId].shirtId = _traitTokenId;
     }
 
     function unequipShirt(uint256 _peterTokenId) public {
+        _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].shirtId = 0;
     }
 
     // NOTE: We Might want counterpart view functions that just compile the svg without writing to chain
     function equipPants(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Pants);
+        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Pants);
 
         peterTokens.all[_peterTokenId].pantsId = _traitTokenId;
     }
 
     function unequipPants(uint256 _peterTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
+        _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].pantsId = 0;
     }
 
     function equipShoes(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Shoes);
+        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Shoes);
 
         peterTokens.all[_peterTokenId].shoesId = _traitTokenId;
     }
 
     function unequipShoes(uint256 _peterTokenId) public {
+        _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].shoesId = 0;
     }
 
+    // validate OwnershipHandoverRequested(pendingOwner);
     function unequipAll(uint256 _peterTokenId) public {
+        _validatePeterOwnership(_peterTokenId);
+
         StoredPeter storage peter = peterTokens.all[_peterTokenId];
         peter.hatId = 0;
         peter.hairId = 0;
@@ -319,6 +328,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _pantsTokenId,
         uint256 _shoesTokenId
     ) public {
+        // Might be able to cut this down gas-wise since it's validating peter ownership each time
         if (_hatTokenId != 0) equipHat(_peterTokenId, _hatTokenId);
         if (_hairTokenId != 0) equipHair(_peterTokenId, _hairTokenId);
         if (_glassesTokenId != 0) equipGlasses(_peterTokenId, _glassesTokenId);
@@ -330,21 +340,20 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Validations
 
-    function _validateTokenOwnership(uint _peterId, uint _traitTokenId, address _msgSender) internal view {
-        address peterOwner = ownerOf(_peterId);
-        if (_msgSender != peterOwner) revert IncorrectPeterOwner(); // Not your Peter
-
-        address tbaOfTokenIdToBeSet = traitsContract.ownerOf(_traitTokenId);
-        address ownerOfTBA = IAccountImplementation(payable(tbaOfTokenIdToBeSet)).owner();
-
-        if (ownerOfTBA != peterOwner) revert IncorrectTBAOwner();
+    function _validatePeterOwnership(uint256 _peterId) internal view {
+        if (msg.sender != ownerOf(_peterId)) revert IncorrectPeterOwner(); // Not your Peter
     }
 
-    // TODO: modifiers for ownership, TODO Fix
-    function _validateTrait(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
+    function _validateTokenOwnership(uint _peterId, uint _traitTokenId) internal view {
+        _validatePeterOwnership(_peterId);
+
+        address tbaOfPeter = address(tokenIdToTBAAccountAddress[_peterId]);
+        address ownerOfTrait = traitsContract.ownerOf(_traitTokenId);
+        if (ownerOfTrait != tbaOfPeter) revert IncorrectTBAOwner();
+    }
+
+    function _validateTraitType(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
         TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId); // Hat, Pants, etc.
-        // console.log("traitTypeofTokenIdToBeSet", traitTypeofTokenIdToBeSet);
-        // console.log("uint(_traitType)", uint(_traitType));
 
         // Checks the fetched TraitCategory.Name against the one we send in
         if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))

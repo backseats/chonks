@@ -6,6 +6,8 @@ import { PeterTraits } from "../src/PeterTraits.sol";
 import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
 import { IPeterStorage } from '../src/interfaces/IPeterStorage.sol';
 import { MainRenderer } from '../src/renderers/MainRenderer.sol';
+import { ITraitStorage } from '../src/interfaces/ITraitStorage.sol';
+import { TraitCategory } from '../src/TraitCategory.sol';
 
 import { Test, console } from 'forge-std/Test.sol';
 
@@ -107,39 +109,110 @@ contract PetersMainTest is Test {
     }
 
     function test_mint() public {
+        // Set up the render minter
         vm.prank(address(1));
         main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
         assertEq(address(main.firstSeasonRenderMinter()), address(firstSeasonMinter));
         vm.stopPrank();
 
+        // mint 5 traits
         address user = address(2);
         vm.startPrank(user);
         main.mint();
         firstSeasonMinter.safeMintMany(user);
         vm.stopPrank();
 
+        // validate data
+        assertEq(main.balanceOf(user), 1);
+        address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
+        assertFalse(tbaWallet == user);
+        assertEq(traits.balanceOf(tbaWallet), 5);
+    }
+
+    function test_equipUnequipShirt() public {
+        // Set up the render minter
+        vm.prank(address(1));
+        main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
+        assertEq(address(main.firstSeasonRenderMinter()), address(firstSeasonMinter));
+        vm.stopPrank();
+
+        // mint 5 traits
+        address user = address(2);
+        vm.startPrank(user);
+        main.mint();
+        firstSeasonMinter.safeMintMany(user);
+        vm.stopPrank();
+
+        // validate data
         assertEq(main.balanceOf(user), 1);
         address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
         assertFalse(tbaWallet == user);
         assertEq(traits.balanceOf(tbaWallet), 5);
 
+        // Get StoredPeter & ShirtId
         IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
-        console.log(storedPeter.hatId); // traits tid 0
-        console.log(storedPeter.shirtId); // traits tid 1
-        console.log(storedPeter.pantsId); // traits tid 2
+        uint256 shirtTokenId = storedPeter.shirtId;
 
+        ITraitStorage.StoredTrait memory trait = traits.getTrait(shirtTokenId); // tid 4,
+        TraitCategory.Name name = trait.traitType;
+        assertEq(TraitCategory.toString(name), "Shirt");
+
+        // Unequip Shirt and validate
         vm.startPrank(user);
         storedPeter = main.getPeter(1);
-        assertEq(storedPeter.shirtId, 1);
+        assertEq(shirtTokenId, 1);
         main.unequipShirt(1);
         storedPeter = main.getPeter(1);
         assertEq(storedPeter.shirtId, 0);
         vm.stopPrank();
 
+        // Admin, set traits contract and assert
+        vm.prank(address(1));
+        main.setTraitsContract(traits);
+        assertEq(address(main.traitsContract()), address(traits));
+
+        // Equip Shirt
         vm.startPrank(user);
         main.equipShirt(1, 1);
         storedPeter = main.getPeter(1);
-        assertEq(storedPeter.shirtId, 1);
+        assertEq(shirtTokenId, 1);
         vm.stopPrank();
+    }
+
+    function test_unequipAll() public {
+        // Set up the render minter
+        vm.prank(address(1));
+        main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
+        assertEq(address(main.firstSeasonRenderMinter()), address(firstSeasonMinter));
+        vm.stopPrank();
+
+        // mint 5 traits
+        address user = address(2);
+        vm.startPrank(user);
+        main.mint();
+        firstSeasonMinter.safeMintMany(user);
+        vm.stopPrank();
+
+        // validate data
+        assertEq(main.balanceOf(user), 1);
+        address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
+        assertFalse(tbaWallet == user);
+        assertEq(traits.balanceOf(tbaWallet), 5);
+
+        // Ensure pants and shirt are equipped
+        IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
+        assertGt(storedPeter.shirtId, 0);
+        assertGt(storedPeter.pantsId, 0);
+
+        vm.prank(user);
+        main.unequipAll(1);
+        storedPeter = main.getPeter(1);
+        assertEq(storedPeter.hatId, 0);
+        assertEq(storedPeter.hairId, 0);
+        assertEq(storedPeter.glassesId, 0);
+        assertEq(storedPeter.handheldId, 0);
+        assertEq(storedPeter.shirtId, 0);
+        assertEq(storedPeter.pantsId, 0);
+        assertEq(storedPeter.shoesId, 0);
     }
 }
