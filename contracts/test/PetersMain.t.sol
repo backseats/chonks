@@ -25,13 +25,11 @@ contract PetersMainTest is Test {
         main = new PetersMain(false);
         traits = new PeterTraits(false);
         firstSeasonMinter = new FirstSeasonRenderMinter(traits, localDeploy);
-        firstSeasonMinter.setMinterStatus(address(main), true);
+        firstSeasonMinter.setMinterStatus(address(main), true); // true uses localDeploy for testing
 
         mainRenderer = new MainRenderer();
         main.setMainRenderer(address(mainRenderer));
 
-        // main.setTraitsContract(traits);
-        // main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
         vm.stopPrank();
     }
 
@@ -106,5 +104,42 @@ contract PetersMainTest is Test {
 
         (bodyIndex, bodyName, colorMap, zMap) = main.bodyIndexToMetadata(5);
         assertEq(bodyName, "");
+    }
+
+    function test_mint() public {
+        vm.prank(address(1));
+        main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
+        assertEq(address(main.firstSeasonRenderMinter()), address(firstSeasonMinter));
+        vm.stopPrank();
+
+        address user = address(2);
+        vm.startPrank(user);
+        main.mint();
+        firstSeasonMinter.safeMintMany(user);
+        vm.stopPrank();
+
+        assertEq(main.balanceOf(user), 1);
+        address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
+        assertFalse(tbaWallet == user);
+        assertEq(traits.balanceOf(tbaWallet), 5);
+
+        IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
+        console.log(storedPeter.hatId); // traits tid 0
+        console.log(storedPeter.shirtId); // traits tid 1
+        console.log(storedPeter.pantsId); // traits tid 2
+
+        vm.startPrank(user);
+        storedPeter = main.getPeter(1);
+        assertEq(storedPeter.shirtId, 1);
+        main.unequipShirt(1);
+        storedPeter = main.getPeter(1);
+        assertEq(storedPeter.shirtId, 0);
+        vm.stopPrank();
+
+        vm.startPrank(user);
+        main.equipShirt(1, 1);
+        storedPeter = main.getPeter(1);
+        assertEq(storedPeter.shirtId, 1);
+        vm.stopPrank();
     }
 }

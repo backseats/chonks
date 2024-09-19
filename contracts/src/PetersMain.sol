@@ -281,7 +281,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function equipShirt(uint256 _peterTokenId, uint256 _traitTokenId) public {
         // _validateTokenOwnership(_peterTokenId, _traitTokenId, msg.sender);
-        _validateTrait(_traitTokenId, TraitCategory.Name.Shirt);
+        // _validateTrait(_traitTokenId, TraitCategory.Name.Shirt); // TODO: fix
 
         peterTokens.all[_peterTokenId].shirtId = _traitTokenId;
     }
@@ -357,9 +357,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (ownerOfTBA != peterOwner) revert IncorrectTBAOwner();
     }
 
-    // TODO: modifiers for ownership
+    // TODO: modifiers for ownership, TODO Fix
     function _validateTrait(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
         TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId); // Hat, Pants, etc.
+        // console.log("traitTypeofTokenIdToBeSet", traitTypeofTokenIdToBeSet);
+        // console.log("uint(_traitType)", uint(_traitType));
 
         // Checks the fetched TraitCategory.Name against the one we send in
         if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))
