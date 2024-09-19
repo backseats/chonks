@@ -44,9 +44,9 @@ interface IPeterStorage {
          // This is the seed that's calculuated in getPeter based on randomness + stored.seed
         uint256 seed;
 
-        // RRGGBB colour of the background, default blue #0D6E9D set in PetersMain.sol mint(), and setBackgroundColor() 
+        // RRGGBB colour of the background, default blue #0D6E9D set in PetersMain.sol mint(), and setBackgroundColor()
         string backgroundColor;
-    
+
         // bool to determine whether to render 3D or not
         bool renderZ;
     }
@@ -68,9 +68,6 @@ interface IPeterStorage {
 
         // e.g. 'Body 001'
         string bodyName;
-
-        // The SVG code
-        string bodyPath;
 
         // bytes memory colorMap = new bytes(2700); 30x30 grid by 3 bytes (rgb, each colour is a byte, or 2 hex digits);
         bytes colorMap;

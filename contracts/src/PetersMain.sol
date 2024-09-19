@@ -93,6 +93,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Errors
 
+    error BodyAlreadyExists();
     error FirstSeasonRenderMinterNotSet();
     error IncorrectPeterOwner();
     error IncorrectTBAOwner();
@@ -669,11 +670,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             '</style>'
         );
 
-        BackgroundStuff memory backgroundStuff; 
+        BackgroundStuff memory backgroundStuff;
 
         // todo, verify one doesn't exist
 
-        backgroundStuff.backgroundColor = storedPeter.backgroundColor;  
+        backgroundStuff.backgroundColor = storedPeter.backgroundColor;
         backgroundStuff.backgroundStyles = backgroundColorStyles;
 
 
@@ -723,14 +724,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Ownable Functions
 
-    function addNewBody(uint256 _bodyIndex, string memory _bodyName, string memory _bodyPath, bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
+    function addNewBody(uint256 _bodyIndex, string memory _bodyName, bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
         BodyMetadata storage metadata = bodyIndexToMetadata[_bodyIndex];
 
-        // todo, verify one doesn't exist
+        if (metadata.bodyIndex != 0) revert BodyAlreadyExists();
 
         metadata.bodyIndex = _bodyIndex;
         metadata.bodyName = _bodyName;
-        metadata.bodyPath = _bodyPath;
         metadata.colorMap = _colorMap;
         metadata.zMap = _zMap;
     }
