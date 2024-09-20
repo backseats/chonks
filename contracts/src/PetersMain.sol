@@ -611,7 +611,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function addNewBody(uint256 _bodyIndex, string memory _bodyName, bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
         BodyMetadata storage metadata = bodyIndexToMetadata[_bodyIndex];
 
-        if (metadata.bodyIndex != 0) revert BodyAlreadyExists();
+        // if (metadata.bodyIndex != 0) revert BodyAlreadyExists(); // TODO: look at what we want to do here - potentially a "timelock"
 
         metadata.bodyIndex = _bodyIndex;
         metadata.bodyName = _bodyName;
