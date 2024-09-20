@@ -247,6 +247,18 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peterTokens.all[_peterTokenId].glassesId = 0;
     }
 
+    function equipHandheld(uint256 _peterTokenId, uint256 _traitTokenId) public {
+        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Handheld);
+
+        peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
+    }
+
+    function unequipHandheld(uint256 _peterTokenId) public {
+        _validatePeterOwnership(_peterTokenId);
+        peterTokens.all[_peterTokenId].handheldId = 0;
+    }
+
     function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public {
         _validateTokenOwnership(_peterTokenId, _traitTokenId);
         _validateTraitType(_traitTokenId, TraitCategory.Name.Hair);
