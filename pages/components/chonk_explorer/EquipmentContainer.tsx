@@ -34,6 +34,10 @@ export default function EquipmentContainer(props: Props) {
     setSelectedCategory(category);
   };
 
+  // what i really want to do here is take the traitTokenIds and get their traitType which i can do with the `useTraitType` hook
+
+  // then i filter below by the selectedCategory
+
   return (
     <div className="flex flex-col pt-4">
       {traitTokenIds.length > 0 ? (
@@ -56,6 +60,7 @@ export default function EquipmentContainer(props: Props) {
                 chonkId={chonkId}
                 traitTokenId={tokenId.toString()}
                 isEquipped={false}
+                selectedCategory={selectedCategory}
               />
             ))}
           </div>

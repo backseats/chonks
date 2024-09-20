@@ -362,6 +362,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                             // @ts-ignore
                             traitTokenId={stored[key].tokenId.toString()}
                             isEquipped={true}
+                            selectedCategory={"All"}
                           />
                         </div>
                       );

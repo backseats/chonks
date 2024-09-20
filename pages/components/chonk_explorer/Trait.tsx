@@ -12,13 +12,17 @@ interface Props {
   chonkId: string;
   traitTokenId: string;
   isEquipped: boolean;
+  selectedCategory: string;
 }
 
 export default function Trait(props: Props) {
-  const { chonkId, traitTokenId, isEquipped } = props;
+  const { chonkId, traitTokenId, isEquipped, selectedCategory } = props;
 
+  // A data object w/ name, desc, image, attributes
   const traitData = useTraitData(traitTokenId);
+  // e.g. "Hair"
   const traitType = useTraitType(traitTokenId);
+  // e.g. "Blue Pants"
   const traitName = useTraitName(traitTokenId);
 
   const { equip, unequip } = useEquipFunction(
@@ -27,6 +31,13 @@ export default function Trait(props: Props) {
     traitType,
     isEquipped
   );
+
+  if (
+    !isEquipped &&
+    selectedCategory !== "All" &&
+    selectedCategory !== traitType
+  )
+    return null;
 
   return traitData ? (
     <div className="relative w-[200px] h-[200px]">
