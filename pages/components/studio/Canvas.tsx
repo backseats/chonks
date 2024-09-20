@@ -8,6 +8,7 @@ interface Props {
   backgroundBody: string;
   hoveredPixel: { x: number; y: number } | null;
   showGrid: boolean;
+  backgroundColor: string;
   handleMouseDown: (event: React.MouseEvent) => void;
   handleMouseUp: () => void;
   handleMouseMove: (event: React.MouseEvent) => void;
@@ -23,6 +24,7 @@ export default function Canvas({
   gridData,
   backgroundBody,
   hoveredPixel,
+  backgroundColor,
   handleMouseDown,
   handleMouseUp,
   handleMouseMove,
@@ -36,7 +38,10 @@ export default function Canvas({
   const gridHeight = gridSize * size + (gridSize - 1) * borderSize;
 
   return (
-    <div className="relative w-fit mx-auto border border-[#6b7280]">
+    <div
+      className={`relative w-fit mx-auto border border-[#6b7280]`}
+      style={{ backgroundColor: backgroundColor }}
+    >
       {/* Background image */}
       <div
         className="absolute top-0 left-0"

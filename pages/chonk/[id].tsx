@@ -16,7 +16,7 @@ import { Category } from "@/types/Category";
 import MenuBar from "@/pages/components/chonk_explorer/MenuBar";
 import MainChonkImage from "@/pages/components/chonk_explorer/MainChonkImage";
 import OwnershipSection from "@/pages/components/chonk_explorer/OwnershipSection";
-import EquippedTrait from "@/pages/components/chonk_explorer/EquippedTrait";
+import Trait from "@/pages/components/chonk_explorer/Trait";
 
 type CurrentChonk = {
   tokenId: number;
@@ -357,12 +357,11 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                       return (
                         <div key={index}>
-                          <EquippedTrait
+                          <Trait
                             chonkId={id}
                             // @ts-ignore
                             traitTokenId={stored[key].tokenId.toString()}
-                            // @ts-ignore
-                            category={stored[key].category}
+                            isEquipped={true}
                           />
                         </div>
                       );

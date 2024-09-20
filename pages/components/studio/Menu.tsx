@@ -7,6 +7,7 @@ interface Props {
   resetSavedColors: () => void;
   startColorPicker: () => void;
   toggleGrid: () => void;
+  setBackgroundColor: (color: string) => void;
 }
 
 export default function Menu({
@@ -16,8 +17,12 @@ export default function Menu({
   selectedColor,
   startColorPicker,
   toggleGrid,
+  setBackgroundColor,
 }: Props) {
   const [buttonText, setButtonText] = useState("Save Color To Palette");
+  const [backgroundColorButtonText, setBackgroundColorButtonText] = useState(
+    "Set Background Color"
+  );
 
   const handleSaveColorToPalette = () => {
     saveColorToPalette();
@@ -61,6 +66,16 @@ export default function Menu({
           style={{ backgroundColor: selectedColor }}
         >
           {buttonText}
+        </button>
+
+        <button
+          onClick={() => setBackgroundColor(selectedColor)}
+          className={`px-4 py-2 text-white rounded transition-colors w-full mt-4 ${
+            selectedColor ? "opacity-100" : "opacity-50"
+          }`}
+          style={{ backgroundColor: selectedColor }}
+        >
+          {backgroundColorButtonText}
         </button>
 
         <button

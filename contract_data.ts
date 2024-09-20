@@ -1,8 +1,8 @@
 import { abi } from './contracts/out/PetersMain.sol/PetersMain.json'
 import { abi as traitsAbi } from './contracts/out/PeterTraits.sol/PeterTraits.json'
 
-export const mainContract = "0x01A64b215115Ddebb3c6400b46298e028280f242";
-export const traitsContract = "0x50C4C54ddF151a2750A488EeFc48b6B330E0975E";
+export const mainContract = "0x5d53cde95e842dd2f6729e416c04733303ac0dcf";
+export const traitsContract = "0x8716772e3E9edef2e91BAD3338f0aF16594F87a1";
 
 export const mainABI = abi;
 export const traitsABI = traitsAbi;
