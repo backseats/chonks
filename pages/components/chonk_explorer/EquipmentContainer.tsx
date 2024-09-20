@@ -1,13 +1,6 @@
-import { useEffect, useState } from "react";
-import Trait from "@/pages/components/chonk_explorer/Trait";
-import { Equipment } from "@/types/Equipment";
-import { Category } from "@/types/Category";
-
-// {
-//     tokenId: BigInt;
-//     cateogry: Category,
-//     isEquipped: Boolean;
-//   }
+import { useState } from "react";
+import Trait from "./Trait";
+import CategoryButton from "./CategoryButton";
 
 interface Props {
   chonkId: string;
@@ -71,24 +64,3 @@ export default function EquipmentContainer(props: Props) {
     </div>
   );
 }
-
-const CategoryButton = ({
-  category,
-  selectedCategory,
-  onClick,
-}: {
-  category: string;
-  selectedCategory: string;
-  onClick: () => void;
-}) => (
-  <button
-    className={`rounded-md px-4 py-2 ${
-      selectedCategory === category
-        ? "bg-black text-white"
-        : "bg-gray-500 text-white hover:bg-black"
-    }`}
-    onClick={onClick}
-  >
-    {category}
-  </button>
-);
