@@ -332,13 +332,12 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     }
 
     function createSvgFromPixels(bytes memory _pixels) public pure returns (bytes memory svgParts) {
-
         string[16] memory hexSymbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
         string[30] memory coords = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"];
 
         // bytes memory svgParts = "";
 
-        for (uint i = 0; i < 4500; i += 5) {
+        for (uint i; i < 4500; i += 5) {
             if (_pixels[i] > 0) {
                 uint x = (i / 5) % 30;
                 uint y = (i / 5) / 30;
