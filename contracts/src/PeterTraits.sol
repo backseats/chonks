@@ -295,7 +295,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         bytes memory pixels = new bytes(30 * 30 * 5); // 30x30 grid with 5 bytes per pixel
         uint256 pixelCount = length / 5;
 
-        for (uint256 i = 0; i < pixelCount; i++) {
+        for (uint256 i; i < pixelCount; i++) {
             uint256 offset = i * 5;
 
             uint8 x = uint8(colorMap[offset]);

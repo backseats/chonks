@@ -205,6 +205,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         traitsContract.safeMint(tbaAddress);
     }
 
+    function getOwnerAndTBAAddressForTokenId(uint256 _tokenId) public view returns (address owner, address tbaAddress) {
+        owner = ownerOf(_tokenId);
+        tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
+    }
+
     /// @notice The identifier of the current epoch
     function getEpoch() view public returns (uint256) {
         return peterTokens.epoch;
@@ -344,7 +349,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (msg.sender != ownerOf(_peterId)) revert IncorrectPeterOwner(); // Not your Peter
     }
 
-    function _validateTokenOwnership(uint _peterId, uint _traitTokenId) internal view {
+    function _validateTokenOwnership(uint256 _peterId, uint256 _traitTokenId) internal view {
         _validatePeterOwnership(_peterId);
 
         address tbaOfPeter = address(tokenIdToTBAAccountAddress[_peterId]);
@@ -457,7 +462,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             '<g id="backpackTraits">'
         );
 
-        for (uint256 i = 0; i < numTraits; ++i) {
+        for (uint256 i; i < numTraits; ++i) {
             string memory traitSvg = traitsContract.getSvgForTokenId(traitTokens[i]);
             buffer = abi.encodePacked(
                 buffer,
@@ -611,7 +616,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setPrice(uint256 _priceInWei) public onlyOwner {
         price = _priceInWei;
     }
-
 
     function setTraitsContract(PeterTraits _address) public onlyOwner {
         traitsContract = _address;
