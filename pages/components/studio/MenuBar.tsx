@@ -4,10 +4,11 @@ interface Props {
   toggleGrid: () => void;
   resetGrid: () => void;
   resetSavedColors: () => void;
+  showLoadTraitModal: () => void;
 }
 
 export default function MenuBar(props: Props) {
-  const { toggleGrid, resetGrid, resetSavedColors } = props;
+  const { toggleGrid, resetGrid, resetSavedColors, showLoadTraitModal } = props;
 
   return (
     <div className="px-8 py-4 border-b border-gray-300 flex flex-col md:flex-row justify-between">
@@ -19,6 +20,13 @@ export default function MenuBar(props: Props) {
           className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors"
         >
           Toggle Grid
+        </button>
+
+        <button
+          onClick={showLoadTraitModal}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors"
+        >
+          Load a Trait
         </button>
 
         <button

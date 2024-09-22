@@ -6,7 +6,7 @@ import MenuBar from "@/pages/components/studio/MenuBar";
 import { parseSvgToBytes } from "@/utils/convertSvgToBytes";
 import MetadataModal from "./components/studio/MetadataModal";
 import KeyboardShortcutsModal from "./components/studio/KeyboardShortcutsModal";
-import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import LoadTraitModal from "@/pages/components/studio/LoadTraitModal";
 
 export type Pixel = {
   x: number;
@@ -32,7 +32,7 @@ const Grid: React.FC = () => {
 
   const [backgroundBody, setBackgroundBody] = useState<string>("ghost.svg");
   const [gridData, setGridData] = useState<Pixel[]>(generateGrid());
-  const [selectedColor, setSelectedColor] = useState<string>("#EFB15E");
+  const [selectedColor, setSelectedColor] = useState<string>("#48A6FA"); // a nice blue
   const [additionalColors, setAdditionalColors] = useState<string[]>([]);
   const [textAreaContent, setTextAreaContent] = useState<string>("");
   const [history, setHistory] = useState<Pixel[][]>([]);
@@ -54,6 +54,7 @@ const Grid: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isKeyboardShortcutsModalOpen, setIsKeyboardShortcutsModalOpen] =
     useState(false);
+  const [isLoadTraitModalOpen, setIsLoadTraitModalOpen] = useState(false);
 
   const gridRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -80,7 +81,7 @@ const Grid: React.FC = () => {
 
   useEffect(() => {
     const storedColors = localStorage.getItem("chonksstudio");
-    console.log("storedColors", storedColors);
+
     if (storedColors) {
       setAdditionalColors(JSON.parse(storedColors));
     } else {
@@ -215,37 +216,6 @@ const Grid: React.FC = () => {
       gridColors[pixel.y][pixel.x] = pixel.color || "";
     });
     setTextAreaContent(JSON.stringify(gridColors, null, 2));
-  };
-
-  const handleTextAreaChange = (
-    event: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    const textarea = event.target;
-    const { selectionStart, selectionEnd } = textarea;
-
-    try {
-      const newGridColors = JSON.parse(event.target.value);
-      if (Array.isArray(newGridColors) && newGridColors.length === gridSize) {
-        setHistory((prevHistory) => [...prevHistory, gridData]);
-        const newGridData = generateGrid().map((pixel) => ({
-          ...pixel,
-          color: newGridColors[pixel.y][pixel.x] || "",
-        }));
-        setGridData(newGridData);
-        setTextAreaContent(event.target.value);
-
-        // Preserve cursor position
-        setTimeout(() => {
-          if (textareaRef.current) {
-            textareaRef.current.selectionStart = selectionStart;
-            textareaRef.current.selectionEnd = selectionEnd;
-          }
-        }, 0);
-      }
-    } catch (error) {
-      console.error("Invalid JSON format");
-      setTextAreaContent(event.target.value);
-    }
   };
 
   const resetGrid = () => {
@@ -458,12 +428,60 @@ const Grid: React.FC = () => {
     if (e.target === e.currentTarget) closeKeyboardShortcutsModal();
   };
 
+  const openLoadTraitModal = () => setIsLoadTraitModalOpen(true);
+  const closeLoadTraitModal = () => setIsLoadTraitModalOpen(false);
+
+  const handleLoadTraitModalBackgroundClick = (
+    e: React.MouseEvent<HTMLDivElement>
+  ) => {
+    if (e.target === e.currentTarget) closeLoadTraitModal();
+  };
+
+  // Translate bytes into a 30x30 grid of colors
+  const loadTrait = (bytes: string) => {
+    // Initialize a 30x30 array filled with empty strings
+    const colorGrid: string[][] = Array(30)
+      .fill(null)
+      .map(() => Array(30).fill(""));
+
+    // Split the bytes string into individual byte strings
+    const byteArray = bytes.match(/.{1,2}/g) || [];
+
+    let index = 0;
+    while (index < byteArray.length) {
+      const x = parseInt(byteArray[index], 16);
+      const y = parseInt(byteArray[index + 1], 16);
+      const color = `#${byteArray[index + 2]}${byteArray[index + 3]}${
+        byteArray[index + 4]
+      }`;
+
+      // Check if x and y are within bounds (0-29)
+      if (x >= 0 && x < 30 && y >= 0 && y < 30) {
+        colorGrid[y][x] = color;
+      }
+
+      index += 5; // Move to the next set of 5 bytes
+    }
+
+    // Update the gridData state with the new colors
+    setGridData(
+      generateGrid().map((pixel) => ({
+        ...pixel,
+        color: colorGrid[pixel.y][pixel.x],
+      }))
+    );
+
+    // Update the text area content
+    setTextAreaContent(JSON.stringify(colorGrid, null, 2));
+  };
+
   return (
     <div className="bg-white">
       <MenuBar
         toggleGrid={toggleGrid}
         resetGrid={resetGrid}
         resetSavedColors={resetSavedColors}
+        showLoadTraitModal={openLoadTraitModal}
       />
 
       <div className="flex md:justify-center md:max-w-[1200px] md:mx-auto">
@@ -529,6 +547,14 @@ const Grid: React.FC = () => {
           handleModalBackgroundClick={
             handleKeyboardShortcutsModalBackgroundClick
           }
+        />
+      )}
+
+      {isLoadTraitModalOpen && (
+        <LoadTraitModal
+          closeModal={closeLoadTraitModal}
+          handleModalBackgroundClick={handleLoadTraitModalBackgroundClick}
+          loadTrait={loadTrait}
         />
       )}
     </div>
