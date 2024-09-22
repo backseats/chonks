@@ -89,33 +89,7 @@ const Grid: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "z") {
-        event.preventDefault();
-        undo();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  useEffect(() => {
-    const preventDefault = (e: TouchEvent) => {
-      if (isDrawing) {
-        e.preventDefault();
-      }
-    };
-
-    document.body.addEventListener("touchmove", preventDefault, {
-      passive: false,
-    });
-
-    return () => {
-      document.body.removeEventListener("touchmove", preventDefault);
-    };
-  }, [isDrawing]);
+  const [currentAction, setCurrentAction] = useState<Pixel[]>([]);
 
   const handlePixelChange = (
     x: number,
@@ -126,16 +100,27 @@ const Grid: React.FC = () => {
       return; // Skip if this pixel was just modified
     }
 
-    setHistory((prevHistory) => [...prevHistory, [...gridData]]);
+    const newColor = isErasing ? "" : selectedColor;
+    const oldPixel = gridData.find((pixel) => pixel.x === x && pixel.y === y);
+
+    if (oldPixel && oldPixel.color !== newColor) {
+      setCurrentAction((prevAction) => [...prevAction, { ...oldPixel }]);
+    }
+
     setGridData((prevGrid) =>
       prevGrid.map((pixel) =>
-        pixel.x === x && pixel.y === y
-          ? { ...pixel, color: isErasing ? "" : selectedColor }
-          : pixel
+        pixel.x === x && pixel.y === y ? { ...pixel, color: newColor } : pixel
       )
     );
     setLastModifiedPixel({ x, y });
   };
+
+  const completeAction = useCallback(() => {
+    if (currentAction.length > 0) {
+      setHistory((prevHistory) => [...prevHistory, currentAction]);
+      setCurrentAction([]);
+    }
+  }, [currentAction]);
 
   const handleMouseDown = (event: React.MouseEvent) => {
     setIsMouseDown(true);
@@ -146,6 +131,7 @@ const Grid: React.FC = () => {
   const handleMouseUp = () => {
     setIsMouseDown(false);
     setLastModifiedPixel(null);
+    completeAction();
   };
 
   const handleMouseMove = (event: React.MouseEvent) => {
@@ -176,6 +162,7 @@ const Grid: React.FC = () => {
     setIsDrawing(false);
     setIsMouseDown(false);
     setLastModifiedPixel(null);
+    completeAction();
   };
 
   const getPixelCoordinates = (
@@ -268,11 +255,46 @@ const Grid: React.FC = () => {
 
   const undo = useCallback(() => {
     if (history.length > 0) {
-      const previousState = history[history.length - 1];
-      setGridData(previousState);
+      const lastAction = history[history.length - 1];
+      setGridData((prevGrid) =>
+        prevGrid.map((pixel) => {
+          const undoPixel = lastAction.find(
+            (p) => p.x === pixel.x && p.y === pixel.y
+          );
+          return undoPixel ? { ...pixel, color: undoPixel.color } : pixel;
+        })
+      );
       setHistory((prevHistory) => prevHistory.slice(0, -1));
     }
   }, [history]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+        event.preventDefault();
+        undo();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [undo]);
+
+  useEffect(() => {
+    const preventDefault = (e: TouchEvent) => {
+      if (isDrawing) {
+        e.preventDefault();
+      }
+    };
+
+    document.body.addEventListener("touchmove", preventDefault, {
+      passive: false,
+    });
+
+    return () => {
+      document.body.removeEventListener("touchmove", preventDefault);
+    };
+  }, [isDrawing]);
 
   const toggleGrid = () => setShowGrid(!showGrid);
 
