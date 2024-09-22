@@ -2,6 +2,7 @@ import { Pixel } from "@/pages/studio";
 import React from "react";
 
 interface Props {
+  selectedColor: string;
   pixelSize: number;
   gridRef: React.RefObject<HTMLDivElement>;
   gridSize: number;
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export default function Canvas({
+  selectedColor,
   pixelSize,
   showGrid,
   gridRef,
@@ -103,7 +105,7 @@ export default function Canvas({
                 hoveredPixel &&
                 hoveredPixel.x === pixel.x &&
                 hoveredPixel.y === pixel.y
-                  ? pixel.color || "white"
+                  ? selectedColor
                   : pixel.color || "transparent",
               transform:
                 hoveredPixel &&

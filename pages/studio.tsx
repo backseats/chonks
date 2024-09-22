@@ -486,6 +486,7 @@ const Grid: React.FC = () => {
             hoveredPixel={hoveredPixel}
             showGrid={showGrid}
             backgroundColor={backgroundColor}
+            selectedColor={selectedColor}
           />
 
           {/* Right column */}
