@@ -1,15 +1,4 @@
-// import fs from 'fs';
 import xml2js from 'xml2js';
-
-// Get the file name from command-line arguments
-// const svgFilePath = process.argv[2];
-// if (!svgFilePath) {
-//     console.error('Please provide an SVG file path as an argument.');
-//     process.exit(1);
-// }
-
-// Read SVG content from the file
-// const svgInput = fs.readFileSync(svgFilePath, 'utf8');
 
 function hexToBytes(hex) {
     let bytes = [];
@@ -60,6 +49,3 @@ export function parseSvgToBytes(svgString) {
 
     return bytesToHex(bytes);
 }
-
-// const hexString = parseSvgToBytes(svgInput);
-// console.log(hexString);
