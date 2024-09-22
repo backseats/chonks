@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import SVGPreview from "@/pages/components/studio/SVGPreview";
 import SelectColor from "@/pages/components/studio/SelectColor";
 import Canvas from "@/pages/components/studio/Canvas";
+import MenuBar from "@/pages/components/studio/MenuBar";
 import { parseSvgToBytes } from "@/utils/convertSvgToBytes";
 
 export type Pixel = {
@@ -46,6 +47,7 @@ const Grid: React.FC = () => {
   const [isPickingColor, setIsPickingColor] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(true);
   const [backgroundColor, setBackgroundColor] = useState<string>("#FFFFFF");
+  const [isDrawing, setIsDrawing] = useState(false);
 
   const gridRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -76,6 +78,22 @@ const Grid: React.FC = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
+
+  useEffect(() => {
+    const preventDefault = (e: TouchEvent) => {
+      if (isDrawing) {
+        e.preventDefault();
+      }
+    };
+
+    document.body.addEventListener("touchmove", preventDefault, {
+      passive: false,
+    });
+
+    return () => {
+      document.body.removeEventListener("touchmove", preventDefault);
+    };
+  }, [isDrawing]);
 
   const handlePixelChange = (
     x: number,
@@ -116,6 +134,28 @@ const Grid: React.FC = () => {
     }
   };
 
+  const handleTouchStart = (event: React.TouchEvent) => {
+    setIsDrawing(true);
+    setIsMouseDown(true);
+    const { x, y } = getTouchPixelCoordinates(event);
+    handlePixelChange(x, y);
+  };
+
+  const handleTouchMove = (event: React.TouchEvent) => {
+    if (!isDrawing) return;
+    const { x, y } = getTouchPixelCoordinates(event);
+    setHoveredPixel({ x, y });
+    if (isMouseDown) {
+      handlePixelChange(x, y);
+    }
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    setIsDrawing(false);
+    setIsMouseDown(false);
+    setLastModifiedPixel(null);
+  };
+
   const getPixelCoordinates = (
     event: React.MouseEvent
   ): { x: number; y: number } => {
@@ -132,6 +172,26 @@ const Grid: React.FC = () => {
     const y = Math.floor(relativeY / pixelSize);
 
     // Ensure x and y are within the grid bounds
+    return {
+      x: Math.max(0, Math.min(x, gridSize - 1)),
+      y: Math.max(0, Math.min(y, gridSize - 1)),
+    };
+  };
+
+  const getTouchPixelCoordinates = (
+    event: React.TouchEvent
+  ): { x: number; y: number } => {
+    if (!gridRef.current) return { x: -1, y: -1 };
+
+    const rect = gridRef.current.getBoundingClientRect();
+    const touch = event.touches[0];
+
+    const relativeX = touch.clientX - rect.left;
+    const relativeY = touch.clientY - rect.top;
+
+    const x = Math.floor(relativeX / pixelSize);
+    const y = Math.floor(relativeY / pixelSize);
+
     return {
       x: Math.max(0, Math.min(x, gridSize - 1)),
       y: Math.max(0, Math.min(y, gridSize - 1)),
@@ -321,35 +381,14 @@ const Grid: React.FC = () => {
 
   return (
     <div className="bg-white">
-      <div className="p-8 border-b border-gray-300 flex flex-row justify-between">
-        <p className="text-3xl font-bold">Chonks Studio</p>
+      <MenuBar
+        toggleGrid={toggleGrid}
+        resetGrid={resetGrid}
+        resetSavedColors={resetSavedColors}
+      />
 
-        <div className="flex flex-row gap-4">
-          <button
-            onClick={toggleGrid}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
-            Toggle Grid
-          </button>
-
-          <button
-            onClick={resetGrid}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-500 transition-colors"
-          >
-            Reset Canvas
-          </button>
-
-          <button
-            onClick={resetSavedColors}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-500 transition-colors"
-          >
-            Reset Saved Colors
-          </button>
-        </div>
-      </div>
-
-      <div className="flex justify-center md:max-w-[1200px] mx-auto">
-        <div className="flex flex-col md:flex-row gap-[25px] p-4 w-full">
+      <div className="flex md:justify-center md:max-w-[1200px] md:mx-auto">
+        <div className="flex flex-col md:flex-row gap-[25px] md:p-4 md:w-full">
           {/* Middle column */}
           <Canvas
             pixelSize={pixelSize}
@@ -360,6 +399,9 @@ const Grid: React.FC = () => {
             handleMouseDown={handleMouseDown}
             handleMouseUp={handleMouseUp}
             handleMouseMove={handleMouseMove}
+            handleTouchStart={handleTouchStart}
+            handleTouchMove={handleTouchMove}
+            handleTouchEnd={handleTouchEnd}
             handlePixelChange={handlePixelChange}
             setHoveredPixel={setHoveredPixel}
             hoveredPixel={hoveredPixel}

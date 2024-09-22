@@ -1,4 +1,5 @@
 import { Pixel } from "@/pages/studio";
+import React from "react";
 
 interface Props {
   pixelSize: number;
@@ -15,6 +16,9 @@ interface Props {
   handlePixelChange: (x: number, y: number, isErasing: boolean) => void;
   setHoveredPixel: (pixel: { x: number; y: number } | null) => void;
   getPixelCoordinates: (event: React.MouseEvent) => { x: number; y: number };
+  handleTouchStart: (event: React.TouchEvent) => void;
+  handleTouchMove: (event: React.TouchEvent) => void;
+  handleTouchEnd: (event: React.TouchEvent) => void;
 }
 
 export default function Canvas({
@@ -32,6 +36,9 @@ export default function Canvas({
   handlePixelChange,
   setHoveredPixel,
   getPixelCoordinates,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
 }: Props) {
   const borderSize = showGrid ? 1 : 0;
   const gridWidth = gridSize * pixelSize + (gridSize - 1) * borderSize;
@@ -75,6 +82,9 @@ export default function Canvas({
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onMouseLeave={() => {
           handleMouseUp();
           setHoveredPixel(null);
