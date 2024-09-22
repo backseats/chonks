@@ -30,7 +30,7 @@ const Grid: React.FC = () => {
     return grid;
   };
 
-  const [backgroundBody, setBackgroundBody] = useState<string>("ghost.svg");
+  const [backgroundBody, setBackgroundBody] = useState<string>("lightbody.svg");
   const [gridData, setGridData] = useState<Pixel[]>(generateGrid());
   const [selectedColor, setSelectedColor] = useState<string>("#48A6FA"); // a nice blue
   const [additionalColors, setAdditionalColors] = useState<string[]>([]);
