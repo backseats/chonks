@@ -436,7 +436,8 @@ const Grid: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Handle form submission logic here
+
+    // TODO: Handle form submission logic here
 
     closeModal();
   };
@@ -445,13 +446,11 @@ const Grid: React.FC = () => {
     if (e.target === e.currentTarget) closeModal();
   };
 
-  const openKeyboardShortcutsModal = () => {
+  const openKeyboardShortcutsModal = () =>
     setIsKeyboardShortcutsModalOpen(true);
-  };
 
-  const closeKeyboardShortcutsModal = () => {
+  const closeKeyboardShortcutsModal = () =>
     setIsKeyboardShortcutsModalOpen(false);
-  };
 
   const handleKeyboardShortcutsModalBackgroundClick = (
     e: React.MouseEvent<HTMLDivElement>

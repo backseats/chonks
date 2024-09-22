@@ -1,7 +1,7 @@
+import { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useAccount } from "wagmi";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
-import React from "react";
 
 interface Props {
   traitType: string;
@@ -26,6 +26,30 @@ export default function MetadataModal(props: Props) {
 
   const { address } = useAccount();
 
+  const [traitName, setTraitName] = useState("");
+  const [error, setError] = useState("");
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const name = traitName.trim();
+    if (!/^[a-z\s]+$/i.test(name)) {
+      setError("Only letters and spaces please");
+      return;
+    }
+
+    setError("");
+
+    const metadataObject = {
+      traitName: name,
+      creator: address,
+      traitType,
+    };
+    console.log(metadataObject);
+
+    handleSubmit(e);
+  };
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -43,7 +67,7 @@ export default function MetadataModal(props: Props) {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleFormSubmit}>
           <div className="mb-4">
             <label
               htmlFor="trait-name"
@@ -57,8 +81,11 @@ export default function MetadataModal(props: Props) {
               name="trait-name"
               placeholder="Trait Name e.g. 'Cap Forward'"
               ref={field1Ref}
+              value={traitName}
+              onChange={(e) => setTraitName(e.target.value)}
               className="mt-1 py-1 block w-full rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0"
             />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
 
           <div className="mb-4">
