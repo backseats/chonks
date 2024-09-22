@@ -1,22 +1,22 @@
+import { ConnectKitButton } from "connectkit";
+
 interface Props {
   toggleGrid: () => void;
   resetGrid: () => void;
   resetSavedColors: () => void;
 }
 
-export default function MenuBar({
-  toggleGrid,
-  resetGrid,
-  resetSavedColors,
-}: Props) {
+export default function MenuBar(props: Props) {
+  const { toggleGrid, resetGrid, resetSavedColors } = props;
+
   return (
-    <div className="p-8 border-b border-gray-300 flex flex-col md:flex-row justify-between">
+    <div className="px-8 py-4 border-b border-gray-300 flex flex-col md:flex-row justify-between">
       <p className="text-5xl md:text-3xl font-bold">Chonks Studio</p>
 
       <div className="flex flex-col md:flex-row gap-4">
         <button
           onClick={toggleGrid}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-600 transition-colors"
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors"
         >
           Toggle Grid
         </button>
@@ -34,6 +34,8 @@ export default function MenuBar({
         >
           Reset Saved Colors
         </button>
+
+        <ConnectKitButton />
       </div>
     </div>
   );

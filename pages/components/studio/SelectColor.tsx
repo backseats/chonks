@@ -1,10 +1,15 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import Colorful from "@uiw/react-color-colorful";
 import Block from "@uiw/react-color-block";
 import { isLightColor } from "@/utils/colorUtils";
 import BodyPresets from "./BodyPresets";
+import {
+  EyeDropperIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/react/24/outline";
 
 interface Props {
+  openKeyboardShortcutsModal: () => void;
   additionalColors: string[];
   hasAdditionalColors: boolean;
   selectedColor: string;
@@ -16,6 +21,7 @@ interface Props {
 }
 
 export default function SelectColor({
+  openKeyboardShortcutsModal,
   additionalColors,
   selectedColor,
   setSelectedColor,
@@ -25,7 +31,7 @@ export default function SelectColor({
   startColorPicker,
   setBackgroundBody,
 }: Props) {
-  const [saveButtonText, setSaveButtonText] = useState("Save To Palette");
+  const [saveButtonText, setSaveButtonText] = useState("Save Color");
   const [backgroundColorButtonText, setBackgroundColorButtonText] =
     useState("Set Background");
 
@@ -53,38 +59,49 @@ export default function SelectColor({
     [hasAdditionalColors, defaultColors, additionalColors]
   );
 
+  // Hide the little triangle and box shadow
+  useEffect(() => {
+    const colorBlock = document.querySelector(".w-color-block");
+    if (colorBlock) {
+      (colorBlock as HTMLElement).style.boxShadow = "none";
+    }
+    if (colorBlock && colorBlock.firstElementChild) {
+      (colorBlock.firstElementChild as HTMLElement).style.display = "none";
+    }
+  }, []);
+
   const handleSaveColorToPalette = () => {
     saveColorToPalette();
     setSaveButtonText("Saved!");
     setTimeout(() => {
-      setSaveButtonText("Save To Palette");
+      setSaveButtonText("Save Color");
     }, 2000);
   };
 
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-xl font-semibold mb-2">Select Color</h2>
+      <div className="h-[2px] bg-gray-200 opacity-80 w-full my-4" />
 
-      <div className="flex flex-col items-center gap-4 mb-4">
-        <Colorful
-          color={selectedColor}
-          disableAlpha={true}
-          onChange={(color) => {
-            setSelectedColor(color.hex);
-          }}
-        />
+      <div className="flex flex-col gap-4 mb-4">
+        <div className="flex flex-row gap-4">
+          <Colorful
+            color={selectedColor}
+            disableAlpha={true}
+            onChange={(color) => setSelectedColor(color.hex)}
+          />
 
-        <Block
-          color={selectedColor}
-          colors={colors}
-          onChange={(color) => setSelectedColor(color.hex)}
-        />
+          <Block
+            color={selectedColor}
+            colors={colors}
+            onChange={(color) => setSelectedColor(color.hex)}
+          />
+        </div>
 
         <div className="flex flex-col">
           <div className="flex gap-2">
             <button
               onClick={handleSaveColorToPalette}
-              className={`p-2 rounded transition-colors w-full ${
+              className={`p-2  rounded transition-colors w-full ${
                 isLightColor(selectedColor) ? "text-black" : "text-white"
               }`}
               style={{ backgroundColor: selectedColor }}
@@ -105,13 +122,25 @@ export default function SelectColor({
 
           <button
             onClick={startColorPicker}
-            className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-red-600 transition-colors w-full mt-4"
+            className="px-4 py-2 bg-gray-300 text-black rounded hover:brightness-105 transition-all w-full mt-4"
           >
-            🖌️ Select Color
+            <div className="flex items-center justify-center">
+              <EyeDropperIcon className="w-5 h-5 mr-2" />
+              Select Color
+            </div>
           </button>
         </div>
       </div>
+
       <BodyPresets setBackgroundBody={setBackgroundBody} />
+
+      <button
+        className="text-gray-500 text-sm text-right hover:underline hidden md:block"
+        onClick={openKeyboardShortcutsModal}
+      >
+        <QuestionMarkCircleIcon className="w-4 h-4 -mt-1 mr-1 inline-block" />
+        Keyboard shortcuts
+      </button>
     </div>
   );
 }

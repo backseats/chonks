@@ -13,9 +13,7 @@ interface Props {
   handleMouseDown: (event: React.MouseEvent) => void;
   handleMouseUp: () => void;
   handleMouseMove: (event: React.MouseEvent) => void;
-  handlePixelChange: (x: number, y: number, isErasing: boolean) => void;
   setHoveredPixel: (pixel: { x: number; y: number } | null) => void;
-  getPixelCoordinates: (event: React.MouseEvent) => { x: number; y: number };
   handleTouchStart: (event: React.TouchEvent) => void;
   handleTouchMove: (event: React.TouchEvent) => void;
   handleTouchEnd: (event: React.TouchEvent) => void;
@@ -33,9 +31,7 @@ export default function Canvas({
   handleMouseDown,
   handleMouseUp,
   handleMouseMove,
-  handlePixelChange,
   setHoveredPixel,
-  getPixelCoordinates,
   handleTouchStart,
   handleTouchMove,
   handleTouchEnd,
@@ -46,7 +42,7 @@ export default function Canvas({
 
   return (
     <div
-      className={`relative w-fit h-fit mx-auto`}
+      className={`relative w-fit h-fit mx-auto mt-2`}
       style={{ backgroundColor: backgroundColor }}
       onContextMenu={(e) => e.preventDefault()}
     >

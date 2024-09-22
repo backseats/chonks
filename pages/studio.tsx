@@ -4,6 +4,9 @@ import SelectColor from "@/pages/components/studio/SelectColor";
 import Canvas from "@/pages/components/studio/Canvas";
 import MenuBar from "@/pages/components/studio/MenuBar";
 import { parseSvgToBytes } from "@/utils/convertSvgToBytes";
+import MetadataModal from "./components/studio/MetadataModal";
+import KeyboardShortcutsModal from "./components/studio/KeyboardShortcutsModal";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 export type Pixel = {
   x: number;
@@ -48,9 +51,28 @@ const Grid: React.FC = () => {
   const [showGrid, setShowGrid] = useState<boolean>(true);
   const [backgroundColor, setBackgroundColor] = useState<string>("#FFFFFF");
   const [isDrawing, setIsDrawing] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isKeyboardShortcutsModalOpen, setIsKeyboardShortcutsModalOpen] =
+    useState(false);
 
   const gridRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const field1Ref = useRef<HTMLInputElement>(null);
+
+  const traitTypes = [
+    "Hat",
+    "Hair",
+    "Glasses",
+    "Handheld",
+    "Shirt",
+    "Pants",
+    "Shoes",
+  ];
+  const [currentTraitIndex, setCurrentTraitIndex] = useState(0);
+
+  const handleTraitTypeChange = () => {
+    setCurrentTraitIndex((prevIndex) => (prevIndex + 1) % traitTypes.length);
+  };
 
   useEffect(() => {
     updateTextArea();
@@ -379,6 +401,42 @@ const Grid: React.FC = () => {
     return () => document.removeEventListener("click", handleColorPick, true);
   }, [isPickingColor, handleColorPick]);
 
+  const openModal = () => {
+    setIsModalOpen(true);
+    // Focus on field1 when the modal opens
+    setTimeout(() => {
+      if (field1Ref.current) {
+        field1Ref.current.focus();
+      }
+    }, 0);
+  };
+  const closeModal = () => setIsModalOpen(false);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    // Handle form submission logic here
+
+    closeModal();
+  };
+
+  const handleModalBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) closeModal();
+  };
+
+  const openKeyboardShortcutsModal = () => {
+    setIsKeyboardShortcutsModalOpen(true);
+  };
+
+  const closeKeyboardShortcutsModal = () => {
+    setIsKeyboardShortcutsModalOpen(false);
+  };
+
+  const handleKeyboardShortcutsModalBackgroundClick = (
+    e: React.MouseEvent<HTMLDivElement>
+  ) => {
+    if (e.target === e.currentTarget) closeKeyboardShortcutsModal();
+  };
+
   return (
     <div className="bg-white">
       <MenuBar
@@ -388,8 +446,8 @@ const Grid: React.FC = () => {
       />
 
       <div className="flex md:justify-center md:max-w-[1200px] md:mx-auto">
-        <div className="flex flex-col md:flex-row gap-[25px] md:p-4 md:w-full">
-          {/* Middle column */}
+        <div className="flex flex-col md:flex-row gap-[75px] md:p-4 md:w-full">
+          {/* Left column */}
           <Canvas
             pixelSize={pixelSize}
             gridRef={gridRef}
@@ -402,17 +460,19 @@ const Grid: React.FC = () => {
             handleTouchStart={handleTouchStart}
             handleTouchMove={handleTouchMove}
             handleTouchEnd={handleTouchEnd}
-            handlePixelChange={handlePixelChange}
             setHoveredPixel={setHoveredPixel}
             hoveredPixel={hoveredPixel}
-            getPixelCoordinates={getPixelCoordinates}
             showGrid={showGrid}
             backgroundColor={backgroundColor}
           />
 
           {/* Right column */}
-          <div className="flex flex-col gap-2 md:max-w-[320px]">
-            <SVGPreview svgContent={svgContent} handleBytes={handleBytes} />
+          <div className="flex flex-col gap-2 md:max-w-[420px]">
+            <SVGPreview
+              svgContent={svgContent}
+              handleBytes={handleBytes}
+              openModal={openModal}
+            />
 
             <SelectColor
               additionalColors={additionalColors}
@@ -423,10 +483,32 @@ const Grid: React.FC = () => {
               setBackgroundColor={setBackgroundColor}
               startColorPicker={startColorPicker}
               setBackgroundBody={setBackgroundBody}
+              openKeyboardShortcutsModal={openKeyboardShortcutsModal}
             />
           </div>
         </div>
       </div>
+
+      {isModalOpen && (
+        <MetadataModal
+          traitType={traitTypes[currentTraitIndex]}
+          traitTypes={traitTypes}
+          closeModal={closeModal}
+          handleSubmit={handleSubmit}
+          field1Ref={field1Ref}
+          handleModalBackgroundClick={handleModalBackgroundClick}
+          onTraitTypeChange={handleTraitTypeChange}
+        />
+      )}
+
+      {isKeyboardShortcutsModalOpen && (
+        <KeyboardShortcutsModal
+          closeModal={closeKeyboardShortcutsModal}
+          handleModalBackgroundClick={
+            handleKeyboardShortcutsModalBackgroundClick
+          }
+        />
+      )}
     </div>
   );
 };
