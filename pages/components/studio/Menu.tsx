@@ -1,90 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 interface Props {
-  selectedColor: string;
   resetGrid: () => void;
-  saveColorToPalette: () => void;
   resetSavedColors: () => void;
-  startColorPicker: () => void;
   toggleGrid: () => void;
-  setBackgroundColor: (color: string) => void;
 }
 
-export default function Menu({
-  resetGrid,
-  saveColorToPalette,
-  resetSavedColors,
-  selectedColor,
-  startColorPicker,
-  toggleGrid,
-  setBackgroundColor,
-}: Props) {
-  const [buttonText, setButtonText] = useState("Save Color To Palette");
-  const [backgroundColorButtonText, setBackgroundColorButtonText] = useState(
-    "Set Background Color"
-  );
-
-  const handleSaveColorToPalette = () => {
-    saveColorToPalette();
-    setButtonText("Saved!");
-    setTimeout(() => {
-      setButtonText("Save Color To Palette");
-    }, 2000);
-  };
+export default function Menu(props: Props) {
+  const { resetGrid, resetSavedColors, toggleGrid } = props;
 
   return (
     <>
-      <h2 className="text-xl font-bold mb-4">Menu</h2>
+      <h2 className="text-xl font-bold">Menu</h2>
 
-      <div className="px-3">
-        <button
-          onClick={toggleGrid}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-600 transition-colors w-full"
-        >
-          Toggle Grid
-        </button>
-
-        <button
-          onClick={resetGrid}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-600 transition-colors w-full mt-2"
-        >
-          Reset Canvas
-        </button>
-
-        <button
-          onClick={resetSavedColors}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-600 transition-colors w-full mt-2"
-        >
-          Reset Saved Colors
-        </button>
-
-        <button
-          onClick={handleSaveColorToPalette}
-          className={`px-4 py-2 text-white rounded transition-colors w-full mt-4 ${
-            selectedColor ? "opacity-100" : "opacity-50"
-          }`}
-          style={{ backgroundColor: selectedColor }}
-        >
-          {buttonText}
-        </button>
-
-        <button
-          onClick={() => setBackgroundColor(selectedColor)}
-          className={`px-4 py-2 text-white rounded transition-colors w-full mt-4 ${
-            selectedColor ? "opacity-100" : "opacity-50"
-          }`}
-          style={{ backgroundColor: selectedColor }}
-        >
-          {backgroundColorButtonText}
-        </button>
-
-        <button
-          onClick={startColorPicker}
-          className="px-4 py-2 bg-gray-300 text-black rounded hover:bg-red-600 transition-colors w-full mt-4"
-        >
-          🖌️ Select Color
-        </button>
-      </div>
+      <div className="px-3"></div>
     </>
   );
 }

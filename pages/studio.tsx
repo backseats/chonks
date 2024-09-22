@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import SVGPreview from "@/pages/components/studio/SVGPreview";
-import TextEditor from "@/pages/components/studio/TextEditor";
-import BodyPresets from "@/pages/components/studio/BodyPresets";
-import Menu from "@/pages/components/studio/Menu";
 import SelectColor from "@/pages/components/studio/SelectColor";
 import Canvas from "@/pages/components/studio/Canvas";
 import { parseSvgToBytes } from "@/utils/convertSvgToBytes";
@@ -13,9 +10,12 @@ export type Pixel = {
   color: string;
 };
 
-const Grid: React.FC = () => {
-  const gridSize = 30;
+// This always needs to be 30 since it's a 30x30 grid in Solidity
+const gridSize = 30;
+// This is the size of each pixel in the grid on the front-end, e.g. 24x24px
+const pixelSize = 24;
 
+const Grid: React.FC = () => {
   const generateGrid = (): Pixel[] => {
     const grid: Pixel[] = [];
     for (let y = 0; y < gridSize; y++) {
@@ -26,7 +26,7 @@ const Grid: React.FC = () => {
     return grid;
   };
 
-  const [backgroundBody, setBackgroundBody] = useState<string>("lightbody.svg");
+  const [backgroundBody, setBackgroundBody] = useState<string>("ghost.svg");
   const [gridData, setGridData] = useState<Pixel[]>(generateGrid());
   const [selectedColor, setSelectedColor] = useState<string>("#EFB15E");
   const [additionalColors, setAdditionalColors] = useState<string[]>([]);
@@ -80,7 +80,7 @@ const Grid: React.FC = () => {
   const handlePixelChange = (
     x: number,
     y: number,
-    isShiftClick: boolean = false
+    isErasing: boolean = false
   ) => {
     if (lastModifiedPixel?.x === x && lastModifiedPixel?.y === y) {
       return; // Skip if this pixel was just modified
@@ -90,7 +90,7 @@ const Grid: React.FC = () => {
     setGridData((prevGrid) =>
       prevGrid.map((pixel) =>
         pixel.x === x && pixel.y === y
-          ? { ...pixel, color: isShiftClick ? "" : selectedColor }
+          ? { ...pixel, color: isErasing ? "" : selectedColor }
           : pixel
       )
     );
@@ -100,7 +100,7 @@ const Grid: React.FC = () => {
   const handleMouseDown = (event: React.MouseEvent) => {
     setIsMouseDown(true);
     const { x, y } = getPixelCoordinates(event);
-    handlePixelChange(x, y, event.shiftKey);
+    handlePixelChange(x, y, event.button === 2); // Right-click is button 2
   };
 
   const handleMouseUp = () => {
@@ -112,7 +112,7 @@ const Grid: React.FC = () => {
     const { x, y } = getPixelCoordinates(event);
     setHoveredPixel({ x, y });
     if (isMouseDown) {
-      handlePixelChange(x, y, event.shiftKey);
+      handlePixelChange(x, y, event.buttons === 2); // Right-click drag is buttons 2
     }
   };
 
@@ -122,7 +122,6 @@ const Grid: React.FC = () => {
     if (!gridRef.current) return { x: -1, y: -1 };
 
     const rect = gridRef.current.getBoundingClientRect();
-    const pixelSize = 30; // Size of each pixel
 
     // Calculate x and y using the mouse position relative to the grid
     const relativeX = event.clientX - rect.left;
@@ -193,28 +192,9 @@ const Grid: React.FC = () => {
     }
   }, [history]);
 
-  const printGrid = () => {
-    console.log(textAreaContent);
-  };
+  const toggleGrid = () => setShowGrid(!showGrid);
 
-  const toggleGrid = () => {
-    setShowGrid(!showGrid);
-  };
-
-  const copyTextAreaContent = () => {
-    navigator.clipboard
-      .writeText(textAreaContent)
-      .then(() => {
-        console.log("Text area content copied to clipboard");
-      })
-      .catch((err) => {
-        console.error("Failed to copy text: ", err);
-      });
-  };
-
-  const copySVGText = () => {
-    navigator.clipboard.writeText(svgContent);
-  };
+  const copySVGText = () => navigator.clipboard.writeText(svgContent);
 
   const generateSVG = (
     gridColors: string[][],
@@ -271,9 +251,7 @@ const Grid: React.FC = () => {
     navigator.clipboard.writeText(bytes);
   };
 
-  useEffect(() => {
-    updateSVG();
-  }, [textAreaContent]);
+  useEffect(() => updateSVG(), [textAreaContent]);
 
   const saveColorToPalette = () => {
     // TODO: ensure it's hex and not rgb
@@ -297,9 +275,7 @@ const Grid: React.FC = () => {
     setAdditionalColors([]);
   };
 
-  const startColorPicker = () => {
-    setIsPickingColor(true);
-  };
+  const startColorPicker = () => setIsPickingColor(true);
 
   const handleColorPick = useCallback(
     (event: MouseEvent) => {
@@ -340,39 +316,43 @@ const Grid: React.FC = () => {
       document.addEventListener("click", handleColorPick, true);
     }
 
-    return () => {
-      document.removeEventListener("click", handleColorPick, true);
-    };
+    return () => document.removeEventListener("click", handleColorPick, true);
   }, [isPickingColor, handleColorPick]);
 
   return (
-    <>
-      <div className="text-3xl font-bold p-8 mb-10 border-b border-gray-300">
-        Chonks Studio
+    <div className="bg-white">
+      <div className="p-8 border-b border-gray-300 flex flex-row justify-between">
+        <p className="text-3xl font-bold">Chonks Studio</p>
+
+        <div className="flex flex-row gap-4">
+          <button
+            onClick={toggleGrid}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-blue-600 transition-colors"
+          >
+            Toggle Grid
+          </button>
+
+          <button
+            onClick={resetGrid}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-500 transition-colors"
+          >
+            Reset Canvas
+          </button>
+
+          <button
+            onClick={resetSavedColors}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-red-500 transition-colors"
+          >
+            Reset Saved Colors
+          </button>
+        </div>
       </div>
 
-      <div className="flex justify-center w-full">
-        <div className="p-4 grid grid-cols-[15%_65%_20%] w-full">
-          <div>
-            <SelectColor
-              additionalColors={additionalColors}
-              hasAdditionalColors={additionalColors?.length > 0}
-              selectedColor={selectedColor}
-              setSelectedColor={setSelectedColor}
-            />
-            <BodyPresets setBackgroundBody={setBackgroundBody} />
-            <Menu
-              resetGrid={resetGrid}
-              saveColorToPalette={saveColorToPalette}
-              selectedColor={selectedColor}
-              resetSavedColors={resetSavedColors}
-              startColorPicker={startColorPicker}
-              toggleGrid={toggleGrid}
-              setBackgroundColor={setBackgroundColor}
-            />
-          </div>
-
+      <div className="flex justify-center md:max-w-[1200px] mx-auto">
+        <div className="flex flex-col md:flex-row gap-[25px] p-4 w-full">
+          {/* Middle column */}
           <Canvas
+            pixelSize={pixelSize}
             gridRef={gridRef}
             gridSize={gridSize}
             gridData={gridData}
@@ -388,17 +368,29 @@ const Grid: React.FC = () => {
             backgroundColor={backgroundColor}
           />
 
-          <div className="flex flex-col justify-end relative right-0 bottom-0 gap-2 p-x ">
+          {/* Right column */}
+          <div className="flex flex-col gap-2">
             <SVGPreview
               svgContent={svgContent}
               copySVGText={copySVGText}
               downloadSVG={downloadSVG}
               handleBytes={handleBytes}
             />
+
+            <SelectColor
+              additionalColors={additionalColors}
+              hasAdditionalColors={additionalColors?.length > 0}
+              selectedColor={selectedColor}
+              setSelectedColor={setSelectedColor}
+              saveColorToPalette={saveColorToPalette}
+              setBackgroundColor={setBackgroundColor}
+              startColorPicker={startColorPicker}
+              setBackgroundBody={setBackgroundBody}
+            />
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -1,7 +1,7 @@
 import { Pixel } from "@/pages/studio";
-import { useState } from "react";
 
 interface Props {
+  pixelSize: number;
   gridRef: React.RefObject<HTMLDivElement>;
   gridSize: number;
   gridData: Pixel[];
@@ -12,12 +12,13 @@ interface Props {
   handleMouseDown: (event: React.MouseEvent) => void;
   handleMouseUp: () => void;
   handleMouseMove: (event: React.MouseEvent) => void;
-  handlePixelChange: (x: number, y: number, shiftKey: boolean) => void;
+  handlePixelChange: (x: number, y: number, isErasing: boolean) => void;
   setHoveredPixel: (pixel: { x: number; y: number } | null) => void;
   getPixelCoordinates: (event: React.MouseEvent) => { x: number; y: number };
 }
 
 export default function Canvas({
+  pixelSize,
   showGrid,
   gridRef,
   gridSize,
@@ -32,15 +33,15 @@ export default function Canvas({
   setHoveredPixel,
   getPixelCoordinates,
 }: Props) {
-  const size = 30;
   const borderSize = showGrid ? 1 : 0;
-  const gridWidth = gridSize * size + (gridSize - 1) * borderSize;
-  const gridHeight = gridSize * size + (gridSize - 1) * borderSize;
+  const gridWidth = gridSize * pixelSize + (gridSize - 1) * borderSize;
+  const gridHeight = gridSize * pixelSize + (gridSize - 1) * borderSize;
 
   return (
     <div
-      className={`relative w-fit mx-auto border border-[#6b7280]`}
+      className={`relative w-fit h-fit mx-auto`}
       style={{ backgroundColor: backgroundColor }}
+      onContextMenu={(e) => e.preventDefault()}
     >
       {/* Background image */}
       <div
@@ -56,7 +57,7 @@ export default function Canvas({
           }
           alt=""
           className="w-full h-full object-cover"
-          style={{ opacity: backgroundBody === "ghost.svg" ? 0.5 : 1 }}
+          style={{ opacity: backgroundBody === "ghost.svg" ? 0.6 : 1 }}
         />
       </div>
 
@@ -65,8 +66,8 @@ export default function Canvas({
         ref={gridRef}
         className="grid bg-transparent relative z-10"
         style={{
-          gridTemplateColumns: `repeat(${gridSize}, ${size}px)`,
-          gridTemplateRows: `repeat(${gridSize}, ${size}px)`,
+          gridTemplateColumns: `repeat(${gridSize}, ${pixelSize}px)`,
+          gridTemplateRows: `repeat(${gridSize}, ${pixelSize}px)`,
           gap: `${borderSize}px`,
           width: `${gridWidth}px`,
           height: `${gridHeight}px`,
@@ -78,15 +79,12 @@ export default function Canvas({
           handleMouseUp();
           setHoveredPixel(null);
         }}
-        onClick={(event: React.MouseEvent) => {
-          const { x, y } = getPixelCoordinates(event);
-          handlePixelChange(x, y, event.shiftKey);
-        }}
+        onContextMenu={(e) => e.preventDefault()}
       >
         {gridData.map((pixel, index) => (
           <div
             key={index}
-            className={`pointer w-[${size}px] h-[${size}px] cursor-pointer transition-colors duration-300
+            className={`pointer w-[${pixelSize}px] h-[${pixelSize}px] cursor-pointer transition-colors duration-300
                   ${pixel.color ? "" : "hover:bg-gray-200"}`}
             style={{
               borderTop:
@@ -95,14 +93,26 @@ export default function Canvas({
                 showGrid && pixel.x === 0 ? "1px solid #8e96a4" : "none",
               borderRight: showGrid ? "1px solid #8e96a4" : "none",
               borderBottom: showGrid ? "1px solid #8e96a4" : "none",
-              backgroundColor: pixel.color || "transparent",
-              filter: pixel.color ? "hover:brightness(80%)" : undefined,
-              outline:
+              backgroundColor:
                 hoveredPixel &&
                 hoveredPixel.x === pixel.x &&
                 hoveredPixel.y === pixel.y
-                  ? "2px solid black"
-                  : "none",
+                  ? pixel.color || "white"
+                  : pixel.color || "transparent",
+              transform:
+                hoveredPixel &&
+                hoveredPixel.x === pixel.x &&
+                hoveredPixel.y === pixel.y
+                  ? "scale(1.35)"
+                  : "scale(1)",
+              zIndex:
+                hoveredPixel &&
+                hoveredPixel.x === pixel.x &&
+                hoveredPixel.y === pixel.y
+                  ? "1"
+                  : "auto",
+              transition:
+                "transform 0.075s ease-in-out, background-color 0.075s ease-in-out",
             }}
             title={`x: ${pixel.x}, y: ${pixel.y}, color: ${
               pixel.color || "transparent"
