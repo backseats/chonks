@@ -369,13 +369,8 @@ const Grid: React.FC = () => {
           />
 
           {/* Right column */}
-          <div className="flex flex-col gap-2">
-            <SVGPreview
-              svgContent={svgContent}
-              copySVGText={copySVGText}
-              downloadSVG={downloadSVG}
-              handleBytes={handleBytes}
-            />
+          <div className="flex flex-col gap-2 md:max-w-[320px]">
+            <SVGPreview svgContent={svgContent} handleBytes={handleBytes} />
 
             <SelectColor
               additionalColors={additionalColors}
