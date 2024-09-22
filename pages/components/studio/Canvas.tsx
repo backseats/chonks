@@ -96,11 +96,11 @@ export default function Canvas({
                   ${pixel.color ? "" : "hover:bg-gray-200"}`}
             style={{
               borderTop:
-                showGrid && pixel.y === 0 ? "1px solid #8e96a4" : "none",
+                showGrid && pixel.y === 0 ? "1px solid #b1b7c2" : "none",
               borderLeft:
-                showGrid && pixel.x === 0 ? "1px solid #8e96a4" : "none",
-              borderRight: showGrid ? "1px solid #8e96a4" : "none",
-              borderBottom: showGrid ? "1px solid #8e96a4" : "none",
+                showGrid && pixel.x === 0 ? "1px solid #b1b7c2" : "none",
+              borderRight: showGrid ? "1px solid #b1b7c2" : "none",
+              borderBottom: showGrid ? "1px solid #b1b7c2" : "none",
               backgroundColor:
                 hoveredPixel &&
                 hoveredPixel.x === pixel.x &&
