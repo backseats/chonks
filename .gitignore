@@ -11,7 +11,9 @@
 
 # next.js
 /.next/
-/out/
+/out/*
+!/out/PetersMain.sol/
+!/out/PeterTraits.sol/
 
 # production
 /build
