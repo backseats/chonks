@@ -7,16 +7,14 @@ interface Props {
 }
 
 const shortcuts = [
-  { key: "Ctrl/Cmd + Z", description: "Undo last action" },
-  { key: "Left Click", description: "Draw pixel" },
-  { key: "Right Click", description: "Erase pixel" },
-  // Add more shortcuts as needed
+  { key: "Ctrl/Cmd + Z", description: "Undo" },
+  { key: "Left Click", description: "Draw" },
+  { key: "Right Click", description: "Erase" },
 ];
 
-export default function KeyboardShortcutsModal({
-  closeModal,
-  handleModalBackgroundClick,
-}: Props) {
+export default function KeyboardShortcutsModal(props: Props) {
+  const { closeModal, handleModalBackgroundClick } = props;
+
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
