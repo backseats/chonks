@@ -1,4 +1,4 @@
-import EquippedAttributes from "@/pages/components/chonk_explorer/EquippedAttributes";
+import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
 import { Chonk } from "@/types/Chonk";
 import { Address } from "viem";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";

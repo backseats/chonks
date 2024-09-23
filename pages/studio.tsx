@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import SVGPreview from "@/pages/components/studio/SVGPreview";
-import SelectColor from "@/pages/components/studio/SelectColor";
-import Canvas from "@/pages/components/studio/Canvas";
-import MenuBar from "@/pages/components/studio/MenuBar";
+import SVGPreview from "../components/studio/SVGPreview";
+import SelectColor from "../components/studio/SelectColor";
+import Canvas from "../components/studio/Canvas";
+import MenuBar from "../components/studio/MenuBar";
 import { parseSvgToBytes } from "@/utils/convertSvgToBytes";
-import MetadataModal from "./components/studio/MetadataModal";
-import KeyboardShortcutsModal from "./components/studio/KeyboardShortcutsModal";
-import LoadTraitModal from "@/pages/components/studio/LoadTraitModal";
+import MetadataModal from "../components/studio/MetadataModal";
+import KeyboardShortcutsModal from "../components/studio/KeyboardShortcutsModal";
+import LoadTraitModal from "../components/studio/LoadTraitModal";
 
 export type Pixel = {
   x: number;

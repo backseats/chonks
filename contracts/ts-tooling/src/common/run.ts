@@ -44,6 +44,7 @@ export async function getForgeConfig(contractRootDir: string) {
     const { stdout } = await execaCommand(`forge config --root ${contractRootDir}`, {
         extendEnv: true,
         env: {
+            ...process.env,
             FOUNDRY_PROFILE: FOUNDRY_PROFILE,
         },
     })
@@ -60,7 +61,7 @@ export async function callTestContract(
 
     if (!fs.existsSync(contractRootDir)) {
         throw new Error('Invalid root dir: ' + path.resolve(contractRootDir))
-    }    
+    }
 
     let pathToContract = path.join(contractRootDir, testContractName);
     if (!fs.existsSync(pathToContract)) {
@@ -72,6 +73,7 @@ export async function callTestContract(
         {
             extendEnv: true,
             env: {
+                ...process.env,
                 NFT_ID: tokenID.toString(),
                 FOUNDRY_PROFILE: FOUNDRY_PROFILE,
             },

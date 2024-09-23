@@ -11,12 +11,12 @@ import {
   traitsABI,
 } from "@/contract_data";
 import { StoredPeter } from "@/types/StoredPeter";
-import EquipmentContainer from "@/pages/components/chonk_explorer/EquipmentContainer";
+import EquipmentContainer from "@/components/chonk_explorer/EquipmentContainer";
 import { Category } from "@/types/Category";
-import MenuBar from "@/pages/components/chonk_explorer/MenuBar";
-import MainChonkImage from "@/pages/components/chonk_explorer/MainChonkImage";
-import OwnershipSection from "@/pages/components/chonk_explorer/OwnershipSection";
-import Trait from "@/pages/components/chonk_explorer/Trait";
+import MenuBar from "@/components/chonk_explorer/MenuBar";
+import MainChonkImage from "@/components/chonk_explorer/MainChonkImage";
+import OwnershipSection from "@/components/chonk_explorer/OwnershipSection";
+import Trait from "@/components/chonk_explorer/Trait";
 
 type CurrentChonk = {
   tokenId: number;

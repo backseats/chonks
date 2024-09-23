@@ -13,6 +13,7 @@ const defaultColors = {
 }
 
 export function colorJsonConsole(json: any) {
+    // @ts-ignore
     return colorizer(JSON.stringify(json, null, 4), { colors: defaultColors })
 }
 
