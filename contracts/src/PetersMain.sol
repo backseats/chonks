@@ -93,14 +93,14 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_localDeploy) {
             for (uint i; i < 20; ++i) {
                 mint(); // Mints N bodies/tokens
-                //  setBackgroundColor(i, "27b143");
+                setBackgroundColor(i, "28b143");
                 setRenderZ(i, true);
             }
             // setting random colors for now
-            setBackgroundColor(1, "333333");
-            setBackgroundColor(3, "27b143");
-            setBackgroundColor(4, "eb068d");
-            setBackgroundColor(8, "F2C304");
+            // setBackgroundColor(1, "333333");
+            // setBackgroundColor(3, "27b143");
+            // setBackgroundColor(4, "eb068d");
+            // setBackgroundColor(8, "F2C304");
 
             // setRenderZ(1, true);
             // setRenderZ(5, true);
@@ -581,6 +581,24 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     /// Getters
+
+    function getPeterZMap(uint256 _tokenId) public view returns (string memory) {
+      
+        bytes memory bodyZmap;
+        bytes memory traitZmaps;
+
+        StoredPeter memory storedPeter = getPeter(_tokenId);
+
+        (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedPeter);
+        (, traitZmaps, ) = traitsContract.getSvgZmapsAndMetadata(storedPeter);
+       
+        return string.concat(
+            string(bodyZmap),
+            string(traitZmaps)
+        );
+
+    }
+
     function getPeter(uint256 _tokenId) public view returns (IPeterStorage.StoredPeter memory) {
         IPeterStorage.StoredPeter memory storedPeter =  peterTokens.all[_tokenId];
 
