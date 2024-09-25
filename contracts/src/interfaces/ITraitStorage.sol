@@ -65,4 +65,9 @@ interface ITraitStorage {
         address renderMinterContract; // cast as not an address
     }
 
+    event Mint(
+        address indexed owner,
+        uint256 indexed tokenId
+    );
+
 }

@@ -150,6 +150,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // set default background color
         peter.backgroundColor = "0D6E9D";
 
+        emit Mint(msg.sender, tokenId);
+
         console.log("minted body tokenId:", tokenId);
     }
 
@@ -223,28 +225,36 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Equip/Unequip clothing traits
 
-    function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        _validateTokenOwnership(_peterTokenId, _traitTokenId);
-        _validateTraitType(_traitTokenId, TraitCategory.Name.Handheld);
+    // function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    //     _validateTokenOwnership(_peterTokenId, _traitTokenId);
+    //     _validateTraitType(_traitTokenId, TraitCategory.Name.Handheld);
 
-        peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
-    }
+    //     peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
 
-    function unequipAccessory(uint256 _peterTokenId) public {
-        _validatePeterOwnership(_peterTokenId);
-        peterTokens.all[_peterTokenId].handheldId = 0;
-    }
+    //     emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Handheld");
+    // }
+
+    // function unequipAccessory(uint256 _peterTokenId) public {
+    //     _validatePeterOwnership(_peterTokenId);
+    //     peterTokens.all[_peterTokenId].handheldId = 0;
+        
+    //     emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Handheld");
+    // }
 
     function equipGlasses(uint256 _peterTokenId, uint256 _traitTokenId) public {
         _validateTokenOwnership(_peterTokenId, _traitTokenId);
         _validateTraitType(_traitTokenId, TraitCategory.Name.Glasses);
 
         peterTokens.all[_peterTokenId].glassesId = _traitTokenId;
+
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Glasses");
     }
 
     function unequipGlasses(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].glassesId = 0;
+
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Glasses");
     }
 
     function equipHandheld(uint256 _peterTokenId, uint256 _traitTokenId) public {
@@ -252,11 +262,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _validateTraitType(_traitTokenId, TraitCategory.Name.Handheld);
 
         peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
+
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Handheld");
     }
 
     function unequipHandheld(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].handheldId = 0;
+
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Handheld");
     }
 
     function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public {
@@ -264,11 +278,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _validateTraitType(_traitTokenId, TraitCategory.Name.Hair);
 
         peterTokens.all[_peterTokenId].hairId = _traitTokenId;
+
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Hair");
     }
 
     function unequipHair(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].hairId = 0;
+
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Hair");
     }
 
     function equipHat(uint256 _peterTokenId, uint256 _traitTokenId) public {
@@ -276,11 +294,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _validateTraitType(_traitTokenId, TraitCategory.Name.Hat);
 
         peterTokens.all[_peterTokenId].hatId = _traitTokenId;
+
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Hat");
     }
 
     function unequipHat(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].hatId = 0;
+
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Hat");
     }
 
     function equipShirt(uint256 _peterTokenId, uint256 _traitTokenId) public {
@@ -288,11 +310,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _validateTraitType(_traitTokenId, TraitCategory.Name.Shirt); // TODO: fix
 
         peterTokens.all[_peterTokenId].shirtId = _traitTokenId;
+
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Shirt");
     }
 
     function unequipShirt(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].shirtId = 0;
+
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Shirt");
     }
 
     // NOTE: We Might want counterpart view functions that just compile the svg without writing to chain
@@ -301,11 +327,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _validateTraitType(_traitTokenId, TraitCategory.Name.Pants);
 
         peterTokens.all[_peterTokenId].pantsId = _traitTokenId;
+
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Pants");
     }
 
     function unequipPants(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].pantsId = 0;
+
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Pants");
     }
 
     function equipShoes(uint256 _peterTokenId, uint256 _traitTokenId) public {
@@ -313,11 +343,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _validateTraitType(_traitTokenId, TraitCategory.Name.Shoes);
 
         peterTokens.all[_peterTokenId].shoesId = _traitTokenId;
+
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Shoes");
     }
 
     function unequipShoes(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].shoesId = 0;
+
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Shoes");
     }
 
     // validate OwnershipHandoverRequested(pendingOwner);
@@ -332,6 +366,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.shirtId = 0;
         peter.pantsId = 0;
         peter.shoesId = 0;
+
+        emit UnequipAll(ownerOf(_peterTokenId), _peterTokenId);
     }
 
     // If 0, it will ignore
@@ -349,10 +385,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_hatTokenId != 0) equipHat(_peterTokenId, _hatTokenId);
         if (_hairTokenId != 0) equipHair(_peterTokenId, _hairTokenId);
         if (_glassesTokenId != 0) equipGlasses(_peterTokenId, _glassesTokenId);
-        if (_handheldTokenId != 0) equipAccessory(_peterTokenId, _handheldTokenId);
+        if (_handheldTokenId != 0) equipHandheld(_peterTokenId, _handheldTokenId);
         if (_shirtTokenId != 0) equipShirt(_peterTokenId, _shirtTokenId);
         if (_pantsTokenId != 0) equipPants(_peterTokenId, _pantsTokenId);
         if (_shoesTokenId != 0) equipShoes(_peterTokenId, _shoesTokenId);
+
+        emit EquipAll(ownerOf(_peterTokenId), _peterTokenId);
     }
 
     /// Validations
@@ -582,6 +620,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Getters
 
+    // gets complete zMap for a Peter, body and traits
+    // TODO: proably should add getPeterColorMap
     function getPeterZMap(uint256 _tokenId) public view returns (string memory) {
       
         bytes memory bodyZmap;
@@ -596,6 +636,20 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             string(bodyZmap),
             string(traitZmaps)
         );
+
+    }
+
+    // need to get the indiviual zMaps for body and traits
+    // TODO: proably should add getBodyColorMap
+    function getBodyZMap(uint256 _tokenId) public view returns (string memory) {
+      
+        bytes memory bodyZmap;
+
+        StoredPeter memory storedPeter = getPeter(_tokenId);
+
+        (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedPeter);
+       
+        return string(bodyZmap);
 
     }
 

@@ -286,6 +286,12 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         }
     }
 
+    // TODO: proably should add getColorMapforTokenId
+    function getZMapForTokenId(uint256 _tokenId) public view returns (string memory) {
+        StoredTrait memory trait = getTrait(_tokenId);
+        return string(traitIndexToMetadata[trait.traitIndex].zMap);
+    }
+    
     // effectively the same as getBodyImageSvg so maybe put in a library or contract
     // receives body colorMap, puts it into a 30x30 grid, with 5 bytes row-major byte array
     function getTraitImage(bytes memory colorMap) public pure returns (bytes memory) {
