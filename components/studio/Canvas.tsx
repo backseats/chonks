@@ -131,4 +131,6 @@ const Canvas = forwardRef<HTMLDivElement, Props>(
   }
 );
 
+Canvas.displayName = "Canvas";
+
 export default Canvas;
