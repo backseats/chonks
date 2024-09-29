@@ -551,7 +551,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             '</style>'
         );
 
-
         return mainRenderer.renderAsDataUriSVG(
             _tokenId,
             bodySvg,
@@ -566,9 +565,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function renderAsDataUriZ(uint256 _tokenId) public view returns (string memory) {
         string memory bodySvg;
         string memory traitsSvg;
-        bytes memory bodyZmap;
-        bytes memory traitZmaps;
-        bytes memory fullZmap;
+        bytes  memory bodyZmap;
+        bytes  memory traitZmaps;
+        bytes  memory fullZmap;
         string memory traitsAttributes;
         string memory bodyAttributes;
         string memory fullAttributes;

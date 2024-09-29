@@ -166,46 +166,41 @@ const Grid: React.FC = () => {
     completeAction();
   };
 
-  const getPixelCoordinates = (
-    event: React.MouseEvent
+  const getCoordinates = (
+    clientX: number,
+    clientY: number,
+    rect: DOMRect
   ): { x: number; y: number } => {
-    if (!gridRef.current) return { x: -1, y: -1 };
+    const pixelWidth = rect.width / gridSize;
+    const pixelHeight = rect.height / gridSize;
 
-    const rect = gridRef.current.getBoundingClientRect();
+    const relativeX = clientX - rect.left;
+    const relativeY = clientY - rect.top;
 
-    // Calculate x and y using the mouse position relative to the grid
-    const relativeX = event.clientX - rect.left;
-    const relativeY = event.clientY - rect.top;
+    const x = Math.floor(relativeX / pixelWidth);
+    const y = Math.floor(relativeY / pixelHeight);
 
-    // Use Math.floor to ensure we're always selecting the pixel the cursor is within
-    const x = Math.floor(relativeX / pixelSize);
-    const y = Math.floor(relativeY / pixelSize);
-
-    // Ensure x and y are within the grid bounds
     return {
       x: Math.max(0, Math.min(x, gridSize - 1)),
       y: Math.max(0, Math.min(y, gridSize - 1)),
     };
   };
 
+  const getPixelCoordinates = (
+    event: React.MouseEvent
+  ): { x: number; y: number } => {
+    if (!gridRef.current) return { x: -1, y: -1 };
+    const rect = gridRef.current.getBoundingClientRect();
+    return getCoordinates(event.clientX, event.clientY, rect);
+  };
+
   const getTouchPixelCoordinates = (
     event: React.TouchEvent
   ): { x: number; y: number } => {
     if (!gridRef.current) return { x: -1, y: -1 };
-
     const rect = gridRef.current.getBoundingClientRect();
     const touch = event.touches[0];
-
-    const relativeX = touch.clientX - rect.left;
-    const relativeY = touch.clientY - rect.top;
-
-    const x = Math.floor(relativeX / pixelSize);
-    const y = Math.floor(relativeY / pixelSize);
-
-    return {
-      x: Math.max(0, Math.min(x, gridSize - 1)),
-      y: Math.max(0, Math.min(y, gridSize - 1)),
-    };
+    return getCoordinates(touch.clientX, touch.clientY, rect);
   };
 
   const updateTextArea = () => {
@@ -278,7 +273,7 @@ const Grid: React.FC = () => {
     const width = gridColors[0].length * pixelSize;
     const height = gridColors.length * pixelSize;
 
-    let svgContent = `<svg width="${width}" height="${height}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">`;
+    let svgContent = `<svg width="${width}" height="${height}" background="${backgroundColor}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">`;
 
     gridColors.forEach((row, y) => {
       row.forEach((color, x) => {
@@ -307,8 +302,10 @@ const Grid: React.FC = () => {
     }
   };
 
-  const downloadSVG = () => {
-    const blob = new Blob([miniSvgContent], { type: "image/svg+xml" });
+  const downloadSVG = (large: boolean = false) => {
+    const blob = new Blob([large ? svgContent : miniSvgContent], {
+      type: "image/svg+xml",
+    });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
@@ -512,6 +509,7 @@ const Grid: React.FC = () => {
               svgContent={svgContent}
               handleBytes={handleBytes}
               openModal={openModal}
+              downloadSVG={() => downloadSVG(true)}
             />
 
             <SelectColor

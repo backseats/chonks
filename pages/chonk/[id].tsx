@@ -319,7 +319,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       <div className="w-[1280px] mx-auto ">
         {tokenData ? (
           <div>
-            <div className="flex flex-row justify-center gap-4 ">
+            <div className="flex flex-row justify-center gap-4">
               <MainChonkImage id={id} tokenData={tokenData} />
             </div>
 
