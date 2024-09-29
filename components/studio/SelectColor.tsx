@@ -9,10 +9,11 @@ import {
 } from "@heroicons/react/24/outline";
 
 interface Props {
-  openKeyboardShortcutsModal: () => void;
+  isPickingColor: boolean;
   additionalColors: string[];
   hasAdditionalColors: boolean;
   selectedColor: string;
+  openKeyboardShortcutsModal: () => void;
   setSelectedColor: (color: string) => void;
   saveColorToPalette: () => void;
   setBackgroundColor: (color: string) => void;
@@ -21,6 +22,7 @@ interface Props {
 }
 
 export default function SelectColor({
+  isPickingColor,
   openKeyboardShortcutsModal,
   additionalColors,
   selectedColor,
@@ -126,7 +128,7 @@ export default function SelectColor({
           >
             <div className="flex items-center justify-center">
               <EyeDropperIcon className="w-5 h-5 mr-2" />
-              Select Color
+              {isPickingColor ? "Select Color" : "Start Eyedropper"}
             </div>
           </button>
         </div>

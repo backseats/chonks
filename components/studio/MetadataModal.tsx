@@ -1,32 +1,34 @@
 import { useState } from "react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useAccount } from "wagmi";
+import { XMarkIcon, ArrowRightCircleIcon } from "@heroicons/react/24/outline";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 
 interface Props {
+  address: string | undefined;
+  traitName: string;
+  traitNameRef: React.RefObject<HTMLInputElement>;
   traitType: string;
   traitTypes: string[];
-  field1Ref: React.RefObject<HTMLInputElement>;
   closeModal: () => void;
   handleModalBackgroundClick: (e: React.MouseEvent<HTMLDivElement>) => void;
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onTraitTypeChange: (newTraitType: string) => void;
+  setTraitName: (newTraitName: string) => void;
 }
 
 export default function MetadataModal(props: Props) {
   const {
-    closeModal,
-    handleSubmit,
-    field1Ref,
-    handleModalBackgroundClick,
+    address,
+    traitName,
+    traitNameRef,
     traitType,
     traitTypes,
+    closeModal,
+    handleModalBackgroundClick,
+    handleSubmit,
     onTraitTypeChange,
+    setTraitName,
   } = props;
 
-  const { address } = useAccount();
-
-  const [traitName, setTraitName] = useState("");
   const [error, setError] = useState("");
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -80,7 +82,7 @@ export default function MetadataModal(props: Props) {
               id="trait-name"
               name="trait-name"
               placeholder="Trait Name e.g. 'Cap Forward'"
-              ref={field1Ref}
+              ref={traitNameRef}
               value={traitName}
               onChange={(e) => setTraitName(e.target.value)}
               className="mt-1 py-1 block w-full rounded-md border-gray-300 shadow-sm focus:outline-none focus:ring-0"
@@ -88,22 +90,24 @@ export default function MetadataModal(props: Props) {
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
 
-          <div className="mb-4">
-            <label
-              htmlFor="creator"
-              className="block text-sm font-sm text-gray-500"
-            >
-              Creator
-            </label>
-            <input
-              type="text"
-              id="creator"
-              name="creator"
-              className="mt-1 py-1 opacity-50 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-              value={truncateEthAddress(address)}
-              disabled={true}
-            />
-          </div>
+          {address && (
+            <div className="mb-4">
+              <label
+                htmlFor="creator"
+                className="block text-sm font-sm text-gray-500"
+              >
+                Creator
+              </label>
+              <input
+                type="text"
+                id="creator"
+                name="creator"
+                className="mt-1 py-1 opacity-50 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                value={truncateEthAddress(address)}
+                disabled={true}
+              />
+            </div>
+          )}
 
           <div className="mb-4">
             <label
@@ -127,11 +131,28 @@ export default function MetadataModal(props: Props) {
             </select>
           </div>
 
+          <a
+            href=""
+            target="_blank"
+            className="w-full h-[40px] mb-4 block text-center bg-green-500 hover:bg-green-600 text-white rounded-md py-2 px-4 focus: outline-none"
+          >
+            <div className="flex items-center justify-center gap-1">
+              Follow @Chonksxyz on{" "}
+              <img
+                src="/x-logo.svg"
+                width={14}
+                height={14}
+                className="ml-[2px] mr-1"
+              />
+              <ArrowRightCircleIcon className="w-5 h-5" />
+            </div>
+          </a>
+
           <button
             type="submit"
             className="w-full bg-blue-500 text-white rounded-md py-2 px-4 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           >
-            Submit
+            Download Your Chonk
           </button>
         </form>
       </div>

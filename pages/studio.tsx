@@ -7,6 +7,10 @@ import { parseSvgToBytes } from "@/utils/convertSvgToBytes";
 import MetadataModal from "../components/studio/MetadataModal";
 import KeyboardShortcutsModal from "../components/studio/KeyboardShortcutsModal";
 import LoadTraitModal from "../components/studio/LoadTraitModal";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
+import { useAccount } from "wagmi";
+import html2canvas from "html2canvas";
 
 export type Pixel = {
   x: number;
@@ -29,6 +33,8 @@ const Grid: React.FC = () => {
     }
     return grid;
   };
+
+  const { address } = useAccount();
 
   const [backgroundBody, setBackgroundBody] = useState<string>("lightbody.svg");
   const [gridData, setGridData] = useState<Pixel[]>(generateGrid());
@@ -55,10 +61,11 @@ const Grid: React.FC = () => {
   const [isKeyboardShortcutsModalOpen, setIsKeyboardShortcutsModalOpen] =
     useState(false);
   const [isLoadTraitModalOpen, setIsLoadTraitModalOpen] = useState(false);
+  const [traitName, setTraitName] = useState("");
 
+  const canvasRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const field1Ref = useRef<HTMLInputElement>(null);
+  const traitNameRef = useRef<HTMLInputElement>(null);
 
   const traitTypes = [
     "Hat",
@@ -263,8 +270,6 @@ const Grid: React.FC = () => {
 
   const toggleGrid = () => setShowGrid(!showGrid);
 
-  const copySVGText = () => navigator.clipboard.writeText(svgContent);
-
   const generateSVG = (
     gridColors: string[][],
     mini: boolean = false
@@ -302,23 +307,73 @@ const Grid: React.FC = () => {
     }
   };
 
-  const downloadSVG = (large: boolean = false) => {
-    const blob = new Blob([large ? svgContent : miniSvgContent], {
-      type: "image/svg+xml",
+  const takeScreenshot = (): Promise<string> => {
+    return new Promise((resolve) => {
+      if (canvasRef.current) {
+        html2canvas(canvasRef.current, { backgroundColor: null }).then(
+          (canvas) => {
+            const imageData = canvas.toDataURL("image/png");
+
+            resolve(imageData);
+          }
+        );
+      } else {
+        resolve(""); // Resolve with empty string if canvas ref is not available
+      }
     });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "heightmap.svg";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  };
+
+  const downloadSVG = async () => {
+    const zip = new JSZip();
+    const folder = zip.folder("My Chonk");
+
+    if (showGrid) setShowGrid(false);
+
+    // Sleep for 0.25 seconds
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    if (folder) {
+      folder.file("chonk.svg", svgContent);
+
+      const dummyData = {
+        traitName: traitName,
+        traitType: traitTypes[currentTraitIndex],
+        creator: address ?? "0x",
+        bytes: parseSvgToBytes(miniSvgContent),
+        createdOn: new Date().toISOString(),
+      };
+
+      folder.file("metadata.json", JSON.stringify(dummyData, null, 2));
+
+      const screenshotData = await takeScreenshot();
+      if (screenshotData) {
+        folder.file("chonk.png", screenshotData.split(",")[1], {
+          base64: true,
+        });
+      }
+
+      const readmeContent = `# My Chonk
+
+This folder contains:
+1. chonk.svg - The Chonk you created in Chonks Studio. Share it on social, use it as your PFP, remix, play, have fun!
+2. chonk.png - A PNG screenshot of your Chonk.
+3. metadata.json - Metadata for your Chonk. Save this for later. Just in case 😉
+
+Thanks for playing! We look forward to seeing what you create.
+
+Follow Chonks on X/Twitter @chonksxyz to stay up to date as we get closer to mint in late October.
+
+– Backseats and Marka`;
+      folder.file("README.md", readmeContent);
+
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, "My_Chonk.zip");
+    }
   };
 
   const handleBytes = () => {
     const bytes = parseSvgToBytes(miniSvgContent);
-    console.log("bytes", bytes);
+    // console.log("bytes", bytes);
     navigator.clipboard.writeText(bytes);
   };
 
@@ -394,8 +449,8 @@ const Grid: React.FC = () => {
     setIsModalOpen(true);
     // Focus on field1 when the modal opens
     setTimeout(() => {
-      if (field1Ref.current) {
-        field1Ref.current.focus();
+      if (traitNameRef.current) {
+        traitNameRef.current.focus();
       }
     }, 0);
   };
@@ -403,9 +458,9 @@ const Grid: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     // TODO: Handle form submission logic here
 
+    downloadSVG(); // use this for now
     closeModal();
   };
 
@@ -485,6 +540,7 @@ const Grid: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-[75px] md:p-4 md:w-full">
           {/* Left column */}
           <Canvas
+            ref={canvasRef} // Pass the ref to the Canvas component
             pixelSize={pixelSize}
             gridRef={gridRef}
             gridSize={gridSize}
@@ -506,13 +562,14 @@ const Grid: React.FC = () => {
           {/* Right column */}
           <div className="flex flex-col gap-2 md:max-w-[420px]">
             <SVGPreview
+              address={address}
               svgContent={svgContent}
               handleBytes={handleBytes}
               openModal={openModal}
-              downloadSVG={() => downloadSVG(true)}
             />
 
             <SelectColor
+              isPickingColor={isPickingColor}
               additionalColors={additionalColors}
               hasAdditionalColors={additionalColors?.length > 0}
               selectedColor={selectedColor}
@@ -529,13 +586,16 @@ const Grid: React.FC = () => {
 
       {isModalOpen && (
         <MetadataModal
+          traitName={traitName}
+          setTraitName={setTraitName}
           traitType={traitTypes[currentTraitIndex]}
           traitTypes={traitTypes}
           closeModal={closeModal}
           handleSubmit={handleSubmit}
-          field1Ref={field1Ref}
+          traitNameRef={traitNameRef}
           handleModalBackgroundClick={handleModalBackgroundClick}
           onTraitTypeChange={handleTraitTypeChange}
+          address={address}
         />
       )}
 

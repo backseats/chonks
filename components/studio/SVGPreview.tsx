@@ -1,18 +1,19 @@
 import { useState } from "react";
 import { ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
+import { ConnectKitButton } from "connectkit";
 
 interface Props {
+  address: string | undefined;
   svgContent: string;
   handleBytes: () => void;
   openModal: () => void;
-  downloadSVG: () => void;
 }
 
 export default function SVGPreview({
   svgContent,
   handleBytes,
   openModal,
-  downloadSVG,
+  address,
 }: Props) {
   const [bytesText, setBytesText] = useState("Copy Bytes");
 
@@ -33,7 +34,7 @@ export default function SVGPreview({
           dangerouslySetInnerHTML={{ __html: svgContent }}
         />
 
-        <button
+        {/* <button
           onClick={copyBytes}
           className="px-4 py-2 bg-yellow-500 text-black rounded hover:brightness-[105%] transition-colors mt-2 w-[300px] mx-auto"
         >
@@ -41,21 +42,35 @@ export default function SVGPreview({
             <ClipboardDocumentListIcon className="w-6 h-6 mr-2" />
             {bytesText}
           </div>
-        </button>
+        </button> */}
 
-        <button
+        {/* <button
           onClick={openModal}
           className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors w-[300px] mx-auto"
         >
           Set Trait Metadata
-        </button>
-
+        </button> */}
+        {/* {address ? ( */}
         <button
-          onClick={downloadSVG}
+          onClick={openModal}
           className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors w-[300px] mx-auto"
         >
           Download SVG
         </button>
+        {/* ) : ( */}
+        {/* <ConnectKitButton.Custom>
+            {({ show }) => {
+              return (
+                <button
+                  onClick={show}
+                  className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors w-[300px] mx-auto"
+                >
+                  Download SVG
+                </button>
+              );
+            }}
+          </ConnectKitButton.Custom>
+        )} */}
 
         {/* <button
           className="px-4 py-2 bg-gray-400 text-black rounded w-[300px] mx-auto cursor-not-allowed opacity-50"
