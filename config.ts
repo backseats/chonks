@@ -2,18 +2,19 @@ import { http, createConfig } from "wagmi";
 import { baseSepolia, base } from "wagmi/chains";
 import { createPublicClient } from 'viem'
 
-export const publicClient = createPublicClient({
-  chain: {
-    ...baseSepolia,
-    id: 1, // Use 1 for local development
-  },
-  transport: http('http://localhost:8545'),
-});
+// Only for local dev
+// export const publicClient = createPublicClient({
+//   chain: {
+//     ...baseSepolia,
+//     id: 1, // Use 1 for local development
+//   },
+//   transport: http('http://localhost:8545'),
+// });
 
 export const config = createConfig({
-  chains: [baseSepolia, base],
+  chains: [base, baseSepolia],
   transports: {
-    [baseSepolia.id]: http(),
     [base.id]: http(),
+    [baseSepolia.id]: http(),
   },
 });
