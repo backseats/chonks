@@ -17,6 +17,8 @@
     "@uiw/react-color-circle": "^2.3.0",
     "@uiw/react-color-colorful": "^2.3.0",
     "connectkit": "^1.8.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "next": "14.2.3",
     "react": "^18",
     "react-dom": "^18",
@@ -25,6 +27,7 @@
     "xml2js": "^0.6.2"
   },
   "devDependencies": {
+    "@types/file-saver": "^2.0.7",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
