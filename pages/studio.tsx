@@ -59,7 +59,7 @@ const Grid: React.FC = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isKeyboardShortcutsModalOpen, setIsKeyboardShortcutsModalOpen] =
-    useState(true);
+    useState(false);
   const [isLoadTraitModalOpen, setIsLoadTraitModalOpen] = useState(false);
   const [traitName, setTraitName] = useState("");
 
@@ -295,6 +295,8 @@ const Grid: React.FC = () => {
   };
 
   const updateSVG = () => {
+    if (textAreaContent === "") return;
+
     try {
       const gridColors = JSON.parse(textAreaContent);
       const newSvgContent = generateSVG(gridColors);
@@ -470,8 +472,10 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
   const openKeyboardShortcutsModal = () =>
     setIsKeyboardShortcutsModalOpen(true);
 
-  const closeKeyboardShortcutsModal = () =>
+  const closeKeyboardShortcutsModal = () => {
     setIsKeyboardShortcutsModalOpen(false);
+    localStorage.setItem("hasSeenKeyboardShortcuts", "true");
+  };
 
   const handleKeyboardShortcutsModalBackgroundClick = (
     e: React.MouseEvent<HTMLDivElement>
@@ -525,6 +529,15 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     // Update the text area content
     setTextAreaContent(JSON.stringify(colorGrid, null, 2));
   };
+
+  useEffect(() => {
+    const hasSeenKeyboardShortcuts = localStorage.getItem(
+      "hasSeenKeyboardShortcuts"
+    );
+    if (!hasSeenKeyboardShortcuts) {
+      setIsKeyboardShortcutsModalOpen(true);
+    }
+  }, []);
 
   return (
     <div className="bg-white">
