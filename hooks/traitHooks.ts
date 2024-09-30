@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useReadContract, useWriteContract } from "wagmi";
-import { decodeAndSetData } from "@/pages/chonk/[id]";
+// import { decodeAndSetData } from "@/pages/chonk/[id]";
 import {
   mainContract,
   mainABI,
@@ -11,6 +11,22 @@ import {
 import { baseSepolia } from "viem/chains";
 import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
+
+// Temporarily here because /chonks/[id] is hidden in vercelignore
+function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
+  // const decodedContent = decodeURIComponent(data);
+  // const base64String = decodedContent.split("data:application/json,")[1];
+  // // Parse as JSON and stringify with proper formatting
+  // const jsonData = JSON.parse(base64String);
+
+  // console.log(jsonData);
+
+  const base64String = data.split(",")[1];
+  const jsonString = atob(base64String);
+  const jsonData = JSON.parse(jsonString) as Chonk;
+
+  setData(jsonData);
+}
 
 export const categoryList = Object.values(Category);
 
