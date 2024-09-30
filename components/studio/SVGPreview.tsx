@@ -55,7 +55,7 @@ export default function SVGPreview({
           onClick={openModal}
           className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors w-[300px] mx-auto"
         >
-          Download SVG
+          Download Your Chonk
         </button>
         {/* ) : ( */}
         {/* <ConnectKitButton.Custom>

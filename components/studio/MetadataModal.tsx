@@ -60,7 +60,7 @@ export default function MetadataModal(props: Props) {
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         {/* Top Bar */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-medium">Set Trait Metadata</h2>
+          <h2 className="text-2xl font-medium">Set Metadata</h2>
           <button
             onClick={closeModal}
             className="text-gray-500 hover:text-gray-700"

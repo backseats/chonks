@@ -122,7 +122,7 @@ export default function SelectColor({
             </button>
           </div>
 
-          <button
+          {/* <button
             onClick={startColorPicker}
             className="px-4 py-2 bg-gray-300 text-black rounded hover:brightness-105 transition-all w-full mt-4"
           >
@@ -130,7 +130,7 @@ export default function SelectColor({
               <EyeDropperIcon className="w-5 h-5 mr-2" />
               {isPickingColor ? "Select Color" : "Start Eyedropper"}
             </div>
-          </button>
+          </button> */}
         </div>
       </div>
 

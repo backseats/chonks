@@ -59,7 +59,7 @@ const Grid: React.FC = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isKeyboardShortcutsModalOpen, setIsKeyboardShortcutsModalOpen] =
-    useState(false);
+    useState(true);
   const [isLoadTraitModalOpen, setIsLoadTraitModalOpen] = useState(false);
   const [traitName, setTraitName] = useState("");
 
@@ -329,7 +329,6 @@ const Grid: React.FC = () => {
 
     if (showGrid) setShowGrid(false);
 
-    // Sleep for 0.25 seconds
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     if (folder) {
@@ -355,13 +354,13 @@ const Grid: React.FC = () => {
       const readmeContent = `# My Chonk
 
 This folder contains:
-1. chonk.svg - The Chonk you created in Chonks Studio. Share it on social, use it as your PFP, remix, play, have fun!
-2. chonk.png - A PNG screenshot of your Chonk.
-3. metadata.json - Metadata for your Chonk. Save this for later. Just in case 😉
+1. chonk.png - The Chonk you created in Chonks Studio. Share it on social, use it as your PFP, remix, play, have fun!
+2. chonk.svg - These are just the pixels you drew.
+3. metadata.json - Metadata for your Chonk. Save this for later. Just in case.
 
 Thanks for playing! We look forward to seeing what you create.
 
-Follow Chonks on X/Twitter @chonksxyz to stay up to date as we get closer to mint in late October.
+Follow @chonksxyz on X to stay up to date, as we get closer to mint in late October.
 
 – Backseats and Marka`;
       folder.file("README.md", readmeContent);
