@@ -185,7 +185,8 @@ export async function main() {
     addPercentages(occurences)
 
     console.log('Occurences: ')
-    console.log(colorJsonConsole(occurences))
+    // console.log(colorJsonConsole(occurences)) // throwing an error
+    console.log(occurences)
 
     let occurencesFile = path.join(tempFolder, 'occurences.json')
     console.log('saving ', occurencesFile)

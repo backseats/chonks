@@ -1,0 +1,32 @@
+{
+    "name": "Peter #1",
+    "description": "Click/tap top left to open your backpack, top right for PFP mode ",
+    "attributes": [
+        {
+            "trait_type": "Body",
+            "value": "Body 001"
+        },
+        {
+            "trait_type": "Hair",
+            "value": "High Top - Pink"
+        },
+        {
+            "trait_type": "Handheld",
+            "value": "Green Sword"
+        },
+        {
+            "trait_type": "Shirt",
+            "value": "Blue Shirt"
+        },
+        {
+            "trait_type": "Pants",
+            "value": "Overalls - Green"
+        },
+        {
+            "trait_type": "Shoes",
+            "value": "Wings Dark"
+        }
+    ],
+    "image": "data:image/svg+xml;base64,PHN2ZyBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZm... (21918 bytes total)",
+    "animation_url": "data:text/html;base64,PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PHN0eWxlPiBib2R5e292ZXJmbG93OiBoaWRkZW47IG... (48566 bytes total)"
+}

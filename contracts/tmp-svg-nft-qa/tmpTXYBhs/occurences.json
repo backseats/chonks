@@ -1,0 +1,38 @@
+{
+    "Body": {
+        "Body 001": "8 (80.00%)",
+        "Body 003": "1 (10.00%)",
+        "Body 004": "1 (10.00%)"
+    },
+    "Hair": {
+        "High Top - Pink": "3 (33.33%)",
+        "Orange Long": "2 (22.22%)",
+        "Purple Long": "3 (33.33%)",
+        "Red Short": "1 (11.11%)"
+    },
+    "Handheld": {
+        "Green Sword": "2 (20.00%)",
+        "Fishing Rod": "4 (40.00%)",
+        "Staff": "2 (20.00%)",
+        "Red Balloon": "1 (10.00%)",
+        "Torch": "1 (10.00%)"
+    },
+    "Shirt": {
+        "Blue Shirt": "10 (100.00%)"
+    },
+    "Pants": {
+        "Overalls - Green": "5 (50.00%)",
+        "Blue Pants": "4 (40.00%)",
+        "Purple Pants": "1 (10.00%)"
+    },
+    "Shoes": {
+        "Wings Dark": "2 (20.00%)",
+        "Degen": "2 (20.00%)",
+        "Wings Red": "1 (10.00%)",
+        "Green": "2 (20.00%)",
+        "Wings Midngiht": "3 (30.00%)"
+    },
+    "Hat": {
+        "": "1 (100.00%)"
+    }
+}

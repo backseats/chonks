@@ -91,10 +91,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
         if (_localDeploy) {
-            for (uint i; i < 20; ++i) {
+            for (uint i; i < 100; ++i) {
                 mint(); // Mints N bodies/tokens
-                setBackgroundColor(i, "28b143");
-                setRenderZ(i, true);
+                // setBackgroundColor(i, "28b143");
+                // setRenderZ(i, true);
             }
             // setting random colors for now
             // setBackgroundColor(1, "333333");
@@ -146,6 +146,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         // set default renderer to 2D
         peter.renderZ = false;
+
+        // on mint, let's make all peter's body index 1 
+        peter.bodyIndex = 1;
 
         // set default background color
         peter.backgroundColor = "0D6E9D";
@@ -612,6 +615,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
+
         StoredPeter memory storedPeter = getPeter(_tokenId);
         return (storedPeter.renderZ) ? renderAsDataUriZ(_tokenId) : renderAsDataUriSVG(_tokenId);
         // return renderAsDataUriSVG(_tokenId);
@@ -657,16 +661,33 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
          // Set up the source of randomness + seed for this Chonk.
         uint128 randomness = peterTokens.epochs[storedPeter.epoch].randomness;
+
+        // note: should we use a salt here? or is it okay to just use the tokenId? both checks and bibos use "gradient" and "eye"
+        // also note, both checks and bibos use a helper function with the max in there e.g. Utilities.random(check.seed, 'gradient', 100);
+        // we don't use the seed anywhere else I don't think
+
         storedPeter.seed = (uint256(keccak256(abi.encodePacked(randomness, storedPeter.tokenId))) % type(uint128).max);
 
         storedPeter.isRevealed = _localDeploy == true ? true : randomness > 0; // if randomness is > 0, epoch & hence peter is revealed
-        storedPeter.bodyIndex = uint256(1 + (storedPeter.seed % 4)); // even chance for 4 different bodies
+        
+        // when minting, we're currently setting body to index 1 for all peters
+
+        // if we want even chance of 4 different bodies, we can do this:
+        // storedPeter.bodyIndex = uint256(1 + (storedPeter.seed % 4)); // even chance for 4 different bodies
+
+        // if we want body rarity: let's make body index 1 70% of the time, and others 10%
+        // if (storedPeter.seed % 100 < 70) storedPeter.bodyIndex = 1;
+        // else if (storedPeter.seed % 100 < 80) storedPeter.bodyIndex = 2; 
+        // else if (storedPeter.seed % 100 < 90) storedPeter.bodyIndex = 3; 
+        // else storedPeter.bodyIndex = 4;
 
         return storedPeter;
     }
 
     /// @dev Returns the token ids the end user's wallet owns
     function walletOfOwner(address _owner) public view returns (uint256[] memory) {
+
+        // console.log(" walletOfOwner:", _owner);
         uint256 tokenCount = balanceOf(_owner);
 
         uint256[] memory tokensId = new uint256[](tokenCount);
@@ -723,6 +744,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peterTokens.all[_peterTokenId].backgroundColor = _color;
     }
 
+    // set function to set bodyIndex to 1, 2, 3, or 4 for a tokenId
+    // todo: user setter ... should only be done by token holder
+    function setBodyIndex(uint256 _peterTokenId, uint256 _bodyIndex) public {
+        // ensure bodyIndex is between 1 and 4
+        if (_bodyIndex < 1 || _bodyIndex > 4) revert("Invalid bodyIndex");
+        peterTokens.all[_peterTokenId].bodyIndex = _bodyIndex;    
+    }
+
+    // todo: user setter ... should only be done by token holder
     function setRenderZ(uint256 _peterTokenId, bool _renderZ) public {
         peterTokens.all[_peterTokenId].renderZ = _renderZ;
     }

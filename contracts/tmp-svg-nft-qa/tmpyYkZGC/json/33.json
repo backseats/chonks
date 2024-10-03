@@ -1,0 +1,31 @@
+{
+    "name": "Peter #33",
+    "description": "Click/tap top left to open your backpack, top right for PFP mode ",
+    "attributes": [
+        {
+            "trait_type": "Body",
+            "value": "Body 001"
+        },
+        {
+            "trait_type": "Hair",
+            "value": "Orange Long"
+        },
+        {
+            "trait_type": "Handheld",
+            "value": "Fishing Rod"
+        },
+        {
+            "trait_type": "Shirt",
+            "value": "Blue Shirt"
+        },
+        {
+            "trait_type": "Pants",
+            "value": "Overalls - Blue"
+        },
+        {
+            "trait_type": "Shoes",
+            "value": "Red"
+        }
+    ],
+    "image": "data:image/svg+xml;base64,PHN2ZyBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZm... (23150 bytes total)"
+}

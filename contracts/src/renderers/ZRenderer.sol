@@ -73,7 +73,8 @@ contract ZRenderer {
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _backgroundStuff.backgroundStyles);
 
         if (bytes(_traitsAttributes).length > 0) {
-            fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
+            // fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
+            fullAttributes = string.concat('"attributes":[', _traitsAttributes, ']');
         } else {
             fullAttributes = string.concat('"attributes":[', _bodyAttributes, ']');
         }

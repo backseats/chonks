@@ -1,0 +1,31 @@
+{
+    "name": "Peter #99",
+    "description": "Click/tap top left to open your backpack, top right for PFP mode ",
+    "attributes": [
+        {
+            "trait_type": "Body",
+            "value": "Body 001"
+        },
+        {
+            "trait_type": "Hair",
+            "value": "Purple Long"
+        },
+        {
+            "trait_type": "Handheld",
+            "value": "Green Sword"
+        },
+        {
+            "trait_type": "Shirt",
+            "value": "Blue Shirt"
+        },
+        {
+            "trait_type": "Pants",
+            "value": "White Pants"
+        },
+        {
+            "trait_type": "Shoes",
+            "value": "Degen"
+        }
+    ],
+    "image": "data:image/svg+xml;base64,PHN2ZyBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiIHZpZXdCb3g9IjAgMCAzMCAzMCIgZm... (20490 bytes total)"
+}

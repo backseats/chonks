@@ -46,7 +46,8 @@ contract MainRenderer {
         );
 
         if (bytes(_traitsAttributes).length > 0) {
-            fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
+            // fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
+            fullAttributes = string.concat('"attributes":[', _traitsAttributes, ']');
         } else {
             fullAttributes = string.concat('"attributes":[', _bodyAttributes, ']');
         }
@@ -79,7 +80,7 @@ contract MainRenderer {
              '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
                 fullAttributes,
             ',', image,
-            ',', animationURL,
+            // ',', animationURL, // comment out for qa collection
             '}'
         );
 
