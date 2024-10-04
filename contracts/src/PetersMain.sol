@@ -138,11 +138,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.epoch = uint32(peterTokens.epoch);
         peter.seed = uint16(tokenId);
         peter.tokenId = uint16(tokenId);
-        peter.shirtId = traitsIds[0]; // shirtId is a trait contract token id
-        peter.pantsId = traitsIds[1]; // same with pants id
-        peter.shoesId = traitsIds[2]; // same with shoes id
-        peter.hairId =  traitsIds[3]; // same with hair id
-        peter.handheldId  =  traitsIds[4]; // same with hat id
+
+        // minting 1 of each for now, same order as trait catgory   Hat 0 : Hair 1 : Glasses  2 : Handheld 3 : Shirt 4 : Pants 5 : Shoes 6
+        peter.hairId =      traitsIds[1]; // same with hair id
+        peter.glassesId =   traitsIds[2]; // same with hat id
+        peter.handheldId =  traitsIds[3]; // same with hat id
+        peter.shirtId =     traitsIds[4]; // shirtId is a trait contract token id
+        peter.pantsId =     traitsIds[5]; // same with pants id
+        peter.shoesId =     traitsIds[6]; // same with shoes id
+        
 
         // set default renderer to 2D
         peter.renderZ = false;
@@ -673,7 +677,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // when minting, we're currently setting body to index 1 for all peters
 
         // if we want even chance of 4 different bodies, we can do this:
-        // storedPeter.bodyIndex = uint256(1 + (storedPeter.seed % 4)); // even chance for 4 different bodies
+        storedPeter.bodyIndex = uint256(1 + (storedPeter.seed % 4)); // even chance for 4 different bodies
 
         // if we want body rarity: let's make body index 1 70% of the time, and others 10%
         // if (storedPeter.seed % 100 < 70) storedPeter.bodyIndex = 1;

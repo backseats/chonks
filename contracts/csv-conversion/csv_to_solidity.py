@@ -22,7 +22,7 @@ def csv_to_solidity_commands(csv_file_path):
   return solidity_commands
 
 # Path to the input CSV file
-csv_file_path = "test.csv"
+csv_file_path = "031024-2-master.csv"
 
 # Convert CSV to Solidity commands
 commands = csv_to_solidity_commands(csv_file_path)
