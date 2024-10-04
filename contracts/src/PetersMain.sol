@@ -140,6 +140,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.tokenId = uint16(tokenId);
 
         // minting 1 of each for now, same order as trait catgory   Hat 0 : Hair 1 : Glasses  2 : Handheld 3 : Shirt 4 : Pants 5 : Shoes 6
+        peter.hatId =       traitsIds[0]; // same with hat id
         peter.hairId =      traitsIds[1]; // same with hair id
         peter.glassesId =   traitsIds[2]; // same with hat id
         peter.handheldId =  traitsIds[3]; // same with hat id
