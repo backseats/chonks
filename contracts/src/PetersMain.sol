@@ -111,8 +111,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function mint() public payable { // TODO amount, check price
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
 
-        // for now, set amount to 3 traits
-        uint256 amount = 3;
+        // for now, set amount to X traits
+        uint256 amount = 7;
 
         resolveEpochIfNecessary();
 
