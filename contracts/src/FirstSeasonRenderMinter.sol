@@ -214,7 +214,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
             //     safeMint(_traits); // Mints 3 sets of traits
             // }
 
-            safeMintMany(msg.sender);
+            safeMintMany(msg.sender, 3);
         }
     }
 
@@ -223,15 +223,16 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
     //     return peterTraits.safeMint(_to);
     // }
 
-     function safeMintMany(address to) public payable returns (uint256[] memory) { // TODO: add onlyMinter modifier
+     function safeMintMany(address _to, uint256 _amount) public payable returns (uint256[] memory) { // TODO: add onlyMinter modifier
         // TODO: check supply?
 
         //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin
 
         uint256[] memory mintedIds = new uint256[](INITIAL_TRAIT_NUMBER);
 
-        for(uint i; i < INITIAL_TRAIT_NUMBER; ++i) {
-            uint tokenId = peterTraits.safeMint(to); // creates a token without any kind of info
+        // for(uint i; i < INITIAL_TRAIT_NUMBER; ++i) {
+        for(uint i; i < _amount; ++i) {
+            uint tokenId = peterTraits.safeMint(_to); // creates a token without any kind of info
             mintedIds[i] = tokenId;
 
             // Initialize our Trait
@@ -241,23 +242,49 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
             trait.seed = tokenId; // seed is the tokenId
             trait.renderMinterContract = address(this);
 
-            // let's mint 1 of each for now, same order as trait catgory   Hat 0 : Hair 1 : Glasses  2 : Handheld 3 : Shirt 4 : Pants 5 : Shoes 6
+            // let's give everyone shoes, pants, shirt: level 0
+            // level 1: shoes, pants, shirt AND hair
+            // level 2: shoes, pants, shirt AND hair AND glasses
+            // level 3: shoes, pants, shirt AND hair AND glasses AND hat
+            // level 4: shoes, pants, shirt AND hair AND glasses AND hat AND handheld
+
+            // amount cats
 
             if (i == 0) {
-                trait.traitType = TraitCategory.Name.Hat;
-            } else if (i == 1) {
-                trait.traitType = TraitCategory.Name.Hair;
-            } else if (i == 2) {
-                trait.traitType = TraitCategory.Name.Glasses;
-            } else if (i == 3) {
-                trait.traitType = TraitCategory.Name.Handheld;
-            }  else if (i == 4) {
-                trait.traitType = TraitCategory.Name.Shirt;
-            } else if (i == 5) {
-                trait.traitType = TraitCategory.Name.Pants;
-            } else if (i == 6) {
                 trait.traitType = TraitCategory.Name.Shoes;
+            } else if (i == 1) {
+                trait.traitType = TraitCategory.Name.Pants;
+            } else if (i == 2) {
+                trait.traitType = TraitCategory.Name.Shirt;
+            } else if (i == 3) {
+                trait.traitType = TraitCategory.Name.Hair;
+            }  else if (i == 4) {
+                trait.traitType = TraitCategory.Name.Glasses;
+            } else if (i == 5) {
+                trait.traitType = TraitCategory.Name.Hat;
+            } else if (i == 6) {
+                trait.traitType = TraitCategory.Name.Handheld;
             }
+
+            // let's mint 1 of each for now, same order as trait catgory   Hat 0 : Hair 1 : Glasses  2 : Handheld 3 : Shirt 4 : Pants 5 : Shoes 6
+            // if (i == 0) {
+            //     trait.traitType = TraitCategory.Name.Hat;
+            // } else if (i == 1) {
+            //     trait.traitType = TraitCategory.Name.Hair;
+            // } else if (i == 2) {
+            //     trait.traitType = TraitCategory.Name.Glasses;
+            // } else if (i == 3) {
+            //     trait.traitType = TraitCategory.Name.Handheld;
+            // }  else if (i == 4) {
+            //     trait.traitType = TraitCategory.Name.Shirt;
+            // } else if (i == 5) {
+            //     trait.traitType = TraitCategory.Name.Pants;
+            // } else if (i == 6) {
+            //     trait.traitType = TraitCategory.Name.Shoes;
+            // }
+
+
+
 
             // Always mint the token a shirt, pants, shoes, and hair and a random 5th token
             // if (i == 0) {
@@ -279,7 +306,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
             peterTraits.setTraitForTokenId(tokenId, trait);
 
-            emit ITraitStorage.Mint(to, tokenId);
+            emit ITraitStorage.Mint(_to, tokenId);
         }
 
         return mintedIds;

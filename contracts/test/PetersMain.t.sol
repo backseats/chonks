@@ -119,7 +119,7 @@ contract PetersMainTest is Test {
         address user = address(2);
         vm.startPrank(user);
         main.mint();
-        firstSeasonMinter.safeMintMany(user);
+        firstSeasonMinter.safeMintMany(user,3);
         vm.stopPrank();
 
         // validate data
@@ -140,7 +140,7 @@ contract PetersMainTest is Test {
         address user = address(2);
         vm.startPrank(user);
         main.mint();
-        firstSeasonMinter.safeMintMany(user);
+        firstSeasonMinter.safeMintMany(user,3);
         vm.stopPrank();
 
         // validate data
@@ -190,7 +190,7 @@ contract PetersMainTest is Test {
         address user = address(2);
         vm.startPrank(user);
         main.mint();
-        firstSeasonMinter.safeMintMany(user);
+        firstSeasonMinter.safeMintMany(user,3);
         vm.stopPrank();
 
         // validate data

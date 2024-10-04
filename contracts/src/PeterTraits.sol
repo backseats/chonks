@@ -417,14 +417,14 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         if (!storedPeter.isRevealed) return ("", "{}");
 
         // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
-        if (storedPeter.hatId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hatId, traitsSvg, traitsAttributes);
-        if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes);
-        if (storedPeter.glassesId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.glassesId, traitsSvg, traitsAttributes);
-        if (storedPeter.handheldId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.handheldId, traitsSvg, traitsAttributes);
-        if (storedPeter.shirtId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.shirtId, traitsSvg, traitsAttributes);
-        if (storedPeter.pantsId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.pantsId, traitsSvg, traitsAttributes);
         if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.shoesId, traitsSvg, traitsAttributes);
-
+        if (storedPeter.pantsId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.pantsId, traitsSvg, traitsAttributes);
+        if (storedPeter.shirtId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.shirtId, traitsSvg, traitsAttributes);
+        if (storedPeter.glassesId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.glassesId, traitsSvg, traitsAttributes);
+        if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes);
+        if (storedPeter.hatId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hatId, traitsSvg, traitsAttributes);
+        if (storedPeter.handheldId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.handheldId, traitsSvg, traitsAttributes);
+        
     }
 
     function callGetSvgAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes ) public view returns (string memory traitsSvg, string memory traitsAttributes) {

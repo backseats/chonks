@@ -111,6 +111,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function mint() public payable { // TODO amount, check price
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
 
+        // for now, set amount to 3 traits
+        uint256 amount = 7;
+
         resolveEpochIfNecessary();
 
         uint256 tokenId = ++_nextTokenId;
@@ -130,7 +133,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
-        uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress);
+        uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, amount);
 
         // Initialize our Peter
         StoredPeter storage peter = peterTokens.all[tokenId];
@@ -140,13 +143,29 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.tokenId = uint16(tokenId);
 
         // minting 1 of each for now, same order as trait catgory   Hat 0 : Hair 1 : Glasses  2 : Handheld 3 : Shirt 4 : Pants 5 : Shoes 6
-        peter.hatId =       traitsIds[0]; // same with hat id
-        peter.hairId =      traitsIds[1]; // same with hair id
-        peter.glassesId =   traitsIds[2]; // same with hat id
-        peter.handheldId =  traitsIds[3]; // same with hat id
-        peter.shirtId =     traitsIds[4]; // shirtId is a trait contract token id
-        peter.pantsId =     traitsIds[5]; // same with pants id
-        peter.shoesId =     traitsIds[6]; // same with shoes id
+        
+        // peter.hatId =       traitsIds[0]; // same with hat id
+        // peter.hairId =      traitsIds[1]; // same with hair id
+        // peter.glassesId =   traitsIds[2]; // same with hat id
+        // peter.handheldId =  traitsIds[3]; // same with hat id
+        // peter.shirtId =     traitsIds[4]; // shirtId is a trait contract token id
+        // peter.pantsId =     traitsIds[5]; // same with pants id
+        // peter.shoesId =     traitsIds[6]; // same with shoes id
+
+        // level 0: let's give everyone shoes, pants, shirt: 
+        // level 1: shoes, pants, shirt AND hair
+        // level 2: shoes, pants, shirt AND hair AND glasses
+        // level 3: shoes, pants, shirt AND hair AND glasses AND hat
+        // level 4: shoes, pants, shirt AND hair AND glasses AND hat AND handheld
+
+        peter.shoesId = traitsIds[0]; 
+        peter.pantsId = traitsIds[1]; 
+        peter.shirtId = traitsIds[2]; 
+
+        if(amount > 3) peter.hairId = traitsIds[3]; 
+        if(amount > 4) peter.glassesId = traitsIds[4]; 
+        if(amount > 5) peter.hatId = traitsIds[5]; 
+        if(amount > 6) peter.handheldId = traitsIds[6]; 
         
 
         // set default renderer to 2D
