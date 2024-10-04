@@ -34,7 +34,7 @@ export default function SVGPreview({
           dangerouslySetInnerHTML={{ __html: svgContent }}
         />
 
-        {/* <button
+        <button
           onClick={copyBytes}
           className="px-4 py-2 bg-yellow-500 text-black rounded hover:brightness-[105%] transition-colors mt-2 w-[300px] mx-auto"
         >
@@ -42,7 +42,7 @@ export default function SVGPreview({
             <ClipboardDocumentListIcon className="w-6 h-6 mr-2" />
             {bytesText}
           </div>
-        </button> */}
+        </button>
 
         {/* <button
           onClick={openModal}
