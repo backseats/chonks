@@ -542,6 +542,14 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     }
   }, []);
 
+  const updateGridColors = (oldColor: string, newColor: string) => {
+    setGridData((prevGrid) =>
+      prevGrid.map((pixel) =>
+        pixel.color === oldColor ? { ...pixel, color: newColor } : pixel
+      )
+    );
+  };
+
   return (
     <div className="bg-white">
       <MenuBar
@@ -595,6 +603,8 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
               startColorPicker={startColorPicker}
               setBackgroundBody={setBackgroundBody}
               openKeyboardShortcutsModal={openKeyboardShortcutsModal}
+              gridData={gridData}
+              updateGridColors={updateGridColors}
             />
           </div>
         </div>
