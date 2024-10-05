@@ -54,7 +54,7 @@ const Grid: React.FC = () => {
   const [svgContent, setSvgContent] = useState<string>("");
   const [miniSvgContent, setMiniSvgContent] = useState<string>("");
   const [isPickingColor, setIsPickingColor] = useState<boolean>(false);
-  const [showGrid, setShowGrid] = useState<boolean>(true);
+  const [showGrid, setShowGrid] = useState<boolean>(false);
   const [backgroundColor, setBackgroundColor] = useState<string>("#FFFFFF");
   const [isDrawing, setIsDrawing] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -78,8 +78,11 @@ const Grid: React.FC = () => {
   ];
   const [currentTraitIndex, setCurrentTraitIndex] = useState(0);
 
-  const handleTraitTypeChange = () => {
-    setCurrentTraitIndex((prevIndex) => (prevIndex + 1) % traitTypes.length);
+  const handleTraitTypeChange = (newTraitType: string) => {
+    const newIndex = traitTypes.indexOf(newTraitType);
+    if (newIndex !== -1) {
+      setCurrentTraitIndex(newIndex);
+    }
   };
 
   useEffect(() => {
@@ -337,7 +340,7 @@ const Grid: React.FC = () => {
       folder.file("chonk.svg", svgContent);
 
       const dummyData = {
-        traitName: traitName,
+        traitName,
         traitType: traitTypes[currentTraitIndex],
         creator: address ?? "0x",
         bytes: parseSvgToBytes(miniSvgContent),
@@ -368,7 +371,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
       folder.file("README.md", readmeContent);
 
       const content = await zip.generateAsync({ type: "blob" });
-      saveAs(content, "My_Chonk.zip");
+      saveAs(content, `Chonk_${traitName}.zip`);
     }
   };
 
@@ -542,6 +545,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
   return (
     <div className="bg-white">
       <MenuBar
+        showGrid={showGrid}
         toggleGrid={toggleGrid}
         resetGrid={resetGrid}
         resetSavedColors={resetSavedColors}

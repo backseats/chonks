@@ -1,6 +1,7 @@
 import { ConnectKitButton } from "connectkit";
 
 interface Props {
+  showGrid: boolean;
   toggleGrid: () => void;
   resetGrid: () => void;
   resetSavedColors: () => void;
@@ -8,7 +9,13 @@ interface Props {
 }
 
 export default function MenuBar(props: Props) {
-  const { toggleGrid, resetGrid, resetSavedColors, showLoadTraitModal } = props;
+  const {
+    showGrid,
+    toggleGrid,
+    resetGrid,
+    resetSavedColors,
+    showLoadTraitModal,
+  } = props;
 
   return (
     <div className="px-8 py-4 border-b border-gray-300 flex flex-col md:flex-row justify-between">
@@ -26,7 +33,7 @@ export default function MenuBar(props: Props) {
           onClick={toggleGrid}
           className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors"
         >
-          Toggle Grid
+          {showGrid ? "Hide Grid" : "Show Grid"}
         </button>
 
         <button

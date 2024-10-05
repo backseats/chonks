@@ -23,8 +23,15 @@ export default function LoadTraitModal({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     loadTrait(bytesInput);
     closeModal();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+      handleSubmit(e as unknown as React.FormEvent<HTMLFormElement>);
+    }
   };
 
   return (
@@ -52,6 +59,7 @@ export default function LoadTraitModal({
               ref={textareaRef}
               value={bytesInput}
               onChange={(e) => setBytesInput(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full px-3 py-2 min-h-[200px] text-gray-700 border rounded-lg focus:outline-none focus:border-blue-500"
               placeholder="Paste trait bytes here"
             />

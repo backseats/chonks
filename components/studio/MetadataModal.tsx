@@ -35,8 +35,8 @@ export default function MetadataModal(props: Props) {
     e.preventDefault();
 
     const name = traitName.trim();
-    if (!/^[a-z\s]+$/i.test(name)) {
-      setError("Only letters and spaces please");
+    if (!/^[a-z0-9\s]+$/i.test(name)) {
+      setError("Only letters, numbers, and spaces please");
       return;
     }
 
