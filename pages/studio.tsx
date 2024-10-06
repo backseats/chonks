@@ -153,10 +153,37 @@ const Grid: React.FC = () => {
     }
   }, [currentAction]);
 
+  // Add a ref to track the Shift key state
+  const shiftKeyRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Shift") {
+        shiftKeyRef.current = true;
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === "Shift") {
+        shiftKeyRef.current = false;
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
+  // Update handleMouseDown to check if Shift key is pressed
   const handleMouseDown = (event: React.MouseEvent) => {
     setIsMouseDown(true);
     const { x, y } = getPixelCoordinates(event);
-    handlePixelChange(x, y, event.button === 2); // Right-click is button 2
+    const isErasing = shiftKeyRef.current || event.button === 2;
+    handlePixelChange(x, y, isErasing);
   };
 
   const handleMouseUp = () => {
@@ -165,11 +192,13 @@ const Grid: React.FC = () => {
     completeAction();
   };
 
+  // Update handleMouseMove to use shiftKeyRef
   const handleMouseMove = (event: React.MouseEvent) => {
     const { x, y } = getPixelCoordinates(event);
     setHoveredPixel({ x, y });
     if (isMouseDown) {
-      handlePixelChange(x, y, event.buttons === 2); // Right-click drag is buttons 2
+      const isErasing = shiftKeyRef.current || event.buttons === 2;
+      handlePixelChange(x, y, isErasing);
     }
   };
 
