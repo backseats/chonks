@@ -23,6 +23,14 @@ const gridSize = 30;
 // This is the size of each pixel in the grid on the front-end, e.g. 24x24px
 const pixelSize = 24;
 
+// Update your types to include old and new colors
+type PixelAction = {
+  x: number;
+  y: number;
+  oldColor: string;
+  newColor: string;
+};
+
 const Grid: React.FC = () => {
   const generateGrid = (): Pixel[] => {
     const grid: Pixel[] = [];
@@ -41,7 +49,7 @@ const Grid: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<string>("#48A6FA"); // a nice blue
   const [additionalColors, setAdditionalColors] = useState<string[]>([]);
   const [textAreaContent, setTextAreaContent] = useState<string>("");
-  const [history, setHistory] = useState<Pixel[][]>([]);
+  const [history, setHistory] = useState<PixelAction[][]>([]);
   const [isMouseDown, setIsMouseDown] = useState<boolean>(false);
   const [lastModifiedPixel, setLastModifiedPixel] = useState<{
     x: number;
@@ -100,7 +108,10 @@ const Grid: React.FC = () => {
     }
   }, []);
 
-  const [currentAction, setCurrentAction] = useState<Pixel[]>([]);
+  const [currentAction, setCurrentAction] = useState<PixelAction[]>([]);
+
+  // Add a new state for redoStack
+  const [redoStack, setRedoStack] = useState<PixelAction[][]>([]);
 
   const handlePixelChange = (
     x: number,
@@ -115,7 +126,15 @@ const Grid: React.FC = () => {
     const oldPixel = gridData.find((pixel) => pixel.x === x && pixel.y === y);
 
     if (oldPixel && oldPixel.color !== newColor) {
-      setCurrentAction((prevAction) => [...prevAction, { ...oldPixel }]);
+      setCurrentAction((prevAction) => [
+        ...prevAction,
+        {
+          x,
+          y,
+          oldColor: oldPixel.color || "",
+          newColor,
+        },
+      ]);
     }
 
     setGridData((prevGrid) =>
@@ -129,6 +148,7 @@ const Grid: React.FC = () => {
   const completeAction = useCallback(() => {
     if (currentAction.length > 0) {
       setHistory((prevHistory) => [...prevHistory, currentAction]);
+      setRedoStack([]); // Clear redoStack
       setCurrentAction([]);
     }
   }, [currentAction]);
@@ -233,27 +253,53 @@ const Grid: React.FC = () => {
       const lastAction = history[history.length - 1];
       setGridData((prevGrid) =>
         prevGrid.map((pixel) => {
-          const undoPixel = lastAction.find(
+          const actionPixel = lastAction.find(
             (p) => p.x === pixel.x && p.y === pixel.y
           );
-          return undoPixel ? { ...pixel, color: undoPixel.color } : pixel;
+          return actionPixel
+            ? { ...pixel, color: actionPixel.oldColor }
+            : pixel;
         })
       );
       setHistory((prevHistory) => prevHistory.slice(0, -1));
+      setRedoStack((prevRedoStack) => [...prevRedoStack, lastAction]);
     }
   }, [history]);
 
+  // Implement redo functionality
+  const redo = useCallback(() => {
+    if (redoStack.length > 0) {
+      const lastUndoneAction = redoStack[redoStack.length - 1];
+      setGridData((prevGrid) =>
+        prevGrid.map((pixel) => {
+          const actionPixel = lastUndoneAction.find(
+            (p) => p.x === pixel.x && p.y === pixel.y
+          );
+          return actionPixel
+            ? { ...pixel, color: actionPixel.newColor }
+            : pixel;
+        })
+      );
+      setHistory((prevHistory) => [...prevHistory, lastUndoneAction]);
+      setRedoStack((prevRedoStack) => prevRedoStack.slice(0, -1));
+    }
+  }, [redoStack]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "z") {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "z") {
         event.preventDefault();
-        undo();
+        if (event.shiftKey) {
+          redo();
+        } else {
+          undo();
+        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [undo]);
+  }, [undo, redo]);
 
   useEffect(() => {
     const preventDefault = (e: TouchEvent) => {
