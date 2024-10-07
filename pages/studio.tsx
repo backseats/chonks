@@ -659,7 +659,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
           />
 
           {/* Right column */}
-          <div className="flex flex-col gap-2 md:max-w-[420px]">
+          <div className="flex flex-col gap-2 md:max-w-[420px] px-4">
             <SVGPreview
               address={address}
               svgContent={svgContent}
@@ -668,14 +668,12 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
             />
 
             <SelectColor
-              isPickingColor={isPickingColor}
               additionalColors={additionalColors}
               hasAdditionalColors={additionalColors?.length > 0}
               selectedColor={selectedColor}
               setSelectedColor={setSelectedColor}
               saveColorToPalette={saveColorToPalette}
               setBackgroundColor={setBackgroundColor}
-              startColorPicker={startColorPicker}
               setBackgroundBody={setBackgroundBody}
               openKeyboardShortcutsModal={openKeyboardShortcutsModal}
               gridData={gridData}

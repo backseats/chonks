@@ -7,6 +7,7 @@ import {
   EyeDropperIcon,
   QuestionMarkCircleIcon,
 } from "@heroicons/react/24/outline";
+import GradientDegrees from "./GradientDegrees";
 
 type Pixel = {
   x: number;
@@ -15,22 +16,19 @@ type Pixel = {
 };
 
 interface Props {
-  isPickingColor: boolean;
   additionalColors: string[];
   hasAdditionalColors: boolean;
   selectedColor: string;
+  gridData: Pixel[];
   openKeyboardShortcutsModal: () => void;
   setSelectedColor: (color: string) => void;
   saveColorToPalette: () => void;
   setBackgroundColor: (color: string) => void;
-  startColorPicker: () => void;
   setBackgroundBody: (body: string) => void;
-  gridData: Pixel[];
   updateGridColors: (oldColor: string, newColor: string) => void;
 }
 
 export default function SelectColor({
-  isPickingColor,
   openKeyboardShortcutsModal,
   additionalColors,
   selectedColor,
@@ -38,7 +36,6 @@ export default function SelectColor({
   hasAdditionalColors,
   saveColorToPalette,
   setBackgroundColor,
-  startColorPicker,
   setBackgroundBody,
   gridData,
   updateGridColors,
@@ -140,23 +137,15 @@ export default function SelectColor({
     <div className="flex flex-col gap-4">
       <div className="h-[2px] bg-gray-200 opacity-80 w-full my-4" />
 
-      <div className="flex flex-col gap-4 mb-4">
+      <div className="flex flex-col gap-4">
         <div className="flex flex-row gap-4">
-          <Colorful
-            color={selectedColor}
-            disableAlpha={true}
-            onChange={(color) => setSelectedColor(color.hex)}
-          />
+          <div className="flex flex-col gap-2 justify-between">
+            <Colorful
+              color={selectedColor}
+              disableAlpha={true}
+              onChange={(color) => setSelectedColor(color.hex)}
+            />
 
-          <Block
-            color={selectedColor}
-            colors={colors}
-            onChange={(color) => setSelectedColor(color.hex)}
-          />
-        </div>
-
-        <div className="flex flex-col">
-          <div className="flex gap-2">
             <button
               onClick={handleSaveColorToPalette}
               className={`p-2  rounded transition-colors w-full ${
@@ -166,6 +155,14 @@ export default function SelectColor({
             >
               {saveButtonText}
             </button>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Block
+              color={selectedColor}
+              colors={colors}
+              onChange={(color) => setSelectedColor(color.hex)}
+            />
 
             <button
               onClick={() => setBackgroundColor(selectedColor)}
@@ -177,23 +174,18 @@ export default function SelectColor({
               {backgroundColorButtonText}
             </button>
           </div>
-
-          {/* <button
-            onClick={startColorPicker}
-            className="px-4 py-2 bg-gray-300 text-black rounded hover:brightness-105 transition-all w-full mt-4"
-          >
-            <div className="flex items-center justify-center">
-              <EyeDropperIcon className="w-5 h-5 mr-2" />
-              {isPickingColor ? "Select Color" : "Start Eyedropper"}
-            </div>
-          </button> */}
         </div>
+
+        <GradientDegrees
+          hexColor={selectedColor}
+          setSelectedColor={setSelectedColor}
+        />
       </div>
 
       {uniqueColors.length > 0 && (
         <>
           <h3 className="text-xl font-semibold">Colors</h3>
-          <div className="flex flex-col gap-2 mb-8">
+          <div className="flex flex-col gap-2 mb-4">
             {uniqueColors.map((color) => (
               <div key={color} className="flex items-center">
                 <div
