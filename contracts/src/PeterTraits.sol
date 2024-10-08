@@ -420,7 +420,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.shoesId, traitsSvg, traitsAttributes);
         if (storedPeter.bottomId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.bottomId, traitsSvg, traitsAttributes);
         if (storedPeter.topId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.topId, traitsSvg, traitsAttributes);
-        if (storedPeter.accessoryId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.accessoryId, traitsSvg, traitsAttributes);
+        if (storedPeter.faceId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.faceId, traitsSvg, traitsAttributes);
         if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes);
         if (storedPeter.hatId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hatId, traitsSvg, traitsAttributes);
         if (storedPeter.accessoryId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.accessoryId, traitsSvg, traitsAttributes);
@@ -459,11 +459,12 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         if (!storedPeter.isRevealed) return ("","","{}");
 
         // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
-        if (storedPeter.hatId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.hatId, traitsSvg, traitsAttributes, traitZMaps);
-        if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes, traitZMaps);
         if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.shoesId, traitsSvg, traitsAttributes, traitZMaps);
         if (storedPeter.bottomId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.bottomId, traitsSvg, traitsAttributes, traitZMaps);
         if (storedPeter.topId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.topId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.faceId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.faceId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.hatId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.hatId, traitsSvg, traitsAttributes, traitZMaps);
         if (storedPeter.accessoryId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.accessoryId, traitsSvg, traitsAttributes, traitZMaps);
     }
 

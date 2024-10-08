@@ -374,41 +374,41 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
             // even chance of any of the traits within category
             // storedTrait.traitIndex = uint256(1 + (storedTrait.seed % accessories.length)); // even split: (mod will be 0 - 19)
 
-            // just an example: 95% will get one of the first 15 items, 5% will get one of the last 5 items
+            // just an example: 95% will get one of the first 16 items, 5% will get one of the last 5 items
             uint256 seed = uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % 100; // think we need a salt in there too
             if(seed < 95) {
-                storedTrait.traitIndex = 1 + uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % 15; 
+                storedTrait.traitIndex = 0 + uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % 16; 
             } else {
-                storedTrait.traitIndex = 15 + uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % 5; 
+                storedTrait.traitIndex = 16 + uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % 5; 
             } 
 
         }
 
-        if (storedTrait.traitType == TraitCategory.Name.Face) {
-            storedTrait.traitIndex = uint256(1000 + (storedTrait.seed % accessory.length));
+        if (storedTrait.traitType == TraitCategory.Name.Hat) {
+            storedTrait.traitIndex = uint256(1000 + (storedTrait.seed % hat.length));
         }
 
         if (storedTrait.traitType == TraitCategory.Name.Hair) {
             storedTrait.traitIndex = uint256(2000 + (storedTrait.seed % hair.length));
         }
 
-        if (storedTrait.traitType == TraitCategory.Name.Hat) {
-            storedTrait.traitIndex = uint256(3000 + (storedTrait.seed % hat.length));
-        }
-
-        if (storedTrait.traitType == TraitCategory.Name.Bottom) {
-            storedTrait.traitIndex = uint256(4000 + (storedTrait.seed % bottom.length));
+        if (storedTrait.traitType == TraitCategory.Name.Face) {
+            storedTrait.traitIndex = uint256(3000 + (storedTrait.seed % accessory.length));
         }
 
         if (storedTrait.traitType == TraitCategory.Name.Top) {
-            storedTrait.traitIndex = uint256(5000 + (storedTrait.seed % top.length));
+            storedTrait.traitIndex = uint256(4000 + (storedTrait.seed % top.length));
+        }
+
+        if (storedTrait.traitType == TraitCategory.Name.Bottom) {
+            storedTrait.traitIndex = uint256(5000 + (storedTrait.seed % bottom.length));
         }
 
         if (storedTrait.traitType == TraitCategory.Name.Shoes) {
             storedTrait.traitIndex = uint256(6000 + (storedTrait.seed % shoes.length));
         }
 
-        console2.log("storedTrait.traitIndex", storedTrait.traitIndex);
+        // console2.log("storedTrait.traitIndex", storedTrait.traitIndex);
 
         return storedTrait;
     }
