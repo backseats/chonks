@@ -164,7 +164,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.topId = traitsIds[2]; 
 
         // so we're not going to equip these on initial mint, people will have to equip them
-        // if(amount > 3) peter.hairId = traitsIds[3]; 
+        if(amount > 3) peter.hairId = traitsIds[3]; 
         // if(amount > 4) peter.faceId = traitsIds[4]; 
         // if(amount > 5) peter.hatId = traitsIds[5]; 
         // if(amount > 6) peter.accessoryId = traitsIds[6]; 
