@@ -52,7 +52,7 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
         trait.seed = tokenId; // seed is the tokenId
         trait.renderMinterContract = address(this);
         trait.isRevealed = true; // BS: I think we can set this in certain instances and be okay, if there's no reveal
-        trait.traitType = TraitCategory.Name.Shirt; // Hardcoded but could be a storage var with a setter
+        trait.traitType = TraitCategory.Name.Top; // Hardcoded but could be a storage var with a setter
 
         peterTraits.setTraitForTokenId(tokenId, trait);
 
@@ -78,7 +78,7 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
          // maybe check if a trait already exists for _traitIndex so we don't override
         // alternatively there should be a time period beyond which we can't "edit" existing traits. it would act as a temporary safeguard
 
-        // trait 4 is Blue Shirt, get existing metadata, should be empty struct, then set below. not associated with any token ids yet
+        // trait 4 is Blue top, get existing metadata, should be empty struct, then set below. not associated with any token ids yet
         // can't use storage across contracts
         ITraitStorage.TraitMetadata memory metadata = peterTraits.getTraitIndexToMetadata(_traitIndex);
 

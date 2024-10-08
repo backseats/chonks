@@ -10,19 +10,19 @@ def csv_to_solidity_commands(csv_file_path):
     for row in csv_reader:
       trait_index = row["Index"]
       trait_name = row["Trait Name"]
-      category = row["Category (e.g. Pants)"] if row["Category (e.g. Pants)"] else "Handheld"
+      category = row["Category (e.g. Bottom)"] if row["Category (e.g. Bottom)"] else "Handheld"
       animation = row["Animation"] if row["Animation"] else ""
       color_map = row["Color Map"]
       z_map = row["z Map"]
 
       # Format Solidity command
-      command = f'addNewTrait({trait_index}, "{trait_name}", TraitCategory.Name.{category}, "{animation}", hex"{color_map}", hex"{z_map}");'
+      command = f'addNewTrait({trait_index}, "{trait_name}", TraitCategory.Name.{category}, "{animation}", hex"{color_map}", "{z_map}");'
       solidity_commands.append(command)
 
   return solidity_commands
 
 # Path to the input CSV file
-csv_file_path = "031024-2-master.csv"
+csv_file_path = "081024-master.csv"
 
 # Convert CSV to Solidity commands
 commands = csv_to_solidity_commands(csv_file_path)

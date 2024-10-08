@@ -25,7 +25,7 @@ interface ITraitStorage {
         // A sequential numbering of the traits that exist in the collection
         uint256 traitIndex;
 
-        // e.g. Hat, Shirt
+        // e.g. Hat, top
         TraitCategory.Name traitType;
     }
 
@@ -46,10 +46,10 @@ interface ITraitStorage {
         // Refers to the number used in PeterTraits.addNewTrait; not a token ID
         uint256 traitIndex;
 
-        // e.g. 'Blue Shirt', same as key, redundant for now
+        // e.g. 'Blue top', same as key, redundant for now
         string traitName;
 
-        // e.g. TraitCategory.Name.Shirt
+        // e.g. TraitCategory.Name.top
         TraitCategory.Name traitType;
 
         // Any possible animations related to the trait, to be loaded in the <head>

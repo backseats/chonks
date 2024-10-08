@@ -133,6 +133,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
+        //TODO: think we need to call this currentSeasonRenderMinter... also, will we ever let people mint bodies again after first mint?
         uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, amount);
 
         // Initialize our Peter
@@ -142,30 +143,30 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.seed = uint16(tokenId);
         peter.tokenId = uint16(tokenId);
 
-        // minting 1 of each for now, same order as trait catgory   Hat 0 : Hair 1 : Glasses  2 : Handheld 3 : Shirt 4 : Pants 5 : Shoes 6
+        // minting 1 of each for now, same order as trait catgory   Hat 0 : Hair 1 : face  2 : accessory 3 : top 4 : bottom 5 : Shoes 6
         
         // peter.hatId =       traitsIds[0]; // same with hat id
         // peter.hairId =      traitsIds[1]; // same with hair id
-        // peter.glassesId =   traitsIds[2]; // same with hat id
-        // peter.handheldId =  traitsIds[3]; // same with hat id
-        // peter.shirtId =     traitsIds[4]; // shirtId is a trait contract token id
-        // peter.pantsId =     traitsIds[5]; // same with pants id
+        // peter.faceId =   traitsIds[2]; // same with hat id
+        // peter.accessoryId =  traitsIds[3]; // same with hat id
+        // peter.topId =     traitsIds[4]; // topId is a trait contract token id
+        // peter.bottomId =     traitsIds[5]; // same with bottom id
         // peter.shoesId =     traitsIds[6]; // same with shoes id
 
-        // level 0: let's give everyone shoes, pants, shirt: 
-        // level 1: shoes, pants, shirt AND hair
-        // level 2: shoes, pants, shirt AND hair AND glasses
-        // level 3: shoes, pants, shirt AND hair AND glasses AND hat
-        // level 4: shoes, pants, shirt AND hair AND glasses AND hat AND handheld
+        // level 0: let's give everyone shoes, bottom, top: 
+        // level 1: shoes, bottom, top AND hair
+        // level 2: shoes, bottom, top AND hair AND face
+        // level 3: shoes, bottom, top AND hair AND face AND hat
+        // level 4: shoes, bottom, top AND hair AND face AND hat AND accessory
 
         peter.shoesId = traitsIds[0]; 
-        peter.pantsId = traitsIds[1]; 
-        peter.shirtId = traitsIds[2]; 
+        peter.bottomId = traitsIds[1]; 
+        peter.topId = traitsIds[2]; 
 
         if(amount > 3) peter.hairId = traitsIds[3]; 
-        if(amount > 4) peter.glassesId = traitsIds[4]; 
+        if(amount > 4) peter.faceId = traitsIds[4]; 
         if(amount > 5) peter.hatId = traitsIds[5]; 
-        if(amount > 6) peter.handheldId = traitsIds[6]; 
+        if(amount > 6) peter.accessoryId = traitsIds[6]; 
         
 
         // set default renderer to 2D
@@ -254,50 +255,50 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
     //     _validateTokenOwnership(_peterTokenId, _traitTokenId);
-    //     _validateTraitType(_traitTokenId, TraitCategory.Name.Handheld);
+    //     _validateTraitType(_traitTokenId, TraitCategory.Name.accessory);
 
-    //     peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
+    //     peterTokens.all[_peterTokenId].accessoryId = _traitTokenId;
 
-    //     emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Handheld");
+    //     emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "accessory");
     // }
 
     // function unequipAccessory(uint256 _peterTokenId) public {
     //     _validatePeterOwnership(_peterTokenId);
-    //     peterTokens.all[_peterTokenId].handheldId = 0;
+    //     peterTokens.all[_peterTokenId].accessoryId = 0;
         
-    //     emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Handheld");
+    //     emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "accessory");
     // }
 
-    function equipGlasses(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    function equipFace(uint256 _peterTokenId, uint256 _traitTokenId) public {
         _validateTokenOwnership(_peterTokenId, _traitTokenId);
-        _validateTraitType(_traitTokenId, TraitCategory.Name.Glasses);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Face);
 
-        peterTokens.all[_peterTokenId].glassesId = _traitTokenId;
+        peterTokens.all[_peterTokenId].faceId = _traitTokenId;
 
-        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Glasses");
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Face");
     }
 
-    function unequipGlasses(uint256 _peterTokenId) public {
+    function unequipFace(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
-        peterTokens.all[_peterTokenId].glassesId = 0;
+        peterTokens.all[_peterTokenId].faceId = 0;
 
-        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Glasses");
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Face");
     }
 
-    function equipHandheld(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
         _validateTokenOwnership(_peterTokenId, _traitTokenId);
-        _validateTraitType(_traitTokenId, TraitCategory.Name.Handheld);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Accessory);
 
-        peterTokens.all[_peterTokenId].handheldId = _traitTokenId;
+        peterTokens.all[_peterTokenId].accessoryId = _traitTokenId;
 
-        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Handheld");
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Accessory");
     }
 
-    function unequipHandheld(uint256 _peterTokenId) public {
+    function unequipAccessory(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
-        peterTokens.all[_peterTokenId].handheldId = 0;
+        peterTokens.all[_peterTokenId].accessoryId = 0;
 
-        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Handheld");
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Accessory");
     }
 
     function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public {
@@ -332,37 +333,37 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Hat");
     }
 
-    function equipShirt(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    function equipTop(uint256 _peterTokenId, uint256 _traitTokenId) public {
         _validateTokenOwnership(_peterTokenId, _traitTokenId);
-        _validateTraitType(_traitTokenId, TraitCategory.Name.Shirt); // TODO: fix
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Top); // TODO: fix
 
-        peterTokens.all[_peterTokenId].shirtId = _traitTokenId;
+        peterTokens.all[_peterTokenId].topId = _traitTokenId;
 
-        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Shirt");
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Top");
     }
 
-    function unequipShirt(uint256 _peterTokenId) public {
+    function unequipTop(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
-        peterTokens.all[_peterTokenId].shirtId = 0;
+        peterTokens.all[_peterTokenId].topId = 0;
 
-        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Shirt");
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Top");
     }
 
     // NOTE: We Might want counterpart view functions that just compile the svg without writing to chain
-    function equipPants(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    function equipBottom(uint256 _peterTokenId, uint256 _traitTokenId) public {
         _validateTokenOwnership(_peterTokenId, _traitTokenId);
-        _validateTraitType(_traitTokenId, TraitCategory.Name.Pants);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Bottom);
 
-        peterTokens.all[_peterTokenId].pantsId = _traitTokenId;
+        peterTokens.all[_peterTokenId].bottomId = _traitTokenId;
 
-        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Pants");
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Bottom");
     }
 
-    function unequipPants(uint256 _peterTokenId) public {
+    function unequipBottom(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
-        peterTokens.all[_peterTokenId].pantsId = 0;
+        peterTokens.all[_peterTokenId].bottomId = 0;
 
-        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Pants");
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Bottom");
     }
 
     function equipShoes(uint256 _peterTokenId, uint256 _traitTokenId) public {
@@ -388,10 +389,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         StoredPeter storage peter = peterTokens.all[_peterTokenId];
         peter.hatId = 0;
         peter.hairId = 0;
-        peter.glassesId = 0;
-        peter.handheldId = 0;
-        peter.shirtId = 0;
-        peter.pantsId = 0;
+        peter.faceId = 0;
+        peter.accessoryId = 0;
+        peter.topId = 0;
+        peter.bottomId = 0;
         peter.shoesId = 0;
 
         emit UnequipAll(ownerOf(_peterTokenId), _peterTokenId);
@@ -402,19 +403,19 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _peterTokenId,
         uint256 _hatTokenId,
         uint256 _hairTokenId,
-        uint256 _glassesTokenId,
-        uint256 _handheldTokenId,
-        uint256 _shirtTokenId,
-        uint256 _pantsTokenId,
+        uint256 _faceTokenId,
+        uint256 _accessoryTokenId,
+        uint256 _topTokenId,
+        uint256 _bottomTokenId,
         uint256 _shoesTokenId
     ) public {
         // Might be able to cut this down gas-wise since it's validating peter ownership each time
         if (_hatTokenId != 0) equipHat(_peterTokenId, _hatTokenId);
         if (_hairTokenId != 0) equipHair(_peterTokenId, _hairTokenId);
-        if (_glassesTokenId != 0) equipGlasses(_peterTokenId, _glassesTokenId);
-        if (_handheldTokenId != 0) equipHandheld(_peterTokenId, _handheldTokenId);
-        if (_shirtTokenId != 0) equipShirt(_peterTokenId, _shirtTokenId);
-        if (_pantsTokenId != 0) equipPants(_peterTokenId, _pantsTokenId);
+        if (_faceTokenId != 0) equipFace(_peterTokenId, _faceTokenId);
+        if (_accessoryTokenId != 0) equipAccessory(_peterTokenId, _accessoryTokenId);
+        if (_topTokenId != 0) equipTop(_peterTokenId, _topTokenId);
+        if (_bottomTokenId != 0) equipBottom(_peterTokenId, _bottomTokenId);
         if (_shoesTokenId != 0) equipShoes(_peterTokenId, _shoesTokenId);
 
         emit EquipAll(ownerOf(_peterTokenId), _peterTokenId);
@@ -435,7 +436,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function _validateTraitType(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
-        TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId); // Hat, Pants, etc.
+        TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId); // Hat, bottom, etc.
 
         // Checks the fetched TraitCategory.Name against the one we send in
         if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))

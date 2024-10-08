@@ -13,17 +13,17 @@ interface IPeterStorage {
         // The token id of the hair, if applicable
         uint256 hairId;
 
-        // The token id of the glasses, if applicable
-        uint256 glassesId;
+        // The token id of the face, if applicable
+        uint256 faceId;
 
-        // The token id of the handheld, if applicable
-        uint256 handheldId;
+        // The token id of the accessory, if applicable
+        uint256 accessoryId;
 
-        // The token id of the shirt, if applicable
-        uint256 shirtId;
+        // The token id of the top, if applicable
+        uint256 topId;
 
-        // The token id of the pants, if applicable
-        uint256 pantsId;
+        // The token id of the bottom, if applicable
+        uint256 bottomId;
 
         // The token id of the shoes, if applicable
         uint256 shoesId;

@@ -7,20 +7,20 @@ library TraitCategory {
     enum Name {
         Hat, // 0
         Hair, // 1
-        Glasses, // 2
-        Handheld, // 3
-        Shirt, // 4
-        Pants, // 5
+        Face, // 2
+        Accessory, // 3
+        Top, // 4
+        Bottom, // 5
         Shoes // 6
     }
 
     function toString(Name name) public pure returns (string memory) {
         if (name == Name.Hat) return "Hat";
         if (name == Name.Hair) return "Hair";
-        if (name == Name.Glasses) return "Glasses";
-        if (name == Name.Handheld) return "Handheld";
-        if (name == Name.Shirt) return "Shirt";
-        if (name == Name.Pants) return "Pants";
+        if (name == Name.Face) return "Face";
+        if (name == Name.Accessory) return "Accessory";
+        if (name == Name.Top) return "Top";
+        if (name == Name.Bottom) return "Bottom";
         if (name == Name.Shoes) return "Shoes";
         return "";
     }

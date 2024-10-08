@@ -13,7 +13,7 @@ def csv_to_json(csv_file_path, json_file_path):
       trait = {
         "id": int(row["Index"]),
         "name": row["Trait Name"],
-        "category": row["Category (e.g. Pants)"] if row["Category (e.g. Pants)"] else "Handheld",  # Default to "Handheld" if category is empty
+        "category": row["Category (e.g. Bottom)"] if row["Category (e.g. Bottom)"] else "Handheld",  # Default to "Handheld" if category is empty
         "animation": row["Animation"] if row["Animation"] else "",
         "colorMap": row["Color Map"],
         "zMap": row["z Map"]

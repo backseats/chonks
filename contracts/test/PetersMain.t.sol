@@ -96,13 +96,13 @@ contract PetersMainTest is Test {
         vm.stopPrank();
 
         (uint256 bodyIndex, string memory bodyName, bytes memory colorMap, bytes memory zMap) = main.bodyIndexToMetadata(1);
-        assertEq(bodyName, "Body 001");
+        assertEq(bodyName, "Light Body");
         (bodyIndex, bodyName, colorMap, zMap) = main.bodyIndexToMetadata(2);
-        assertEq(bodyName, "Body 002");
+        assertEq(bodyName, "Mid Body");
         (bodyIndex, bodyName, colorMap, zMap) = main.bodyIndexToMetadata(3);
-        assertEq(bodyName, "Body 003");
+        assertEq(bodyName, "Dark Body");
         (bodyIndex, bodyName, colorMap, zMap) = main.bodyIndexToMetadata(4);
-        assertEq(bodyName, "Body 004");
+        assertEq(bodyName, "Super Light Body");
 
         (bodyIndex, bodyName, colorMap, zMap) = main.bodyIndexToMetadata(5);
         assertEq(bodyName, "");
@@ -151,19 +151,19 @@ contract PetersMainTest is Test {
 
         // Get StoredPeter & ShirtId
         IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
-        uint256 shirtTokenId = storedPeter.shirtId;
+        uint256 topTokenId = storedPeter.topId;
 
-        ITraitStorage.StoredTrait memory trait = traits.getTrait(shirtTokenId); // tid 4,
+        ITraitStorage.StoredTrait memory trait = traits.getTrait(topTokenId); // tid 4,
         TraitCategory.Name name = trait.traitType;
-        assertEq(TraitCategory.toString(name), "Shirt");
+        assertEq(TraitCategory.toString(name), "Top");
 
-        // Unequip Shirt and validate
+        // Unequip Top and validate
         vm.startPrank(user);
         storedPeter = main.getPeter(1);
-        assertEq(shirtTokenId, 1);
-        main.unequipShirt(1);
+        assertEq(topTokenId, 1);
+        main.unequipTop(1);
         storedPeter = main.getPeter(1);
-        assertEq(storedPeter.shirtId, 0);
+        assertEq(storedPeter.topId, 0);
         vm.stopPrank();
 
         // Admin, set traits contract and assert
@@ -171,11 +171,11 @@ contract PetersMainTest is Test {
         main.setTraitsContract(traits);
         assertEq(address(main.traitsContract()), address(traits));
 
-        // Equip Shirt
+        // Equip Top
         vm.startPrank(user);
-        main.equipShirt(1, 1);
+        main.equipTop(1, 1);
         storedPeter = main.getPeter(1);
-        assertEq(shirtTokenId, 1);
+        assertEq(topTokenId, 1);
         vm.stopPrank();
     }
 
@@ -199,20 +199,20 @@ contract PetersMainTest is Test {
         assertFalse(tbaWallet == user);
         assertEq(traits.balanceOf(tbaWallet), 5);
 
-        // Ensure pants and shirt are equipped
+        // Ensure bottom and top are equipped
         IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
-        assertGt(storedPeter.shirtId, 0);
-        assertGt(storedPeter.pantsId, 0);
+        assertGt(storedPeter.topId, 0);
+        assertGt(storedPeter.bottomId, 0);
 
         vm.prank(user);
         main.unequipAll(1);
         storedPeter = main.getPeter(1);
         assertEq(storedPeter.hatId, 0);
         assertEq(storedPeter.hairId, 0);
-        assertEq(storedPeter.glassesId, 0);
-        assertEq(storedPeter.handheldId, 0);
-        assertEq(storedPeter.shirtId, 0);
-        assertEq(storedPeter.pantsId, 0);
+        assertEq(storedPeter.faceId, 0);
+        assertEq(storedPeter.accessoryId, 0);
+        assertEq(storedPeter.topId, 0);
+        assertEq(storedPeter.bottomId, 0);
         assertEq(storedPeter.shoesId, 0);
     }
 }
