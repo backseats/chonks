@@ -77,7 +77,49 @@ export default function SelectColor({
     if (colorBlock && colorBlock.firstElementChild) {
       (colorBlock.firstElementChild as HTMLElement).style.display = "none";
     }
+
+    // Add event listener for the color input
+    const colorInput = document.querySelector(".w-color-editable-input input");
+    if (colorInput) {
+      colorInput.addEventListener("click", handleColorInputClick);
+    }
+
+    // Add event listener for copying color value
+    const colorValue = colorBlock?.children[1] as HTMLElement;
+    if (colorValue) {
+      colorValue.addEventListener("click", () => {
+        const textToCopy = colorValue.textContent;
+        if (textToCopy && textToCopy !== "Copied!") {
+          navigator.clipboard
+            .writeText(textToCopy)
+            .then(() => {
+              const originalText = textToCopy;
+              colorValue.textContent = "Copied!";
+              setTimeout(() => {
+                colorValue.textContent = originalText;
+              }, 2000);
+            })
+            .catch((err) => console.error("Failed to copy: ", err));
+        }
+      });
+    }
+
+    // Cleanup function
+    return () => {
+      if (colorInput) {
+        colorInput.removeEventListener("click", handleColorInputClick);
+      }
+      if (colorValue) {
+        colorValue.removeEventListener("click", () => {});
+      }
+    };
   }, []);
+
+  const handleColorInputClick = (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    input.value = "";
+    input.focus();
+  };
 
   const [editingColor, setEditingColor] = useState<string | null>(null);
   const [newColor, setNewColor] = useState<string>("");
