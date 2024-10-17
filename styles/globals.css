@@ -13,4 +13,9 @@
 body {
   background: white;
   color: black;
+  @apply font-sans;
+}
+
+.heading {
+  @apply font-mono;
 }

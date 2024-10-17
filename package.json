@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
+    "@next/font": "^14.2.15",
     "@tanstack/query-core": "^5.40.0",
     "@tanstack/react-query": "^5.40.1",
     "@tokenbound/sdk": "^0.5.4",
