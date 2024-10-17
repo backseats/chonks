@@ -132,7 +132,7 @@ export default function MetadataModal(props: Props) {
           </div>
 
           <a
-            href=""
+            href="https://twitter.com/chonksxyz"
             target="_blank"
             className="w-full h-[40px] mb-4 block text-center bg-green-500 hover:bg-green-600 text-white rounded-md py-2 px-4 focus: outline-none"
           >

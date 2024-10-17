@@ -10,6 +10,7 @@ const shortcuts = [
   { key: "Ctrl/Cmd + Z", description: "Undo" },
   { key: "Left Click", description: "Draw" },
   { key: "Right Click", description: "Erase" },
+  { key: "Shift + Left Click", description: "Erase" },
 ];
 
 export default function KeyboardShortcutsModal(props: Props) {

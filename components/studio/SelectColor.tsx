@@ -283,7 +283,7 @@ export default function SelectColor({
         onClick={openKeyboardShortcutsModal}
       >
         <QuestionMarkCircleIcon className="w-4 h-4 -mt-1 mr-1 inline-block" />
-        Keyboard shortcuts
+        Keyboard Shortcuts, Tips & Tricks
       </button>
     </div>
   );
