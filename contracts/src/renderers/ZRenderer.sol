@@ -37,10 +37,12 @@ contract ZRenderer {
     // string private constant SVG_END = '</svg> ';
 
 
-    function generateFullSvg( string memory _bodySvg, string memory _traitsSvg, string memory _backgroundColorStyles) internal pure returns (string memory image) {
+    // function generateFullSvg( string memory _bodySvg, string memory _traitsSvg, string memory _backgroundColorStyles) internal pure returns (string memory image) {
+    function generateFullSvg( string memory _bodySvg, string memory _traitsSvg, IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory image) {
         string memory fullSvg = string.concat(
             SVG_START_STYLE,
-            _backgroundColorStyles,
+            // _backgroundColorStyles,
+            generateBackgroundColorStyles(_chonkdata),
             '<g id="body">',
             _bodySvg,
             '</g>',
@@ -56,6 +58,49 @@ contract ZRenderer {
         );
     }
 
+    function generateBackgroundColorStyles( IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
+
+        backgroundColorStyles = string.concat(
+            '<style>',
+            'body, svg{ background: #', _chonkdata.backgroundColor, '; }',
+            '.bg { fill: #', _chonkdata.backgroundColor, '; }',
+            '</style>'
+        );
+    }
+
+    function generateChonkdata( IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
+
+        chonkDataJson = string.concat(
+            '"chonkdata":[',
+                '{ "background_color" : "#', _chonkdata.backgroundColor, '" },',
+                '{ "num_items_in_backpack" : "', Utils.toString(_chonkdata.numOfItemsInBackpack), '" },',
+                '{ "renderer" : "', _chonkdata.rendererSet, '" },',
+                '{ "body_type" : "', _chonkdata.bodyName, '" }'
+           ']'
+        );
+    }
+
+    function generateAttributes(string memory _traitsAttributes, string memory _bodyAttributes, IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory fullAttributes) {
+
+        //todo: do we need this bodyAttributes check in here?
+        if (bytes(_traitsAttributes).length > 0) {
+            // fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
+            fullAttributes = string.concat(
+                '"attributes":[', 
+                _traitsAttributes, 
+                '],',
+                generateChonkdata(_chonkdata)
+            );
+        } else {
+            fullAttributes = string.concat(
+                '"attributes":[', 
+                _bodyAttributes, 
+                '],',
+                generateChonkdata(_chonkdata)
+            );
+        }
+    }
+
     function renderAsDataUriZ(
         uint256 _tokenId,
         string memory _bodySvg,
@@ -63,21 +108,17 @@ contract ZRenderer {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         bytes memory _fullZmap,
-        IPeterStorage.BackgroundStuff memory _backgroundStuff
-        // string memory _backgroundColorStyles
-        // string memory _backgroundColor
+        IPeterStorage.Chonkdata memory _chonkdata
     ) public view returns (string memory) {
 
         string memory fullAttributes;
 
-        string memory image = generateFullSvg( _bodySvg, _traitsSvg, _backgroundStuff.backgroundStyles);
+        // string memory image = generateFullSvg( _bodySvg, _traitsSvg, _backgroundStuff.backgroundStyles);
+        string memory image = generateFullSvg( _bodySvg, _traitsSvg, _chonkdata);
 
-        if (bytes(_traitsAttributes).length > 0) {
-            // fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
-            fullAttributes = string.concat('"attributes":[', _traitsAttributes, ']');
-        } else {
-            fullAttributes = string.concat('"attributes":[', _bodyAttributes, ']');
-        }
+       
+
+        fullAttributes = generateAttributes(_traitsAttributes, _bodyAttributes, _chonkdata);
 
 
         // html style
@@ -158,7 +199,7 @@ contract ZRenderer {
             string.concat(
                 "%253Cscript%253Evar%2520bgColor%2520%253D%2527", // <script>var bgColor ='
                   encodeURIContract.encodeURI(
-                    encodeURIContract.encodeURI(string.concat("#", _backgroundStuff.backgroundColor))
+                    encodeURIContract.encodeURI(string.concat("#", _chonkdata.backgroundColor))
                 )
             )
         );
@@ -204,6 +245,8 @@ contract ZRenderer {
                     encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
                     encodeURIContract.encodeURI(fullAttributes),
                     encodeURIContract.encodeURI(','),
+                    // encodeURIContract.encodeURI(generateChonkdata(_chonkdata)),
+                    // encodeURIContract.encodeURI(','),
                     encodeURIContract.encodeURI(image),
                     encodeURIContract.encodeURI(',"animation_url":"'),
                     doubleURLEncodedHTMLDataURI,

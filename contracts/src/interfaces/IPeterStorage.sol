@@ -76,6 +76,16 @@ interface IPeterStorage {
         bytes zMap;
     }
 
+    // old struct, let's move this into Chonkdata
+
+    struct Chonkdata {
+        string backgroundColor;
+        string bodyName;
+        string rendererSet;
+        uint256 numOfItemsInBackpack;
+        // string backgroundStyles;
+    }
+
     struct BackgroundStuff {
         string backgroundColor;
         string backgroundStyles;

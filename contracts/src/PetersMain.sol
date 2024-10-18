@@ -94,17 +94,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             for (uint i; i < 100; ++i) {
                 mint(); // Mints N bodies/tokens
                 // setBackgroundColor(i, "28b143");
-                // setRenderZ(i, true);
+                // setTokenRenderZ(i, true);
             }
             // setting random colors for now
-            // setBackgroundColor(1, "333333");
-            // setBackgroundColor(3, "27b143");
-            // setBackgroundColor(4, "eb068d");
-            // setBackgroundColor(8, "F2C304");
+            setBackgroundColor(1, "333333");
+            setBackgroundColor(3, "ffffff"); //27b143
+            setBackgroundColor(4, "eb068d");
+            setBackgroundColor(8, "F2C304");
 
-            // setRenderZ(1, true);
-            // setRenderZ(5, true);
-            // setRenderZ(6, true);
+            // setTokenRenderZ(1, true);
+            // setTokenRenderZ(2, true);
+            // setTokenRenderZ(6, true);
         }
     }
 
@@ -164,9 +164,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.topId = traitsIds[2]; 
 
         // so we're not going to equip these on initial mint, people will have to equip them
-        if(amount > 3) peter.hairId = traitsIds[3]; 
+        // if(amount > 3) peter.hairId = traitsIds[3]; 
         // if(amount > 4) peter.faceId = traitsIds[4]; 
-        // if(amount > 5) peter.hatId = traitsIds[5]; 
+        if(amount > 5) peter.hatId = traitsIds[5]; 
         // if(amount > 6) peter.accessoryId = traitsIds[6]; 
         
 
@@ -504,7 +504,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return (
             getBodyImageSvg(storedPeter.bodyIndex),
             bodyIndexToMetadata[storedPeter.bodyIndex].zMap,
-            RenderHelper.stringTrait('Body', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
+            RenderHelper.stringTrait('Body Type', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
         );
     }
 
@@ -519,14 +519,26 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         return (
             getBodyImageSvg(storedPeter.bodyIndex),
-            RenderHelper.stringTrait('Body', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
+            RenderHelper.stringTrait('Body Type', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
         );
     }
 
-    function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
-        address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
-        uint256[] memory traitTokens = getTraitTokens(tbaAddress);
+    function getTBAAddressForTokenId(uint256 _tokenId) public view returns (address) {
+        return address(tokenIdToTBAAccountAddress[_tokenId]);
+    }
 
+    function getTraitsForTokenId(uint256 _tokenId) public view returns (uint256[] memory traitTokens) {
+        address tbaAddress = getTBAAddressForTokenId(_tokenId);
+        traitTokens = getTraitTokens(tbaAddress);
+    }
+
+    function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
+        // address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
+        // address tbaAddress = getTBAAddressForTokenId(_tokenId);
+        // uint256[] memory traitTokens = getTraitTokens(tbaAddress);
+
+        uint256[] memory traitTokens = getTraitsForTokenId(_tokenId);
+        
         string memory baseSvgPart = '<svg viewBox="0 0 150 150">';
         string memory closeSvgTag = '</svg>';
         bytes memory buffer;
@@ -566,19 +578,19 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         string memory traitsSvg;
         string memory traitsAttributes;
         string memory backpackSVGs;
-        string memory backgroundColorStyles;
+        // string memory backgroundColorStyles;
 
         StoredPeter memory storedPeter = getPeter(_tokenId);
         (bodySvg, bodyAttributes) = getBodySvgAndMetadata(storedPeter);
         (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedPeter);
         backpackSVGs = getBackpackSVGs(_tokenId);
 
-        backgroundColorStyles  = string.concat(
-            '<style>',
-            'body, svg{ background: #', storedPeter.backgroundColor, '; }'
-            '.bg { fill: #', storedPeter.backgroundColor, '; }',
-            '</style>'
-        );
+        Chonkdata memory chonkdata;
+
+        chonkdata.backgroundColor = storedPeter.backgroundColor;
+        chonkdata.numOfItemsInBackpack = getTraitsForTokenId(_tokenId).length;
+        chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
+        chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 
         return mainRenderer.renderAsDataUriSVG(
             _tokenId,
@@ -587,7 +599,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitsSvg,
             traitsAttributes,
             backpackSVGs,
-            backgroundColorStyles
+            chonkdata
         );
     }
 
@@ -613,19 +625,27 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitZmaps
         );
 
-        backgroundColorStyles  = string.concat(
-            '<style>',
-            'body, svg{ background: #', storedPeter.backgroundColor, '; }'
-            '.bg { fill: #', storedPeter.backgroundColor, '; }',
-            '</style>'
-        );
+        // backgroundColorStyles  = string.concat(
+        //     '<style>',
+        //     'body, svg{ background: #', storedPeter.backgroundColor, '; }'
+        //     '.bg { fill: #', storedPeter.backgroundColor, '; }',
+        //     '</style>'
+        // );
 
-        BackgroundStuff memory backgroundStuff;
+        // BackgroundStuff memory backgroundStuff;
 
-        // todo, verify one doesn't exist
+        // // todo, verify one doesn't exist
 
-        backgroundStuff.backgroundColor = storedPeter.backgroundColor;
-        backgroundStuff.backgroundStyles = backgroundColorStyles;
+        // backgroundStuff.backgroundColor = storedPeter.backgroundColor;
+        // backgroundStuff.backgroundStyles = backgroundColorStyles;
+
+        Chonkdata memory chonkdata;
+
+        chonkdata.backgroundColor = storedPeter.backgroundColor;
+        chonkdata.numOfItemsInBackpack = getTraitsForTokenId(_tokenId).length;
+        chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
+        chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
+
 
 
         return zRenderer.renderAsDataUriZ(
@@ -635,7 +655,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitsSvg,
             traitsAttributes,
             fullZmap,
-            backgroundStuff
+            chonkdata
+            // backgroundStuff
             // storedPeter.backgroundColor // look to combined these perhaps?
         );
     }
@@ -710,6 +731,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return storedPeter;
     }
 
+    function getTokenRenderZ(uint256 _peterTokenId) public view returns (bool) {
+        return peterTokens.all[_peterTokenId].renderZ;
+    }
+
     /// @dev Returns the token ids the end user's wallet owns
     function walletOfOwner(address _owner) public view returns (uint256[] memory) {
 
@@ -779,7 +804,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // todo: user setter ... should only be done by token holder
-    function setRenderZ(uint256 _peterTokenId, bool _renderZ) public {
+    function setTokenRenderZ(uint256 _peterTokenId, bool _renderZ) public {
         peterTokens.all[_peterTokenId].renderZ = _renderZ;
     }
 
@@ -790,5 +815,32 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // TODO: Withdraw function
+        
+    // Override functions for marketplace compatibility
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
+        // TODO: Backseats to add logic here for marketplace
+        super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    // function transferFrom(
+    //     address from,
+    //     address to,
+    //     uint256 tokenId
+    // ) public override(ERC721, IERC721) {
+    //     super.transferFrom(from, to, tokenId);
+    // }
+
+    // function safeTransferFrom(
+    //     address from,
+    //     address to,
+    //     uint256 tokenId,
+    //     bytes memory data
+    // ) public override {
+    //     super.safeTransferFrom(from, to, tokenId, data);
+    // }
 
 }

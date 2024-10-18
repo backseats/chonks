@@ -63,6 +63,15 @@ interface ITraitStorage {
 
         // The RenderMinter contract responsible for this trait
         address renderMinterContract; // cast as not an address
+
+         // address of creator
+        address creatorAddress;
+
+        // name of creator
+        string creatorName;
+
+        // season of trait
+        string season;
     }
 
     event Mint(

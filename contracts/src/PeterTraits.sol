@@ -236,11 +236,23 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
             attributes = string.concat(
                 '"attributes":[',
-                    RenderHelper.stringTrait(
-                        // TraitCategory.toString(trait.stored.traitType),
-                        TraitCategory.toString(trait.traitType),
-                        metadata.traitName
-                    ),
+                RenderHelper.stringTrait(
+                    // TraitCategory.toString(trait.stored.traitType),
+                    TraitCategory.toString(trait.traitType),
+                    metadata.traitName
+                ),
+                ',',
+                RenderHelper.stringTrait(
+                    'Creator',
+                    // bytes(metadata.creatorName).length > 0 ? metadata.creatorName : "Team Chonks" // let's enforce creator name when adding traits
+                    metadata.creatorName
+                ),
+                 ',',
+                RenderHelper.stringTrait(
+                    'Season',
+                    metadata.season
+                ),
+                
                 ']'
             );
         } else {
@@ -264,7 +276,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         string memory json = string.concat(
             '{"name":"Peter Trait #',
                 Utils.toString(_tokenId),
-             '","description":"This is just a test",',
+             '","description":"This is just a test",', //TODO: look at description, we could have a link in here to the site/mp to encourage trading there e.g. chonks.xyz/traits/traitIndex or the likes (maybe make this updateable via contract)
                 attributes,
             ',',
                 image,
@@ -373,9 +385,17 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         if (trait.isRevealed && traitId > 0) {
             TraitMetadata storage metadata = traitIndexToMetadata[trait.traitIndex];
 
+            // string memory traitName = metadata.traitName;
+            // traitName = string.concat(
+            //     traitName,
+            //     ' - ',
+            //     metadata.creatorName // todo: if included, need to ensure it's set
+            // );
+
             traitAttributes = RenderHelper.stringTrait(
                 TraitCategory.toString(metadata.traitType),
                 metadata.traitName
+                // traitName // if we want to affix creator name to the trait name
             );
 
             // old traitPath svg way
@@ -546,6 +566,16 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     // DEPLOY: remove/just for testing
     function onERC721Received(address, address, uint256, bytes calldata) pure external returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
+    }
+
+    // Override functions for marketplace compatibility
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 tokenId
+    ) internal override {
+        // TODO: Backseats to add logic here for marketplace
+        super._beforeTokenTransfer(from, to, tokenId);
     }
 
 }
