@@ -5,6 +5,17 @@ library Utils {
     uint256 internal constant MULTIPLIER   = 100;
     uint256 internal constant GOLDEN_RATIO = 161803;
 
+
+    /// @dev Zero-index based pseudorandom number based on one input and max bound - thank you Checks
+    function random(uint256 input, uint256 _max) internal pure returns (uint256) {
+        return (uint256(keccak256(abi.encodePacked(input))) % _max);
+    }
+
+    /// @dev Zero-index based salted pseudorandom number based on two inputs and max bound - thank you Checks
+    function random(uint256 input, string memory salt, uint256 _max) internal pure returns (uint256) {
+        return (uint256(keccak256(abi.encodePacked(input, salt))) % _max);
+    }
+
     /**
       * Compute the largest integer smaller than or equal to the square root of `n`
     */

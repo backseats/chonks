@@ -13,8 +13,6 @@ import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../../lib/
 // import { console2 } from 'forge-std/console2.sol';
 import "forge-std/console.sol"; // DEPLOY: remove
 
-
-
 // I don't think this should know about any kind of contracts. It should just get data and render it.
 contract ZRenderer {
 
@@ -111,15 +109,10 @@ contract ZRenderer {
         IPeterStorage.Chonkdata memory _chonkdata
     ) public view returns (string memory) {
 
-        string memory fullAttributes;
-
         // string memory image = generateFullSvg( _bodySvg, _traitsSvg, _backgroundStuff.backgroundStyles);
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _chonkdata);
 
-       
-
-        fullAttributes = generateAttributes(_traitsAttributes, _bodyAttributes, _chonkdata);
-
+        string memory fullAttributes = generateAttributes(_traitsAttributes, _bodyAttributes, _chonkdata);
 
         // html style
         HTMLTag[] memory headTags = new HTMLTag[](1);
@@ -245,8 +238,6 @@ contract ZRenderer {
                     encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
                     encodeURIContract.encodeURI(fullAttributes),
                     encodeURIContract.encodeURI(','),
-                    // encodeURIContract.encodeURI(generateChonkdata(_chonkdata)),
-                    // encodeURIContract.encodeURI(','),
                     encodeURIContract.encodeURI(image),
                     encodeURIContract.encodeURI(',"animation_url":"'),
                     doubleURLEncodedHTMLDataURI,
