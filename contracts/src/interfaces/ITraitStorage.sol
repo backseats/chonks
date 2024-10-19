@@ -26,7 +26,7 @@ interface ITraitStorage {
         // A sequential numbering of the traits that exist in the collection
         uint256 traitIndex;
 
-        // e.g. Hat, top
+        // e.g. Head, top
         TraitCategory.Name traitType;
     }
 

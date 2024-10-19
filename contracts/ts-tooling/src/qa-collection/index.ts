@@ -82,9 +82,9 @@ function saveSingleContent(svgFolder: string, pngFolder: string, tokenId: number
     console.log('saving ', svgFile)
     fs.writeFileSync(svgFile, contentElement.content)
 
-    let pngFile = path.join(pngFolder, preffix + tokenId + '.png')
-    console.log('saving ', pngFile)
-    convertSvgFileToPNG(contentElement.content, pngFile)
+    // let pngFile = path.join(pngFolder, preffix + tokenId + '.png')
+    // console.log('saving ', pngFile)
+    // convertSvgFileToPNG(contentElement.content, pngFile)
 }
 
 export async function main() {

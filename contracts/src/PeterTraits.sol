@@ -442,7 +442,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         if (storedPeter.topId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.topId, traitsSvg, traitsAttributes);
         if (storedPeter.faceId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.faceId, traitsSvg, traitsAttributes);
         if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes);
-        if (storedPeter.hatId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hatId, traitsSvg, traitsAttributes);
+        if (storedPeter.headId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.headId, traitsSvg, traitsAttributes);
         if (storedPeter.accessoryId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.accessoryId, traitsSvg, traitsAttributes);
         
     }
@@ -484,7 +484,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         if (storedPeter.topId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.topId, traitsSvg, traitsAttributes, traitZMaps);
         if (storedPeter.faceId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.faceId, traitsSvg, traitsAttributes, traitZMaps);
         if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes, traitZMaps);
-        if (storedPeter.hatId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.hatId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.headId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.headId, traitsSvg, traitsAttributes, traitZMaps);
         if (storedPeter.accessoryId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.accessoryId, traitsSvg, traitsAttributes, traitZMaps);
     }
 

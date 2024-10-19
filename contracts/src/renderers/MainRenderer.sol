@@ -123,9 +123,9 @@ contract MainRenderer {
              '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
                 // chonkData,
                 fullAttributes,
-                ',', generateChonkdata(_chonkdata),
+                // ',', generateChonkdata(_chonkdata),
                 ',', image,
-                ',', animationURL, // comment out for qa collection
+                // ',', animationURL, // comment out for qa collection
             '}'
         );
 

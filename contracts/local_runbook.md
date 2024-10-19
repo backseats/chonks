@@ -23,3 +23,11 @@ To run Eto Vass locally:
 1. run `anvil --fork-url $BASE_SEPOLIA_RPC_URL --fork-block-number 10373769 --fork-chain-id 84532`
 2. run `./start-hot-reload.sh` or `./start-hot-reload-traits.sh`
 3. Go to http://localhost:9901
+
+
+QA Notes:
+
+1. Ensure that setRenderZ is not set to true for any token
+2. In PetersMain.sol _debugPostConstructorMint is where the number of tokens is set, need to increase to 500 if running a qa for 500 - (1000 seems to hang fyi)
+3. I've turned off png ouput in ts-tooling/qa-collection/index.ts as not needed and slows things down
+

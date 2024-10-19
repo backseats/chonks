@@ -207,7 +207,7 @@ contract PetersMainTest is Test {
         vm.prank(user);
         main.unequipAll(1);
         storedPeter = main.getPeter(1);
-        assertEq(storedPeter.hatId, 0);
+        assertEq(storedPeter.headId, 0);
         assertEq(storedPeter.hairId, 0);
         assertEq(storedPeter.faceId, 0);
         assertEq(storedPeter.accessoryId, 0);

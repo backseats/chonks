@@ -7,8 +7,8 @@ interface IPeterStorage {
 
     // The token id in the traits contract of each corresponding trait to be layered on the Peter from the PeterTraits contract
     struct StoredPeter {
-        // The token id of the hat, if applicable
-        uint256 hatId;
+        // The token id of the head, if applicable
+        uint256 headId;
 
         // The token id of the hair, if applicable
         uint256 hairId;

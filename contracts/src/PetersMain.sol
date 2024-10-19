@@ -91,7 +91,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
         if (_localDeploy) {
-            for (uint i; i < 100; ++i) {
+            for (uint i; i < 500; ++i) {
                 mint(); // Mints N bodies/tokens
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
@@ -104,7 +104,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
             // setTokenRenderZ(1, true);
             // setTokenRenderZ(2, true);
-            // setTokenRenderZ(6, true);
+            // setTokenRenderZ(7, true);
         }
     }
 
@@ -143,12 +143,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.seed = uint16(tokenId);
         peter.tokenId = uint16(tokenId);
 
-        // minting 1 of each for now, same order as trait catgory   Hat 0 : Hair 1 : face  2 : accessory 3 : top 4 : bottom 5 : Shoes 6
+        // minting 1 of each for now, same order as trait catgory   Head 0 : Hair 1 : face  2 : accessory 3 : top 4 : bottom 5 : Shoes 6
         
-        // peter.hatId =       traitsIds[0]; // same with hat id
+        // peter.hatId =       traitsIds[0]; // same with head id
         // peter.hairId =      traitsIds[1]; // same with hair id
-        // peter.faceId =   traitsIds[2]; // same with hat id
-        // peter.accessoryId =  traitsIds[3]; // same with hat id
+        // peter.faceId =   traitsIds[2]; // same with head id
+        // peter.accessoryId =  traitsIds[3]; // same with head id
         // peter.topId =     traitsIds[4]; // topId is a trait contract token id
         // peter.bottomId =     traitsIds[5]; // same with bottom id
         // peter.shoesId =     traitsIds[6]; // same with shoes id
@@ -156,24 +156,24 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // level 0: let's give everyone shoes, bottom, top: 
         // level 1: shoes, bottom, top AND hair
         // level 2: shoes, bottom, top AND hair AND face
-        // level 3: shoes, bottom, top AND hair AND face AND hat
-        // level 4: shoes, bottom, top AND hair AND face AND hat AND accessory
+        // level 3: shoes, bottom, top AND hair AND face AND head
+        // level 4: shoes, bottom, top AND hair AND face AND head AND accessory
 
         peter.shoesId = traitsIds[0]; 
         peter.bottomId = traitsIds[1]; 
         peter.topId = traitsIds[2]; 
 
         // so we're not going to equip these on initial mint, people will have to equip them
-        // if(amount > 3) peter.hairId = traitsIds[3]; 
-        // if(amount > 4) peter.faceId = traitsIds[4]; 
-        if(amount > 5) peter.hatId = traitsIds[5]; 
+        if(amount > 3) peter.hairId = traitsIds[3]; 
+        if(amount > 4) peter.faceId = traitsIds[4]; 
+        if(amount > 5) peter.headId = traitsIds[5]; 
         if(amount > 6) peter.accessoryId = traitsIds[6]; 
         
 
         // set default renderer to 2D
         peter.renderZ = false;
 
-        // on mint, let's make all peter's body index 1 
+        // on mint, let's make all peter's body index 1, which is then updated in getPeter (even chance)
         peter.bodyIndex = 1;
 
         // set default background color
@@ -318,20 +318,20 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Hair");
     }
 
-    function equipHat(uint256 _peterTokenId, uint256 _traitTokenId) public {
+    function equipHead(uint256 _peterTokenId, uint256 _traitTokenId) public {
         _validateTokenOwnership(_peterTokenId, _traitTokenId);
-        _validateTraitType(_traitTokenId, TraitCategory.Name.Hat);
+        _validateTraitType(_traitTokenId, TraitCategory.Name.Head);
 
-        peterTokens.all[_peterTokenId].hatId = _traitTokenId;
+        peterTokens.all[_peterTokenId].headId = _traitTokenId;
 
-        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Hat");
+        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Head");
     }
 
-    function unequipHat(uint256 _peterTokenId) public {
+    function unequipHead(uint256 _peterTokenId) public {
         _validatePeterOwnership(_peterTokenId);
-        peterTokens.all[_peterTokenId].hatId = 0;
+        peterTokens.all[_peterTokenId].headId = 0;
 
-        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Hat");
+        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Head");
     }
 
     function equipTop(uint256 _peterTokenId, uint256 _traitTokenId) public {
@@ -388,7 +388,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _validatePeterOwnership(_peterTokenId);
 
         StoredPeter storage peter = peterTokens.all[_peterTokenId];
-        peter.hatId = 0;
+        peter.headId = 0;
         peter.hairId = 0;
         peter.faceId = 0;
         peter.accessoryId = 0;
@@ -402,7 +402,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // If 0, it will ignore
     function equipAll(
         uint256 _peterTokenId,
-        uint256 _hatTokenId,
+        uint256 _headTokenId,
         uint256 _hairTokenId,
         uint256 _faceTokenId,
         uint256 _accessoryTokenId,
@@ -411,7 +411,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _shoesTokenId
     ) public {
         // Might be able to cut this down gas-wise since it's validating peter ownership each time
-        if (_hatTokenId != 0) equipHat(_peterTokenId, _hatTokenId);
+        if (_headTokenId != 0) equipHead(_peterTokenId, _headTokenId);
         if (_hairTokenId != 0) equipHair(_peterTokenId, _hairTokenId);
         if (_faceTokenId != 0) equipFace(_peterTokenId, _faceTokenId);
         if (_accessoryTokenId != 0) equipAccessory(_peterTokenId, _accessoryTokenId);
@@ -437,7 +437,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function _validateTraitType(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
-        TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId); // Hat, bottom, etc.
+        TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId); // Head, bottom, etc.
 
         // Checks the fetched TraitCategory.Name against the one we send in
         if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))
@@ -449,7 +449,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
         if (!_exists(_tokenId)) revert PeterDoesntExist();
 
-        return renderAsDataUri(_tokenId);
+        return "yo";
+
+        // return renderAsDataUri(_tokenId);
     }
 
     function getTraitTokens(address _tbaAddress) public view returns (uint256[] memory) {
