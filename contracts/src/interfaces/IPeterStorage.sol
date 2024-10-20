@@ -32,17 +32,17 @@ interface IPeterStorage {
         uint32 epoch;
 
         // was seed // TODO: make this uint256? | TODO
-        uint16 tokenId;
+        uint256 tokenId;
 
         // this is calculuated in getPeter based on peter.seed
         // TODO: make this a uint16 or so? we're never going to have more than 65k peter body types. uint8 might be fine
         uint256 bodyIndex;
 
         // Set in getPeter if epoch is revealed
-        bool isRevealed;
+        // bool isRevealed;
 
          // This is the seed that's calculuated in getPeter based on randomness + stored.seed
-        uint256 seed;
+        // uint256 seed;
 
         // RRGGBB colour of the background, default blue #0D6E9D set in PetersMain.sol mint(), and setBackgroundColor()
         string backgroundColor;

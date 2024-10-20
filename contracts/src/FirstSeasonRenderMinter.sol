@@ -232,7 +232,7 @@ addNewTrait(6013, "White", TraitCategory.Name.Shoes, "", hex"0b17FFFFFF0c17FFFFF
     //     return peterTraits.safeMint(_to);
     // }
 
-     function safeMintMany(address _to, uint256 _amount) public payable returns (uint256[] memory) { // TODO: add onlyMinter modifier
+     function safeMintMany(address _to, uint8 _amount) public payable returns (uint256[] memory) { // TODO: add onlyMinter modifier
         // TODO: check supply?
 
         //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin

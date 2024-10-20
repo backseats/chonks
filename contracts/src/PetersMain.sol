@@ -30,6 +30,8 @@ import { CommitReveal } from "./common/CommitReveal.sol";
 
 import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
+import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+
 // Scripty for 3D rendering
 // import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../lib/scripty/interfaces/IScriptyBuilderV2.sol";
 
@@ -71,8 +73,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // The render contract that handles SVG generation
     MainRenderer public mainRenderer;
 
-     // The render contract that handles 3d generation
+    // The render contract that handles 3d generation
     ZRenderer public zRenderer;
+
+    // Tracking which nonces have been used from the server
+    mapping (string => bool) usedNonces;
+
+    address systemAddress;
 
     /// Errors
 
@@ -82,6 +89,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error IncorrectTBAOwner();
     error IncorrectTraitType();
     error PeterDoesntExist();
+    error NonceAlreadyUsed();
+    error InvalidSignature();
+    error InvalidLevelAmount();
 
     constructor(bool localDeploy_) ERC721("Peter Test", "PETER") {
         _initializeOwner(msg.sender);
@@ -109,12 +119,29 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function mint() public payable { // TODO amount, check price
+
+        _mintAmount(3);
+        
+    }
+
+    // just popping this in here for now, we can decide full spec later
+    function mintByLevel(uint8 amount, string calldata nonce, bytes calldata signature ) public payable {
+        if (amount < 3 || amount > 7) revert InvalidLevelAmount();
+        if (!isValidSignature(keccak256(abi.encodePacked(msg.sender, nonce)), signature)) revert InvalidSignature();
+        if (usedNonces[nonce]) revert NonceAlreadyUsed();
+
+        _mintAmount(amount);
+
+        usedNonces[nonce] = true;
+    }
+
+    function _mintAmount(uint8 amount) internal {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
 
         // for now, set amount to X traits
-        uint256 amount = 7;
+        // uint256 amount = 7;
 
-        resolveEpochIfNecessary();
+        // resolveEpochIfNecessary(); // no longer need this as bodies can be changed by holders
 
         uint256 tokenId = ++_nextTokenId;
         _mint(msg.sender, tokenId);
@@ -139,19 +166,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // Initialize our Peter
         StoredPeter storage peter = peterTokens.all[tokenId];
 
-        peter.epoch = uint32(peterTokens.epoch);
-        peter.seed = uint16(tokenId);
-        peter.tokenId = uint16(tokenId);
-
-        // minting 1 of each for now, same order as trait catgory   Head 0 : Hair 1 : face  2 : accessory 3 : top 4 : bottom 5 : Shoes 6
-        
-        // peter.hatId =       traitsIds[0]; // same with head id
-        // peter.hairId =      traitsIds[1]; // same with hair id
-        // peter.faceId =   traitsIds[2]; // same with head id
-        // peter.accessoryId =  traitsIds[3]; // same with head id
-        // peter.topId =     traitsIds[4]; // topId is a trait contract token id
-        // peter.bottomId =     traitsIds[5]; // same with bottom id
-        // peter.shoesId =     traitsIds[6]; // same with shoes id
+        // peter.epoch = uint32(peterTokens.epoch);
+        // peter.seed = uint16(tokenId);
+        peter.tokenId = uint256(tokenId);
 
         // level 0: let's give everyone shoes, bottom, top: 
         // level 1: shoes, bottom, top AND hair
@@ -173,17 +190,29 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // set default renderer to 2D
         peter.renderZ = false;
 
-        // on mint, let's make all peter's body index 1, which is then updated in getPeter (even chance)
-        peter.bodyIndex = 1;
+        // on mint, let's make all peter's body index 0, which is then updated in getPeter (even chance)
+        // peter.bodyIndex = 0;
+        // as we're letting people change these, just do it upon mint now
+        peter.bodyIndex = uint256(keccak256(abi.encodePacked(tokenId))) % 4; // even chance for 4 different bodies
 
         // set default background color
         peter.backgroundColor = "0D6E9D";
 
         emit Mint(msg.sender, tokenId);
 
-        console.log("minted body tokenId:", tokenId);
+        // console.log("minted body tokenId:", tokenId);
     }
 
+    using ECDSA for bytes32;
+    /// @notice Checks if the private key that singed the nonce matches the system address of the contract
+    function isValidSignature(bytes32 hash, bytes calldata signature) internal view returns (bool) {
+        require(systemAddress != address(0), "Missing system address");
+        bytes32 signedHash = hash.toEthSignedMessageHash();
+        return signedHash.recover(signature) == systemAddress;
+    }
+
+    // no longer need this as bodies can be changed by holders
+    /*
     /// @notice Initializes and closes epochs. Thank you jalil & mouseDev.
     /// @dev Based on the commit-reveal scheme proposed by MouseDev.
     function resolveEpochIfNecessary() public {
@@ -224,6 +253,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             resolveEpochIfNecessary();
         }
     }
+    */
 
     // TODO: payable, this probably actually calls the first season contract to mint
     function buyTrait(uint256 _tokenId) public {
@@ -241,16 +271,16 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
     }
 
-    /// @notice The identifier of the current epoch
-    function getEpoch() view public returns (uint256) {
-        return peterTokens.epoch;
-    }
+    // /// @notice The identifier of the current epoch
+    // function getEpoch() view public returns (uint256) {
+    //     return peterTokens.epoch;
+    // }
 
-    /// @notice Get the data for a given epoch
-    /// @param index The identifier of the epoch to fetch
-    function getEpochData(uint256 index) view public returns (CommitReveal.Epoch memory) {
-        return peterTokens.epochs[index];
-    }
+    // /// @notice Get the data for a given epoch
+    // /// @param index The identifier of the epoch to fetch
+    // function getEpochData(uint256 index) view public returns (CommitReveal.Epoch memory) {
+    //     return peterTokens.epochs[index];
+    // }
 
     /// Equip/Unequip clothing traits
 
@@ -495,13 +525,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function getBodySVGZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory, bytes memory , string memory ) {
-        if (!storedPeter.isRevealed) {
-            return (
-                '<svg><text x="8" y="15" style="font: normal 2px sans-serif; fill: black;">Coming Soon...</text></svg>',
-                '',
-                '{}'
-            );
-        }
+        // if (!storedPeter.isRevealed) {
+        //     return (
+        //         '<svg><text x="8" y="15" style="font: normal 2px sans-serif; fill: black;">Coming Soon...</text></svg>',
+        //         '',
+        //         '{}'
+        //     );
+        // }
 
         return (
             getBodyImageSvg(storedPeter.bodyIndex),
@@ -512,12 +542,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
 
     function getBodySvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory, string memory) {
-        if (!storedPeter.isRevealed) {
-            return (
-                '<svg><text x="8" y="15" style="font: normal 2px sans-serif; fill: black;">Coming Soon...</text></svg>',
-                '{}'
-            );
-        }
+        // if (!storedPeter.isRevealed) {
+        //     return (
+        //         '<svg><text x="8" y="15" style="font: normal 2px sans-serif; fill: black;">Coming Soon...</text></svg>',
+        //         '{}'
+        //     );
+        // }
 
         return (
             getBodyImageSvg(storedPeter.bodyIndex),
@@ -614,7 +644,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         string memory traitsAttributes;
         string memory bodyAttributes;
         string memory fullAttributes;
-        string memory backgroundColorStyles;
+        Chonkdata memory chonkdata;
 
         StoredPeter memory storedPeter = getPeter(_tokenId);
 
@@ -626,29 +656,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             bodyZmap,
             traitZmaps
         );
-
-        // backgroundColorStyles  = string.concat(
-        //     '<style>',
-        //     'body, svg{ background: #', storedPeter.backgroundColor, '; }'
-        //     '.bg { fill: #', storedPeter.backgroundColor, '; }',
-        //     '</style>'
-        // );
-
-        // BackgroundStuff memory backgroundStuff;
-
-        // // todo, verify one doesn't exist
-
-        // backgroundStuff.backgroundColor = storedPeter.backgroundColor;
-        // backgroundStuff.backgroundStyles = backgroundColorStyles;
-
-        Chonkdata memory chonkdata;
-
+        
         chonkdata.backgroundColor = storedPeter.backgroundColor;
         chonkdata.numOfItemsInBackpack = getTraitsForTokenId(_tokenId).length;
         chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
-
-
 
         return zRenderer.renderAsDataUriZ(
             _tokenId,
@@ -658,8 +670,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitsAttributes,
             fullZmap,
             chonkdata
-            // backgroundStuff
-            // storedPeter.backgroundColor // look to combined these perhaps?
         );
     }
 
@@ -706,30 +716,21 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function getPeter(uint256 _tokenId) public view returns (IPeterStorage.StoredPeter memory) {
-        IPeterStorage.StoredPeter memory storedPeter =  peterTokens.all[_tokenId];
+        IPeterStorage.StoredPeter memory storedPeter = peterTokens.all[_tokenId];
 
-         // Set up the source of randomness + seed for this Chonk.
+        // old way, if using CR and seed
+        /*
+        // Set up the source of randomness + seed for this Chonk.
         uint128 randomness = peterTokens.epochs[storedPeter.epoch].randomness;
 
-        // note: should we use a salt here? or is it okay to just use the tokenId? both checks and bibos use "gradient" and "eye"
-        // also note, both checks and bibos use a helper function with the max in there e.g. Utilities.random(check.seed, 'gradient', 100);
-        // we don't use the seed anywhere else I don't think
-
         storedPeter.seed = (uint256(keccak256(abi.encodePacked(randomness, storedPeter.tokenId))) % type(uint128).max);
-
         storedPeter.isRevealed = _localDeploy == true ? true : randomness > 0; // if randomness is > 0, epoch & hence peter is revealed
-        
-        // when minting, we're currently setting body to index 1 for all peters
-
-        // if we want even chance of 4 different bodies, we can do this:
         storedPeter.bodyIndex = uint256(1 + (storedPeter.seed % 4)); // even chance for 4 different bodies
+        */
 
-        // if we want body rarity: let's make body index 1 70% of the time, and others 10%
-        // if (storedPeter.seed % 100 < 70) storedPeter.bodyIndex = 1;
-        // else if (storedPeter.seed % 100 < 80) storedPeter.bodyIndex = 2; 
-        // else if (storedPeter.seed % 100 < 90) storedPeter.bodyIndex = 3; 
-        // else storedPeter.bodyIndex = 4;
-
+        // actually, as we're letting people change these, just do this in mint and not here
+        // storedPeter.bodyIndex = uint256(keccak256(abi.encodePacked(_tokenId))) % 4; // even chance for 4 different bodies
+        
         return storedPeter;
     }
 
@@ -790,6 +791,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         zRenderer = ZRenderer(_zRenderer);
     }
 
+    function setSystemAddress(address _systemAddress) external onlyOwner {
+      systemAddress = _systemAddress;
+    }
+
     // todo: user setter ... should only be done by token holder
     function setBackgroundColor(uint256 _peterTokenId, string memory _color) public {
         // error checking for #RRGGBB... might want more here
@@ -797,11 +802,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peterTokens.all[_peterTokenId].backgroundColor = _color;
     }
 
-    // set function to set bodyIndex to 1, 2, 3, or 4 for a tokenId
+    // set function to set bodyIndex to 0, 1, 2, 3 for a tokenId
     // todo: user setter ... should only be done by token holder
     function setBodyIndex(uint256 _peterTokenId, uint256 _bodyIndex) public {
-        // ensure bodyIndex is between 1 and 4
-        if (_bodyIndex < 1 || _bodyIndex > 4) revert("Invalid bodyIndex");
+        // ensure bodyIndex is between 0 and 3
+        if (_bodyIndex < 0 || _bodyIndex > 3) revert("Invalid bodyIndex");
         peterTokens.all[_peterTokenId].bodyIndex = _bodyIndex;    
     }
 

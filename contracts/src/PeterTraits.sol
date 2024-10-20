@@ -434,7 +434,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     function getSvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, string memory traitsAttributes)
     {
 
-        if (!storedPeter.isRevealed) return ("", "{}");
+        // if (!storedPeter.isRevealed) return ("", "{}");
 
         // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
         if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.shoesId, traitsSvg, traitsAttributes);
@@ -476,7 +476,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     function getSvgZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
 
-        if (!storedPeter.isRevealed) return ("","","{}");
+        // if (!storedPeter.isRevealed) return ("","","{}");
 
         // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
         if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.shoesId, traitsSvg, traitsAttributes, traitZMaps);
