@@ -452,6 +452,23 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         emit EquipAll(ownerOf(_peterTokenId), _peterTokenId);
     }
 
+    function chonkMakeover(
+        uint256 _peterTokenId,
+        uint256 _headTokenId,
+        uint256 _hairTokenId,
+        uint256 _faceTokenId,
+        uint256 _accessoryTokenId,
+        uint256 _topTokenId,
+        uint256 _bottomTokenId,
+        uint256 _shoesTokenId,
+        uint256 _bodyIndex,
+        string memory _backgroundColor
+    ) public {
+        equipAll(_peterTokenId, _headTokenId, _hairTokenId, _faceTokenId, _accessoryTokenId, _topTokenId, _bottomTokenId, _shoesTokenId);
+        setBodyIndex(_peterTokenId, _bodyIndex);
+        setBackgroundColor(_peterTokenId, _backgroundColor);
+    }
+
     /// Validations
 
     function _validatePeterOwnership(uint256 _peterId) internal view {
