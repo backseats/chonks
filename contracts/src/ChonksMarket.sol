@@ -1,37 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-
-/*
-We want to be able to:
-List a Chonk for sale (comes with all of his traits)
-List a Trait for sale (can only buy if you own a chonk, if you own multiple then you have select which TBA it goes to, verify the TBA is real)
-Cancel a listing
-
-An Offer is you listing something
-A Bid is someone trying to buy it
-
-You can list one or multiple traits
-You can list a body
-
-msg.sender must own at least 1 body if buying
-msg.sender must have a tba if selling (i dont think this is a real requirement but let's see)
-
-
-msg.sender (buyer) walletOfOwner.length > 0. Wallet of Owner gives you the Chonk IDs. And the id of the Chonk buying must be in there.
-*/
-
+import { IPeterStorage } from "./interfaces/IPeterStorage.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { PetersMain } from "./PetersMain.sol";
 import { PeterTraits } from "./PeterTraits.sol";
-import { IPeterStorage } from "./interfaces/IPeterStorage.sol";
-
-// TODO: transfers should kill offers
-// We need a way to know if a token id has an offer on it
-
-// Does the user own the chonk/trait? theyre trying to action
-// do they own a chonk body to bid or buy (if so, which one?)
-// what data should be cleared when a bid/buy/cancel happens?
 
 // IMPORTANT: peter traits and peter main transfers and safeTransfers should kill offers if they exist. bids can stay
 
@@ -129,11 +102,10 @@ contract ChonksMarket is Ownable {
     // Multi-Trait Offers
 
     mapping(bytes32 traitsOfferHash => TraitsOffer offer) public traitsOffer;
-
-    // This is to make it easier to find the traits offer hash for a given trait id. Only applies to multi-trait offers.
     mapping(uint256 traitId => bytes32 traitsOfferHash) public traitIdToTraitsOfferHash;
+    // ^ This is to make it easier to find the traits offer hash for a given trait id. Only applies to multi-trait offers.
 
-    // might get confusing if someone lists multiple traits as part of a single offer and someone bids on one and it gets accepted. that should probably kill the multi-trait offer, no? -> so yeah in the accept bid for a single trait, check traitIdToTraitsOfferHash and if something exists, delete that multi-offer and return funds?
+    // TODO: might get confusing if someone lists multiple traits as part of a single offer and someone bids on one and it gets accepted. that should probably kill the multi-trait offer, no? -> so yeah in the accept bid for a single trait, check traitIdToTraitsOfferHash and if something exists, delete that multi-offer/bid and return funds?
 
     // Bids
 
