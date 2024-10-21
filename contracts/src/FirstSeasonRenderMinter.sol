@@ -230,6 +230,8 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
         //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin
 
+        _amount = 100; // for testing
+
         uint256[] memory mintedIds = new uint256[](_amount);
 
         // for(uint i; i < INITIAL_TRAIT_NUMBER; ++i) {
@@ -257,6 +259,10 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
             } else if (i == 5) {
                 trait.traitType = TraitCategory.Name.Head;
             } else if (i == 6) {
+                trait.traitType = TraitCategory.Name.Accessory;
+            } else {
+                // this should never happen as amount should never be more than 7
+                // but for testing purposes, assign a random accessory
                 trait.traitType = TraitCategory.Name.Accessory;
             }
 

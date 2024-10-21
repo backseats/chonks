@@ -58,7 +58,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     address constant ACCOUNT_IMPLEMENTATION = 0x41C8f39463A868d3A88af00cd0fe7102F30E44eC;
 
     // Backpack stuff
-    uint256 public MAX_TRAITS_TO_OUTPUT = 69;
+    uint256 maxTraitsToOutput = 99;
     string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
 
     // Mapping of tokenIds to TBA account addresses
@@ -89,6 +89,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error NonceAlreadyUsed();
     error InvalidSignature();
     error InvalidLevelAmount();
+    error InvalidBodyIndex();
+    error InvalidColor();
 
     constructor(bool localDeploy_) ERC721("Peter Test", "PETER") {
         _initializeOwner(msg.sender);
@@ -103,18 +105,18 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
             }
-            //setBackgroundColor(1, "333333");
-            // setTokenRenderZ(1, true);
+            setBackgroundColor(1, "ffffff");
+            setTokenRenderZ(1, true);
         }
     }
 
     function mint() public payable { // TODO amount, check price
-        _mintAmount(3);
+        _mintAmount(4);
     }
 
     // just popping this in here for now, we can decide full spec later
     function mintByLevel(uint8 amount, string calldata nonce, bytes calldata signature ) public payable {
-        if (amount < 3 || amount > 7) revert InvalidLevelAmount();
+        if (amount < 4 || amount > 7) revert InvalidLevelAmount();
         if (!isValidSignature(keccak256(abi.encodePacked(msg.sender, nonce)), signature)) revert InvalidSignature();
         if (usedNonces[nonce]) revert NonceAlreadyUsed();
 
@@ -156,18 +158,16 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // peter.seed = uint16(tokenId);
         peter.tokenId = uint256(tokenId);
 
-        // level 0: let's give everyone shoes, bottom, top: 
-        // level 1: shoes, bottom, top AND hair
-        // level 2: shoes, bottom, top AND hair AND face
-        // level 3: shoes, bottom, top AND hair AND face AND head
-        // level 4: shoes, bottom, top AND hair AND face AND head AND accessory
+        // level 0: let's give everyone shoes, bottom, top & hair : 4 traits
+        // level 1: shoes, bottom, top, hair AND face: 5 traits
+        // level 3: shoes, bottom, top AND hair AND face AND head AND accessory : 7 traits
 
         peter.shoesId = traitsIds[0]; 
         peter.bottomId = traitsIds[1]; 
         peter.topId = traitsIds[2]; 
-
+        peter.hairId = traitsIds[3]; 
+        
         // so we're not going to equip these on initial mint, people will have to equip them
-        // if(amount > 3) peter.hairId = traitsIds[3]; 
         // if(amount > 4) peter.faceId = traitsIds[4]; 
         // if(amount > 5) peter.headId = traitsIds[5]; 
         // if(amount > 6) peter.accessoryId = traitsIds[6]; 
@@ -179,7 +179,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // on mint, let's make all peter's body index 0, which is then updated in getPeter (even chance)
         // peter.bodyIndex = 0;
         // as we're letting people change these, just do it upon mint now
-        peter.bodyIndex = uint256(keccak256(abi.encodePacked(tokenId))) % 4; // even chance for 4 different bodies
+        peter.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 4); // even chance for 4 different bodies
 
         // set default background color
         peter.backgroundColor = "0D6E9D";
@@ -365,7 +365,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         emit EquipAll(ownerOf(_peterTokenId), _peterTokenId);
     }
 
-    function chonkMakeover(
+    function peterMakeover(
         uint256 _peterTokenId,
         uint256 _headTokenId,
         uint256 _hairTokenId,
@@ -374,7 +374,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _topTokenId,
         uint256 _bottomTokenId,
         uint256 _shoesTokenId,
-        uint256 _bodyIndex,
+        uint8 _bodyIndex,
         string memory _backgroundColor
     ) public {
         equipAll(_peterTokenId, _headTokenId, _hairTokenId, _faceTokenId, _accessoryTokenId, _topTokenId, _bottomTokenId, _shoesTokenId);
@@ -486,7 +486,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         string memory bodyGhostSvg = traitsContract.getGhostSvg();
 
-        uint256 numTraits = traitTokens.length < MAX_TRAITS_TO_OUTPUT ? traitTokens.length : MAX_TRAITS_TO_OUTPUT;
+        uint256 numTraits = traitTokens.length < maxTraitsToOutput ? traitTokens.length : maxTraitsToOutput; // this means if they are the same, the exact amount will ouput
 
         buffer = abi.encodePacked(
             SVG_BACKPACK,
@@ -500,6 +500,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 buffer,
                 baseSvgPart,
                 traitSvg,
+                closeSvgTag
+            );
+        }
+
+        if(traitTokens.length > maxTraitsToOutput ) {
+            buffer = abi.encodePacked(
+                buffer,
+                baseSvgPart,
+                '<g id="MoreTraits"><rect style="width:10px; height:2px;" x="10" y="16" fill="#ffffff"></rect><rect style="height:10px; width:2px;" x="14" y="12" fill="#ffffff"></rect></g>',
                 closeSvgTag
             );
         }
@@ -657,7 +666,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Setters
 
     function setMaxTraitsToOutput(uint256 _maxTraitsToOutput) public onlyOwner {
-        MAX_TRAITS_TO_OUTPUT = _maxTraitsToOutput;
+        maxTraitsToOutput = _maxTraitsToOutput;
     }
 
     function setPrice(uint256 _priceInWei) public onlyOwner {
@@ -684,24 +693,46 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
       systemAddress = _systemAddress;
     }
 
-    // todo: user setter ... should only be done by token holder
     function setBackgroundColor(uint256 _peterTokenId, string memory _color) public {
-        // error checking for #RRGGBB... might want more here
-        if (bytes(_color).length != 6) revert("Invalid color");
+        _validatePeterOwnership(_peterTokenId);
+        
+        if (bytes(_color).length == 0) return;
+
+        bytes memory colorBytes = bytes(_color);
+    
+        // Check that the color string is exactly 6 characters long
+        if (colorBytes.length != 6) revert InvalidColor();
+
+        // Ensure all characters are valid hex characters (0-9, a-f, A-F)
+        for (uint i = 0; i < 6; i++) {
+            if (
+                !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
+                !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
+                !(colorBytes[i] >= 0x61 && colorBytes[i] <= 0x66)    // a-f
+            ) {
+                revert InvalidColor(); // Invalid character found
+            }
+        }
         peterTokens.all[_peterTokenId].backgroundColor = _color;
+
+        emit BackgroundColor(ownerOf(_peterTokenId), _peterTokenId, _color );
     }
 
-    // set function to set bodyIndex to 0, 1, 2, 3 for a tokenId
-    // todo: user setter ... should only be done by token holder
-    function setBodyIndex(uint256 _peterTokenId, uint256 _bodyIndex) public {
-        // ensure bodyIndex is between 0 and 3
-        if (_bodyIndex < 0 || _bodyIndex > 3) revert("Invalid bodyIndex");
-        peterTokens.all[_peterTokenId].bodyIndex = _bodyIndex;    
+    function setBodyIndex(uint256 _peterTokenId, uint8 _bodyIndex) public {
+        _validatePeterOwnership(_peterTokenId);
+        if (_bodyIndex > 3) revert InvalidBodyIndex();    // ensure bodyIndex is not greater than 3
+        if (_bodyIndex != 0) {
+            peterTokens.all[_peterTokenId].bodyIndex = _bodyIndex; // and only set if not 0
+            emit BodyIndex(ownerOf(_peterTokenId), _peterTokenId, _bodyIndex );
+        }
     }
 
-    // todo: user setter ... should only be done by token holder
     function setTokenRenderZ(uint256 _peterTokenId, bool _renderZ) public {
+        _validatePeterOwnership(_peterTokenId);
         peterTokens.all[_peterTokenId].renderZ = _renderZ;
+
+        // emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Accessory");
+        emit RenderZ(ownerOf(_peterTokenId), _peterTokenId, _renderZ );
     }
 
     // Boilerplate

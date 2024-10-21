@@ -101,11 +101,10 @@ contract MainRenderer {
             '{"name":"Peter #',
                 Utils.toString(_tokenId),
              '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
-                // chonkData,
                 fullAttributes,
                 ',', generateChonkdata(_chonkdata),
                 ',', image,
-                ',', animationURL, // comment out for qa collection
+                // ',', animationURL, // comment out for qa collection
             '}'
         );
 

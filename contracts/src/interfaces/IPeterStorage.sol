@@ -34,9 +34,8 @@ interface IPeterStorage {
         // was seed // TODO: make this uint256? | TODO
         uint256 tokenId;
 
-        // this is calculuated in getPeter based on peter.seed
-        // TODO: make this a uint16 or so? we're never going to have more than 65k peter body types. uint8 might be fine
-        uint256 bodyIndex;
+        // randomly set in PetersMain.mint() but can be updated by holder
+        uint8 bodyIndex;
 
         // Set in getPeter if epoch is revealed
         // bool isRevealed;
@@ -114,6 +113,24 @@ interface IPeterStorage {
     event UnequipAll(
         address indexed owner,
         uint256 indexed tokenId
+    );
+
+    event BackgroundColor(
+        address indexed owner,
+        uint256 indexed tokenId,
+        string color
+    );
+
+    event BodyIndex(
+        address indexed owner,
+        uint256 indexed tokenId,
+        uint8 _bodyIndex
+    );
+
+    event RenderZ(
+        address indexed owner,
+        uint256 indexed tokenId,
+        bool renderZ
     );
 
 
