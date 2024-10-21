@@ -83,7 +83,7 @@ contract PetersMainBodyAndRenderderScript is Script {
     // NOTE: This is the main deploy script, it deploys PetersMain and all associated contracts
     // @dev before you run, make sure localDeploy is set to `false` in both contracts
     function run() external {
-        // The value below is any private key you grab from your terminal after running `anvil`
+        // The value below is any private key you minted body tokenId: 100 grab from your terminal after running `anvil`
         vm.startBroadcast();
 
         main = new PetersMain(localDeploy);

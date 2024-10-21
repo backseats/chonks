@@ -85,12 +85,7 @@ interface IPeterStorage {
         uint256 numOfItemsInBackpack;
         // string backgroundStyles;
     }
-
-    struct BackgroundStuff {
-        string backgroundColor;
-        string backgroundStyles;
-    }
-
+    
     // Events
 
     event Mint(

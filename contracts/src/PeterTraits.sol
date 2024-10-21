@@ -32,8 +32,6 @@ import "forge-std/console.sol"; // DEPLOY: remove
 
 contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4906, IERC721Receiver {
 
-    // BodyRenderer public bodyRenderer;
-
     /// @dev We use this database for persistent storage
     Traits public traitTokens;
 
@@ -222,7 +220,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         string memory fullSvg;
         string memory traitSvg;
         string memory attributes;
-
         string memory bodyGhostSvg = getGhostSvg();
 
         // Trait memory trait = getTrait(_tokenId);
@@ -287,7 +284,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     }
 
     function getSvgForTokenId(uint256 _tokenId) public view returns (string memory traitSvg) {
-
         // don't get the ghost here for now
         StoredTrait memory trait = getTrait(_tokenId);
 
@@ -385,25 +381,12 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         if (trait.isRevealed && traitId > 0) {
             TraitMetadata storage metadata = traitIndexToMetadata[trait.traitIndex];
 
-            // string memory traitName = metadata.traitName;
-            // traitName = string.concat(
-            //     traitName,
-            //     ' - ',
-            //     metadata.creatorName // todo: if included, need to ensure it's set
-            // );
-
             traitAttributes = RenderHelper.stringTrait(
                 TraitCategory.toString(metadata.traitType),
                 metadata.traitName
                 // traitName // if we want to affix creator name to the trait name
             );
 
-            // old traitPath svg way
-            // Combine the traits
-            // NOTE: here we can add an svg path for something that isn't equipped (ie and empty string and it shouldnt affect the render)
-            // traitSvg = metadata.traitPath;
-
-            // new way - we'll want to make getTraitImageSvg a public function so should we send it trait.traitIndex? i think so
             traitSvg = getTraitImageSvg(trait.traitIndex);
         } else {
             traitAttributes = '{}';
@@ -433,9 +416,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     // called from PeterMain renderAsDataUriSVG()
     function getSvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, string memory traitsAttributes)
     {
-
-        // if (!storedPeter.isRevealed) return ("", "{}");
-
         // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
         if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.shoesId, traitsSvg, traitsAttributes);
         if (storedPeter.bottomId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.bottomId, traitsSvg, traitsAttributes);
@@ -444,7 +424,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.hairId, traitsSvg, traitsAttributes);
         if (storedPeter.headId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.headId, traitsSvg, traitsAttributes);
         if (storedPeter.accessoryId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTrait(storedPeter.accessoryId, traitsSvg, traitsAttributes);
-        
     }
 
     function callGetSvgAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes ) public view returns (string memory traitsSvg, string memory traitsAttributes) {
@@ -469,15 +448,10 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
                 ',',
                 traitAttribute
             );
-
         }
-
     }
 
     function getSvgZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
-
-        // if (!storedPeter.isRevealed) return ("","","{}");
-
         // This is a little wonky if doing either the straight assign or the concat depending on if its the first trait or not
         if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.shoesId, traitsSvg, traitsAttributes, traitZMaps);
         if (storedPeter.bottomId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTrait(storedPeter.bottomId, traitsSvg, traitsAttributes, traitZMaps);

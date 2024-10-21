@@ -27,19 +27,11 @@ contract ZRenderer {
     // Three.js script for 3D rendering
     bytes public base64ScriptContent;
 
-    // string private constant SVG_START = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">';
-    // string private constant SVG_STYLE = '<style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
-
     string private constant SVG_START_STYLE = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
-    // string private constant SVG_BG_MAIN_START = '<rect class="bg"/><g id="main" class="off">';
-    // string private constant SVG_END = '</svg> ';
 
-
-    // function generateFullSvg( string memory _bodySvg, string memory _traitsSvg, string memory _backgroundColorStyles) internal pure returns (string memory image) {
     function generateFullSvg( string memory _bodySvg, string memory _traitsSvg, IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory image) {
         string memory fullSvg = string.concat(
             SVG_START_STYLE,
-            // _backgroundColorStyles,
             generateBackgroundColorStyles(_chonkdata),
             '<g id="body">',
             _bodySvg,
@@ -57,7 +49,6 @@ contract ZRenderer {
     }
 
     function generateBackgroundColorStyles( IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
-
         backgroundColorStyles = string.concat(
             '<style>',
             'body, svg{ background: #', _chonkdata.backgroundColor, '; }',
@@ -67,7 +58,6 @@ contract ZRenderer {
     }
 
     function generateChonkdata( IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
-
         chonkDataJson = string.concat(
             '"chonkdata":[',
                 '{ "background_color" : "#', _chonkdata.backgroundColor, '" },',
@@ -79,7 +69,6 @@ contract ZRenderer {
     }
 
     function generateAttributes(string memory _traitsAttributes, string memory _bodyAttributes, IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory fullAttributes) {
-
         //todo: do we need this bodyAttributes check in here?
         if (bytes(_traitsAttributes).length > 0) {
             // fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
@@ -108,8 +97,6 @@ contract ZRenderer {
         bytes memory _fullZmap,
         IPeterStorage.Chonkdata memory _chonkdata
     ) public view returns (string memory) {
-
-        // string memory image = generateFullSvg( _bodySvg, _traitsSvg, _backgroundStuff.backgroundStyles);
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _chonkdata);
 
         string memory fullAttributes = generateAttributes(_traitsAttributes, _bodyAttributes, _chonkdata);
@@ -198,8 +185,6 @@ contract ZRenderer {
         );
         bodyTags[9].tagClose = "%2527%253B%253C%252Fscript%253E"; // ';</script>
 
-
-
         // output the three.js script
         bodyTags[10]
             .tagOpen = "%253Cscript%2520type%253D%2522module%2522%2520src%253D%2522data%253Atext%252Fjavascript%253Bbase64%252C";
@@ -216,19 +201,6 @@ contract ZRenderer {
             scriptyBuilderAddress
         ).getHTMLURLSafe(htmlRequest);
 
-        // bytes memory base64EncodedHTMLDataURI = IScriptyBuilderV2(
-        //     scriptyBuilderAddress
-        // ).getEncodedHTML(htmlRequest); 
-
-        // console2.log('doubleURLEncodedHTMLDataURI', doubleURLEncodedHTMLDataURI);
-
-        // string memory doubleURLEncodedHTMLDataURI = IScriptyBuilderV2(
-        //     scriptyBuilderAddress
-        // ).getHTMLString(htmlRequest); 
-
-        // console2.log('doubleURLEncodedHTMLDataURI', doubleURLEncodedHTMLDataURI);  
-
-        // this works but doesn't have base64 encoding:
         return 
             string(
                 abi.encodePacked(
@@ -244,57 +216,15 @@ contract ZRenderer {
                     encodeURIContract.encodeURI('"}')
                 )
             );
-
-         // this outputs valid json but the animation_url is broken
-        // return base64AndEncodeJson(_tokenId, fullAttributes, image, base64EncodedHTMLDataURI);
     }
-
-    /*
-    function base64AndEncodeJson(uint256 _tokenId, string memory _fullAttributes, string memory _image, bytes memory _doubleURLEncodedHTMLDataURI) internal pure returns (string memory) {
-
-        string memory json = 
-            string(
-                abi.encodePacked(
-                    // "data:application/json,",
-                    '{"name":"Peter #', // encodeURIContract.encodeURI('{"name":"Peter #'),
-                    Utils.toString(_tokenId),
-                    '", "description":"Click/tap top left to open your backpack, top right for PFP mode ",', //encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
-                    // encodeURIContract.encodeURI(_fullAttributes),
-                    _fullAttributes,
-                    ',', // encodeURIContract.encodeURI(','),
-                    _image, // encodeURIContract.encodeURI(_image),
-                    ',"animation_url":"', // encodeURIContract.encodeURI(',"animation_url":"'),
-                    // Utils.encode(_doubleURLEncodedHTMLDataURI),
-                    _doubleURLEncodedHTMLDataURI,
-                    '"}' // encodeURIContract.encodeURI('"}')
-                )
-            );
-
-        return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
-    }
-    */
 
 
     function base64AndEncodeJson(uint256 tokenId, string memory fullAttributes, string memory image, bytes memory base64EncodedHTMLDataURI) pure internal returns (string memory) {
-
-        // bytes memory metadata = abi.encodePacked(
-        //     '{"name":"Peter #',
-        //         Utils.toString(tokenId),
-        //      '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
-        //         fullAttributes,
-        //     ',', image,
-        //     ',"animation_url":"',
-        //     base64EncodedHTMLDataURI,
-        //     '"}'
-        // );
-
         bytes memory metadata = abi.encodePacked(
             '{"name":"Peters","animation_url":"',
             base64EncodedHTMLDataURI,
             '"}'
         );
-
-        // return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
 
         return
             string(
@@ -304,39 +234,6 @@ contract ZRenderer {
                 )
             );
     }
-
-    // function getBodyImageSvg(bytes memory _pixels) public pure returns (string memory) {
-    //     // optimised for hex and set 30 coords
-    //     string[16] memory hexSymbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
-    //     string[30] memory coords = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"];
-
-    //     bytes memory svgParts;
-
-    //     for (uint i; i < 4500; i += 5) {
-    //         if (_pixels[i] > 0) {
-    //             uint x = (i / 5) % 30;
-    //             uint y = (i / 5) / 30;
-
-    //             bytes memory color = abi.encodePacked(
-    //                 hexSymbols[uint8(_pixels[i + 2]) >> 4],
-    //                 hexSymbols[uint8(_pixels[i + 2]) & 0xf],
-    //                 hexSymbols[uint8(_pixels[i + 3]) >> 4],
-    //                 hexSymbols[uint8(_pixels[i + 3]) & 0xf],
-    //                 hexSymbols[uint8(_pixels[i + 4]) >> 4],
-    //                 hexSymbols[uint8(_pixels[i + 4]) & 0xf]
-    //             );
-
-    //             svgParts = abi.encodePacked(
-    //                 svgParts,
-    //                 '<rect x="', coords[x],
-    //                 '" y="', coords[y],
-    //                 '" width="1" height="1" fill="#', color, '"/>'
-    //             );
-    //         }
-    //     }
-
-    //     return string(abi.encodePacked('<g id="Body">', svgParts, '</g>'));
-    // }
 
     // TODO: put in onlyOwner here? or call this from PetersMain?
     function setEncodeURI(address _encodeURIAddress) public  {
