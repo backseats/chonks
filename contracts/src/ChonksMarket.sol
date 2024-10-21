@@ -142,6 +142,7 @@ contract ChonksMarket is Ownable {
     error RefundFailed();
     error RoyaltiesTransferFailed();
     error TraitEquipped();
+    error TraitNotOwnedByChonk();
     error WrongAmount();
     error YouCantBuyThatChonk();
     error YouCantBuyThatTrait();
@@ -196,26 +197,6 @@ contract ChonksMarket is Ownable {
         teamWallet = _teamWallet;
     }
 
-    // function hashChonkOffer(ChonkOffer calldata offer) private pure returns (bytes32) {
-    //     return keccak256(abi.encodePacked(
-    //         offer.chonkId,
-    //         offer.price,
-    //         offer.seller,
-    //         offer.sellerTBA
-    //     ));
-    // }
-
-    // function hashTraitsOffer(TraitsOffer calldata offer) private pure returns (bytes32) {
-    //     return keccak256(abi.encodePacked(
-    //         offer.traitIds,
-    //         offer.price,
-    //         offer.seller,
-    //         offer.sellerTBA
-    //     ));
-    // }
-    // TODO: more signature/hashing. See https://www.contractreader.io/contract/mainnet/0x7bd29408f11d2bfc23c34f18275bbf23bb716bc7#meebits-1-1-533
-
-
     /*
     Chonk
 
@@ -253,9 +234,6 @@ contract ChonksMarket is Ownable {
 
         // Ensure correct price
         if (offer.priceInWei != msg.value) revert WrongAmount();
-
-        // Delete Offer
-        delete chonkOffers[_chonkId];
 
         // Pay Royalties and Seller
         _calculateRoyaltiesAndTransferFunds(msg.value, offer.seller);
@@ -337,17 +315,13 @@ contract ChonksMarket is Ownable {
     */
 
     function cancelOfferTrait(uint256 _traitId, uint256 _chonkId) public {
-        if (traitOffers[_traitId].seller == address(0)) revert NoOfferToCancel();
-        if (traitOffers[_traitId].seller != msg.sender) revert NotYourOffer();
+        if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
 
-        (address owner, address tbaAddress) = PETERS_MAIN.getOwnerAndTBAAddressForTokenId(_chonkId);
-        if (msg.sender != owner) revert NotYourChonk();
+        TraitOffer memory offer = traitOffers[_traitId];
+        if (offer.seller == address(0)) revert NoOfferToCancel();
+        if (offer.seller != msg.sender) revert NotYourOffer();
 
-        // also ensure the trait is associated with the chonk id
-        if (PETER_TRAITS.ownerOf(_traitId)  != tbaAddress) revert NotYourTrait();
-        if (traitOffers[_traitId].sellerTBA != tbaAddress) revert NotYourTraitToSell(); // TODO: i dont think this works, needs to do some msg.sender shit in here
-
-        delete traitOffers[_traitId];
+        delete offer;
 
         emit TraitOfferCanceled(_traitId);
     }
@@ -356,15 +330,10 @@ contract ChonksMarket is Ownable {
         // Please unequip the trait if you want to sell it
         if (_checkIfTraitIsEquipped(_traitId, _chonkId)) revert TraitEquipped();
 
-        // The TBA that owns the Trait
-        address tbaTraitOwner = PETER_TRAITS.ownerOf(_traitId);
-        // The owner of the Chonk ID and the TBA associated with that Chonk ID
-        (address tokenOwner, address tbaForChonkId) = PETERS_MAIN.getOwnerAndTBAAddressForTokenId(_chonkId);
+        if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
 
-        // Ensure that the TBA that owns the trait is the same as the TBA associated with the Chonk ID
-        if (tbaTraitOwner != tbaForChonkId) revert NotYourTraitToSell();
-        // And make sure that the msg.sender owns the Chonk ID
-        if (msg.sender != tokenOwner) revert NotYourTraitToSell();
+        address tbaTraitOwner = PETER_TRAITS.ownerOf(_traitId);
+        (address tokenOwner,) = PETERS_MAIN.getOwnerAndTBAAddressForTokenId(_chonkId);
 
         // Also check if the offered Trait exists in a multi-trait offer. If so, delete that offer.
         bytes32 traitsOfferHash = traitIdToTraitsOfferHash[_traitId];
@@ -377,6 +346,8 @@ contract ChonksMarket is Ownable {
 
         emit TraitOffered(_traitId, _priceInWei, tokenOwner, tbaTraitOwner);
     }
+
+    // make not equipped
 
     function buyTrait(uint256 _traitId, uint256 _forChonkId, address _buyerTBA) public payable notPaused {
         // Ensure msg.sender owns the Chonk token of the TBA
@@ -656,6 +627,22 @@ contract ChonksMarket is Ownable {
 
         // TODO: transfer from the TBA of the current owner to the buyerTBA
         // ensure not equipped
+    }
+
+    /// Helper Functions
+
+    /// Ensures that the msg.sender owns the Chonk which owns the TBA that owns the Trait
+    function ensureTraitOwner(uint256 _traitId, uint256 _chonkId) public view returns (bool) {
+        address traitOwnerTBA = PETER_TRAITS.ownerOf(_traitId);
+        (address chonkOwner, address tbaForChonkId) = PETERS_MAIN.getOwnerAndTBAAddressForTokenId(_chonkId);
+        return (traitOwnerTBA == tbaForChonkId) && (chonkOwner == msg.sender);
+    }
+
+    // TODO: Maybe this goes in Peter Traits
+    function addressesForTraitId(uint256 _traitId, uint256 _chonkId) public view returns (address tbaThatOwnsTrait, address tbaForChonkId, address ownerOfChonk) {
+        tbaThatOwnsTrait = PETER_TRAITS.ownerOf(_traitId);
+        (ownerOfChonk, tbaForChonkId) = PETERS_MAIN.getOwnerAndTBAAddressForTokenId(_chonkId);
+        if (tbaThatOwnsTrait != tbaForChonkId) revert TraitNotOwnedByChonk();
     }
 
     /// Internal
