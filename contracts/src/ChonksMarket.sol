@@ -115,7 +115,6 @@ contract ChonksMarket is Ownable {
 
     /// Errors
 
-    error BidDoesNotExist();
     error BidIsTooLow();
     error BuyFailed();
     error CantAcceptYourOwnBid();
@@ -148,30 +147,36 @@ contract ChonksMarket is Ownable {
     error YouCantBuyThatTrait();
     error YouCantBuyThoseTraits();
 
-    /// Events
+    /// Events (These map to the order of the functions below)
 
-    event ChonkOffered(uint256 indexed chonkId, uint256 indexed price, address indexed seller, address sellerTBA);
-    event TraitOffered(uint256 indexed traitId, uint256 indexed price, address indexed seller, address sellerTBA);
-    event TraitsOffered(bytes32 indexed traitsOfferHash, uint256[] indexed offeredTraitIds, uint256 indexed price, address seller, address sellerTBA);
+    // Chonk Events
 
     event ChonkOfferCanceled(uint256 indexed chonkId);
-    event TraitOfferCanceled(uint256 indexed traitId);
-    event TraitsOfferCanceled(bytes32 indexed traitsOfferHash);
-
-    event ChonkBidEntered(uint256 indexed chonkId, address indexed bidder, uint256 amountInWei);
-    event TraitBidEntered(uint256 indexed traitId, address indexed bidder, uint256 amountInWei);
-    event TraitsBidEntered(bytes32 indexed traitsBidHash, address indexed bidder, uint256 amountInWei);
+    event ChonkOffered(uint256 indexed chonkId, uint256 indexed price, address indexed seller, address sellerTBA);
+    event ChonkBought(uint256 indexed chonkId, address indexed buyer, uint256 amountInWei);
 
     event ChonkBidWithdrawn(uint256 indexed chonkId, address indexed bidder, uint256 amountInWei);
-    event TraitBidWithdrawn(uint256 indexed traitId, address indexed bidder, uint256 amountInWei);
-    event TraitsBidWithdrawn(bytes32 indexed traitsOfferHash, address indexed bidder, uint256 amountInWei);
+    event ChonkBidEntered(uint256 indexed chonkId, address indexed bidder, uint256 amountInWei);
+    event ChonkBidAccepted(uint256 indexed chonkId, uint256 indexed amountInWei, address indexed buyer, address seller);
 
-    event ChonkBought(uint256 indexed chonkId, address indexed buyer, uint256 amountInWei);
+    // Trait Events
+
+    event TraitOfferCanceled(uint256 indexed traitId);
+    event TraitOffered(uint256 indexed traitId, uint256 indexed price, address indexed seller, address sellerTBA);
     event TraitBought(uint256 indexed traitId, address indexed buyerTBA, uint256 amountInWei, address buyer);
+
+    event TraitBidWithdrawn(uint256 indexed traitId, address indexed bidder, uint256 amountInWei);
+    event TraitBidEntered(uint256 indexed traitId, address indexed bidder, uint256 amountInWei);
+    event TraitBidAccepted(uint256 indexed traitId, uint256 indexed amountInWei, address indexed buyer, address seller);
+
+    // Traits Events
+
+    event TraitsOfferCanceled(bytes32 indexed traitsOfferHash);
+    event TraitsOffered(bytes32 indexed traitsOfferHash, uint256[] indexed offeredTraitIds, uint256 indexed price, address seller, address sellerTBA);
     event TraitsBought(bytes32 indexed traitsOfferHash, address indexed buyerTBA, uint256 amountInWei, address buyer);
 
-    event ChonkBidAccepted(uint256 indexed chonkId, uint256 indexed amountInWei, address indexed buyer, address seller);
-    event TraitBidAccepted(uint256 indexed traitId, uint256 indexed amountInWei, address indexed buyer, address seller);
+    event TraitsBidWithdrawn(bytes32 indexed traitsOfferHash, address indexed bidder, uint256 amountInWei);
+    event TraitsBidEntered(bytes32 indexed traitsBidHash, address indexed bidder, uint256 amountInWei);
     event TraitsBidAccepted(bytes32 indexed traitsOfferHash, uint256 indexed amountInWei, address indexed buyer, address seller, uint256[] boughtTraitIds);
 
     /// Modifiers
@@ -304,7 +309,7 @@ contract ChonksMarket is Ownable {
 
         PETERS_MAIN.transferFrom(msg.sender, bid.bidder, _chonkId);
 
-        emit ChonkBought(_chonkId, bid.bidder, bid.amountInWei);
+        emit ChonkBidAccepted(_chonkId, bid.amountInWei, bid.bidder, owner);
     }
 
     /*
