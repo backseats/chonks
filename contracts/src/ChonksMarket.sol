@@ -276,7 +276,7 @@ contract ChonksMarket is Ownable {
         emit ChonkBidWithdrawn(_chonkId, msg.sender, bid.amountInWei);
     }
 
-    function bidOnChonk(uint256 _chonkId) public payable ensurePriceIsNotZero(msg.value) {
+    function bidOnChonk(uint256 _chonkId) public payable ensurePriceIsNotZero(msg.value) notPaused {
         address owner = PETERS_MAIN.ownerOf(_chonkId);
         if (owner == address(0)) revert ChonkDoesNotExist();
         if (owner == msg.sender) revert CantBidOnYourOwnChonk();
@@ -408,7 +408,7 @@ contract ChonksMarket is Ownable {
         emit TraitBidWithdrawn(_traitId, msg.sender, bid.amountInWei);
     }
 
-    function bidOnTrait(uint256 _traitId, uint256 _yourChonkId) public payable ensurePriceIsNotZero(msg.value) {
+    function bidOnTrait(uint256 _traitId, uint256 _yourChonkId) public payable ensurePriceIsNotZero(msg.value) notPaused {
         // Ensure it's not your Trait
         (address traitOwner, address traitOwnerTBA) = PETERS_MAIN.getOwnerAndTBAAddressForTokenId(_traitId);
         if (traitOwner == msg.sender || traitOwnerTBA == msg.sender) revert CantBidOnYourOwnTrait();
@@ -571,7 +571,7 @@ contract ChonksMarket is Ownable {
         emit TraitsBidWithdrawn(_traitsOfferHash, msg.sender, bid.amountInWei);
     }
 
-    function bidOnTraits(bytes32 _traitsOfferHash, uint256 _yourChonkId) public payable ensurePriceIsNotZero(msg.value) {
+    function bidOnTraits(bytes32 _traitsOfferHash, uint256 _yourChonkId) public payable ensurePriceIsNotZero(msg.value) notPaused {
         // Ensure you own the Chonk
         address owner = PETERS_MAIN.ownerOf(_yourChonkId);
         if (owner != msg.sender) revert NotYourChonk();
@@ -667,12 +667,12 @@ contract ChonksMarket is Ownable {
 
     function _checkIfTraitIsEquipped(uint256 _traitId, uint256 _chonkId) internal view returns (bool) {
         IPeterStorage.StoredPeter memory storedPeter = PETERS_MAIN.getPeter(_chonkId);
-        return storedPeter.hatId == _traitId ||
+        return storedPeter.headId == _traitId ||
             storedPeter.hairId == _traitId ||
-            storedPeter.glassesId == _traitId ||
-            storedPeter.handheldId == _traitId ||
-            storedPeter.shirtId == _traitId ||
-            storedPeter.pantsId == _traitId ||
+            storedPeter.faceId == _traitId ||
+            storedPeter.accessoryId == _traitId ||
+            storedPeter.topId == _traitId ||
+            storedPeter.bottomId == _traitId ||
             storedPeter.shoesId == _traitId;
     }
 
