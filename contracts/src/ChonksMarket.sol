@@ -88,7 +88,7 @@ contract ChonksMarket is Ownable {
     PetersMain  public immutable PETERS_MAIN;
     PeterTraits public immutable PETER_TRAITS;
 
-    uint8 public royaltyPercentage;
+    uint256 public royaltyPercentage; // starts at 250 (for 2.5%)
     address public teamWallet;
 
     bool public paused;
@@ -658,12 +658,11 @@ contract ChonksMarket is Ownable {
         if (tbaThatOwnsTrait != tbaForChonkId) revert TraitNotOwnedByChonk();
     }
 
-    /// Internal
-
-    // maybe make public for testing, or just make public in general
-    function _calculateRoyalty(uint256 _amount) internal view returns (uint256) {
-        return (_amount * uint256(royaltyPercentage)) / 100;
+    function calculateRoyalty(uint256 _amount) public view returns (uint256) {
+        return (_amount * uint256(royaltyPercentage)) / 1000;
     }
+
+    /// Internal
 
     function _checkIfTraitIsEquipped(uint256 _traitId, uint256 _chonkId) internal view returns (bool) {
         IPeterStorage.StoredPeter memory storedPeter = PETERS_MAIN.getPeter(_chonkId);
@@ -679,7 +678,7 @@ contract ChonksMarket is Ownable {
     /// Private
 
     function _calculateRoyaltiesAndTransferFunds(uint256 _amount, address _to) private returns (bool success) {
-        uint256 royalties = _calculateRoyalty(_amount);
+        uint256 royalties = calculateRoyalty(_amount);
         uint256 amountForSeller = _amount - royalties;
 
         (bool royaltyPayment, ) = payable(teamWallet).call{value: royalties}("");
@@ -692,7 +691,7 @@ contract ChonksMarket is Ownable {
     /// Only Owner
 
     // Set the royalty percentage
-    function setRoyaltyPercentage(uint8 _royaltyPercentage) public onlyOwner {
+    function setRoyaltyPercentage(uint256 _royaltyPercentage) public onlyOwner {
         royaltyPercentage = _royaltyPercentage;
     }
 
