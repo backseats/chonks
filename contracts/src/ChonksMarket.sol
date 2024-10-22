@@ -210,13 +210,11 @@ contract ChonksMarket is Ownable {
     */
 
    function cancelOfferChonk(uint256 _chonkId) public {
-        if (chonkOffers[_chonkId].seller == address(0)) revert NoOfferToCancel();
-        if (chonkOffers[_chonkId].seller != msg.sender) revert NotYourOffer();
+        ChonkOffer memory offer = chonkOffers[_chonkId];
+        if (offer.seller == address(0)) revert NoOfferToCancel();
+        if (offer.seller != msg.sender) revert NotYourOffer();
 
-        (address owner,) = PETERS_MAIN.getOwnerAndTBAAddressForTokenId(_chonkId);
-        if (msg.sender != owner) revert NotYourChonk();
-
-        delete chonkOffers[_chonkId];
+        delete offer;
 
         emit ChonkOfferCanceled(_chonkId);
     }
