@@ -39,8 +39,6 @@ contract ChonksMarket is Ownable {
         address onlySellTo;
     }
 
-    struct TraitsOffer {
-        // The Trait IDs
         uint256[] traitIds;
         // How much for the lot of Traits
         uint256 priceInWei;
