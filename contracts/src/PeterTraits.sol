@@ -11,6 +11,9 @@ import { Utils } from "./common/Utils.sol";
 import { RenderHelper } from "./renderers/RenderHelper.sol";
 // import { BodyRenderer } from "./renderers/BodyRenderer.sol";
 
+import { PetersMain } from "./PetersMain.sol";
+import { ChonksMarket } from "./ChonksMarket.sol";
+
 // Associated Interfaces and Libraries
 import { ITraitStorage } from "./interfaces/ITraitStorage.sol";
 import { TraitCategory } from "./TraitCategory.sol";
@@ -56,6 +59,10 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     mapping(uint256 => TraitMetadata) public traitIndexToMetadata;
 
+    PetersMain public petersMain;
+
+    ChonksMarket public marketplace;
+
     // Commit Reveal
     // mapping(uint256 => CommitReveal.Epoch) epochs; // All epochs
     // uint256 epoch;  // The current epoch index
@@ -68,9 +75,10 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     /// Errors
 
+    error NotATBA();
     error NotAValidMinterContract();
-    error TraitTokenDoesntExist();
     error TraitNotFound(uint256 _tokenId);
+    error TraitTokenDoesntExist();
 
     /// Modifiers
 
@@ -507,6 +515,14 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     // OnlyOwner
 
+    function setPetersMain(address _petersMain) public onlyOwner {
+        petersMain = PetersMain(_petersMain);
+    }
+
+    function setMarketplace(address _marketplace) public onlyOwner {
+        marketplace = ChonksMarket(_marketplace);
+    }
+
     // function addMinter(address _minter) public onlyOwner {
     //     isMinter[_minter] = true;
     // }
@@ -543,12 +559,13 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
     }
 
     // Override functions for marketplace compatibility
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override {
-        // TODO: Backseats to add logic here for marketplace
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
+        // Ensure the `to` address is a TBA
+        if (petersMain.tbaAddressToTokenId(to) == 0) revert NotATBA(); // TODO: ensure mint starts at Token ID 1 for Peters Main, in test
+
+        marketplace.deleteTraitOffersBeforeTokenTransfer(tokenId);
+        marketplace.deleteTraitBidsBeforeTokenTransfer(tokenId, to);
+
         super._beforeTokenTransfer(from, to, tokenId);
     }
 

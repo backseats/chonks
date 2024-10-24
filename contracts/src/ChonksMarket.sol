@@ -6,8 +6,6 @@ import { Ownable } from "solady/auth/Ownable.sol";
 import { PetersMain } from "./PetersMain.sol";
 import { PeterTraits } from "./PeterTraits.sol";
 
-// IMPORTANT: peter traits and peter main transfers and safeTransfers should kill offers if they exist. bids can stay
-
 contract ChonksMarket is Ownable {
 
     // Structs
@@ -328,7 +326,7 @@ contract ChonksMarket is Ownable {
 
         _calculateRoyaltiesAndTransferFunds(msg.value, seller);
 
-        PETER_TRAITS.safeTransferFrom(offer.sellerTBA, _buyerTBA, _traitId);
+        PETER_TRAITS.transferFrom(offer.sellerTBA, _buyerTBA, _traitId);
 
         emit TraitBought(_traitId, _buyerTBA, msg.value, msg.sender);
     }
@@ -390,7 +388,7 @@ contract ChonksMarket is Ownable {
 
         _calculateRoyaltiesAndTransferFunds(bid.amountInWei, seller);
 
-        PETER_TRAITS.safeTransferFrom(sellerTBA, bid.bidderTBA, _traitId);
+        PETER_TRAITS.transferFrom(sellerTBA, bid.bidderTBA, _traitId);
 
         emit TraitBidAccepted(_traitId, bid.amountInWei, bidder, seller);
     }
@@ -417,32 +415,53 @@ contract ChonksMarket is Ownable {
         if (offer.seller != address(0)) delete chonkOffers[_chonkId];
     }
 
-    function deleteTraitOffersBeforeTokenTransfer(uint256 _traitId) public {
-        if (msg.sender != address(PETER_TRAITS) || msg.sender != address(PETERS_MAIN)) revert CMUnauthorized();
-
-        // Delete the Trait Offer
-        if (traitOffers[_traitId].seller != address(0))
-            delete traitOffers[_traitId];
-    }
-
-    function deleteChonkBidsBeforeTokenTransfer(uint256 _chonkId, address _toTBA) public {
-        if (msg.sender != address(PETERS_MAIN)) revert Unauthorized();
+    function deleteChonkBidsBeforeTokenTransfer(uint256 _chonkId, address _toEOA) public {
+        if (msg.sender != address(PETERS_MAIN)) revert CMUnauthorized();
 
         ChonkBid memory bid = chonkBids[_chonkId];
-        if (bid.bidder == _toTBA) {
+        if (bid.bidder == _toEOA) {
             delete chonkBids[_chonkId];
             _refundBid(bid.bidder, bid.amountInWei);
         }
     }
 
-    // bidder bid on a package, then bought something. clean it up?
+    function deleteTraitOffersBeforeTokenTransfer(uint256 _traitId) public {
+        if (msg.sender != address(PETER_TRAITS) || msg.sender != address(PETERS_MAIN)) revert CMUnauthorized();
+
+        // Delete the Trait Offer
+        if (traitOffers[_traitId].seller!= address(0))
+            delete traitOffers[_traitId];
+    }
+
+    /// @dev Loops through all of the TBAs associated with the _toEOA address to see if they bid on the Trait. If so, delete and refund the bidder
+    function deleteTraitBidsBeforeTokenTransfer(uint256 _traitId, address[] memory _toTBAs) public {
+        if (msg.sender != address(PETERS_MAIN)) revert CMUnauthorized();
+
+        // This handles the case where the bid.bidder owns multiple Chonks
+        // since each Chonk has its own TBA and when you bid, we record the TBA
+        // the transfer would happen to, we need to check the bid's bidderTBA against
+        // the TBA that will receive the trait and then refund the *bidder* if necessary
+        TraitBid memory bid = traitBids[_traitId];
+        if (bid.bidder != address(0)) {
+            for (uint256 i; i < _toTBAs.length; ++i) {
+                address toTBA = _toTBAs[i];
+                if (bid.bidderTBA == toTBA) {
+                    delete traitBids[_traitId];
+                    _refundBid(bid.bidder, bid.amountInWei);
+                }
+            }
+        }
+    }
+
     function deleteTraitBidsBeforeTokenTransfer(uint256 _traitId, address _toTBA) public {
-        if (msg.sender != address(PETER_TRAITS) || msg.sender != address(PETERS_MAIN)) revert Unauthorized();
+        if (msg.sender != address(PETER_TRAITS)) revert CMUnauthorized();
 
         TraitBid memory bid = traitBids[_traitId];
-        if (bid.bidderTBA == _toTBA) {
-            delete traitBids[_traitId];
-            _refundBid(bid.bidder, bid.amountInWei);
+        if (bid.bidder != address(0)) {
+            if (bid.bidderTBA == _toTBA) {
+                delete traitBids[_traitId];
+                _refundBid(bid.bidder, bid.amountInWei);
+            }
         }
     }
 

@@ -188,6 +188,8 @@ export default function SelectColor({
               onChange={(color) => setSelectedColor(color.hex)}
             />
 
+            {/* Add 10 most recent colors here */}
+
             <button
               onClick={handleSaveColorToPalette}
               className={`p-2  rounded transition-colors w-full ${
