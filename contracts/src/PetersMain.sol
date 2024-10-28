@@ -214,9 +214,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         traitsContract.safeMint(tbaAddress);
     }
 
-    function getOwnerAndTBAAddressForTokenId(uint256 _tokenId) public view returns (address owner, address tbaAddress) {
-        owner = ownerOf(_tokenId);
-        tbaAddress = tokenIdToTBAAccountAddress[_tokenId];
+    function getOwnerAndTBAAddressForChonkId(uint256 _chonkId) public view returns (address owner, address tbaAddress) {
+        owner = ownerOf(_chonkId);
+        tbaAddress = tokenIdToTBAAccountAddress[_chonkId];
     }
 
     /// Equip/Unequip clothing traits
@@ -487,17 +487,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // Returns the TBA address for a Chonk
-    function getTBAAddressForTokenId(uint256 _tokenId) public view returns (address) {
-        return tokenIdToTBAAccountAddress[_tokenId];
+    function getTBAAddressForChonkId(uint256 _chonkId) public view returns (address) {
+        return tokenIdToTBAAccountAddress[_chonkId];
     }
 
-    function getTraitsForTokenId(uint256 _tokenId) public view returns (uint256[] memory traitTokens) {
-        address tbaAddress = getTBAAddressForTokenId(_tokenId);
+    function getTraitsForChonkId(uint256 _chonkId) public view returns (uint256[] memory traitTokens) {
+        address tbaAddress = getTBAAddressForChonkId(_chonkId);
         traitTokens = getTraitTokens(tbaAddress);
     }
 
     function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
-        uint256[] memory traitTokens = getTraitsForTokenId(_tokenId);
+        uint256[] memory traitTokens = getTraitsForChonkId(_tokenId);
 
         string memory baseSvgPart = '<svg viewBox="0 0 150 150">';
         string memory closeSvgTag = '</svg>';
@@ -557,7 +557,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         Chonkdata memory chonkdata;
 
         chonkdata.backgroundColor = storedPeter.backgroundColor;
-        chonkdata.numOfItemsInBackpack = getTraitsForTokenId(_tokenId).length;
+        chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
         chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 
@@ -595,7 +595,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         );
 
         chonkdata.backgroundColor = storedPeter.backgroundColor;
-        chonkdata.numOfItemsInBackpack = getTraitsForTokenId(_tokenId).length;
+        chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
         chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 

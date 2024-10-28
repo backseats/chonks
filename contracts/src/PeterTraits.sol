@@ -302,7 +302,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         }
     }
 
-    // TODO: proably should add getColorMapforTokenId
+    // TODO: probably should add getColorMapforTokenId
     function getZMapForTokenId(uint256 _tokenId) public view returns (string memory) {
         StoredTrait memory trait = getTrait(_tokenId);
         return string(traitIndexToMetadata[trait.traitIndex].zMap);
