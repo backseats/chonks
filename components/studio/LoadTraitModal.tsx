@@ -13,6 +13,8 @@ export default function LoadTraitModal({
   loadTrait,
 }: Props) {
   const [bytesInput, setBytesInput] = useState("");
+  const [xOffset, setXOffset] = useState(0);
+  const [yOffset, setYOffset] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export default function LoadTraitModal({
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    loadTrait(bytesInput);
+    loadTrait(bytesInput, xOffset, yOffset);
     closeModal();
   };
 
@@ -63,6 +65,33 @@ export default function LoadTraitModal({
               className="w-full px-3 py-2 min-h-[200px] text-gray-700 border rounded-lg focus:outline-none focus:border-blue-500"
               placeholder="Paste trait bytes here"
             />
+          </div>
+
+          <div className="flex gap-4 mb-4">
+            <div className="w-1/2">
+              <label htmlFor="x-offset" className="block text-sm font-medium text-gray-700 mb-1">
+                X Offset
+              </label>
+              <input
+                type="number"
+                id="x-offset" 
+                className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-blue-500"
+                placeholder="0"
+                onChange={(e) => setXOffset(parseInt(e.target.value))}
+              />
+            </div>
+            <div className="w-1/2">
+              <label htmlFor="y-offset" className="block text-sm font-medium text-gray-700 mb-1">
+                Y Offset
+              </label>
+              <input
+                type="number"
+                id="y-offset"
+                className="w-full px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-blue-500"
+                placeholder="0"
+                onChange={(e) => setYOffset(parseInt(e.target.value))}
+              />
+            </div>
           </div>
 
           <button

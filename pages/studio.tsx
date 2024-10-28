@@ -571,7 +571,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
   };
 
   // Translate bytes into a 30x30 grid of colors
-  const loadTrait = (bytes: string) => {
+  const loadTrait = (bytes: string, xOffset: number, yOffset: number) => {
     // Initialize a 30x30 array filled with empty strings
     const colorGrid: string[][] = Array(30)
       .fill(null)
@@ -590,7 +590,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
 
       // Check if x and y are within bounds (0-29)
       if (x >= 0 && x < 30 && y >= 0 && y < 30) {
-        colorGrid[y][x] = color;
+        colorGrid[y + yOffset][x + xOffset] = color;
       }
 
       index += 5; // Move to the next set of 5 bytes
