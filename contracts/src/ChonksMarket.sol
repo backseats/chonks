@@ -163,7 +163,7 @@ contract ChonksMarket is Ownable {
     }
 
 
-   function offerChonk(uint256 _chonkId, uint256 _priceInWei, address _onlySellTo) public ensurePriceIsNotZero(_priceInWei)
+   function offerChonk(uint256 _chonkId, uint256 _priceInWei, address _onlySellTo) public notPaused ensurePriceIsNotZero(_priceInWei)
    {
         (address owner, address tbaAddress) = PETERS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
         if (msg.sender != owner) revert NotYourChonkToSell();
@@ -205,7 +205,7 @@ contract ChonksMarket is Ownable {
 
     ///////////////////////////////////////////////////////////////////////
 
-    function withdrawBid(uint256 _chonkId) public {
+    function withdrawBidOnChonk(uint256 _chonkId) public {
         // Ensure bid and that it's yours
         ChonkBid memory bid = chonkBids[_chonkId];
         if (bid.bidder != msg.sender) revert NotYourBid();
@@ -272,7 +272,7 @@ contract ChonksMarket is Ownable {
         emit TraitOfferCanceled(_traitId);
     }
 
-    function offerTrait(uint256 _traitId, uint256 _chonkId, uint256 _priceInWei, address _onlySellTo) public ensurePriceIsNotZero(_priceInWei) {
+    function offerTrait(uint256 _traitId, uint256 _chonkId, uint256 _priceInWei, address _onlySellTo) public notPaused ensurePriceIsNotZero(_priceInWei) {
         if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
 
         // Please unequip the trait if you want to sell it
