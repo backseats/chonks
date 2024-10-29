@@ -404,6 +404,40 @@ const Grid: React.FC = () => {
     });
   };
 
+  const generatePNG = (gridColors: string[][]): Promise<string> => {
+    return new Promise((resolve) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return resolve('');
+
+      // Set canvas size to 1440x1440 (30 * 48)
+      const pixelScale = 48;  // 1440/30 = 48
+      canvas.width = gridSize * pixelScale;
+      canvas.height = gridSize * pixelScale;
+
+      // Make background transparent
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw each pixel scaled up to 48x48
+      gridColors.forEach((row, y) => {
+        row.forEach((color, x) => {
+          if (color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(
+              x * pixelScale, 
+              y * pixelScale, 
+              pixelScale, 
+              pixelScale
+            );
+          }
+        });
+      });
+
+      // Convert to PNG data URL with transparency
+      resolve(canvas.toDataURL('image/png'));
+    });
+  };
+
   const downloadSVG = async () => {
     const zip = new JSZip();
     const folder = zip.folder("My Chonk");
@@ -425,12 +459,16 @@ const Grid: React.FC = () => {
 
       folder.file("metadata.json", JSON.stringify(dummyData, null, 2));
 
+      // Generate both PNG versions
       const screenshotData = await takeScreenshot();
       if (screenshotData) {
-        folder.file("chonk.png", screenshotData.split(",")[1], {
-          base64: true,
-        });
+        folder.file("chonk.png", screenshotData.split(",")[1], { base64: true });
       }
+
+      // Add the transparent PNG
+      const gridColors = JSON.parse(textAreaContent);
+      const transparentPNG = await generatePNG(gridColors);
+      folder.file("chonk-transparent.png", transparentPNG.split(",")[1], { base64: true });
 
       const readmeContent = `# My Chonk
 
