@@ -29,6 +29,7 @@ import { TraitCategory } from "./TraitCategory.sol";
 import { CommitReveal } from "./common/CommitReveal.sol";
 
 import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
+import { ChonksMarket } from "./ChonksMarket.sol";
 
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
@@ -48,7 +49,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     /// The address of the ERC-721 Traits contract
     PeterTraits public traitsContract;
 
-    uint256 _nextTokenId = 0;
+    // The address of the ChonksMarket contract
+    ChonksMarket public marketplace;
+
+    uint256 _nextTokenId;
 
     uint256 public price;
 
@@ -61,8 +65,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     uint256 maxTraitsToOutput = 99;
     string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
 
-    // Mapping of tokenIds to TBA account addresses
-    mapping(uint256 => uint160) public tokenIdToTBAAccountAddress;
+    // Mapping of tokenID to the TBA account address
+    mapping(uint256 => address) public tokenIdToTBAAccountAddress;
+
+    // Mapping of the TBA account address to its tokenId. Great for getting from Trait Token ID to Chonk Token ID or Owner
+    mapping(address => uint256) public tbaAddressToTokenId;
 
     // The contract that handles rendering and minting the first season of traits
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
@@ -81,16 +88,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     /// Errors
 
     error BodyAlreadyExists();
+    error CantTransferToTBAs();
     error FirstSeasonRenderMinterNotSet();
     error IncorrectPeterOwner();
     error IncorrectTBAOwner();
     error IncorrectTraitType();
-    error PeterDoesntExist();
-    error NonceAlreadyUsed();
-    error InvalidSignature();
-    error InvalidLevelAmount();
     error InvalidBodyIndex();
     error InvalidColor();
+    error InvalidLevelAmount();
+    error InvalidSignature();
+    error NonceAlreadyUsed();
+    error PeterDoesntExist();
 
     constructor(bool localDeploy_) ERC721("Peter Test", "PETER") {
         _initializeOwner(msg.sender);
@@ -138,12 +146,14 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         address tokenBoundAccountAddress = REGISTRY.createAccount(
             ACCOUNT_PROXY,
             0,
-            84532, // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia
+            84532, // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia // DEPLOY
             address(this),
             tokenId
         );
 
-        tokenIdToTBAAccountAddress[tokenId] = uint160(tokenBoundAccountAddress);
+        // Set the cross-reference between tokenId and TBA account address
+        tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
+        tbaAddressToTokenId[tokenBoundAccountAddress] = tokenId;
 
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
@@ -162,16 +172,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // level 1: shoes, bottom, top, hair AND face: 5 traits
         // level 3: shoes, bottom, top AND hair AND face AND head AND accessory : 7 traits
 
-        peter.shoesId = traitsIds[0]; 
-        peter.bottomId = traitsIds[1]; 
-        peter.topId = traitsIds[2]; 
-        peter.hairId = traitsIds[3]; 
-        
+        peter.shoesId = traitsIds[0];
+        peter.bottomId = traitsIds[1];
+        peter.topId = traitsIds[2];
+        peter.hairId = traitsIds[3];
+
         // so we're not going to equip these on initial mint, people will have to equip them
-        // if(amount > 4) peter.faceId = traitsIds[4]; 
-        // if(amount > 5) peter.headId = traitsIds[5]; 
-        // if(amount > 6) peter.accessoryId = traitsIds[6]; 
-        
+        // if(amount > 4) peter.faceId = traitsIds[4];
+        // if(amount > 5) peter.headId = traitsIds[5];
+        // if(amount > 6) peter.accessoryId = traitsIds[6];
 
         // set default renderer to 2D
         peter.renderZ = false;
@@ -200,19 +209,19 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // require(msg.value == price, "Insufficient funds");
         // require(ownerOf(_tokenId) == msg.sender, "You do not own this Peter");
 
-        address tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
+        address tbaAddress = tokenIdToTBAAccountAddress[_tokenId];
 
         // Mint a new unequipped trait token to the TBA for this token id
         traitsContract.safeMint(tbaAddress);
     }
 
-    function getOwnerAndTBAAddressForTokenId(uint256 _tokenId) public view returns (address owner, address tbaAddress) {
-        owner = ownerOf(_tokenId);
-        tbaAddress = address(tokenIdToTBAAccountAddress[_tokenId]);
+    function getOwnerAndTBAAddressForChonkId(uint256 _chonkId) public view returns (address owner, address tbaAddress) {
+        owner = ownerOf(_chonkId);
+        tbaAddress = tokenIdToTBAAccountAddress[_chonkId];
     }
 
     /// Equip/Unequip clothing traits
-    
+
     function equipFace(uint256 _peterTokenId, uint256 _traitTokenId) public {
         _validateTokenOwnership(_peterTokenId, _traitTokenId);
         _validateTraitType(_traitTokenId, TraitCategory.Name.Face);
@@ -391,7 +400,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function _validateTokenOwnership(uint256 _peterId, uint256 _traitTokenId) internal view {
         _validatePeterOwnership(_peterId);
 
-        address tbaOfPeter = address(tokenIdToTBAAccountAddress[_peterId]);
+        address tbaOfPeter = tokenIdToTBAAccountAddress[_peterId];
         address ownerOfTrait = traitsContract.ownerOf(_traitTokenId);
         if (ownerOfTrait != tbaOfPeter) revert IncorrectTBAOwner();
     }
@@ -460,7 +469,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         );
     }
 
-
     function getBodySvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory, string memory) {
         return (
             getBodyImageSvg(storedPeter.bodyIndex),
@@ -468,18 +476,30 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         );
     }
 
-    function getTBAAddressForTokenId(uint256 _tokenId) public view returns (address) {
-        return address(tokenIdToTBAAccountAddress[_tokenId]);
+    // Returns all necessary ownership info for a Trait
+    function getFullPictureForTrait(uint256 _chonkTraitTokenId) public view returns (
+        address traitOwnerTBA,
+        uint256 chonkTokenId,
+        address chonkOwner
+    ) {
+        traitOwnerTBA = traitsContract.ownerOf(_chonkTraitTokenId);
+        chonkTokenId = tbaAddressToTokenId[traitOwnerTBA];
+        chonkOwner = ownerOf(chonkTokenId);
     }
 
-    function getTraitsForTokenId(uint256 _tokenId) public view returns (uint256[] memory traitTokens) {
-        address tbaAddress = getTBAAddressForTokenId(_tokenId);
+    // Returns the TBA address for a Chonk
+    function getTBAAddressForChonkId(uint256 _chonkId) public view returns (address) {
+        return tokenIdToTBAAccountAddress[_chonkId];
+    }
+
+    function getTraitsForChonkId(uint256 _chonkId) public view returns (uint256[] memory traitTokens) {
+        address tbaAddress = getTBAAddressForChonkId(_chonkId);
         traitTokens = getTraitTokens(tbaAddress);
     }
 
     function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
-        uint256[] memory traitTokens = getTraitsForTokenId(_tokenId);
-        
+        uint256[] memory traitTokens = getTraitsForChonkId(_tokenId);
+
         string memory baseSvgPart = '<svg viewBox="0 0 150 150">';
         string memory closeSvgTag = '</svg>';
         bytes memory buffer;
@@ -538,7 +558,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         Chonkdata memory chonkdata;
 
         chonkdata.backgroundColor = storedPeter.backgroundColor;
-        chonkdata.numOfItemsInBackpack = getTraitsForTokenId(_tokenId).length;
+        chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
         chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 
@@ -574,9 +594,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             bodyZmap,
             traitZmaps
         );
-        
+
         chonkdata.backgroundColor = storedPeter.backgroundColor;
-        chonkdata.numOfItemsInBackpack = getTraitsForTokenId(_tokenId).length;
+        chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
         chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 
@@ -601,7 +621,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // gets complete zMap for a Peter, body and traits
     // TODO: proably should add getPeterColorMap
-    function getPeterZMap(uint256 _tokenId) public view returns (string memory) { 
+    function getPeterZMap(uint256 _tokenId) public view returns (string memory) {
         bytes memory bodyZmap;
         bytes memory traitZmaps;
 
@@ -609,7 +629,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedPeter);
         (, traitZmaps, ) = traitsContract.getSvgZmapsAndMetadata(storedPeter);
-       
+
         return string.concat(
             string(bodyZmap),
             string(traitZmaps)
@@ -624,13 +644,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         StoredPeter memory storedPeter = getPeter(_tokenId);
 
         (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedPeter);
-       
+
         return string(bodyZmap);
     }
 
     function getPeter(uint256 _tokenId) public view returns (IPeterStorage.StoredPeter memory) {
         IPeterStorage.StoredPeter memory storedPeter = peterTokens.all[_tokenId];
-        
         return storedPeter;
     }
 
@@ -695,11 +714,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function setBackgroundColor(uint256 _peterTokenId, string memory _color) public {
         _validatePeterOwnership(_peterTokenId);
-        
+
         if (bytes(_color).length == 0) return;
 
         bytes memory colorBytes = bytes(_color);
-    
+
         // Check that the color string is exactly 6 characters long
         if (colorBytes.length != 6) revert InvalidColor();
 
@@ -735,6 +754,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         emit RenderZ(ownerOf(_peterTokenId), _peterTokenId, _renderZ );
     }
 
+    function setMarketplace(address _marketplace) public onlyOwner {
+        marketplace = ChonksMarket(_marketplace);
+    }
+
     // Boilerplate
 
     function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, IERC165) returns (bool) {
@@ -742,15 +765,33 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // TODO: Withdraw function
-        
+
     // Override functions for marketplace compatibility
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override {
-        // TODO: Backseats to add logic here for marketplace
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
+        // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
+        if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();
+
+        // Clean up Chonk Offers and Bids
+        marketplace.deleteChonkOfferBeforeTokenTransfer(tokenId);
+        marketplace.deleteChonkBidsBeforeTokenTransfer(tokenId, to);
+
+        // Get all the Trait tokens in the Chonk's TBA
+        uint256[] memory traitTokenIds = traitsContract.walletOfOwner(tokenIdToTBAAccountAddress[tokenId]);
+        // Loop through all the Trait tokens and delete the offers and bids
+        for (uint256 i; i < traitTokenIds.length; ++i) {
+            uint256 traitTokenId = traitTokenIds[i];
+            marketplace.deleteTraitOffersBeforeTokenTransfer(traitTokenId);
+
+            // Delete any bids for that traitTokenId for any TBAs the `to` address also owns
+            uint256[] memory chonkIds = walletOfOwner(to);
+            address[] memory tbas = new address[](chonkIds.length);
+            for (uint256 j; j < chonkIds.length; ++j) {
+                tbas[j] = tokenIdToTBAAccountAddress[chonkIds[j]];
+            }
+            marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas);
+        }
+
         super._beforeTokenTransfer(from, to, tokenId);
     }
-    
+
 }

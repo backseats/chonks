@@ -84,54 +84,17 @@ interface IPeterStorage {
         uint256 numOfItemsInBackpack;
         // string backgroundStyles;
     }
-    
-    // Events
 
-    event Mint(
-        address indexed owner,
-        uint256 indexed tokenId
-    );
+    /// Events
 
-    event Equip(
-        address indexed owner,
-        uint256 indexed tokenId,
-        uint256 indexed traitTokenId,
-        string traitCategory
-    );
-
-    event Unequip(
-        address indexed owner,
-        uint256 indexed tokenId,
-        string indexed traitCategory
-    );
-
-    event EquipAll(
-        address indexed owner,
-        uint256 indexed tokenId
-    );
-
-    event UnequipAll(
-        address indexed owner,
-        uint256 indexed tokenId
-    );
-
-    event BackgroundColor(
-        address indexed owner,
-        uint256 indexed tokenId,
-        string color
-    );
-
-    event BodyIndex(
-        address indexed owner,
-        uint256 indexed tokenId,
-        uint8 _bodyIndex
-    );
-
-    event RenderZ(
-        address indexed owner,
-        uint256 indexed tokenId,
-        bool renderZ
-    );
+    event Mint(address indexed owner, uint256 indexed tokenId);
+    event Equip(address indexed owner, uint256 indexed tokenId, uint256 indexed traitTokenId, string traitCategory);
+    event Unequip(address indexed owner, uint256 indexed tokenId, string indexed traitCategory);
+    event EquipAll(address indexed owner, uint256 indexed tokenId);
+    event UnequipAll(address indexed owner, uint256 indexed tokenId);
+    event BackgroundColor(address indexed owner, uint256 indexed tokenId, string color);
+    event BodyIndex(address indexed owner, uint256 indexed tokenId, uint8 _bodyIndex);
+    event RenderZ(address indexed owner, uint256 indexed tokenId, bool renderZ);
 
 
 }
