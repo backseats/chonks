@@ -81,6 +81,7 @@ contract ChonksMarket is Ownable {
     error CantBuyYourOwnChonk();
     error CantBuyYourOwnTrait();
     error ChonkDoesNotExist();
+    error CMUnauthorized();
     error MsgSenderDoesNotMatchTBA();
     error NoBidToAccept();
     error NoOfferToCancel();
@@ -94,7 +95,6 @@ contract ChonksMarket is Ownable {
     error RefundFailed();
     error RoyaltiesTransferFailed();
     error TraitEquipped();
-    error CMUnauthorized();
     error WrongAmount();
     error YouCantBuyThatChonk();
     error YouCantBuyThatTrait();
@@ -105,20 +105,20 @@ contract ChonksMarket is Ownable {
 
     event ChonkOfferCanceled(uint256 indexed chonkId);
     event ChonkOffered(uint256 indexed chonkId, uint256 indexed price, address indexed seller, address sellerTBA);
-    event ChonkBought(uint256 indexed chonkId, address indexed buyer, uint256 amountInWei);
+    event ChonkBought(uint256 indexed chonkId, address indexed buyer, uint256 indexed amountInWei);
 
-    event ChonkBidWithdrawn(uint256 indexed chonkId, address indexed bidder, uint256 amountInWei);
-    event ChonkBidEntered(uint256 indexed chonkId, address indexed bidder, uint256 amountInWei);
+    event ChonkBidWithdrawn(uint256 indexed chonkId, address indexed bidder, uint256 indexed amountInWei);
+    event ChonkBidEntered(uint256 indexed chonkId, address indexed bidder, uint256 indexed amountInWei);
     event ChonkBidAccepted(uint256 indexed chonkId, uint256 indexed amountInWei, address indexed buyer, address seller);
 
     // Trait Events
 
     event TraitOfferCanceled(uint256 indexed traitId);
     event TraitOffered(uint256 indexed traitId, uint256 indexed price, address indexed seller, address sellerTBA);
-    event TraitBought(uint256 indexed traitId, address indexed buyerTBA, uint256 amountInWei, address buyer);
+    event TraitBought(uint256 indexed traitId, address indexed buyerTBA, uint256 indexed amountInWei, address buyer);
 
-    event TraitBidWithdrawn(uint256 indexed traitId, address indexed bidder, uint256 amountInWei);
-    event TraitBidEntered(uint256 indexed traitId, address indexed bidder, uint256 amountInWei);
+    event TraitBidWithdrawn(uint256 indexed traitId, address indexed bidder, uint256 indexed amountInWei);
+    event TraitBidEntered(uint256 indexed traitId, address indexed bidder, uint256 indexed amountInWei);
     event TraitBidAccepted(uint256 indexed traitId, uint256 indexed amountInWei, address indexed buyer, address seller);
 
     /// Modifiers
