@@ -3,6 +3,7 @@ pragma solidity ^0.8.22;
 
 // OpenZeppelin Imports
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import { ERC721Burnable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { Utils } from "./common/Utils.sol";
@@ -33,7 +34,7 @@ import "forge-std/console.sol"; // DEPLOY: remove
 //     _;
 // }
 
-contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4906, IERC721Receiver {
+contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage, Ownable, IERC4906, IERC721Receiver {
 
     /// @dev We use this database for persistent storage
     Traits public traitTokens;
@@ -116,6 +117,16 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
         emit BatchMetadataUpdate(0, type(uint256).max);
 
         return tokenId;
+    }
+
+    function burn(uint256 tokenId) public override {
+        super.burn(tokenId);
+    }
+
+    function burnBatch(uint256[] memory tokenIds) public {
+        for (uint256 i; i < tokenIds.length; ++i) {
+            super.burn(tokenIds[i]);
+        }
     }
 
     // TODO: onlyMinter and set minters in a mapping
@@ -549,24 +560,36 @@ contract PeterTraits is IERC165, ERC721Enumerable, ITraitStorage, Ownable, IERC4
 
     /// Boilerplate
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, IERC165, ERC721) returns (bool) {
         return super.supportsInterface(interfaceId);
+    }
+
+    function _cleanUpMarketplaceOffersAndBids(uint256 _tokenId, address _to) internal {
+        marketplace.deleteTraitOffersBeforeTokenTransfer(_tokenId);
+        marketplace.deleteTraitBidsBeforeTokenTransfer(_tokenId, _to);
+    }
+
+    // Override functions for marketplace compatibility
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
+        if (to == address(0)) {
+            _cleanUpMarketplaceOffersAndBids(tokenId, to);
+
+            super._beforeTokenTransfer(from, to, tokenId);
+            return;
+        }
+
+        // TODO: ensure mint starts at Token ID 1 for Peters Main, in test
+
+        // Ensure the `to` address is a TBA
+        if (petersMain.tbaAddressToTokenId(to) == 0) revert NotATBA();
+        _cleanUpMarketplaceOffersAndBids(tokenId, to);
+
+        super._beforeTokenTransfer(from, to, tokenId);
     }
 
     // DEPLOY: remove/just for testing
     function onERC721Received(address, address, uint256, bytes calldata) pure external returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
-    }
-
-    // Override functions for marketplace compatibility
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
-        // Ensure the `to` address is a TBA
-        if (petersMain.tbaAddressToTokenId(to) == 0) revert NotATBA(); // TODO: ensure mint starts at Token ID 1 for Peters Main, in test
-
-        marketplace.deleteTraitOffersBeforeTokenTransfer(tokenId);
-        marketplace.deleteTraitBidsBeforeTokenTransfer(tokenId, to);
-
-        super._beforeTokenTransfer(from, to, tokenId);
     }
 
 }
