@@ -11,6 +11,7 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { useAccount } from "wagmi";
 import html2canvas from "html2canvas";
+import traits from '../contracts/csv-conversion/latest.json';
 
 export type Pixel = {
   x: number;
@@ -564,6 +565,19 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
   const openLoadTraitModal = () => setIsLoadTraitModalOpen(true);
   const closeLoadTraitModal = () => setIsLoadTraitModalOpen(false);
 
+  const loadRandomChonk = () => {
+    // const randomBytes = generateRandomBytes();
+
+    // get 5 traits from the traits.json file and load them in via parseZColorMapBlocks
+    for (let i = 0; i < 5; i++) {
+      const randomTrait = traits.traits[Math.floor(Math.random() * traits.traits.length)];
+      // parseZColorMapBlocks(randomTrait.zMap);
+      if (i === 0) loadTrait(randomTrait.colorMap, 0, 0, false);
+      else loadTrait(randomTrait.colorMap, 0, 0, true);
+    }
+    
+  };
+
   const handleLoadTraitModalBackgroundClick = (
     e: React.MouseEvent<HTMLDivElement>
   ) => {
@@ -571,7 +585,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
   };
 
   // Translate bytes into a 30x30 grid of colors
-  const loadTrait = (bytes: string, xOffset: number, yOffset: number) => {
+  const loadTrait = (bytes: string, xOffset: number, yOffset: number, affix: boolean = false) => {
     // Initialize a 30x30 array filled with empty strings
     const colorGrid: string[][] = Array(30)
       .fill(null)
@@ -597,12 +611,22 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     }
 
     // Update the gridData state with the new colors
-    setGridData(
-      generateGrid().map((pixel) => ({
-        ...pixel,
-        color: colorGrid[pixel.y][pixel.x],
-      }))
-    );
+    if (affix) {
+      setGridData(prevGrid => 
+        generateGrid().map((pixel) => ({
+          ...pixel,
+          // Keep existing color if new color is empty, otherwise use new color
+          color: colorGrid[pixel.y][pixel.x] || prevGrid[pixel.y * gridSize + pixel.x].color
+        }))
+      );
+    } else {
+      setGridData(
+        generateGrid().map((pixel) => ({
+          ...pixel,
+          color: colorGrid[pixel.y][pixel.x],
+        }))
+      );
+    }
 
     // Update the text area content
     setTextAreaContent(JSON.stringify(colorGrid, null, 2));
@@ -633,6 +657,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
         resetGrid={resetGrid}
         resetSavedColors={resetSavedColors}
         showLoadTraitModal={openLoadTraitModal}
+        loadRandomChonk={loadRandomChonk}
       />
 
       <div className="flex md:justify-center md:max-w-[1200px] md:mx-auto">
