@@ -88,6 +88,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     /// Errors
 
     error BodyAlreadyExists();
+    error CantTransferToTBAs();
     error FirstSeasonRenderMinterNotSet();
     error IncorrectPeterOwner();
     error IncorrectTBAOwner();
@@ -767,6 +768,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // Override functions for marketplace compatibility
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
+        // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
+        if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();
+
         // Clean up Chonk Offers and Bids
         marketplace.deleteChonkOfferBeforeTokenTransfer(tokenId);
         marketplace.deleteChonkBidsBeforeTokenTransfer(tokenId, to);
