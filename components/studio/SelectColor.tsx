@@ -46,16 +46,16 @@ export default function SelectColor({
 
   const defaultColors = useMemo(
     () => [
-      "#000000",
-      "#FFFFFF",
-      "#EAD9D9",
-      "#E2CACA",
-      "#EFB15E",
-      "#D69743",
-      "#BA8136",
-      "#9A6D2E",
-      "#8A5E24",
-      "#77511E",
+      "#000000", // black
+      "#FFFFFF", // white
+      "#EAD9D9", // super light 1
+      "#E2CACA", // super light 2
+      "#EFB15E", // light 1
+      "#D69743", // light 2
+      "#BA8136", // mid 1
+      "#9A6D2E", // mid 2
+      "#8A5E24", // dark 1
+      "#77511E", // dark 2
     ],
     []
   );
@@ -248,6 +248,7 @@ export default function SelectColor({
                     {color.toUpperCase()}
                   </span>
                 ) : (
+                  // TODO change copy to Copied
                   <div className="flex items-center ml-2">
                     <input
                       type="text"

@@ -120,12 +120,12 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     function burn(uint256 tokenId) public override {
-        super.burn(tokenId);
+        _burn(tokenId);
     }
 
     function burnBatch(uint256[] memory tokenIds) public {
         for (uint256 i; i < tokenIds.length; ++i) {
-            super.burn(tokenIds[i]);
+            _burn(tokenIds[i]);
         }
     }
 
