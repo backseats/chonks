@@ -4,7 +4,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 interface Props {
   closeModal: () => void;
   handleModalBackgroundClick: (e: React.MouseEvent<HTMLDivElement>) => void;
-  loadTrait: (bytes: string) => void;
+  loadTrait: (bytes: string, xOffset: number, yOffset: number) => void;
 }
 
 export default function LoadTraitModal({

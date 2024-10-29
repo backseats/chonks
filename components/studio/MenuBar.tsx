@@ -45,12 +45,16 @@ export default function MenuBar(props: Props) {
           Load a Trait
         </button>
 
-        <button
-          onClick={loadRandomChonk}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors"
-        >
-          Load Random Chonk
-        </button>
+        {process.env.NODE_ENV === 'development' && (
+  
+          <button
+            onClick={loadRandomChonk}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors"
+          >
+            Load Random Chonk
+          </button>
+          
+        )}
 
         <div className="w-[0.5px] bg-gray-500" />
 

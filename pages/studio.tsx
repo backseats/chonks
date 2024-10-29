@@ -351,13 +351,14 @@ const Grid: React.FC = () => {
 
   const generateSVG = (
     gridColors: string[][],
-    mini: boolean = false
+    mini: boolean = false,
+    transparent: boolean = false
   ): string => {
     const pixelSize = mini ? 1 : 10; // Size of each pixel in the SVG
     const width = gridColors[0].length * pixelSize;
     const height = gridColors.length * pixelSize;
 
-    let svgContent = `<svg width="${width}" height="${height}" background="${backgroundColor}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">`;
+    let svgContent = `<svg width="${width}" height="${height}" ${!transparent ? `background="${backgroundColor}"` : ''} shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">`;
 
     gridColors.forEach((row, y) => {
       row.forEach((color, x) => {
@@ -468,7 +469,7 @@ const Grid: React.FC = () => {
       // Add the transparent PNG
       const gridColors = JSON.parse(textAreaContent);
       const transparentPNG = await generatePNG(gridColors);
-      folder.file("chonk-transparent.png", transparentPNG.split(",")[1], { base64: true });
+      folder.file("chonk-traits-transparent.png", transparentPNG.split(",")[1], { base64: true });
 
       const readmeContent = `# My Chonk
 
@@ -774,7 +775,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
         <LoadTraitModal
           closeModal={closeLoadTraitModal}
           handleModalBackgroundClick={handleLoadTraitModalBackgroundClick}
-          loadTrait={loadTrait}
+          loadTrait={(bytes: string) => loadTrait(bytes, 0, 0, false)}
         />
       )}
     </div>
