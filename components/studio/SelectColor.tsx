@@ -243,7 +243,7 @@ export default function SelectColor({
                 {editingColor !== color ? (
                   <span
                     className="ml-2 cursor-pointer"
-                    onClick={() => handleColorEdit(color)}
+                    onClick={() => setSelectedColor(color)}
                   >
                     {color.toUpperCase()}
                   </span>
