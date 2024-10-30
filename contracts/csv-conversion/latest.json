@@ -637,7 +637,7 @@
             "name": "Brown Long Shag",
             "category": "Hair",
             "animation": "",
-            "colorMap": "0b076b4c0a0c076b4c0a0d076b4c0a0e076b4c0a0f076b4c0a10076b4c0a11076b4c0a12076b4c0a0a08de30300b08ff7c7c0c086b4c0a0d086b4c0a0e086b4c0a0f086b4c0a10086b4c0a11086b4c0a12086b4c0a13086b4c0a09096b4c0a0a09ff7c7c0b09de30300c096b4c0a0d096b4c0a0e096b4c0a0f096b4c0a10096b4c0a11096b4c0a12096b4c0a13096b4c0a14096b4c0a090a6b4c0a0a0a6b4c0a0c0a6b4c0a0d0a6b4c0a0e0a6b4c0a0f0a6b4c0a100a6b4c0a110a6b4c0a130a6b4c0a140a6b4c0a080b6b4c0a090b6b4c0a0a0b6b4c0a140b6b4c0a080c6b4c0a090c6b4c0a0a0c6b4c0a140c6b4c0a080d6b4c0a090d6b4c0a0a0d6b4c0a140d6b4c0a080e6b4c0a090e6b4c0a0a0e6b4c0a140e6b4c0a080f6b4c0a090f6b4c0a0a0f6b4c0a130f6b4c0a140f6b4c0a08106b4c0a09106b4c0a0a106b4c0a12106b4c0a13106b4c0a14106b4c0a08116b4c0a09116b4c0a13116b4c0a14116b4c0a08126b4c0a14126b4c0a",
+            "colorMap": "0b076b4c0a0c076b4c0a0d076b4c0a0e076b4c0a0f076b4c0a10076b4c0a11076b4c0a12076b4c0a0a08de30300b08ff7c7c0c086b4c0a0d086b4c0a0e086b4c0a0f086b4c0a10086b4c0a11086b4c0a12086b4c0a13086b4c0a09096b4c0a0a09ff7c7c0b09de30300c096b4c0a0d096b4c0a0e096b4c0a0f096b4c0a10096b4c0a11096b4c0a12096b4c0a13096b4c0a14096b4c0a090a6b4c0a0a0a6b4c0a0b0a6b4c0a130a6b4c0a140a6b4c0a080b6b4c0a090b6b4c0a0a0b6b4c0a140b6b4c0a080c6b4c0a090c6b4c0a0a0c6b4c0a140c6b4c0a080d6b4c0a090d6b4c0a0a0d6b4c0a140d6b4c0a080e6b4c0a090e6b4c0a0a0e6b4c0a140e6b4c0a080f6b4c0a090f6b4c0a0a0f6b4c0a130f6b4c0a140f6b4c0a08106b4c0a09106b4c0a0a106b4c0a12106b4c0a13106b4c0a14106b4c0a08116b4c0a09116b4c0a13116b4c0a14116b4c0a08126b4c0a14126b4c0a",
             "zMap": ""
         },
         {
@@ -645,7 +645,7 @@
             "name": "Olive Long Shag",
             "category": "Hair",
             "animation": "",
-            "colorMap": "0b078e80000c078e80000d078e80000e078e80000f078e800010078e800011078e800012078e80000a08de30300b08ff7c7c0c088e80000d088e80000e088e80000f088e800010088e800011088e800012088e800013088e800009098e80000a09ff7c7c0b09de30300c098e80000d098e80000e098e80000f098e800010098e800011098e800012098e800013098e800014098e8000090a8e80000a0a8e80000c0a8e80000d0a8e80000e0a8e80000f0a8e8000100a8e8000110a8e8000130a8e8000140a8e8000080b8e8000090b8e80000a0b8e8000140b8e8000080c8e8000090c8e80000a0c8e8000140c8e8000080d8e8000090d8e80000a0d8e8000140d8e8000080e8e8000090e8e80000a0e8e8000140e8e8000080f8e8000090f8e80000a0f8e8000130f8e8000140f8e800008108e800009108e80000a108e800012108e800013108e800014108e800008118e800009118e800013118e800014118e800008128e800014128e8000",
+            "colorMap": "0b078e80000c078e80000d078e80000e078e80000f078e800010078e800011078e800012078e80000a08de30300b08ff7c7c0c088e80000d088e80000e088e80000f088e800010088e800011088e800012088e800013088e800009098e80000a09ff7c7c0b09de30300c098e80000d098e80000e098e80000f098e800010098e800011098e800012098e800013098e800014098e8000090a8e80000a0a8e80000b0a8e8000130a8e8000140a8e8000080b8e8000090b8e80000a0b8e8000140b8e8000080c8e8000090c8e80000a0c8e8000140c8e8000080d8e8000090d8e80000a0d8e8000140d8e8000080e8e8000090e8e80000a0e8e8000140e8e8000080f8e8000090f8e80000a0f8e8000130f8e8000140f8e800008108e800009108e80000a108e800012108e800013108e800014108e800008118e800009118e800013118e800014118e800008128e800014128e8000",
             "zMap": ""
         },
         {
@@ -653,7 +653,7 @@
             "name": "Sky Blue Long Shag",
             "category": "Hair",
             "animation": "",
-            "colorMap": "0b0710aec30c0710aec30d0710aec30e0710aec30f0710aec3100710aec3110710aec3120710aec30a08de30300b08ff7c7c0c0810aec30d0810aec30e0810aec30f0810aec3100810aec3110810aec3120810aec3130810aec3090910aec30a09ff7c7c0b09de30300c0910aec30d0910aec30e0910aec30f0910aec3100910aec3110910aec3120910aec3130910aec3140910aec3090a10aec30a0a10aec30c0a10aec30d0a10aec30e0a10aec30f0a10aec3100a10aec3110a10aec3130a10aec3140a10aec3080b10aec3090b10aec30a0b10aec3140b10aec3080c10aec3090c10aec30a0c10aec3140c10aec3080d10aec3090d10aec30a0d10aec3140d10aec3080e10aec3090e10aec30a0e10aec3140e10aec3080f10aec3090f10aec30a0f10aec3130f10aec3140f10aec3081010aec3091010aec30a1010aec3121010aec3131010aec3141010aec3081110aec3091110aec3131110aec3141110aec3081210aec3141210aec3",
+            "colorMap": "0b0710aec30c0710aec30d0710aec30e0710aec30f0710aec3100710aec3110710aec3120710aec30a08de30300b08ff7c7c0c0810aec30d0810aec30e0810aec30f0810aec3100810aec3110810aec3120810aec3130810aec3090910aec30a09ff7c7c0b09de30300c0910aec30d0910aec30e0910aec30f0910aec3100910aec3110910aec3120910aec3130910aec3140910aec3090a10aec30a0a10aec30b0a10aec3130a10aec3140a10aec3080b10aec3090b10aec30a0b10aec3140b10aec3080c10aec3090c10aec30a0c10aec3140c10aec3080d10aec3090d10aec30a0d10aec3140d10aec3080e10aec3090e10aec30a0e10aec3140e10aec3080f10aec3090f10aec30a0f10aec3130f10aec3140f10aec3081010aec3091010aec30a1010aec3121010aec3131010aec3141010aec3081110aec3091110aec3131110aec3141110aec3081210aec3141210aec3",
             "zMap": ""
         },
         {
@@ -661,7 +661,7 @@
             "name": "Purple Long Shag",
             "category": "Hair",
             "animation": "",
-            "colorMap": "0b079e329c0c079e329c0d079e329c0e079e329c0f079e329c10079e329c11079e329c12079e329c0a08de30300b08ff7c7c0c089e329c0d089e329c0e089e329c0f089e329c10089e329c11089e329c12089e329c13089e329c09099e329c0a09ff7c7c0b09de30300c099e329c0d099e329c0e099e329c0f099e329c10099e329c11099e329c12099e329c13099e329c14099e329c090a9e329c0a0a9e329c0c0a9e329c0d0a9e329c0e0a9e329c0f0a9e329c100a9e329c110a9e329c130a9e329c140a9e329c080b9e329c090b9e329c0a0b9e329c140b9e329c080c9e329c090c9e329c0a0c9e329c140c9e329c080d9e329c090d9e329c0a0d9e329c140d9e329c080e9e329c090e9e329c0a0e9e329c140e9e329c080f9e329c090f9e329c0a0f9e329c130f9e329c140f9e329c08109e329c09109e329c0a109e329c12109e329c13109e329c14109e329c08119e329c09119e329c13119e329c14119e329c08129e329c14129e329c",
+            "colorMap": "0b079e329c0c079e329c0d079e329c0e079e329c0f079e329c10079e329c11079e329c12079e329c0a08de30300b08ff7c7c0c089e329c0d089e329c0e089e329c0f089e329c10089e329c11089e329c12089e329c13089e329c09099e329c0a09ff7c7c0b09de30300c099e329c0d099e329c0e099e329c0f099e329c10099e329c11099e329c12099e329c13099e329c14099e329c090a9e329c0a0a9e329c0b0a9e329c130a9e329c140a9e329c080b9e329c090b9e329c0a0b9e329c140b9e329c080c9e329c090c9e329c0a0c9e329c140c9e329c080d9e329c090d9e329c0a0d9e329c140d9e329c080e9e329c090e9e329c0a0e9e329c140e9e329c080f9e329c090f9e329c0a0f9e329c130f9e329c140f9e329c08109e329c09109e329c0a109e329c12109e329c13109e329c14109e329c08119e329c09119e329c13119e329c14119e329c08129e329c14129e329c",
             "zMap": ""
         },
         {
@@ -1474,14 +1474,6 @@
         },
         {
             "id": 4058,
-            "name": "Colorful skirt",
-            "category": "Top",
-            "animation": "",
-            "colorMap": "0b14daddaa0c14c94fe40d14daddaa0e1457b1e60f14c94fe41014daddaa111457b1e60b15c94fe40c1557b1e60d15c94fe40e15daddaa0f153a8ed510153fc5a81115c94fe40a1657b1e60b163fc5a80c16c94fe40d1657b1e60e16c94fe40f163fc5a81016c94fe411163a8ed512163fc5a809173a8ed50a17d7d8a90b17c94fe40c1757b1e60d173a8ed50e173fc5a80f173a8ed51017daddaa11173fc5a81217c94fe41317daddaa",
-            "zMap": ""
-        },
-        {
-            "id": 4059,
             "name": "Mermaid",
             "category": "Top",
             "animation": "",
@@ -1489,7 +1481,7 @@
             "zMap": ""
         },
         {
-            "id": 4060,
+            "id": 4059,
             "name": "Peplum",
             "category": "Top",
             "animation": "",
@@ -1497,7 +1489,7 @@
             "zMap": ""
         },
         {
-            "id": 4061,
+            "id": 4060,
             "name": "Roman",
             "category": "Top",
             "animation": "",
@@ -1505,15 +1497,7 @@
             "zMap": ""
         },
         {
-            "id": 4062,
-            "name": "Short Skirt",
-            "category": "Top",
-            "animation": "",
-            "colorMap": "0b14f819190c14f819190d14f819190e14f819190f14f819191014f819191114f819190b15f819190c15f819190d15f819190e15f819190f15f819191015f819191115f819190b16f819190c16f819190d16f819190e16f819190f16f819191016f819191116f81919",
-            "zMap": ""
-        },
-        {
-            "id": 4063,
+            "id": 4061,
             "name": "T shirt 1",
             "category": "Top",
             "animation": "",
@@ -1521,7 +1505,7 @@
             "zMap": ""
         },
         {
-            "id": 4064,
+            "id": 4062,
             "name": "T shirt 2",
             "category": "Top",
             "animation": "",
@@ -1529,7 +1513,7 @@
             "zMap": ""
         },
         {
-            "id": 4065,
+            "id": 4063,
             "name": "Spaghetti strap top",
             "category": "Top",
             "animation": "",
@@ -1537,7 +1521,7 @@
             "zMap": ""
         },
         {
-            "id": 4066,
+            "id": 4064,
             "name": "Blouse 2",
             "category": "Top",
             "animation": "",
@@ -1545,7 +1529,7 @@
             "zMap": ""
         },
         {
-            "id": 4067,
+            "id": 4065,
             "name": "Bodycon",
             "category": "Top",
             "animation": "",
@@ -1553,15 +1537,7 @@
             "zMap": ""
         },
         {
-            "id": 4068,
-            "name": "Peplum skirt",
-            "category": "Top",
-            "animation": "",
-            "colorMap": "0b1408ac820c1408ac820d1408ac820e1408ac820f1408ac82101408ac82111408ac820a1508ac820b1508ac820c1508ac820d1508ac820e1508ac820f1508ac82101508ac82111508ac82121508ac820b1600dfa60c1600dfa60d1600dfa60e1600dfa60f1600dfa6101600dfa6111600dfa60b1700dfa60c1700dfa60d1700dfa60e1700dfa60f1700dfa6101700dfa6111700dfa6",
-            "zMap": ""
-        },
-        {
-            "id": 4069,
+            "id": 4066,
             "name": "Bathing suit2",
             "category": "Top",
             "animation": "",
@@ -1569,7 +1545,7 @@
             "zMap": ""
         },
         {
-            "id": 4070,
+            "id": 4067,
             "name": "Maxi",
             "category": "Top",
             "animation": "",
@@ -1577,23 +1553,7 @@
             "zMap": ""
         },
         {
-            "id": 4071,
-            "name": "Panel skirt",
-            "category": "Top",
-            "animation": "",
-            "colorMap": "0b1422c01b0c1459d8530d1422c01b0e1459d8530f1422c01b101459d853111422c01b0b1522c01b0c1559d8530d1522c01b0e1559d8530f1522c01b101559d853111522c01b0b1622c01b0c1659d8530d1622c01b0e1659d8530f1622c01b101659d853111622c01b0b1722c01b0c1759d8530d1722c01b0e1759d8530f1722c01b101759d853111722c01b",
-            "zMap": ""
-        },
-        {
-            "id": 4072,
-            "name": "Slit skirt",
-            "category": "Top",
-            "animation": "",
-            "colorMap": "0b14f73f610c14f73f610d14f73f610e14f73f610f14f73f611014f73f611114f73f610b15f73f610c15f73f610e15f73f610f15f73f611015f73f611115f73f610b16f73f610c16f73f610e16f73f610f16f73f611016f73f611116f73f610b17f73f610c17f73f610e17f73f610f17f73f611017f73f611117f73f61",
-            "zMap": ""
-        },
-        {
-            "id": 4073,
+            "id": 4068,
             "name": "Overalls",
             "category": "Top",
             "animation": "",
@@ -1601,7 +1561,7 @@
             "zMap": ""
         },
         {
-            "id": 4074,
+            "id": 4069,
             "name": "Blouse1",
             "category": "Top",
             "animation": "",
@@ -1609,7 +1569,7 @@
             "zMap": ""
         },
         {
-            "id": 4075,
+            "id": 4070,
             "name": "Coat",
             "category": "Top",
             "animation": "",
@@ -1617,7 +1577,7 @@
             "zMap": ""
         },
         {
-            "id": 4076,
+            "id": 4071,
             "name": "Lingerie",
             "category": "Top",
             "animation": "",
@@ -1625,7 +1585,7 @@
             "zMap": ""
         },
         {
-            "id": 4077,
+            "id": 4072,
             "name": "Lingerie2",
             "category": "Top",
             "animation": "",
@@ -1633,7 +1593,7 @@
             "zMap": ""
         },
         {
-            "id": 4078,
+            "id": 4073,
             "name": "Ball gown1",
             "category": "Top",
             "animation": "",
@@ -1641,7 +1601,7 @@
             "zMap": ""
         },
         {
-            "id": 4079,
+            "id": 4074,
             "name": "Comet1",
             "category": "Top",
             "animation": "",
@@ -1649,7 +1609,7 @@
             "zMap": ""
         },
         {
-            "id": 4080,
+            "id": 4075,
             "name": "Boat neck1",
             "category": "Top",
             "animation": "",
@@ -1657,7 +1617,7 @@
             "zMap": ""
         },
         {
-            "id": 4081,
+            "id": 4076,
             "name": "Mermaid1",
             "category": "Top",
             "animation": "",
@@ -1958,6 +1918,46 @@
             "category": "Bottom",
             "animation": "",
             "colorMap": "0b144eb6fd0c144eb6fd0d144eb6fd0e144eb6fd0f144eb6fd10144eb6fd11144eb6fd0b1547a5e60c1547a5e60d1547a5e60e1547a5e60f1547a5e6101547a5e6111547a5e60b1647a5e60c1647a5e60d1647a5e60f1647a5e6101647a5e6111647a5e6",
+            "zMap": ""
+        },
+        {
+            "id": 5037,
+            "name": "Colorful skirt",
+            "category": "Bottom",
+            "animation": "",
+            "colorMap": "0b14daddaa0c14c94fe40d14daddaa0e1457b1e60f14c94fe41014daddaa111457b1e60b15c94fe40c1557b1e60d15c94fe40e15daddaa0f153a8ed510153fc5a81115c94fe40a1657b1e60b163fc5a80c16c94fe40d1657b1e60e16c94fe40f163fc5a81016c94fe411163a8ed512163fc5a809173a8ed50a17d7d8a90b17c94fe40c1757b1e60d173a8ed50e173fc5a80f173a8ed51017daddaa11173fc5a81217c94fe41317daddaa",
+            "zMap": ""
+        },
+        {
+            "id": 5038,
+            "name": "Short Skirt",
+            "category": "Bottom",
+            "animation": "",
+            "colorMap": "0b14f819190c14f819190d14f819190e14f819190f14f819191014f819191114f819190b15f819190c15f819190d15f819190e15f819190f15f819191015f819191115f819190b16f819190c16f819190d16f819190e16f819190f16f819191016f819191116f81919",
+            "zMap": ""
+        },
+        {
+            "id": 5039,
+            "name": "Peplum skirt",
+            "category": "Bottom",
+            "animation": "",
+            "colorMap": "0b1408ac820c1408ac820d1408ac820e1408ac820f1408ac82101408ac82111408ac820a1508ac820b1508ac820c1508ac820d1508ac820e1508ac820f1508ac82101508ac82111508ac82121508ac820b1600dfa60c1600dfa60d1600dfa60e1600dfa60f1600dfa6101600dfa6111600dfa60b1700dfa60c1700dfa60d1700dfa60e1700dfa60f1700dfa6101700dfa6111700dfa6",
+            "zMap": ""
+        },
+        {
+            "id": 5040,
+            "name": "Panel skirt",
+            "category": "Bottom",
+            "animation": "",
+            "colorMap": "0b1422c01b0c1459d8530d1422c01b0e1459d8530f1422c01b101459d853111422c01b0b1522c01b0c1559d8530d1522c01b0e1559d8530f1522c01b101559d853111522c01b0b1622c01b0c1659d8530d1622c01b0e1659d8530f1622c01b101659d853111622c01b0b1722c01b0c1759d8530d1722c01b0e1759d8530f1722c01b101759d853111722c01b",
+            "zMap": ""
+        },
+        {
+            "id": 5041,
+            "name": "Slit skirt",
+            "category": "Bottom",
+            "animation": "",
+            "colorMap": "0b14f73f610c14f73f610d14f73f610e14f73f610f14f73f611014f73f611114f73f610b15f73f610c15f73f610e15f73f610f15f73f611015f73f611115f73f610b16f73f610c16f73f610e16f73f610f16f73f611016f73f611116f73f610b17f73f610c17f73f610e17f73f610f17f73f611017f73f611117f73f61",
             "zMap": ""
         },
         {
