@@ -12,6 +12,7 @@ import { saveAs } from "file-saver";
 import { useAccount } from "wagmi";
 import html2canvas from "html2canvas";
 import traits from '../contracts/csv-conversion/latest.json';
+import bodies from '../contracts/csv-conversion/bodies.json';
 
 export type Pixel = {
   x: number;
@@ -61,6 +62,7 @@ const Grid: React.FC = () => {
     y: number;
   } | null>(null);
   const [svgContent, setSvgContent] = useState<string>("");
+  const [svgFullContent, setSvgFullContent] = useState<string>("");
   const [miniSvgContent, setMiniSvgContent] = useState<string>("");
   const [isPickingColor, setIsPickingColor] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(false);
@@ -352,13 +354,43 @@ const Grid: React.FC = () => {
   const generateSVG = (
     gridColors: string[][],
     mini: boolean = false,
-    transparent: boolean = false
+    showBackgroundAndBody: boolean = false
   ): string => {
-    const pixelSize = mini ? 1 : 10; // Size of each pixel in the SVG
+    const pixelSize = mini ? 1 : 10;
     const width = gridColors[0].length * pixelSize;
     const height = gridColors.length * pixelSize;
 
-    let svgContent = `<svg width="${width}" height="${height}" ${!transparent ? `background="${backgroundColor}"` : ''} shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">`;
+    let svgContent = `<svg width="${width}" height="${height}"  shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">`;
+
+    if(showBackgroundAndBody) {
+      
+      svgContent += '<style>body,svg{background-color: ' + backgroundColor + '} .bg{width: ' + width * 30 + 'px; height: ' + height * 30 + 'px; fill: ' + backgroundColor + '}</style>';
+      
+      svgContent += '<rect class="bg"/>';
+
+      const bodySVG = bodies.bodies.find(body => body.path === (backgroundBody === "ghost.svg" ? "lightbody.svg" : backgroundBody));
+
+      if (bodySVG && bodySVG.colorMap) {
+
+        if(backgroundBody === "ghost.svg") svgContent += '<g opacity="0.5">';
+
+        const byteArray = bodySVG.colorMap.match(/.{1,2}/g) || [];
+        let index = 0;
+        
+        while (index < byteArray.length) {
+          const x = parseInt(byteArray[index], 16);
+          const y = parseInt(byteArray[index + 1], 16);
+          const color = `#${byteArray[index + 2]}${byteArray[index + 3]}${byteArray[index + 4]}`;
+
+          if (x >= 0 && x < 30 && y >= 0 && y < 30) {
+            svgContent += `<rect x="${x * pixelSize}" y="${y * pixelSize}" width="${pixelSize}" height="${pixelSize}" fill="${color}" />`;
+          }
+
+          index += 5;
+        }
+        if(backgroundBody === "ghost.svg") svgContent += '</g>';
+      }
+    }
 
     gridColors.forEach((row, y) => {
       row.forEach((color, x) => {
@@ -379,11 +411,14 @@ const Grid: React.FC = () => {
 
     try {
       const gridColors = JSON.parse(textAreaContent);
-      const newSvgContent = generateSVG(gridColors);
+      const newSvgContent = generateSVG(gridColors, false, false);
       setSvgContent(newSvgContent);
 
       const mini = generateSVG(gridColors, true);
       setMiniSvgContent(mini);
+
+      const full = generateSVG(gridColors, false, true);
+      setSvgFullContent(full);
     } catch (error) {
       console.error("Error generating SVG:", error);
     }
@@ -448,7 +483,9 @@ const Grid: React.FC = () => {
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     if (folder) {
-      folder.file("chonk.svg", svgContent);
+      folder.file("chonk-traits-transparent.svg", svgContent);
+
+      folder.file("chonk.svg", svgFullContent);
 
       const dummyData = {
         traitName,
@@ -496,7 +533,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     navigator.clipboard.writeText(bytes);
   };
 
-  useEffect(() => updateSVG(), [textAreaContent]);
+  useEffect(() => updateSVG(), [backgroundBody, textAreaContent, backgroundColor]);
 
   const saveColorToPalette = () => {
     // TODO: ensure it's hex and not rgb
