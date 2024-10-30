@@ -22,14 +22,15 @@ def csv_to_solidity_commands(csv_file_path):
   return solidity_commands
 
 # Path to the input CSV file
-csv_file_path = "281024-master.csv"
+csv_file_path = "latest.csv"
 
 # Convert CSV to Solidity commands
 commands = csv_to_solidity_commands(csv_file_path)
 
 # Get current time and date for the filename
 current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-txt_file_path = f"solidity_commands_{current_time}.txt"
+# txt_file_path = f"solidity_commands_{current_time}.txt"
+txt_file_path = f"latest.txt"
 
 # Output the commands to a .txt file
 with open(txt_file_path, mode='w') as txt_file:

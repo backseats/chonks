@@ -24,13 +24,16 @@ def csv_to_json(csv_file_path, json_file_path):
     json.dump(data, json_file, indent=4)
 
 # Get CSV file path from command line argument
-if len(sys.argv) < 2:
-  print("Please provide the path to your CSV file as a command-line argument.")
-  sys.exit(1)
+# if len(sys.argv) < 2:
+#   print("Please provide the path to your CSV file as a command-line argument.")
+#   sys.exit(1)
 
-csv_file_path = sys.argv[1]
+# csv_file_path = sys.argv[1]
+csv_file_path = "latest.csv"
+
 current_time = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-json_file_path = f"output_{current_time}.json"  # Output file with current date and time
+# json_file_path = f"output_{current_time}.json"  # Output file with current date and time
+json_file_path = f"latest.json"
 
 # Convert CSV to JSON
 csv_to_json(csv_file_path, json_file_path)
