@@ -646,6 +646,15 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     const mainCategories = ["Shoes", "Bottom", "Top", "Hair"];
     const rngCategories = ["Face", "Head", "Accessory"];
     const backgroundColors = ["#EAD9D9", "#E2CACA", "#FF80CA", "#28b143", "#69B8FF", "#F36464"];
+    const backgroundBodies = ["lightbody.svg", "midbody.svg", "darkbody.svg", "superlightbody.svg"];
+    
+    if (Math.random() < 0.5) setBackgroundColor(backgroundColors[Math.floor(Math.random() * backgroundColors.length)])
+    else setBackgroundColor("#0D6E9D"); // default background color
+    console.log("backgroundColor", backgroundColor);
+
+    let randomBackgroundBody = backgroundBodies[Math.floor(Math.random() * backgroundBodies.length)];
+    setBackgroundBody(randomBackgroundBody);
+    console.log("backgroundBody", backgroundBody);
 
      // Load main categories first
      mainCategories.forEach((category, i) => {
@@ -656,9 +665,6 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
         loadTrait(randomTrait.colorMap, 0, 0, i !== 0);
       }
     });
-
-    if (Math.random() < 0.5) setBackgroundColor(backgroundColors[Math.floor(Math.random() * backgroundColors.length)])
-    else setBackgroundColor("#0D6E9D"); // default background color
 
     rngCategories.forEach(category => {
       if (Math.random() < 0.1) { 
