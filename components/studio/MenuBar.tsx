@@ -1,3 +1,4 @@
+import React from "react";
 import { ConnectKitButton } from "connectkit";
 
 interface Props {
@@ -10,6 +11,13 @@ interface Props {
 }
 
 export default function MenuBar(props: Props) {
+  const [showRandomButton, setShowRandomButton] = React.useState(false);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setShowRandomButton(params.get('loadRandomChonk') === 'true');
+  }, []);
+
   const {
     showGrid,
     toggleGrid,
@@ -45,15 +53,13 @@ export default function MenuBar(props: Props) {
           Load a Trait
         </button>
 
-        {process.env.NODE_ENV === 'development' && (
-  
+        {(process.env.NODE_ENV === 'development' || showRandomButton) && (
           <button
             onClick={loadRandomChonk}
             className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors"
           >
             Load Random Chonk
           </button>
-          
         )}
 
         <div className="w-[0.5px] bg-gray-500" />

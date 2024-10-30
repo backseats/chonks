@@ -642,24 +642,30 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
   const closeLoadTraitModal = () => setIsLoadTraitModalOpen(false);
 
   const loadRandomChonk = () => {
+    console.log("=== loadRandomChonk ===");
     const mainCategories = ["Shoes", "Bottom", "Top", "Hair"];
     const rngCategories = ["Face", "Head", "Accessory"];
+    const backgroundColors = ["#EAD9D9", "#E2CACA", "#FF80CA", "#28b143", "#69B8FF", "#F36464"];
 
-    // Load main categories first
-    mainCategories.forEach((category, i) => {
+     // Load main categories first
+     mainCategories.forEach((category, i) => {
       const categoryTraits = traits.traits.filter(trait => trait.category === category);
       if (categoryTraits.length > 0) {
         const randomTrait = categoryTraits[Math.floor(Math.random() * categoryTraits.length)];
+        console.log("main category trait: ",  randomTrait.name + "(" + randomTrait.category + ")");
         loadTrait(randomTrait.colorMap, 0, 0, i !== 0);
       }
     });
 
-    // For each rng category, 50% chance to load it
+    if (Math.random() < 0.5) setBackgroundColor(backgroundColors[Math.floor(Math.random() * backgroundColors.length)])
+    else setBackgroundColor("#0D6E9D"); // default background color
+
     rngCategories.forEach(category => {
-      if (Math.random() < 0.1) { // 50% chance
+      if (Math.random() < 0.1) { 
         const categoryTraits = traits.traits.filter(trait => trait.category === category);
         if (categoryTraits.length > 0) {
           const randomTrait = categoryTraits[Math.floor(Math.random() * categoryTraits.length)];
+          console.log("rng category trait: ",  randomTrait.name + "(" + randomTrait.category + ")");
           loadTrait(randomTrait.colorMap, 0, 0, true);
         }
       }
