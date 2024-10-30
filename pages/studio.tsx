@@ -642,16 +642,28 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
   const closeLoadTraitModal = () => setIsLoadTraitModalOpen(false);
 
   const loadRandomChonk = () => {
-    // const randomBytes = generateRandomBytes();
+    const mainCategories = ["Shoes", "Bottom", "Top", "Hair"];
+    const rngCategories = ["Face", "Head", "Accessory"];
 
-    // get 5 traits from the traits.json file and load them in via parseZColorMapBlocks
-    for (let i = 0; i < 5; i++) {
-      const randomTrait = traits.traits[Math.floor(Math.random() * traits.traits.length)];
-      // parseZColorMapBlocks(randomTrait.zMap);
-      if (i === 0) loadTrait(randomTrait.colorMap, 0, 0, false);
-      else loadTrait(randomTrait.colorMap, 0, 0, true);
-    }
-    
+    // Load main categories first
+    mainCategories.forEach((category, i) => {
+      const categoryTraits = traits.traits.filter(trait => trait.category === category);
+      if (categoryTraits.length > 0) {
+        const randomTrait = categoryTraits[Math.floor(Math.random() * categoryTraits.length)];
+        loadTrait(randomTrait.colorMap, 0, 0, i !== 0);
+      }
+    });
+
+    // For each rng category, 50% chance to load it
+    rngCategories.forEach(category => {
+      if (Math.random() < 0.1) { // 50% chance
+        const categoryTraits = traits.traits.filter(trait => trait.category === category);
+        if (categoryTraits.length > 0) {
+          const randomTrait = categoryTraits[Math.floor(Math.random() * categoryTraits.length)];
+          loadTrait(randomTrait.colorMap, 0, 0, true);
+        }
+      }
+    });
   };
 
   const handleLoadTraitModalBackgroundClick = (
