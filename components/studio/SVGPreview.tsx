@@ -30,13 +30,13 @@ export default function SVGPreview({
       <div className="flex flex-col gap-2 p-2">
         {/* The Preview */}
         <div
-          className="border border-gray-300 md:w-[302px] mx-auto bg-[#356D9A] rounded-sm"
+          className="border border-gray-300 md:w-[302px] mx-auto bg-[#356D9A] "
           dangerouslySetInnerHTML={{ __html: svgContent }}
         />
 
         <button
           onClick={copyBytes}
-          className="px-4 py-2 bg-yellow-500 text-black rounded hover:brightness-[105%] transition-colors mt-2 w-[300px] mx-auto"
+          className="px-4 py-2 bg-yellow-500 text-black  hover:brightness-[105%] transition-colors mt-2 w-[300px] mx-auto"
         >
           <div className="flex items-center justify-center">
             <ClipboardDocumentListIcon className="w-6 h-6 mr-2" />
@@ -53,7 +53,7 @@ export default function SVGPreview({
         {/* {address ? ( */}
         <button
           onClick={openModal}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:brightness-[105%] transition-colors w-[300px] mx-auto"
+          className="px-4 py-2 bg-gray-500 text-white  hover:brightness-[105%] transition-colors w-[300px] mx-auto"
         >
           Download Your Chonk
         </button>

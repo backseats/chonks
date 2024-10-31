@@ -11,7 +11,9 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <ConnectKitProvider>
+        <ConnectKitProvider
+          theme="minimal"
+        >
           <Component {...pageProps} />
         </ConnectKitProvider>
       </QueryClientProvider>

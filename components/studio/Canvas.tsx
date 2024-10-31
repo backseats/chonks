@@ -63,7 +63,7 @@ const Canvas = forwardRef<HTMLDivElement, Props>(
         >
           <img
             src={
-              backgroundBody === "ghost.svg" ? "lightbody.svg" : backgroundBody
+              backgroundBody === "ghost.svg" ? "skinTone1.svg" : backgroundBody
             }
             alt=""
             className="w-full h-full object-cover"

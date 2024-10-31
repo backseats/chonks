@@ -177,9 +177,9 @@ export default function SelectColor({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="h-[2px] bg-gray-200 opacity-80 w-full my-4" />
+      {/* <div className="h-[2px] bg-gray-200 opacity-80 w-full my-4" /> */}
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 mt-4">
         <div className="flex flex-row gap-4">
           <div className="flex flex-col gap-2 justify-between">
             <Colorful
@@ -192,7 +192,7 @@ export default function SelectColor({
 
             <button
               onClick={handleSaveColorToPalette}
-              className={`p-2  rounded transition-colors w-full ${
+              className={`p-2   transition-colors w-full ${
                 isLightColor(selectedColor) ? "text-black" : "text-white"
               }`}
               style={{ backgroundColor: selectedColor }}
@@ -210,7 +210,7 @@ export default function SelectColor({
 
             <button
               onClick={() => setBackgroundColor(selectedColor)}
-              className={`p-2 rounded transition-colors w-full ${
+              className={`p-2  transition-colors w-full ${
                 isLightColor(selectedColor) ? "text-black" : "text-white"
               }`}
               style={{ backgroundColor: selectedColor }}
@@ -261,13 +261,13 @@ export default function SelectColor({
                     />
                     <button
                       onClick={handleColorUpdate}
-                      className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
+                      className="ml-2 px-2 py-1 bg-blue-500 text-white "
                     >
                       Update
                     </button>
                     <button
                       onClick={handleCancelEdit}
-                      className="ml-2 px-2 py-1 bg-gray-300 text-black rounded"
+                      className="ml-2 px-2 py-1 bg-gray-300 text-black "
                     >
                       Cancel
                     </button>
@@ -279,7 +279,9 @@ export default function SelectColor({
         </>
       )}
 
-      <BodyPresets setBackgroundBody={setBackgroundBody} />
+      {/* Move this into it's own component */}
+
+      {/* <BodyPresets setBackgroundBody={setBackgroundBody} />
 
       <button
         className="text-gray-500 text-sm text-right hover:underline hidden md:block"
@@ -287,7 +289,7 @@ export default function SelectColor({
       >
         <QuestionMarkCircleIcon className="w-4 h-4 -mt-1 mr-1 inline-block" />
         Keyboard Shortcuts, Tips & Tricks
-      </button>
+      </button> */}
     </div>
   );
 }

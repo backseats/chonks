@@ -1,8 +1,14 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Source_Code_Pro } from 'next/font/google'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
+
+const sourceCodePro = Source_Code_Pro({
+  weight: '600',
+  subsets: ['latin'],
+  variable: '--font-source-code-pro',
+})
 
 export const metadata: Metadata = {
   title: 'NFT Viewer',

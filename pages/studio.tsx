@@ -14,6 +14,12 @@ import html2canvas from "html2canvas";
 import traits from '../contracts/csv-conversion/latest.json';
 import bodies from '../contracts/csv-conversion/bodies.json';
 
+import BodyPresets from "../components/studio/BodyPresets";
+import {
+  EyeDropperIcon,
+  QuestionMarkCircleIcon,
+} from "@heroicons/react/24/outline";
+
 export type Pixel = {
   x: number;
   y: number;
@@ -764,10 +770,35 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
         loadRandomChonk={loadRandomChonk}
       />
 
-      <div className="flex md:justify-center md:max-w-[1200px] md:mx-auto">
-        <div className="flex flex-col md:flex-row gap-[75px] md:p-4 md:w-full">
-          {/* Left column */}
-          <Canvas
+{/* md:max-w-[1200px] gap-[75px] */}
+      <div className="flex md:justify-center  md:mx-auto">
+        <div className="flex flex-col md:flex-row  md:p-4 md:w-full">
+
+          {/* left column */}
+          <div className="flex flex-col gap-2 md:max-w-[420px] px-4">
+            {/* <SVGPreview
+              address={address}
+              svgContent={svgContent}
+              handleBytes={handleBytes}
+              openModal={openModal}
+            /> */}
+
+            <SelectColor
+              additionalColors={additionalColors}
+              hasAdditionalColors={additionalColors?.length > 0}
+              selectedColor={selectedColor}
+              setSelectedColor={setSelectedColor}
+              saveColorToPalette={saveColorToPalette}
+              setBackgroundColor={setBackgroundColor}
+              setBackgroundBody={setBackgroundBody}
+              openKeyboardShortcutsModal={openKeyboardShortcutsModal}
+              gridData={gridData}
+              updateGridColors={updateGridColors}
+            />
+          </div>
+
+           {/* Middle column */}
+           <Canvas
             ref={canvasRef} // Pass the ref to the Canvas component
             pixelSize={pixelSize}
             gridRef={gridRef}
@@ -787,28 +818,31 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
             selectedColor={selectedColor}
           />
 
-          {/* Right column */}
-          <div className="flex flex-col gap-2 md:max-w-[420px] px-4">
+          <div>
+            <div>
             <SVGPreview
               address={address}
               svgContent={svgContent}
               handleBytes={handleBytes}
               openModal={openModal}
-            />
+            /> 
+            </div>
+            
+            <div className="border-t border-gray-200 pt-6  mt-6">
+              <BodyPresets setBackgroundBody={setBackgroundBody} />
 
-            <SelectColor
-              additionalColors={additionalColors}
-              hasAdditionalColors={additionalColors?.length > 0}
-              selectedColor={selectedColor}
-              setSelectedColor={setSelectedColor}
-              saveColorToPalette={saveColorToPalette}
-              setBackgroundColor={setBackgroundColor}
-              setBackgroundBody={setBackgroundBody}
-              openKeyboardShortcutsModal={openKeyboardShortcutsModal}
-              gridData={gridData}
-              updateGridColors={updateGridColors}
-            />
+              <button
+                className="mt-6 text-gray-500 text-sm text-right hover:underline hidden md:block"
+                onClick={openKeyboardShortcutsModal}
+              >
+                <QuestionMarkCircleIcon className="w-4 h-4 -mt-1 mr-1 inline-block" />
+                Keyboard Shortcuts, Tips & Tricks
+              </button>
+            </div>
+
+
           </div>
+          
         </div>
       </div>
 
