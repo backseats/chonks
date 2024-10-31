@@ -29,41 +29,50 @@ export default function BodyPresets({ setBackgroundBody }: Props) {
       </h2>
 
       {!isCollapsed && (
-        <div className="flex flex-col gap-2 px-3">
+        
+         
+
+          <div className="grid grid-cols-2 gap-2">
+
           <button
             onClick={() => setBackgroundBody("ghost.svg")}
             className="px-4 py-2 bg-gray-700 text-white rounded hover:brightness-[70%] transition-colors"
           >
-            Body With Opacity
+            Transparent Skin
           </button>
-
-          <div className="grid grid-cols-2 gap-2">
+           
             <button
-              onClick={() => setBackgroundBody("superlightbody.svg")}
-              className="px-4 py-2 bg-[#EAD9D9] text-black rounded hover:brightness-[105%] transition-colors"
-            >
-              Super Light Body
-            </button>
-            <button
-              onClick={() => setBackgroundBody("lightbody.svg")}
+              onClick={() => setBackgroundBody("skinTone1.svg")}
               className="px-4 py-2 bg-[#EFB15D] text-black rounded hover:brightness-[105%] transition-colors"
             >
-              Light Body
+              Skin Tone 1
             </button>
             <button
-              onClick={() => setBackgroundBody("midbody.svg")}
+              onClick={() => setBackgroundBody("skinTone2.svg")}
               className="px-4 py-2 bg-[#BB8136] text-white rounded hover:brightness-[105%] transition-colors"
             >
-              Mid Body
+              Skin Tone 2
             </button>
             <button
-              onClick={() => setBackgroundBody("darkbody.svg")}
+              onClick={() => setBackgroundBody("skinTone3.svg")}
               className="px-4 py-2 bg-[#8B5E24] text-white rounded hover:brightness-[105%] transition-colors"
             >
-              Dark Body
+              Skin Tone 3
+            </button>
+            <button
+              onClick={() => setBackgroundBody("skinTone4.svg")}
+              className="px-4 py-2 bg-[#EAD9D9] text-black rounded hover:brightness-[105%] transition-colors"
+            >
+              Skin Tone 4
+            </button>
+            <button
+              onClick={() => setBackgroundBody("skinTone5.svg")}
+              className="px-4 py-2 bg-[#3C290F] text-white rounded hover:brightness-[105%] transition-colors"
+            >
+              Skin Tone 5
             </button>
           </div>
-        </div>
+       
       )}
     </>
   );

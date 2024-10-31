@@ -46,7 +46,7 @@ const Grid: React.FC = () => {
 
   const { address } = useAccount();
 
-  const [backgroundBody, setBackgroundBody] = useState<string>("lightbody.svg");
+  const [backgroundBody, setBackgroundBody] = useState<string>("skinTone1.svg");
   const [gridData, setGridData] = useState<Pixel[]>(generateGrid());
   const [selectedColor, setSelectedColor] = useState<string>("#48A6FA"); // a nice blue
   const [additionalColors, setAdditionalColors] = useState<string[]>([]);
@@ -79,12 +79,12 @@ const Grid: React.FC = () => {
   const traitNameRef = useRef<HTMLInputElement>(null);
 
   const traitTypes = [
-    "Hat",
+    "Head",
     "Hair",
-    "Glasses",
-    "Handheld",
-    "Shirt",
-    "Pants",
+    "Face",
+    "Accessory",
+    "Top",
+    "Bottom",
     "Shoes",
   ];
   const [currentTraitIndex, setCurrentTraitIndex] = useState(0);
@@ -368,7 +368,7 @@ const Grid: React.FC = () => {
       
       svgContent += '<rect class="bg"/>';
 
-      const bodySVG = bodies.bodies.find(body => body.path === (backgroundBody === "ghost.svg" ? "lightbody.svg" : backgroundBody));
+      const bodySVG = bodies.bodies.find(body => body.path === (backgroundBody === "ghost.svg" ? "skinTone1.svg" : backgroundBody));
 
       if (bodySVG && bodySVG.colorMap) {
 
@@ -645,8 +645,9 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     console.log("=== loadRandomChonk ===");
     const mainCategories = ["Shoes", "Bottom", "Top", "Hair"];
     const rngCategories = ["Face", "Head", "Accessory"];
+    // const rngCategories = ["Head"]; // looking at just head traits for now....
     const backgroundColors = ["#EAD9D9", "#E2CACA", "#FF80CA", "#28b143", "#69B8FF", "#F36464"];
-    const backgroundBodies = ["lightbody.svg", "midbody.svg", "darkbody.svg", "superlightbody.svg"];
+    const backgroundBodies = ["skinTone1.svg", "skinTone2.svg", "skinTone3.svg", "skinTone4.svg", "skinTone5.svg"];
     
     if (Math.random() < 0.5) setBackgroundColor(backgroundColors[Math.floor(Math.random() * backgroundColors.length)])
     else setBackgroundColor("#0D6E9D"); // default background color
@@ -667,7 +668,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     });
 
     rngCategories.forEach(category => {
-      if (Math.random() < 0.1) { 
+      if (Math.random() < 0.5) { 
         const categoryTraits = traits.traits.filter(trait => trait.category === category);
         if (categoryTraits.length > 0) {
           const randomTrait = categoryTraits[Math.floor(Math.random() * categoryTraits.length)];
@@ -686,6 +687,9 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
 
   // Translate bytes into a 30x30 grid of colors
   const loadTrait = (bytes: string, xOffset: number, yOffset: number, affix: boolean = false) => {
+
+    // console.log('affix: ', affix);
+    // affix = true;
     // Initialize a 30x30 array filled with empty strings
     const colorGrid: string[][] = Array(30)
       .fill(null)
@@ -836,7 +840,8 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
         <LoadTraitModal
           closeModal={closeLoadTraitModal}
           handleModalBackgroundClick={handleLoadTraitModalBackgroundClick}
-          loadTrait={(bytes: string) => loadTrait(bytes, 0, 0, false)}
+          // loadTrait={(bytes: string) => loadTrait(bytes, 0, 0, true)}
+          loadTrait={loadTrait}
         />
       )}
     </div>
