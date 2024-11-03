@@ -157,9 +157,11 @@ export default function Home() {
           <div >
 
             <h1 className=" text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
-              <img
+              <Image
                 src="/chonks-logo.svg"
                 alt="Chonks"
+                width={48}
+                height={48}
                 className="h-12 md:h-12 w-auto"
               />
 
@@ -257,7 +259,7 @@ export default function Home() {
                 <p>Using the ERC-6551 standard, known as Token Bound Accounts, you can collect Traits and customize what your Chonk looks like.</p>
               </div>
               <div className={`sm:w-1/2 px-[3.45vw] pb-[3.45vw] md:py-[6.9vw] p-4  `}>
-                <p>Mint, collect, and trade Traits whenever you like on the Chonks Marketplace, and because it's on Base, changing up your Chonk is super cheap.</p>
+                <p>Mint, collect, and trade Traits whenever you like on the Chonks Marketplace, and because it&apos;s on Base, changing up your Chonk is super cheap.</p>
               </div>
             </section>
 
@@ -383,7 +385,7 @@ export default function Home() {
                 Chonks Studio
               </h2>
               <p className="font-source-code-pro  font-weight-600 mx-[3.45vw] mb-[3.45vw]">
-                We've built an online Studio so anyone can create a Chonk.
+                We&apos;ve built an online Studio so anyone can create a Chonk.
               </p>
               <div className="w-full px-[3.45vw]">
                 <video
@@ -400,7 +402,7 @@ export default function Home() {
               </div>
               <div  className={`flex flex-col sm:flex-row border-t border-r  bg-white/50`}>
                 <div className={`sm:w-1/2 px-[3.45vw] py-[6.9vw] sm:border-r `}>
-                  <p>The Studio will be open to everyone so they can have fun unleashing their Chonk creativity. We can't wait to see what you will create!</p>
+                  <p>The Studio will be open to everyone so they can have fun unleashing their Chonk creativity. We can&apos;t wait to see what you will create!</p>
                 </div>
                 <div className={`sm:w-1/2 px-[3.45vw] pb-[3.45vw] md:py-[6.9vw] p-4  `}>
                   <p><i><strong>Approved Creators</strong></i> will be able to use the Studio to deploy their Traits to the official collection for future Season releases. Simples.</p>
@@ -422,11 +424,11 @@ export default function Home() {
               <div className="sm:w-1/2 px-[3.45vw] py-[6.9vw] bg-white bg-opacity-50 backdrop-blur-[5px] ">
                 <h2 className="font-source-code-pro text-[4vw] font-weight-600 mb-[3.3vw]">
                   {/* Both 2d &amp; 3d */}
-                  But wait... there's more!
+                  But wait... there&apos;s more!
                 </h2>
                 <p>Every Chonk is also 3D.</p>
                 <p>Yes, Chonks are both 2D & 3D, oooohhh.</p>
-                <p>Not "soon", not in a year... when you mint a Chonk, it will be both.</p>
+                <p>Not &quot;soon&quot;, not in a year... when you mint a Chonk, it will be both.</p>
                 <p>Just like you can change your skin tone and background colour, you can also set your Chonk to render in 3D.</p>
                 <p>But under the hood (pun intended), we store both the pixel data AND the voxel data onchain:</p>
                 <p>X, Y and colour values for the 2D version....</p>
@@ -458,7 +460,7 @@ export default function Home() {
                   Chonks Marketplace
                 </h2>
                 <p className="font-source-code-pro  font-weight-600 mx-[3.45vw]">
-                  Inspired by our beloved Cryptopunks, we've built a fully onchain marketplace where you can buy & sell Chonks and individual Traits.
+                  Inspired by our beloved Cryptopunks, we&apos;ve built a fully onchain marketplace where you can buy & sell Chonks and individual Traits.
                 </p>
               </div>
               
@@ -468,25 +470,49 @@ export default function Home() {
                 <div className="flex flex-col gap-4">
                   
                   <div className="flex items-start gap-4">
-                    <img src="/bullet.svg" alt="bullet point" className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]" />
+                    <Image
+                      src="/bullet.svg"
+                      alt="bullet point"
+                      width={12}
+                      height={12}
+                      className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]"
+                    />
                     <p>Buy and sell individual Traits to customize your Chonk exactly how you want.</p>
                   </div>
 
                  
 
                   <div className="flex items-start gap-4">
-                    <img src="/bullet.svg" alt="bullet point" className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]" />
-                    <p>All offers and bids are stored onchain using Base's low gas fees.</p>
+                    <Image
+                      src="/bullet.svg"
+                      alt="bullet point"
+                      width={12}
+                      height={12}
+                      className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]"
+                    />
+                    <p>All offers and bids are stored onchain using Base&apos;s low gas fees.</p>
                   </div>
                   
                   <div className="flex items-start gap-4">
-                    <img src="/bullet.svg" alt="bullet point" className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]" />
+                    <Image
+                      src="/bullet.svg"
+                      alt="bullet point"
+                      width={12}
+                      height={12}
+                      className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]"
+                    />
                     <p>By using our marketplace, you can be confident in knowing your Chonk will come with the Traits you bidded for.</p>
                   </div>
                   
 
                   <div className="flex items-start gap-4">
-                    <img src="/bullet.svg" alt="bullet point" className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]" />
+                    <Image
+                      src="/bullet.svg"
+                      alt="bullet point"
+                      width={12}
+                      height={12}
+                      className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]"
+                    />
                     <p>More info coming soon.</p>
                   </div>
                 </div>
@@ -606,10 +632,10 @@ export default function Home() {
             <div className="marquee-wrapper relative flex whitespace-nowrap my-[3.45vw]">
               <div className="marquee-text inline-flex">
                 <span className="font-source-code-pro text-[12vw] font-weight-600 mx-[1.725vw]">
-                  LET'S F*CKING CHONK! &nbsp;
+                  LET&apos;S F*CKING CHONK! &nbsp;
                 </span>
                 <span className="font-source-code-pro text-[12vw] font-weight-600 mx-[1.725vw]">
-                  LET'S F*CKING CHONK! &nbsp;
+                  LET&apos;S F*CKING CHONK! &nbsp;
                 </span>
               </div>
             </div>
@@ -619,7 +645,7 @@ export default function Home() {
 
          {/* <div className="marquee-text flex whitespace-nowrap my-[3.45vw]">
                 <span className="font-source-code-pro text-[12vw] font-weight-600 mx-[1.725vw] block">
-                LET'S F*CKING CHONK!
+                LET&apos;S F*CKING CHONK!
                 </span>
                 
               </div> */}
@@ -633,15 +659,17 @@ export default function Home() {
         <footer className={`w-full flex flex-col sm:flex-row justify-between px-[3.45vw] py-[3.45vw] border-t text-[2vw] md:text-[1vw] bg-white`}>
           <div className="text-left mb-2 sm:mb-0 flex items-start">
             <a href="#home" onClick={(e) => scrollToSection(e, '#top')} className="hover:opacity-70 transition-opacity">
-              <img
+              <Image
                 src="/chonks-head-outline.svg"
                 alt="Chonks Head"
+                width={48}
+                height={48}
                 className="h-12 md:h-12 w-auto"
               />
             </a>
             <span className="ml-[3.45vw] md:ml-[1.725vw]">
               Chonks are cc0. <br />
-              We'll have some terms in here... eventually.
+              We&apos;ll have some terms in here... eventually.
             </span>
           </div>
           <div className="text-center sm:text-right my-[3.45vw] md:my-0">
