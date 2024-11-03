@@ -76,6 +76,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     /// Errors
 
+    error CantTransfer();
     error NotATBA();
     error NotAValidMinterContract();
     error TraitNotFound(uint256 _tokenId);
@@ -571,6 +572,13 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // Override functions for marketplace compatibility
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
+        // TODO: ensure not equipped
+
+        (, address seller,,) = marketplace.traitOffers(tokenId);
+        if (seller != address(0)) {
+            if (msg.sender != address(marketplace)) revert CantTransfer();
+        }
+
         if (to == address(0)) {
             _cleanUpMarketplaceOffersAndBids(tokenId, to);
 

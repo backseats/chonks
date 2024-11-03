@@ -4,6 +4,7 @@ pragma solidity ^0.8.22;
 // OpenZeppelin Imports
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { IERC165 } from  "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { Utils } from "./common/Utils.sol";
@@ -37,6 +38,11 @@ import "forge-std/console.sol"; // DEPLOY: remove
 
 // TODO: withdraw or send us the ETH per each txn
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906 {
+
+    struct Approvals {
+        uint256 nonce;
+        address[] operators;
+    }
 
     bool _localDeploy; // DEPLOY: remove
 
@@ -88,6 +94,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     /// Errors
 
     error BodyAlreadyExists();
+    error CantTransfer();
     error CantTransferToTBAs();
     error FirstSeasonRenderMinterNotSet();
     error IncorrectPeterOwner();
@@ -771,6 +778,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
         if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();
 
+        // check marketplace if tokenId is for sale via offer and msg.sender is the marketplace
+        (, address seller,,) = marketplace.chonkOffers(tokenId);
+        if (seller != address(0)) {
+            if (msg.sender != address(marketplace)) revert CantTransfer();
+        }
+
         // Clean up Chonk Offers and Bids
         marketplace.deleteChonkOfferBeforeTokenTransfer(tokenId);
         marketplace.deleteChonkBidsBeforeTokenTransfer(tokenId, to);
@@ -791,7 +804,50 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas);
         }
 
+        _invalidateAllOperatorApprovals(tokenId);
+
         super._beforeTokenTransfer(from, to, tokenId);
+    }
+
+    mapping(uint256 chonkId => Approvals approvals) public chonkIdToApprovals;
+
+    /// Approvals
+
+    function approve(address operator, uint256 _chonkId) public override(IERC721, ERC721) {
+        Approvals storage approvals = chonkIdToApprovals[_chonkId];
+        approvals.nonce += 1;
+        approvals.operators.push(operator);
+
+        _approve(operator, _chonkId);
+    }
+
+    function setApprovalForAll(uint256 _chonkId, address operator, bool approved) public {
+        Approvals storage approvals = chonkIdToApprovals[_chonkId];
+        approvals.nonce += 1;
+        approvals.operators.push(operator);
+
+        _setApprovalForAll(msg.sender, operator, approved);
+    }
+
+    // Use the function above
+    function setApprovalForAll(address, bool) public pure override(IERC721, ERC721) {
+        revert("Not implemented");
+    }
+
+    /// @dev – Called on _beforeTokenTransfer
+    /// Prevents subsequent owners from using the previous owner's approvals
+    function _invalidateAllOperatorApprovals(uint256 _chonkId) internal {
+        Approvals memory approvals = chonkIdToApprovals[_chonkId];
+
+        for (uint i; i < approvals.operators.length; ++i) {
+            // Keep the marketplace approval
+            if (approvals.operators[i] == address(marketplace)) continue;
+
+            // Invalidate all other approvals
+            _setApprovalForAll(msg.sender, approvals.operators[i], false);
+        }
+
+        delete chonkIdToApprovals[_chonkId];
     }
 
 }
