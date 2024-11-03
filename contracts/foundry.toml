@@ -11,6 +11,13 @@ verbosity = 3
 [fmt]
 line_length = 100
 
+[rpc_endpoints]
+base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
+
+[profile.private_keys]
+deployer = "${DEPLOYER_PRIVATE_KEY}"
+
+
 # [rpc_endpoints]
 # base = "${BASE_SEPOLIA_RPC_URL}"
 # goerli = "${GOERLI_RPC_URL}"
