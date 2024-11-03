@@ -16,6 +16,8 @@ const config: Config = {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         mono: ['"Source Code Pro"', 'monospace'],
+        'source-code-pro': ['"Source Code Pro"', 'monospace'], // need to amalgate this properly
+        'inter': ['Inter', 'sans-serif'] // need to amalgate this properly
       },
     },
   },

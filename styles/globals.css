@@ -19,3 +19,49 @@ body {
 .heading {
   @apply font-mono;
 }
+
+
+/* HOME */
+
+canvas {
+  width: 100vw !important;
+  height: 100vh !important;
+  filter: saturate(1.4);
+}
+
+h1, h2{
+line-height: 1;
+}
+
+p{
+  padding-bottom: 3.45vw;
+}
+
+@media (max-width: 640px) {
+  p {
+    padding-bottom: 2vw;
+  }
+}
+
+.borderTopFull {
+  position: relative;
+}
+
+.borderTopFull::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  height: 1px;
+  background-color: rgba(0,0,0,.15);
+}
+
+.hero {
+  perspective: 1000px;
+}
+
+.hero h1{
+  opacity: 0;
+}
