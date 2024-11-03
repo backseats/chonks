@@ -272,7 +272,7 @@ contract ChonksMarket is Ownable {
         if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
 
         // Please unequip the trait if you want to sell it
-        if (_checkIfTraitIsEquipped(_traitId, _chonkId)) revert TraitEquipped();
+        if (PETERS_MAIN.checkIfTraitIsEquipped(_chonkId, _traitId)) revert TraitEquipped();
 
         address tbaTraitOwner = PETER_TRAITS.ownerOf(_traitId);
         (address tokenOwner,) = PETERS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
@@ -308,7 +308,7 @@ contract ChonksMarket is Ownable {
         if (offer.priceInWei != msg.value) revert WrongAmount();
 
         (,uint256 chonkId,) = PETERS_MAIN.getFullPictureForTrait(_traitId);
-        if (_checkIfTraitIsEquipped(_traitId, chonkId)) revert TraitEquipped();
+        if (PETERS_MAIN.checkIfTraitIsEquipped(chonkId, _traitId)) revert TraitEquipped();
 
         // Delete the Offer
         delete traitOffers[_traitId];
@@ -375,7 +375,7 @@ contract ChonksMarket is Ownable {
         (address sellerTBA, uint256 chonkId, address seller) = PETERS_MAIN.getFullPictureForTrait(_traitId);
         if (seller != msg.sender) revert NotYourTrait();
 
-        if (_checkIfTraitIsEquipped(_traitId, chonkId)) revert TraitEquipped();
+        if (PETERS_MAIN.checkIfTraitIsEquipped(chonkId, _traitId)) revert TraitEquipped();
 
         // Delete Offer for trait ID if present, delete Bid you're accepting
         delete traitOffers[_traitId];
@@ -468,19 +468,6 @@ contract ChonksMarket is Ownable {
 
         (bool success, ) = msg.sender.call{value: balance}("");
         if (!success) revert WithdrawFailed();
-    }
-
-    /// Internal
-
-    function _checkIfTraitIsEquipped(uint256 _traitId, uint256 _chonkId) internal view returns (bool) {
-        IPeterStorage.StoredPeter memory storedPeter = PETERS_MAIN.getPeter(_chonkId);
-        return storedPeter.headId == _traitId ||
-            storedPeter.hairId == _traitId ||
-            storedPeter.faceId == _traitId ||
-            storedPeter.accessoryId == _traitId ||
-            storedPeter.topId == _traitId ||
-            storedPeter.bottomId == _traitId ||
-            storedPeter.shoesId == _traitId;
     }
 
     /// Private

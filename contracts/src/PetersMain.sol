@@ -664,6 +664,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return peterTokens.all[_peterTokenId].renderZ;
     }
 
+    function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
+        IPeterStorage.StoredPeter memory storedPeter = getPeter(_chonkId);
+        return storedPeter.headId == _traitId ||
+            storedPeter.hairId == _traitId ||
+            storedPeter.faceId == _traitId ||
+            storedPeter.accessoryId == _traitId ||
+            storedPeter.topId == _traitId ||
+            storedPeter.bottomId == _traitId ||
+            storedPeter.shoesId == _traitId;
+    }
+
     /// @dev Returns the token ids the end user's wallet owns
     function walletOfOwner(address _owner) public view returns (uint256[] memory) {
         uint256 tokenCount = balanceOf(_owner);
