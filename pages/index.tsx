@@ -24,6 +24,9 @@ export default function Home() {
   const lenisRef = useRef<Lenis | null>(null);
 
   useEffect(() => {
+
+    // document.body.classList.add( 'overflow-x-hidden');
+
     const lenis = new Lenis({
       duration: 2, // Default is 1.2 - higher number = slower scroll
       smoothWheel: true,
@@ -94,6 +97,7 @@ export default function Home() {
     return () => {
       lenis.destroy();
       clearTimeout(timer);
+      // document.body.classList.remove('overflow-x-hidden');
     };
   }, []);
 
@@ -129,6 +133,16 @@ export default function Home() {
 
   return (
     <>
+      <Head>
+        <title>CHONKS - Chonkie Characters Onchain</title>
+        <meta name="description" content="Welcome to my homepage" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+        />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
       <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
 
         {/* 
@@ -137,15 +151,7 @@ export default function Home() {
           ***************************************************
       */}
 
-        <Head>
-          <title>CHONKS - Chonkie Characters Onchain</title>
-          <meta name="description" content="Welcome to my homepage" />
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
-          />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
+        
 
         {/* 
           ***************************************************
@@ -196,7 +202,7 @@ export default function Home() {
         </nav>
 
 
-        <main className="w-full">
+        <main className="w-full overflow-x-hidden">
 
           {/* guide lines, deploy: remove */}
           {/* <div className="fixed inset-0 pointer-events-none z-50">
