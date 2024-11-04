@@ -526,18 +526,24 @@ export default function Home() {
               <div className="sm:w-1/2 px-[3.45vw] py-[6.9vw] bg-white bg-opacity-50 backdrop-blur-[5px] ">
                 <h2 className="font-source-code-pro text-[4vw] font-weight-600 mb-[3.3vw]">
                   {/* Both 2d &amp; 3d */}
-                  But wait... there&apos;s more!
+                  {/* But wait... there&apos;s more! */}
+                  Chonks in 3D
                 </h2>
-                <p>Every Chonk is also 3D.</p>
+                <p>Every Chonk also comes in 3D at launch.</p>
+                <p>Pixel and voxel data is stored onchain.</p>
+                <p>Switch between rendering your Chonk in 2D or 3D whenever you like.</p>
+                <p>Newly released Traits will come in 3D as well.</p>
+
+                {/* <p>Every Chonk is also 3D.</p>
                 <p>Yes, Chonks are both 2D & 3D, oooohhh.</p>
                 <p>Not &quot;soon&quot;, not in a year... when you mint a Chonk, it will be both.</p>
                 <p>Just like you can change your skin tone and background colour, you can also set your Chonk to render in 3D.</p>
                 <p>But under the hood (pun intended), we store both the pixel data AND the voxel data onchain:</p>
                 <p>X, Y and colour values for the 2D version....</p>
                 <p>X, Y & Z and colour values for the 3D version.</p>
-                <p>You can then output your Chonk as 3D if you wish - and we can do fun stuff down the track with games, 3d printing and so much more.</p>
+                <p>You can then output your Chonk as 3D if you wish - and we can do fun stuff down the track with games, 3d printing and so much more.</p> */}
                 <p className=""> 
-                  <i><strong>Chonks Ztudio</strong> - z, get it?!</i>
+                  <i><strong>Coming Soon: Chonks Ztudio</strong> (it&apos;s a voxel studio, get it?)</i>
                 </p>
                 {/* <p className="">
                   Chonks are initially designed as 2d pixel characters in the <i>Chonk Studio</i>. The pixel data is added to the contract as a bytes array: for each pixel, we store the x, y and rgb values.
@@ -561,9 +567,9 @@ export default function Home() {
                 <h2 className="font-source-code-pro text-[4vw] font-weight-600 mx-[3.45vw] mb-[3.45vw]">
                   Chonks Marketplace
                 </h2>
-                <p className="font-source-code-pro  font-weight-600 mx-[3.45vw]">
+                {/* <p className="font-source-code-pro  font-weight-600 mx-[3.45vw]">
                   Inspired by our beloved Cryptopunks, we&apos;ve built a fully onchain marketplace where you can buy & sell Chonks and individual Traits.
-                </p>
+                </p> */}
               </div>
               
 
@@ -579,7 +585,10 @@ export default function Home() {
                       height={12}
                       className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]"
                     />
-                    <p>Buy and sell individual Traits to customize your Chonk exactly how you want.</p>
+                    {/* <p>Buy and sell individual Traits to customize your Chonk exactly how you want.</p>
+                     */}
+                     <p>Buy and sell Chonks and individual Traits. Due to the technical architecture of Chonks, leading marketplaces don’t support the functionality we needed, so we built our own.</p>
+
                   </div>
 
                  
@@ -592,10 +601,12 @@ export default function Home() {
                       height={12}
                       className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]"
                     />
-                    <p>All offers and bids are stored onchain using Base&apos;s low gas fees.</p>
+                    {/* <p>All offers and bids are stored onchain using Base&apos;s low gas fees.</p> */}
+                    <p>Buy a Chonk and all of its Traits or collect your favorite Traits to dress your Chonk. It&apos;s all up to you.</p>
+                  
                   </div>
                   
-                  <div className="flex items-start gap-4">
+                  {/* <div className="flex items-start gap-4">
                     <Image
                       src="/bullet.svg"
                       alt="bullet point"
@@ -604,7 +615,7 @@ export default function Home() {
                       className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]"
                     />
                     <p>By using our marketplace, you can be confident in knowing your Chonk will come with the Traits you bidded for.</p>
-                  </div>
+                  </div> */}
                   
 
                   <div className="flex items-start gap-4">
@@ -680,7 +691,7 @@ export default function Home() {
                       />
                     </div>
                   </a>
-                  <p className="mt-4">backseats</p>
+                  <p className="mt-4"><a className="hover:underline" href="https://twitter.com/backseats_eth" target="_blank" rel="noopener noreferrer">backseats</a></p>
                 </div>
                 <div className={`sm:w-1/2 px-[3.45vw] py-[6.9vw] flex flex-col items-center`}>
                   <a href="https://twitter.com/marka_eth" target="_blank" rel="noopener noreferrer" className="block">
@@ -694,7 +705,7 @@ export default function Home() {
                       />
                     </div>
                   </a>
-                  <p className="mt-4">marka</p>
+                  <p className="mt-4"><a className="hover:underline" href="https://twitter.com/marka_eth" target="_blank" rel="noopener noreferrer">marka</a></p>
                 </div>
               </div>
 
