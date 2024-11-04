@@ -827,14 +827,14 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // for chonk action, get tba, use that address
 
-    function approve(address operator, uint256 _chonkId) public override(IERC721, ERC721) {
-        _incrementApprovals(_chonkId);
-        _approve(operator, _chonkId);
+    function approve(address _operator, uint256 _chonkId) public override(IERC721, ERC721) {
+        _incrementApprovals(_chonkId, _operator);
+        _approve(_operator, _chonkId);
     }
 
-    function setApprovalForAllChonksMarketplace(uint256 _chonkId, address operator, bool approved) public {
-        if (approved) _incrementApprovals(_chonkId);
-        _setApprovalForAll(msg.sender, operator, approved);
+    function setApprovalForAllChonksMarketplace(uint256 _chonkId, address _operator, bool _approved) public {
+        if (_approved) _incrementApprovals(_chonkId, _operator);
+        _setApprovalForAll(_operator, _operator, _approved);
     }
 
     // Please use the function above
@@ -843,20 +843,21 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // we could just add the approval to the struct for all of their chonks for good measure and then
 
         // who is msg.sender here? is it the tba or is it the eoa that owns the token?
-        if (approved) {
+        console.log("msg.sender", msg.sender);
+        if (_approved) {
             uint256[] chonkIds = walletOfOwner(msg.sender);
             for (uint i; i < chonkIds.length; ++i) {
-                _incrementApprovals(chonkIds[i]);
+                _incrementApprovals(chonkIds[i], _operator);
             }
         }
 
         _setApprovalForAll(msg.sender, _operator, _approved);
     }
 
-    function _incrementApprovals(uint256 _chonkId) private {
+    function _incrementApprovals(uint256 _chonkId, address _operator) private {
         address[] operators = chonkIdToApprovedOperators[_chonkId];
-        operators.push(operator);
-        chonkIdToApprovedOperators[_chonkId] = operators; // does this work
+        operators.push(_operator);
+        chonkIdToApprovedOperators[_chonkId] = operators; // does this work? should.
     }
 
     /// @dev – Called on _afterTokenTransfer
