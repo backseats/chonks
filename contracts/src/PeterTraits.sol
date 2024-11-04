@@ -595,6 +595,13 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
+    // Remove an active ChonkOffer if Chonk token ID because owned Traits changed
+    function _afterTokenTransfer(address, address, uint256 _traitTokenId) internal override(ERC721, ERC721Enumerable) {
+        address tba = ownerOf(_traitTokenId);
+        uint256 chonkId = petersMain.tbaAddressToTokenId(tba);
+        marketplace.removeChonkOfferOnTraitTransfer(chonkId);
+    }
+
     // DEPLOY: remove/just for testing
     function onERC721Received(address, address, uint256, bytes calldata) pure external returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;

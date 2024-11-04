@@ -39,11 +39,6 @@ import "forge-std/console.sol"; // DEPLOY: remove
 // TODO: withdraw or send us the ETH per each txn
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906 {
 
-    struct Approvals {
-        uint256 nonce;
-        address[] operators;
-    }
-
     bool _localDeploy; // DEPLOY: remove
 
     /// @dev We use this database for persistent storage.
@@ -76,6 +71,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // Mapping of the TBA account address to its tokenId. Great for getting from Trait Token ID to Chonk Token ID or Owner
     mapping(address => uint256) public tbaAddressToTokenId;
+
+    // Chonk ID to approved addresses
+    mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators;
 
     // The contract that handles rendering and minting the first season of traits
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
@@ -815,50 +813,66 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas);
         }
 
-        _invalidateAllOperatorApprovals(tokenId);
-
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    mapping(uint256 chonkId => Approvals approvals) public chonkIdToApprovals;
+    function _afterTokenTransfer(address, address, uint256 tokenId) internal virtual override {
+        _invalidateAllOperatorApprovals(tokenId);
+    }
 
     /// Approvals
 
-    function approve(address operator, uint256 _chonkId) public override(IERC721, ERC721) {
-        Approvals storage approvals = chonkIdToApprovals[_chonkId];
-        approvals.nonce += 1;
-        approvals.operators.push(operator);
+    // - tokenIdToTBAAccountAddress
+    // - tbaAddressToTokenId
 
+    // for chonk action, get tba, use that address
+
+    function approve(address operator, uint256 _chonkId) public override(IERC721, ERC721) {
+        _incrementApprovals(_chonkId);
         _approve(operator, _chonkId);
     }
 
-    function setApprovalForAll(uint256 _chonkId, address operator, bool approved) public {
-        Approvals storage approvals = chonkIdToApprovals[_chonkId];
-        approvals.nonce += 1;
-        approvals.operators.push(operator);
-
+    function setApprovalForAllChonksMarketplace(uint256 _chonkId, address operator, bool approved) public {
+        if (approved) _incrementApprovals(_chonkId);
         _setApprovalForAll(msg.sender, operator, approved);
     }
 
-    // Use the function above
-    function setApprovalForAll(address, bool) public pure override(IERC721, ERC721) {
-        revert("Not implemented");
-    }
+    // Please use the function above
+    function setApprovalForAll(address _operator, bool _approved) public pure override(IERC721, ERC721) {
+        // here you know msg.sedner, you also know wihch chonkIds they hold using `walletOfOwner`
+        // we could just add the approval to the struct for all of their chonks for good measure and then
 
-    /// @dev – Called on _beforeTokenTransfer
-    /// Prevents subsequent owners from using the previous owner's approvals
-    function _invalidateAllOperatorApprovals(uint256 _chonkId) internal {
-        Approvals memory approvals = chonkIdToApprovals[_chonkId];
-
-        for (uint i; i < approvals.operators.length; ++i) {
-            // Keep the marketplace approval
-            if (approvals.operators[i] == address(marketplace)) continue;
-
-            // Invalidate all other approvals
-            _setApprovalForAll(msg.sender, approvals.operators[i], false);
+        // who is msg.sender here? is it the tba or is it the eoa that owns the token?
+        if (approved) {
+            uint256[] chonkIds = walletOfOwner(msg.sender);
+            for (uint i; i < chonkIds.length; ++i) {
+                _incrementApprovals(chonkIds[i]);
+            }
         }
 
-        delete chonkIdToApprovals[_chonkId];
+        _setApprovalForAll(msg.sender, _operator, _approved);
+    }
+
+    function _incrementApprovals(uint256 _chonkId) private {
+        address[] operators = chonkIdToApprovedOperators[_chonkId];
+        operators.push(operator);
+        chonkIdToApprovedOperators[_chonkId] = operators; // does this work
+    }
+
+    /// @dev – Called on _afterTokenTransfer
+    /// Prevents subsequent owners from using the previous owner's approvals
+    function _invalidateAllOperatorApprovals(uint256 _chonkId) private {
+        address[] memory approvals = chonkIdToApprovedOperators[_chonkId];
+        address tbaForChonk = tokenIdToTBAAccountAddress[_chonkId];
+        // may need to use tbaAddressToTokenId w/ msg.sender value and check that?
+
+        // Invalidate all other approvals, including the ChonksMarket.
+        // Be sure to check if the marketplace has approval for the new owner.
+        for (uint i; i < approvals.operators.length; ++i) {
+            _setApprovalForAll(tbaForChonk, approvals.operators[i], false);
+        }
+
+        delete chonkIdToApprovedOperators[_chonkId];
     }
 
 }
