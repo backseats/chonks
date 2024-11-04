@@ -178,8 +178,11 @@ export default function Home() {
             <a href="#intro" onClick={(e) => scrollToSection(e, '#intro')} className="hover:opacity-70 transition-opacity">
               Intro
             </a>
+            <a href="#tbas" onClick={(e) => scrollToSection(e, '#tbas')} className="hover:opacity-70 transition-opacity">
+              TBAs
+            </a>
             
-            <a href="#studio" onClick={(e) => scrollToSection(e, '#studio')} className="hover:opacity-70 transition-opacity">
+            <a href="#studio" onClick={(e) => scrollToSection(e, '#tbas')} className="hover:opacity-70 transition-opacity">
               Studio
             </a>
             <a href="#marketplace" onClick={(e) => scrollToSection(e, '#marketplace')} className="hover:opacity-70 transition-opacity">
@@ -262,16 +265,109 @@ export default function Home() {
 
             <section  className={`flex flex-col sm:flex-row border-t border-l border-r backdrop-blur-[5px] `}>
               <div className={`sm:w-1/2 px-[3.45vw] py-[6.9vw] sm:border-r `}>
-                <p>Using the ERC-6551 standard, known as Token Bound Accounts, you can collect Traits and customize what your Chonk looks like.</p>
+                <p>Using the ERC-661 standard - Token Bound Accounts - your Chonk holds all of its traits which you can put on and take off to customize your Chonk!</p>
               </div>
               <div className={`sm:w-1/2 px-[3.45vw] pb-[3.45vw] md:py-[6.9vw] p-4  `}>
-                <p>Mint, collect, and trade Traits whenever you like on the Chonks Marketplace, and because it&apos;s on Base, changing up your Chonk is super cheap.</p>
+                <p>Mint, collect, and trade Traits whenever you like on the Chonks Marketplace, our custom marketplace built specifically for Chonks & TBAs.</p>
               </div>
             </section>
 
             <section className={`chonkMouse borderTopFull border-l border-r h-[50vh] md:h-[100vh]`}>
               <div className="absolute bottom-0 right-0 text-[0.8vw] opacity-20 p-[3.45vw]">
                 hello there sexy - move your mouse ;)
+              </div>
+            </section>
+
+
+            <section id="tbas" className="border-t border-l border-r py-[13.8vw] bg-white">
+              <div className="mb-[3.45vw] md:mb-[1vw]">
+                <h2 className="font-source-code-pro text-[4vw] font-weight-600 mx-[3.45vw] mb-[3.45vw]">
+                  Token Bound Accounts
+                </h2>
+              </div>
+
+              {/* Main container with flex column on mobile, row on desktop */}
+              <div className="flex flex-col md:flex-row">
+                {/* Top row / Left section */}
+                <div className="flex-1 flex justify-center mb-[6.9vw] md:mb-0">
+                  {/* Column 1 */}
+                  <div className="w-[50] md:w-[18vw] flex flex-col items-center text-center justify-center mt-[0.55vw]">
+                    <h3 className="text-[3vw] md:text-[1vw] mb-4 mx-[3.45vw] md:mx-0">Token Bound Account</h3>
+                    <Image
+                      src="/skinTone1.svg"
+                      alt="Token Bound Account"
+                      width={200}
+                      height={200}
+                      className="w-[20vw] h-[20vw] md:w-[10vw] md:h-[10vw] bg-[#0d6e9d]"
+                    />
+                    <div className="flex mt-4">
+                      <div className="w-[2vw] h-[2vw] bg-[#EFB15E]"></div>
+                      <div className="w-[2vw] h-[2vw] bg-[#BA8136]"></div>
+                      <div className="w-[2vw] h-[2vw] bg-[#8A5E24]"></div>
+                      <div className="w-[2vw] h-[2vw] bg-[#EAD9D9]"></div>
+                      <div className="w-[2vw] h-[2vw] bg-[#493213]"></div>
+                    </div>
+                  </div>
+
+                  {/* Column 2 */}
+                  <div className="w-[50] md:w-[28vw] flex flex-col items-center text-center justify-center relative mt-[0.5vw]">
+                    <h3 className="text-[3vw] md:text-[1vw] mb-4 mx-[3.45vw]  md:mx-0">A Fully Dressed Chonk</h3>
+                    <Image
+                      src="/marka/marka-transparent-chonk.svg"
+                      alt="Fully Dressed Chonk"
+                      width={200}
+                      height={200}
+                      className="w-[20vw] h-[20vw] md:w-[10vw] md:h-[10vw] bg-[#0d6e9d]"
+                    />
+                    <div className="flex mt-4">
+                      <div className="w-[2vw] h-[2vw] bg-[#FFFFFF]"></div>
+                    </div>
+                    {/* Horizontal line only visible on desktop */}
+                    <div className="hidden md:block absolute right-0 top-1/2 w-[calc(50%-5vw)] h-px bg-gray-300"></div>
+                  </div>
+                </div>
+
+                {/* Bottom row / Right section */}
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-1 gap-[3.45vw] px-[3.45vw] md:px-0 relative">
+
+                  <div className="absolute hidden md:block left-[5vw] top-[5vw] bottom-[5vw] w-px bg-gray-300 z-[1]"></div>
+
+                  {/* Item 1 */}
+                  <div className="flex items-center gap-4  relative z-[1] mr-[1.725vw]">
+                    <Image
+                      src="/marka/marka-hoodie-ghost-chonk.svg"
+                      alt="Trait 1"
+                      width={200}
+                      height={200}
+                      className="w-[20vw] h-[20vw] md:w-[10vw] md:h-[10vw] bg-[#0d6e9d]"
+                    />
+                    <span className="text-[3vw] md:text-[1vw]">Each collectible trait is a separate ERC-721</span>
+                  </div>
+
+                  {/* Item 2 */}
+                  <div className="flex items-center gap-4 relative z-[1] mr-[1.725vw]">
+                    <Image
+                      src="/marka/marka-pants-ghost-chonk.svg"
+                      alt="Trait 2"
+                      width={200}
+                      height={200}
+                      className="w-[20vw] h-[20vw] md:w-[10vw] md:h-[10vw] bg-[#0d6e9d]"
+                    />
+                    <span className="text-[3vw] md:text-[1vw]">Held by the Body NFT Token</span>
+                  </div>
+
+                  {/* Item 3 */}
+                  <div className="flex items-center gap-4 relative z-[1] mr-[1.725vw]">
+                    <Image
+                      src="/marka/marka-shoes-ghost-chonk.svg"
+                      alt="Trait 3"
+                      width={200}
+                      height={200}
+                      className="w-[20vw] h-[20vw] md:w-[10vw] md:h-[10vw] bg-[#0d6e9d]"
+                    />
+                    <span className="text-[3vw] md:text-[1vw]">Tradable together with the Body or individually on the Chonks Marketplace</span>
+                  </div>
+                </div>
               </div>
             </section>
 
@@ -567,16 +663,16 @@ export default function Home() {
               <h2 className="font-source-code-pro text-[6vw] font-weight-600 mx-[6.9vw] mb-[3.45vw]  ">
                 Our Team
               </h2>
-              <p className="font-source-code-pro font-weight-600 mx-[3.45vw] ">
+              {/* <p className="font-source-code-pro font-weight-600 mx-[3.45vw] ">
                 2 passionate builders, no bullsh*t.
-              </p>
+              </p> */}
 
               <div className='flex flex-col sm:flex-row w-full  justify-center items-center'>
                 <div className={`sm:w-1/2 px-[3.45vw] py-[3.45vw] flex flex-col items-center`}>
                   <a href="https://twitter.com/backseats_eth" target="_blank" rel="noopener noreferrer" className="block">
                     <div className="w-[50vw] h-[50vw] sm:w-[30vw] sm:h-[30vw] bg-gray-200 border border-white-300 hover:bg-gray-600 transition-colors duration-300 flex items-center justify-center overflow-hidden">
                       <Image
-                        src="/backseats-transparent-3000x3000.png"
+                        src="/backseats/backseats-transparent-chonk.svg"
                         alt="backseats"
                         width={3000}
                         height={3000}
@@ -590,7 +686,7 @@ export default function Home() {
                   <a href="https://twitter.com/marka_eth" target="_blank" rel="noopener noreferrer" className="block">
                     <div className="w-[50vw] h-[50vw] sm:w-[30vw] sm:h-[30vw] bg-gray-200 border border-white-300 hover:bg-gray-600  transition-colors duration-300 flex items-center justify-center overflow-hidden">
                       <Image
-                        src="/marka-transparent-bg-3000x3000.png"
+                        src="/marka/marka-transparent-chonk.svg"
                         alt="marka"
                         width={3000}
                         height={3000}
@@ -603,7 +699,7 @@ export default function Home() {
               </div>
 
               <p className="font-source-code-pro text-[2.5vw] md:text-[1.5vw] font-weight-600 mx-[3.45vw] ">
-                Much love to <a href="https://twitter.com/theharveydean" target="_blank" rel="noopener noreferrer" className="underline">Dean Harvey</a>, who designed the original Chonk & most of the Season 1 Traits. And <a href="https://x.com/NaimePakniyat" target="_blank" rel="noopener noreferrer" className="underline">Naime</a> & <a href="https://x.com/nahidpakniyat" target="_blank" rel="noopener noreferrer" className="underline">Nahid</a>, who designed a lot of the Season 1 girl Traits.
+                A special thank you <a href="https://twitter.com/theharveydean" target="_blank" rel="noopener noreferrer" className="underline">Dean Harvey</a>, who designed the original Chonk and many of the Season 1 Traits. Thank you to <a href="https://x.com/NaimePakniyat" target="_blank" rel="noopener noreferrer" className="underline">Naime</a> and <a href="https://x.com/nahidpakniyat" target="_blank" rel="noopener noreferrer" className="underline">Nahid</a>, who helped with additional Season 1 Traits.
               </p>
             </section>
 
