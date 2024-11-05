@@ -22,6 +22,9 @@ export default function Home() {
   const [showOverlay, setShowOverlay] = useState(true);
   const horizontalScrollRef = useRef<HTMLDivElement>(null);
   const lenisRef = useRef<Lenis | null>(null);
+  const tba1Ref = useRef<HTMLDivElement>(null);
+  const tba2Ref = useRef<HTMLDivElement>(null);
+  const tba3Ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
 
@@ -92,6 +95,44 @@ export default function Home() {
           x: gsap.utils.unitize(x => parseFloat(x) % 100)
         }
       });
+    }
+
+     // Add new scroll trigger animation for TBA section
+     if (tba1Ref.current && tba2Ref.current && tba3Ref.current) {
+      
+      const tlTBA = gsap.timeline({
+        scrollTrigger: {
+            trigger: "#tbas",
+            start: "top 30%",
+            end: 'top 0%',
+            scrub: 1,
+            
+            // markers: true,
+            onLeaveBack: () => {
+                // console.log("tlTBAs on LeaveBack");
+            }
+        }
+    });
+
+    tlTBA.to(tba1Ref.current, {
+        x: +20,
+        opacity: 1,
+
+    }, 0)
+    .to(tba2Ref.current, {
+      x: +20,
+      opacity: 1,
+      delay: 0.5,
+    }, 0)
+    .to(tba3Ref.current, {
+      // y: +20,
+      opacity: 1,
+      delay: 1,
+    }, 0);
+
+    
+
+     
     }
 
     return () => {
@@ -291,7 +332,7 @@ export default function Home() {
                 {/* Top row / Left section */}
                 <div className="flex-1 flex justify-center mb-[6.9vw] md:mb-0">
                   {/* Column 1 */}
-                  <div className="w-[50] md:w-[18vw] flex flex-col items-center text-center justify-center mt-[0.55vw]">
+                  <div ref={tba1Ref} className="opacity-0 translate-x-[-100]  w-[50] md:w-[18vw] flex flex-col items-center text-center justify-center mt-[0.55vw]">
                     <h3 className="text-[3vw] md:text-[1vw] mb-4 mx-[3.45vw] md:mx-0">Token Bound Account</h3>
                     <Image
                       src="/skinTone1.svg"
@@ -310,7 +351,7 @@ export default function Home() {
                   </div>
 
                   {/* Column 2 */}
-                  <div className="w-[50] md:w-[28vw] flex flex-col items-center text-center justify-center relative mt-[0.5vw]">
+                  <div ref={tba2Ref} className="opacity-0 w-[50] md:w-[28vw] flex flex-col items-center text-center justify-center relative mt-[0.5vw]">
                     <h3 className="text-[3vw] md:text-[1vw] mb-4 mx-[3.45vw]  md:mx-0">A Fully Dressed Chonk</h3>
                     <Image
                       src="/marka/marka-transparent-chonk.svg"
@@ -328,7 +369,7 @@ export default function Home() {
                 </div>
 
                 {/* Bottom row / Right section */}
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-1 gap-[3.45vw] px-[3.45vw] md:px-0 relative">
+                <div ref={tba3Ref} className="opacity-0 flex-1 grid grid-cols-1 md:grid-cols-1 gap-[3.45vw] px-[3.45vw] md:px-0 relative">
 
                   <div className="absolute hidden md:block left-[5vw] top-[5vw] bottom-[5vw] w-px bg-gray-300 z-[1]"></div>
 
