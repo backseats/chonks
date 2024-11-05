@@ -310,7 +310,7 @@ export default function Home() {
 
             <section  className={`flex flex-col sm:flex-row border-t border-l border-r backdrop-blur-[5px] `}>
               <div className={`sm:w-1/2 px-[3.45vw] py-[6.9vw] sm:border-r `}>
-                <p>Using the ERC-661 standard - Token Bound Accounts - your Chonk holds all of its traits which you can put on and take off to customize your Chonk!</p>
+                <p>Using the ERC-6551 standard - Token Bound Accounts - your Chonk holds all of its traits which you can put on and take off to customize your Chonk!</p>
               </div>
               <div className={`sm:w-1/2 px-[3.45vw] pb-[3.45vw] md:py-[6.9vw] p-4  `}>
                 <p>Mint, collect, and trade Traits whenever you like on the Chonks Marketplace, our custom marketplace built specifically for Chonks & TBAs.</p>
