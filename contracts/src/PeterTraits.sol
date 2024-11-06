@@ -3,10 +3,12 @@ pragma solidity ^0.8.22;
 
 // OpenZeppelin Imports
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { ERC721Burnable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { Utils } from "./common/Utils.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 // Renderers
 import { RenderHelper } from "./renderers/RenderHelper.sol";
@@ -34,7 +36,7 @@ import "forge-std/console.sol"; // DEPLOY: remove
 //     _;
 // }
 
-contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage, Ownable, IERC4906, IERC721Receiver {
+contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage, Ownable, IERC4906, IERC721Receiver, ReentrancyGuard {
 
     /// @dev We use this database for persistent storage
     Traits public traitTokens;
@@ -59,6 +61,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     address public signer;
 
     mapping(uint256 => TraitMetadata) public traitIndexToMetadata;
+    mapping(uint256 traitId => address[] operators) public traitIdToApprovedOperators;
 
     PetersMain public petersMain;
 
@@ -79,6 +82,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     error CantTransfer();
     error NotATBA();
     error NotAValidMinterContract();
+    error NotYourTrait();
     error TraitNotFound(uint256 _tokenId);
     error TraitTokenDoesntExist();
 
@@ -107,7 +111,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     // TODO: move this mint logic into FirstSeasonRenderMinter
 
     /// @dev NOTE: Mints to a smart contract address that implements onERC721Received
-    function safeMint(address _to) public returns (uint256) { // TODO: add onlyMinter modifier | rename to initial mint or something?
+    function safeMint(address _to) public nonReentrant returns (uint256) { // TODO: add onlyMinter modifier | rename to initial mint or something?
         // TODO: check supply?
 
         resolveEpochIfNecessary();
@@ -596,10 +600,122 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     // Remove an active ChonkOffer if Chonk token ID because owned Traits changed
-    function _afterTokenTransfer(address, address, uint256 _traitTokenId) internal override(ERC721, ERC721Enumerable) {
+    function _afterTokenTransfer(address, address, uint256 _traitTokenId) internal override(ERC721) {
         address tba = ownerOf(_traitTokenId);
         uint256 chonkId = petersMain.tbaAddressToTokenId(tba);
         marketplace.removeChonkOfferOnTraitTransfer(chonkId);
+    }
+
+    // Approvals
+
+    // add nonReentrant?
+    /// @notice Override approve to track individual token approvals
+    function approve(address _operator, uint256 _tokenId) public override(ERC721, IERC721) {
+        // CHECKS //
+        
+        if (!_exists(_tokenId)) revert TraitTokenDoesntExist(); // not needed as done in super.approve but no harm leaving it in
+        if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait(); // ML: should we allow approved operators to also approve? I don't think so
+        
+        // EFFECTS //
+        
+        // if removing approval
+        if (_operator == address(0)) {
+            // Remove the operator from the array
+            address[] storage operators = traitIdToApprovedOperators[_tokenId];
+            for (uint256 i = 0; i < operators.length; i++) {
+                if (operators[i] == _operator) {
+                    // Replace with last element and pop
+                    operators[i] = operators[operators.length - 1];
+                    operators.pop();
+                    break;
+                }
+            }
+        } else {
+            // Add operator if not already present
+            address[] storage operators = traitIdToApprovedOperators[_tokenId];
+            bool exists = false;
+            for (uint256 i = 0; i < operators.length; i++) {
+                if (operators[i] == _operator) {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists) {
+                operators.push(_operator);
+            }
+        }
+
+        // INTERACTIONS //
+        super.approve(_operator, _tokenId);
+    }
+
+    // add nonReentrant?
+    /// @notice Override setApprovalForAll to track operator approvals
+    function setApprovalForAll(address _operator, bool _approved) public override(ERC721, IERC721) {
+        // CHECKS //
+
+        // Cannot approve self as operator
+        require(_operator != msg.sender, "ERC721: approve to caller");
+        
+        // EFFECTS //
+
+        // For setApprovalForAll, we need to update approvals for all tokens owned by msg.sender
+        uint256 balance = balanceOf(msg.sender);
+        for (uint256 i = 0; i < balance; i++) {
+            uint256 tokenId = tokenOfOwnerByIndex(msg.sender, i);
+            
+            if (_approved) {
+                // Add operator if not already present
+                address[] storage operators = traitIdToApprovedOperators[tokenId];
+                bool exists = false;
+                for (uint256 j = 0; j < operators.length; j++) {
+                    if (operators[j] == _operator) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    operators.push(_operator);
+                }
+            } else {
+                // Remove the operator
+                address[] storage operators = traitIdToApprovedOperators[tokenId];
+                for (uint256 j = 0; j < operators.length; j++) {
+                    if (operators[j] == _operator) {
+                        // Replace with last element and pop
+                        operators[j] = operators[operators.length - 1];
+                        operators.pop();
+                        break;
+                    }
+                }
+            }
+        }
+
+        // INTERACTIONS //
+        super.setApprovalForAll(_operator, _approved);
+    }
+
+    /// @notice Invalidates all operator approvals for a specific token
+    function invalidateAllOperatorApprovals(uint256 _tokenId) public {
+        // CHECKS
+        if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
+        if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait();
+        
+        // EFFECTS
+        // Clear our tracking array
+        delete traitIdToApprovedOperators[_tokenId];
+        
+        // INTERACTIONS
+        // Remove individual token approval
+        super.approve(address(0), _tokenId);
+        
+        // Remove all operator approvals for this token
+        address[] memory operators = traitIdToApprovedOperators[_tokenId];
+        for (uint256 i = 0; i < operators.length; i++) {
+            super.setApprovalForAll(operators[i], false);
+        }
+        
+        emit AllOperatorApprovalsInvalidated(_tokenId);
     }
 
     // DEPLOY: remove/just for testing

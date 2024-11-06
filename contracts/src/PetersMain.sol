@@ -4,6 +4,7 @@ pragma solidity ^0.8.22;
 // OpenZeppelin Imports
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { IERC165 } from  "@openzeppelin/contracts/utils/introspection/IERC165.sol";
@@ -37,7 +38,7 @@ import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "forge-std/console.sol"; // DEPLOY: remove
 
 // TODO: withdraw or send us the ETH per each txn
-contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906 {
+contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
 
     bool _localDeploy; // DEPLOY: remove
 
@@ -783,12 +784,29 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // TODO: Withdraw function
 
     // Override functions for marketplace compatibility
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override nonReentrant {
+
+        // CHECKS
+
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
         if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();
 
+        // Cache TBA address and trait tokens to minimize external calls
+        address tbaAddress = tokenIdToTBAAccountAddress[tokenId];
+        uint256[] memory traitTokenIds = traitsContract.walletOfOwner(tbaAddress);
+        uint256[] memory chonkIds = walletOfOwner(to);
+        address[] memory tbas = new address[](chonkIds.length);
+        for (uint256 j; j < chonkIds.length; ++j) {
+            tbas[j] = tokenIdToTBAAccountAddress[chonkIds[j]];
+        }
+
+        // EFFECTS (if any state changes were needed)
+
+        // INTERACTIONS
+        // Marketplace checks and cleanup
+
         // check marketplace if tokenId is for sale via offer and msg.sender is the marketplace
-        (, address seller,,) = marketplace.chonkOffers(tokenId);
+        (, address seller,,,) = marketplace.chonkOffers(tokenId);
         if (seller != address(0)) {
             if (msg.sender != address(marketplace)) revert CantTransfer();
         }
@@ -796,29 +814,42 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // Clean up Chonk Offers and Bids
         marketplace.deleteChonkOfferBeforeTokenTransfer(tokenId);
         marketplace.deleteChonkBidsBeforeTokenTransfer(tokenId, to);
-
-        // Get all the Trait tokens in the Chonk's TBA
-        uint256[] memory traitTokenIds = traitsContract.walletOfOwner(tokenIdToTBAAccountAddress[tokenId]);
-        // Loop through all the Trait tokens and delete the offers and bids
+        
+        // Loop through all the Trait tokens
         for (uint256 i; i < traitTokenIds.length; ++i) {
             uint256 traitTokenId = traitTokenIds[i];
+            
+            // Clean up marketplace offers/bids
             marketplace.deleteTraitOffersBeforeTokenTransfer(traitTokenId);
 
-            // Delete any bids for that traitTokenId for any TBAs the `to` address also owns
-            uint256[] memory chonkIds = walletOfOwner(to);
-            address[] memory tbas = new address[](chonkIds.length);
-            for (uint256 j; j < chonkIds.length; ++j) {
-                tbas[j] = tokenIdToTBAAccountAddress[chonkIds[j]];
-            }
+            // Invalidate all approvals for each trait token
+            // Note: This needs to be called from the TBA's context
+            IAccountProxy(payable(tbaAddress)).execute(
+                address(traitsContract), // target
+                0, // value
+                abi.encodeWithSignature(
+                    "invalidateAllOperatorApprovals(uint256)",
+                    traitTokenId
+                ),
+                0 // operation
+            );
+
             marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas);
         }
 
         super._beforeTokenTransfer(from, to, tokenId);
+
+        // Additional considerations:
+        // Consider if the marketplace contract needs its own reentrancy protection
+        // Verify that the traitsContract and marketplace addresses cannot be changed during execution
+        // Consider adding emergency pause functionality for critical issues
     }
 
-    function _afterTokenTransfer(address, address, uint256 tokenId) internal virtual override {
-        _invalidateAllOperatorApprovals(tokenId);
-    }
+    // better to invalidate TBA approvals in before or after?
+    // i think before.... 
+    // function _afterTokenTransfer(address, address, uint256 tokenId) internal virtual override {
+    //     _invalidateAllOperatorApprovals(tokenId);
+    // }
 
     /// Approvals
 
@@ -827,6 +858,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // for chonk action, get tba, use that address
 
+    /*
     function approve(address _operator, uint256 _chonkId) public override(IERC721, ERC721) {
         _incrementApprovals(_chonkId, _operator);
         _approve(_operator, _chonkId);
@@ -855,9 +887,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function _incrementApprovals(uint256 _chonkId, address _operator) private {
-        address[] operators = chonkIdToApprovedOperators[_chonkId];
+        address[] storage operators = chonkIdToApprovedOperators[_chonkId];
         operators.push(_operator);
-        chonkIdToApprovedOperators[_chonkId] = operators; // does this work? should.
     }
 
     /// @dev – Called on _afterTokenTransfer
@@ -875,5 +906,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         delete chonkIdToApprovedOperators[_chonkId];
     }
+    */
 
 }

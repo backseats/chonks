@@ -215,4 +215,18 @@ contract PetersMainTest is Test {
         assertEq(storedPeter.bottomId, 0);
         assertEq(storedPeter.shoesId, 0);
     }
+
+    // function testIncrementApprovals() public {
+    //     uint256 chonkId = 1;
+    //     address operator1 = address(0x1);
+    //     address operator2 = address(0x2);
+        
+    //     _incrementApprovals(chonkId, operator1);
+    //     _incrementApprovals(chonkId, operator2);
+        
+    //     address[] memory operators = chonkIdToApprovedOperators[chonkId];
+    //     assert(operators.length == 2);
+    //     assert(operators[0] == operator1);
+    //     assert(operators[1] == operator2);
+    // }
 }
