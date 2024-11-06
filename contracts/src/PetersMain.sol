@@ -114,13 +114,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
         if (_localDeploy) {
-            for (uint i; i < 100; ++i) {
+            for (uint i; i < 5; ++i) {
                 mint(); // Mints N bodies/tokens
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
             }
-            setBackgroundColor(1, "ffffff");
-            setTokenRenderZ(1, true);
+            // setBackgroundColor(1, "ffffff");
+            // setTokenRenderZ(1, true);
         }
     }
 
@@ -129,15 +129,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // just popping this in here for now, we can decide full spec later
-    function mintByLevel(uint8 amount, string calldata nonce, bytes calldata signature ) public payable {
-        if (amount < 4 || amount > 7) revert InvalidLevelAmount();
-        if (!isValidSignature(keccak256(abi.encodePacked(msg.sender, nonce)), signature)) revert InvalidSignature();
-        if (usedNonces[nonce]) revert NonceAlreadyUsed();
+    // function mintByLevel(uint8 amount, string calldata nonce, bytes calldata signature ) public payable {
+    //     if (amount < 4 || amount > 7) revert InvalidLevelAmount();
+    //     if (!isValidSignature(keccak256(abi.encodePacked(msg.sender, nonce)), signature)) revert InvalidSignature();
+    //     if (usedNonces[nonce]) revert NonceAlreadyUsed();
 
-        _mintAmount(amount);
+    //     _mintAmount(amount);
 
-        usedNonces[nonce] = true;
-    }
+    //     usedNonces[nonce] = true;
+    // }
 
     function _mintAmount(uint8 amount) internal {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
@@ -202,13 +202,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         emit Mint(msg.sender, tokenId);
     }
 
-    using ECDSA for bytes32;
-    /// @notice Checks if the private key that singed the nonce matches the system address of the contract
-    function isValidSignature(bytes32 hash, bytes calldata signature) internal view returns (bool) {
-        require(systemAddress != address(0), "Missing system address");
-        bytes32 signedHash = hash.toEthSignedMessageHash();
-        return signedHash.recover(signature) == systemAddress;
-    }
+    // using ECDSA for bytes32;
+    // /// @notice Checks if the private key that singed the nonce matches the system address of the contract
+    // function isValidSignature(bytes32 hash, bytes calldata signature) internal view returns (bool) {
+    //     require(systemAddress != address(0), "Missing system address");
+    //     bytes32 signedHash = hash.toEthSignedMessageHash();
+    //     return signedHash.recover(signature) == systemAddress;
+    // }
 
     // TODO: payable, this probably actually calls the first season contract to mint
     function buyTrait(uint256 _tokenId) public {
@@ -786,6 +786,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Override functions for marketplace compatibility
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override nonReentrant {
 
+        if (from == address(0)) {
+            super._beforeTokenTransfer(from, to, tokenId);
+            return;
+        }
+
+        console.log('PetersMain _beforeTokenTransfer called for token ID:', tokenId);
         // CHECKS
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
@@ -793,11 +799,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         // Cache TBA address and trait tokens to minimize external calls
         address tbaAddress = tokenIdToTBAAccountAddress[tokenId];
+        console.log('- tbaAddress:', tbaAddress);
         uint256[] memory traitTokenIds = traitsContract.walletOfOwner(tbaAddress);
         uint256[] memory chonkIds = walletOfOwner(to);
         address[] memory tbas = new address[](chonkIds.length);
         for (uint256 j; j < chonkIds.length; ++j) {
             tbas[j] = tokenIdToTBAAccountAddress[chonkIds[j]];
+            console.log('- tbas...:', tokenIdToTBAAccountAddress[chonkIds[j]]);
         }
 
         // EFFECTS (if any state changes were needed)

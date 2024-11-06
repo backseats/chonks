@@ -13,6 +13,7 @@ import { TraitCategory } from './TraitCategory.sol';
 import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { Utils } from './common/Utils.sol';
 import { console2 } from 'forge-std/console2.sol';
+import "forge-std/console.sol"; // DEPLOY: remove
 
 // contract FirstSeasonRenderMinter is IRenderMinterV1 { // TODO: ownable, ITraitStorage
 contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
@@ -230,14 +231,18 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
         //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin
 
-        _amount = 100; // for testing
+        _amount = 5; // for testing
 
         uint256[] memory mintedIds = new uint256[](_amount);
 
         // for(uint i; i < INITIAL_TRAIT_NUMBER; ++i) {
         for(uint i; i < _amount; ++i) {
+
+            console.log('minting', i);
             uint tokenId = peterTraits.safeMint(_to); // creates a token without any kind of info
             mintedIds[i] = tokenId;
+
+            console.log('tokenId', tokenId);
 
             // Initialize our Trait
             ITraitStorage.StoredTrait memory trait = peterTraits.getStoredTraitForTokenId(tokenId);
@@ -270,6 +275,8 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
             emit ITraitStorage.Mint(_to, tokenId);
         }
+
+        console.log('finished for...');
 
         return mintedIds;
     }

@@ -97,6 +97,9 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     constructor(bool localDeploy_) ERC721("PeterTraits", "PTR") {
         _initializeOwner(msg.sender);
         _localDeploy = localDeploy_;
+
+        console.log("PeterTraits Constructor called with localDeploy:", localDeploy_);
+        console.log("PeterTraits Owner set to:", msg.sender);
     }
 
     function getTraitIndexToMetadata(uint256 _traitIndex) public view returns (TraitMetadata memory) {
@@ -111,13 +114,20 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     // TODO: move this mint logic into FirstSeasonRenderMinter
 
     /// @dev NOTE: Mints to a smart contract address that implements onERC721Received
-    function safeMint(address _to) public nonReentrant returns (uint256) { // TODO: add onlyMinter modifier | rename to initial mint or something?
+    function safeMint(address _to) public returns (uint256) { // TODO: add onlyMinter modifier | rename to initial mint or something?
         // TODO: check supply?
+        console.log('PeterTraits safeMint, to:', _to);
 
+        console.log('resolving epoch...');
         resolveEpochIfNecessary();
+
+        console.log('PeterTraits calling safeMint...');
 
         uint tokenId = totalSupply() + 1;
         _safeMint(_to, tokenId); // creates a token without any kind of info, info is filled in in the render contract
+        
+        console.log('PeterTraits safeMinted token:', tokenId);
+
 
         emit BatchMetadataUpdate(0, type(uint256).max);
 

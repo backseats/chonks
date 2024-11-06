@@ -7,6 +7,8 @@ import { PetersMain } from "./PetersMain.sol";
 import { PeterTraits } from "./PeterTraits.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
+import "forge-std/console.sol"; // DEPLOY: remove
+
 contract ChonksMarket is Ownable, ReentrancyGuard {
 
     // Structs
@@ -165,6 +167,8 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     /// Constructor
 
     constructor(address _petersMain, address _peterTraits, uint8 _royaltyPercentage, address _teamWallet) {
+
+        console.log('ChonksMarket constructor called, msg.sender:', msg.sender);
         _initializeOwner(msg.sender);
 
         PETERS_MAIN = PetersMain(_petersMain);
@@ -519,6 +523,8 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     }
 
     function removeChonkOfferOnTraitTransfer(uint256 _chonkId) public onlyTraitContract {
+        console.log('ChonksMarket removeChonkOfferOnTraitTransfer called for chonk ID:', _chonkId);
+        console.log('- message sender:', msg.sender);
         delete chonkOffers[_chonkId];
     }
 
