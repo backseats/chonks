@@ -103,6 +103,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error InvalidColor();
     error InvalidLevelAmount();
     error InvalidSignature();
+    error markaSaysNo();
     error NonceAlreadyUsed();
     error PeterDoesntExist();
 
@@ -113,8 +114,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
+        console.log('localDeploy:', _localDeploy);
         if (_localDeploy) {
-            for (uint i; i < 5; ++i) {
+            for (uint i; i < 1; ++i) {
                 mint(); // Mints N bodies/tokens
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
@@ -125,6 +127,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function mint() public payable { // TODO amount, check price
+        console.log('minting...');
         _mintAmount(4);
     }
 
@@ -142,11 +145,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function _mintAmount(uint8 amount) internal {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
 
+        console.log('minting amount:', amount);
         // uint256 amount = 7;
         // resolveEpochIfNecessary(); // no longer need this as bodies can be changed by holders
 
         uint256 tokenId = ++_nextTokenId;
         _mint(msg.sender, tokenId);
+
+        console.log('minted tokenId:', tokenId);
+
+        console.log('creating tba...');
+        console.log('address(this)', address(this));
 
         // params: implementation address, salt, chainId, tokenContract, tokenId
         address tokenBoundAccountAddress = REGISTRY.createAccount(
@@ -157,9 +166,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             tokenId
         );
 
+        console.log('tokenBoundAccountAddress:', tokenBoundAccountAddress);
+
         // Set the cross-reference between tokenId and TBA account address
         tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
         tbaAddressToTokenId[tokenBoundAccountAddress] = tokenId;
+
+        
 
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
@@ -167,6 +180,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         //TODO: think we need to call this currentSeasonRenderMinter... also, will we ever let people mint bodies again after first mint?
         uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, amount);
 
+        console.log('traitsIds[0]:', traitsIds[0]);
         // Initialize our Peter
         StoredPeter storage peter = peterTokens.all[tokenId];
 
@@ -732,13 +746,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setBackgroundColor(uint256 _peterTokenId, string memory _color) public {
         _validatePeterOwnership(_peterTokenId);
 
-        if (bytes(_color).length == 0) return;
-
         bytes memory colorBytes = bytes(_color);
-
-        // Check that the color string is exactly 6 characters long
         if (colorBytes.length != 6) revert InvalidColor();
 
+        if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo();
         // Ensure all characters are valid hex characters (0-9, a-f, A-F)
         for (uint i = 0; i < 6; i++) {
             if (

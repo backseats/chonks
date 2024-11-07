@@ -229,6 +229,8 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
      function safeMintMany(address _to, uint8 _amount) public payable returns (uint256[] memory) { // TODO: add onlyMinter modifier
         // TODO: check supply?
 
+        console.log('safeMintMany called, _to:', _to, ', _amount:', _amount);
+
         //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin
 
         _amount = 5; // for testing

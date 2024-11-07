@@ -26,6 +26,7 @@ contract PetersMainRendererTest is AbstractTest {
 
     function setUp() public {
         address deployer = vm.addr(1);
+        vm.createSelectFork("base_sepolia", 17419761);
         vm.startPrank(deployer);
 
         main = new PetersMain(true);

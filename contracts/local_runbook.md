@@ -31,3 +31,10 @@ QA Notes:
 2. In PetersMain.sol _debugPostConstructorMint is where the number of tokens is set, need to increase to 500 if running a qa for 500 - (1000 seems to hang fyi)
 3. I've turned off png ouput in ts-tooling/qa-collection/index.ts as not needed and slows things down
 
+
+Test Notes:
+
+1. Need to run anvil and fork url when running tests: 
+    forge test --fork-url http://localhost:8545 --match-path test/PetersMainRenderer.t.sol
+    forge test --fork-url http://localhost:8545 (seems to stall and failing on some curently)
+2. Make sure you add this to .env or testSvgRenderer will fail: NFT_ID=1
