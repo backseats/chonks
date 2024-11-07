@@ -125,7 +125,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         uint tokenId = totalSupply() + 1;
         _safeMint(_to, tokenId); // creates a token without any kind of info, info is filled in in the render contract
-        
+
         console.log('PeterTraits safeMinted token:', tokenId);
 
 
@@ -622,17 +622,17 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     /// @notice Override approve to track individual token approvals
     function approve(address _operator, uint256 _tokenId) public override(ERC721, IERC721) {
         // CHECKS //
-        
-        if (!_exists(_tokenId)) revert TraitTokenDoesntExist(); // not needed as done in super.approve but no harm leaving it in
-        if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait(); // ML: should we allow approved operators to also approve? I don't think so
-        
+
+        if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
+        if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait();
+
         // EFFECTS //
-        
+
         // if removing approval
         if (_operator == address(0)) {
             // Remove the operator from the array
             address[] storage operators = traitIdToApprovedOperators[_tokenId];
-            for (uint256 i = 0; i < operators.length; i++) {
+            for (uint256 i; i < operators.length; ++i {
                 if (operators[i] == _operator) {
                     // Replace with last element and pop
                     operators[i] = operators[operators.length - 1];
@@ -644,7 +644,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             // Add operator if not already present
             address[] storage operators = traitIdToApprovedOperators[_tokenId];
             bool exists = false;
-            for (uint256 i = 0; i < operators.length; i++) {
+            for (uint256 i; i < operators.length; ++i) {
                 if (operators[i] == _operator) {
                     exists = true;
                     break;
@@ -666,19 +666,19 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         // Cannot approve self as operator
         require(_operator != msg.sender, "ERC721: approve to caller");
-        
+
         // EFFECTS //
 
         // For setApprovalForAll, we need to update approvals for all tokens owned by msg.sender
         uint256 balance = balanceOf(msg.sender);
-        for (uint256 i = 0; i < balance; i++) {
+        for (uint256 i; i < balance; ++i) {
             uint256 tokenId = tokenOfOwnerByIndex(msg.sender, i);
-            
+
             if (_approved) {
                 // Add operator if not already present
                 address[] storage operators = traitIdToApprovedOperators[tokenId];
                 bool exists = false;
-                for (uint256 j = 0; j < operators.length; j++) {
+                for (uint256 j; j < operators.length; ++j) {
                     if (operators[j] == _operator) {
                         exists = true;
                         break;
@@ -690,7 +690,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             } else {
                 // Remove the operator
                 address[] storage operators = traitIdToApprovedOperators[tokenId];
-                for (uint256 j = 0; j < operators.length; j++) {
+                for (uint256 j; j < operators.length; ++j) {
                     if (operators[j] == _operator) {
                         // Replace with last element and pop
                         operators[j] = operators[operators.length - 1];
@@ -710,21 +710,21 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         // CHECKS
         if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
         if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait();
-        
+
         // EFFECTS
         // Clear our tracking array
         delete traitIdToApprovedOperators[_tokenId];
-        
+
         // INTERACTIONS
         // Remove individual token approval
         super.approve(address(0), _tokenId);
-        
+
         // Remove all operator approvals for this token
         address[] memory operators = traitIdToApprovedOperators[_tokenId];
-        for (uint256 i = 0; i < operators.length; i++) {
+        for (uint256 i; i < operators.length; ++i) {
             super.setApprovalForAll(operators[i], false);
         }
-        
+
         emit AllOperatorApprovalsInvalidated(_tokenId);
     }
 
