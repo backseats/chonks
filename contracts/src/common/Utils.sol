@@ -6,6 +6,19 @@ library Utils {
     uint256 internal constant GOLDEN_RATIO = 161803;
 
 
+    function toHexString(bytes memory data) internal pure returns (string memory) {
+        bytes memory alphabet = "0123456789abcdef";
+        bytes memory str = new bytes(2 + data.length * 2);
+        str[0] = "0";
+        str[1] = "x";
+        for (uint256 i = 0; i < data.length; i++) {
+            str[2 + i * 2] = alphabet[uint8(data[i] >> 4)];
+            str[2 + i * 2 + 1] = alphabet[uint8(data[i] & 0x0f)];
+        }
+        return string(str);
+    }
+
+
     /// @dev Zero-index based pseudorandom number based on one input and max bound - thank you Checks
     function random(uint256 input, uint256 _max) internal pure returns (uint256) {
         return (uint256(keccak256(abi.encodePacked(input))) % _max);

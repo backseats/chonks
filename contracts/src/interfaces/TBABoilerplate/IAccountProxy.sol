@@ -9,4 +9,9 @@ interface IAccountProxy {
         bytes calldata data,
         uint256 operation
     ) external returns (bytes memory);
+    function executeCall(
+        address to,
+        uint256 value,
+        bytes calldata data
+    ) external payable returns (bytes memory);
 }

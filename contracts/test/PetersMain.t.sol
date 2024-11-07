@@ -11,87 +11,91 @@ import { TraitCategory } from '../src/TraitCategory.sol';
 
 import { Test, console } from 'forge-std/Test.sol';
 
-contract PetersMainTest is Test {
+import { PetersBaseTest } from './PetersBase.t.sol';
 
-    PetersMain public main;
-    PeterTraits public traits;
-    FirstSeasonRenderMinter public firstSeasonMinter;
-    MainRenderer public mainRenderer;
+import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
-    bool constant localDeploy = true;
+contract PetersMainTest is PetersBaseTest {
 
-    error Unauthorized();
-
-    function setUp() public {
-        vm.startPrank(address(1));
-        main = new PetersMain(false);
-        traits = new PeterTraits(false);
-        firstSeasonMinter = new FirstSeasonRenderMinter(traits, localDeploy);
-        firstSeasonMinter.setMinterStatus(address(main), true); // true uses localDeploy for testing
-
-        mainRenderer = new MainRenderer();
-        main.setMainRenderer(address(mainRenderer));
-
-        vm.stopPrank();
-    }
-
-    function addBodyTraits() internal {
-        main.addNewBody(0, 'Skin Tone 1',hex"0b17efb15e0c17efb15e1017efb15e1117efb15e0b15efb15e0c15efb15e0d15efb15e0e15efb15e0f15efb15e1015efb15e1115efb15e0b16efb15e0c16efb15e0d16efb15e0f16efb15e1016efb15e1116efb15e0b11efb15e0c11efb15e0d11efb15e0e11efb15e0f11efb15e1011efb15e1111efb15e0b12efb15e0c12d697430e12efb15e0f12efb15e1012d697430b13efb15e0b14efb15e0c14efb15e0d14efb15e0e14efb15e0f14efb15e1014efb15e1114efb15e0c13efb15e0d13efb15e0e13efb15e0f13efb15e1013efb15e1113efb15e1211efb15e1212efb15e1312efb15e1213d697431214d697431313efb15e1314efb15e0a11efb15e0912efb15e0913efb15e0914efb15e0a13d697430a14d697430a12efb15e0d12efb15e1112efb15e0b10d697430c10d697430d10d697430e10d697430f10d697431010d697431110d697430f0fefb15e100fefb15e0b09efb15e0e0cefb15e0c09efb15e0d09efb15e0e09efb15e0f09efb15e1009efb15e1109efb15e1209efb15e0a0aefb15e0b0aefb15e0c0aefb15e0d0aefb15e0e0aefb15e0f0aefb15e100aefb15e110aefb15e120aefb15e130aefb15e0a0befb15e0b0befb15e0c0befb15e0d0befb15e0e0befb15e0f0befb15e100befb15e110befb15e120befb15e130befb15e0a0cefb15e0b0cefb15e0f0cefb15e100cefb15e0a0defb15e0b0defb15e0a0eefb15e0b0eefb15e0d0eefb15e0e0eefb15e0f0eefb15e100eefb15e110eefb15e120eefb15e130eefb15e0b0fefb15e0c0fefb15e0d0fefb15e0e0fefb15e110fefb15e120fefb15e0c0eefb15e130defb15e130cefb15e090cd69743090dd69743120c000000120d000000110dffffff110cffffff0d0c0000000c0cffffff0c0dffffff0d0d0000000f0dd697430e0dd69743100dd69743", "0b1705efb15e0c1705efb15e101705efb15e111705efb15e0b1605efb15e0c1605efb15e0d1605efb15e0f1605efb15e101605efb15e111605efb15e0b1505efb15e0c1505efb15e0d1505efb15e0e1505efb15e0f1505efb15e101505efb15e111505efb15e091405efb15e0a1405d697430b1405efb15e0c1405efb15e0d1405efb15e0e1405efb15e0f1405efb15e101405efb15e111405efb15e121405d69743131405efb15e091305efb15e0a1305d697430b1305efb15e0c1305efb15e0d1305efb15e0e1305efb15e0f1305efb15e101305efb15e111305efb15e121305d69743131305efb15e091205efb15e0a1205efb15e0b1205efb15e0c1205d697430d1205efb15e0e1205efb15e0f1205efb15e101205d69743111205efb15e121205efb15e131205efb15e0a1105efb15e0b1105efb15e0c1105efb15e0d1105efb15e0e1105efb15e0f1105efb15e101105efb15e111105efb15e121105efb15e0b1706efb15e0c1706efb15e101706efb15e111706efb15e0b1504efb15e0c1504efb15e0d1504efb15e0e1504efb15e0f1504efb15e101504efb15e111504efb15e0b1404efb15e0c1404efb15e0d1404efb15e0e1404efb15e0f1404efb15e101404efb15e111404efb15e0b1304efb15e0c1304efb15e0d1304efb15e0e1304efb15e0f1304efb15e101304efb15e111304efb15e0b1204efb15e0c1204efb15e0d1204efb15e0e1204efb15e0f1204efb15e101204efb15e111204efb15e0b1104efb15e0c1104efb15e0d1104efb15e0e1104efb15e0f1104efb15e101104efb15e111104efb15e0b1005d697430c1005d697430d1005d697430e1005d697430f1005d69743101005d69743111005d697430b1004d697430c1004d697430d1004d697430e1004d697430f1004d69743101004d69743111004d697430b0f05efb15e0c0f05efb15e0d0f05efb15e0e0f05efb15e0f0f05efb15e100f05efb15e110f05efb15e120f05efb15e0a0e05efb15e0b0e05efb15e0c0e05efb15e0d0e05efb15e0e0e05efb15e0f0e05efb15e100e05efb15e110e05efb15e120e05efb15e130e05efb15e0a0d05efb15e0b0d05efb15e0c0d05efb15e0d0d05efb15e0e0d05efb15e0f0d05efb15e100d05efb15e110d05efb15e120d05efb15e130d05efb15e0a0c05efb15e0b0c05efb15e0c0c05efb15e0d0c05efb15e0e0c05efb15e0f0c05efb15e100c05efb15e110c05efb15e120c05efb15e130c05efb15e0a0b05efb15e0b0b05efb15e0c0b05efb15e0d0b05efb15e0e0b05efb15e0f0b05efb15e100b05efb15e110b05efb15e120b05efb15e130b05efb15e0a0a05efb15e0b0a05efb15e0c0a05efb15e0d0a05efb15e0e0a05efb15e0f0a05efb15e100a05efb15e110a05efb15e120a05efb15e130a05efb15e0b0905efb15e0c0905efb15e0d0905efb15e0e0905efb15e0f0905efb15e100905efb15e110905efb15e120905efb15e0b0f04efb15e0c0f04efb15e0d0f04efb15e0e0f04efb15e0f0f04efb15e100f04efb15e110f04efb15e120f04efb15e0a0e04efb15e0b0e04efb15e0c0e04efb15e0d0e04efb15e0e0e04efb15e0f0e04efb15e100e04efb15e110e04efb15e120e04efb15e130e04efb15e0a0d04efb15e0b0d04efb15e0c0d04efb15e0d0d04efb15e0e0d04efb15e0f0d04efb15e100d04efb15e110d04efb15e120d04efb15e130d04efb15e0a0c04efb15e0b0c04efb15e0c0c04efb15e0d0c04efb15e0e0c04efb15e0f0c04efb15e100c04efb15e110c04efb15e120c04efb15e130c04efb15e0a0b04efb15e0b0b04efb15e0c0b04efb15e0d0b04efb15e0e0b04efb15e0f0b04efb15e100b04efb15e110b04efb15e120b04efb15e130b04efb15e0a0a04efb15e0b0a04efb15e0c0a04efb15e0d0a04efb15e0e0a04efb15e0f0a04efb15e100a04efb15e110a04efb15e120a04efb15e130a04efb15e0b0904efb15e0c0904efb15e0d0904efb15e0e0904efb15e0f0904efb15e100904efb15e110904efb15e120904efb15e0b0f03efb15e0c0f03efb15e0d0f03efb15e0e0f03efb15e0f0f03efb15e100f03efb15e110f03efb15e0a0e03efb15e0b0e03efb15e0c0e03efb15e0d0e03efb15e0e0e03efb15e0f0e03efb15e100e03efb15e110e03efb15e120e03efb15e130e03efb15e0a0d03efb15e0b0d03efb15e0c0d03efb15e0d0d03efb15e0e0d03efb15e0f0d03efb15e100d03efb15e110d03efb15e120d03efb15e130d03efb15e0a0c03efb15e0b0c03efb15e0c0c03efb15e0d0c03efb15e0e0c03efb15e0f0c03efb15e100c03efb15e110c03efb15e120c03efb15e130c03efb15e0a0b03efb15e0b0b03efb15e0c0b03efb15e0d0b03efb15e0e0b03efb15e0f0b03efb15e100b03efb15e110b03efb15e120b03efb15e130b03efb15e0b0a03efb15e0c0a03efb15e0d0a03efb15e0e0a03efb15e0f0a03efb15e100a03efb15e110a03efb15e120a03efb15e0b0f06efb15e0c0f06efb15e0d0f06efb15e0e0f06efb15e0f0f06efb15e100f06efb15e110f06efb15e120f06efb15e0a0e06efb15e0b0e06efb15e0c0e06efb15e0d0e06efb15e0e0e06efb15e0f0e06efb15e100e06efb15e110e06efb15e120e06efb15e130e06efb15e0a0d06efb15e0b0d06efb15e0c0d06ffffff0d0d060000000e0d06d697430f0d06d69743100d06d69743110d06ffffff120d06000000130d06efb15e0a0c06efb15e0b0c06efb15e0c0c06ffffff0d0c060000000e0c06efb15e0f0c06efb15e100c06efb15e110c06ffffff120c06000000130c06efb15e0a0b06efb15e0b0b06efb15e0c0b06efb15e0d0b06efb15e0e0b06efb15e0f0b06efb15e100b06efb15e110b06efb15e120b06efb15e130b06efb15e0a0a06efb15e0b0a06efb15e0c0a06efb15e0d0a06efb15e0e0a06efb15e0f0a06efb15e100a06efb15e110a06efb15e120a06efb15e130a06efb15e0b0906efb15e0c0906efb15e0d0906efb15e0e0906efb15e0f0906efb15e100906efb15e110906efb15e120906efb15e090d05d69743090c05d69743");
-        main.addNewBody(1, 'Skin Tone 2', hex"0b17ba81360c17ba81361017ba81361117ba81360b15ba81360c15ba81360d15ba81360e15ba81360f15ba81361015ba81361115ba81360b16ba81360c16ba81360d16ba81360f16ba81361016ba81361116ba81360b11ba81360c11ba81360d11ba81360e11ba81360f11ba81361011ba81361111ba81360b12ba81360c129a6d2e0e12ba81360f12ba813610129a6d2e0b13ba81360b14ba81360c14ba81360d14ba81360e14ba81360f14ba81361014ba81361114ba81360c13ba81360d13ba81360e13ba81360f13ba81361013ba81361113ba81361211ba81361212ba81361312ba813612139a6d2e12149a6d2e1313ba81361314ba81360a11ba81360912ba81360913ba81360914ba81360a139a6d2e0a149a6d2e0a12ba81360d12ba81361112ba81360b109a6d2e0c109a6d2e0d109a6d2e0e109a6d2e0f109a6d2e10109a6d2e11109a6d2e0f0fba8136100fba81360b09ba81360e0cba81360c09ba81360d09ba81360e09ba81360f09ba81361009ba81361109ba81361209ba81360a0aba81360b0aba81360c0aba81360d0aba81360e0aba81360f0aba8136100aba8136110aba8136120aba8136130aba81360a0bba81360b0bba81360c0bba81360d0bba81360e0bba81360f0bba8136100bba8136110bba8136120bba8136130bba81360a0cba81360b0cba81360f0cba8136100cba81360a0dba81360b0dba81360a0eba81360b0eba81360d0eba81360e0eba81360f0eba8136100eba8136110eba8136120eba8136130eba81360b0fba81360c0fba81360d0fba81360e0fba8136110fba8136120fba81360c0eba8136130dba8136130cba8136090c9a6d2e090d9a6d2e120c000000120d000000110dffffff110cffffff0d0c0000000c0cffffff0c0dffffff0d0d0000000f0d9a6d2e0e0d9a6d2e100d9a6d2e", "0b1705BA81360c1705BA8136101705BA8136111705BA81360b1605BA81360c1605BA81360d1605BA81360f1605BA8136101605BA8136111605BA81360b1505BA81360c1505BA81360d1505BA81360e1505BA81360f1505BA8136101505BA8136111505BA8136091405BA81360a14059A6D2E0b1405BA81360c1405BA81360d1405BA81360e1405BA81360f1405BA8136101405BA8136111405BA81361214059A6D2E131405BA8136091305BA81360a13059A6D2E0b1305BA81360c1305BA81360d1305BA81360e1305BA81360f1305BA8136101305BA8136111305BA81361213059A6D2E131305BA8136091205BA81360a1205BA81360b1205BA81360c12059A6D2E0d1205BA81360e1205BA81360f1205BA81361012059A6D2E111205BA8136121205BA8136131205BA81360a1105BA81360b1105BA81360c1105BA81360d1105BA81360e1105BA81360f1105BA8136101105BA8136111105BA8136121105BA81360b1706BA81360c1706BA8136101706BA8136111706BA81360b1504BA81360c1504BA81360d1504BA81360e1504BA81360f1504BA8136101504BA8136111504BA81360b1404BA81360c1404BA81360d1404BA81360e1404BA81360f1404BA8136101404BA8136111404BA81360b1304BA81360c1304BA81360d1304BA81360e1304BA81360f1304BA8136101304BA8136111304BA81360b1204BA81360c1204BA81360d1204BA81360e1204BA81360f1204BA8136101204BA8136111204BA81360b1104BA81360c1104BA81360d1104BA81360e1104BA81360f1104BA8136101104BA8136111104BA81360b10059A6D2E0c10059A6D2E0d10059A6D2E0e10059A6D2E0f10059A6D2E1010059A6D2E1110059A6D2E0b10049A6D2E0c10049A6D2E0d10049A6D2E0e10049A6D2E0f10049A6D2E1010049A6D2E1110049A6D2E0b0f05BA81360c0f05BA81360d0f05BA81360e0f05BA81360f0f05BA8136100f05BA8136110f05BA8136120f05BA81360a0e05BA81360b0e05BA81360c0e05BA81360d0e05BA81360e0e05BA81360f0e05BA8136100e05BA8136110e05BA8136120e05BA8136130e05BA81360a0d05BA81360b0d05BA81360c0d05BA81360d0d05BA81360e0d05BA81360f0d05BA8136100d05BA8136110d05BA8136120d05BA8136130d05BA81360a0c05BA81360b0c05BA81360c0c05BA81360d0c05BA81360e0c05BA81360f0c05BA8136100c05BA8136110c05BA8136120c05BA8136130c05BA81360a0b05BA81360b0b05BA81360c0b05BA81360d0b05BA81360e0b05BA81360f0b05BA8136100b05BA8136110b05BA8136120b05BA8136130b05BA81360a0a05BA81360b0a05BA81360c0a05BA81360d0a05BA81360e0a05BA81360f0a05BA8136100a05BA8136110a05BA8136120a05BA8136130a05BA81360b0905BA81360c0905BA81360d0905BA81360e0905BA81360f0905BA8136100905BA8136110905BA8136120905BA81360b0f04BA81360c0f04BA81360d0f04BA81360e0f04BA81360f0f04BA8136100f04BA8136110f04BA8136120f04BA81360a0e04BA81360b0e04BA81360c0e04BA81360d0e04BA81360e0e04BA81360f0e04BA8136100e04BA8136110e04BA8136120e04BA8136130e04BA81360a0d04BA81360b0d04BA81360c0d04BA81360d0d04BA81360e0d04BA81360f0d04BA8136100d04BA8136110d04BA8136120d04BA8136130d04BA81360a0c04BA81360b0c04BA81360c0c04BA81360d0c04BA81360e0c04BA81360f0c04BA8136100c04BA8136110c04BA8136120c04BA8136130c04BA81360a0b04BA81360b0b04BA81360c0b04BA81360d0b04BA81360e0b04BA81360f0b04BA8136100b04BA8136110b04BA8136120b04BA8136130b04BA81360a0a04BA81360b0a04BA81360c0a04BA81360d0a04BA81360e0a04BA81360f0a04BA8136100a04BA8136110a04BA8136120a04BA8136130a04BA81360b0904BA81360c0904BA81360d0904BA81360e0904BA81360f0904BA8136100904BA8136110904BA8136120904BA81360b0f03BA81360c0f03BA81360d0f03BA81360e0f03BA81360f0f03BA8136100f03BA8136110f03BA81360a0e03BA81360b0e03BA81360c0e03BA81360d0e03BA81360e0e03BA81360f0e03BA8136100e03BA8136110e03BA8136120e03BA8136130e03BA81360a0d03BA81360b0d03BA81360c0d03BA81360d0d03BA81360e0d03BA81360f0d03BA8136100d03BA8136110d03BA8136120d03BA8136130d03BA81360a0c03BA81360b0c03BA81360c0c03BA81360d0c03BA81360e0c03BA81360f0c03BA8136100c03BA8136110c03BA8136120c03BA8136130c03BA81360a0b03BA81360b0b03BA81360c0b03BA81360d0b03BA81360e0b03BA81360f0b03BA8136100b03BA8136110b03BA8136120b03BA8136130b03BA81360b0a03BA81360c0a03BA81360d0a03BA81360e0a03BA81360f0a03BA8136100a03BA8136110a03BA8136120a03BA81360b0f06BA81360c0f06BA81360d0f06BA81360e0f06BA81360f0f06BA8136100f06BA8136110f06BA8136120f06BA81360a0e06BA81360b0e06BA81360c0e06BA81360d0e06BA81360e0e06BA81360f0e06BA8136100e06BA8136110e06BA8136120e06BA8136130e06BA81360a0d06BA81360b0d06BA81360c0d06ffffff0d0d060000000e0d069A6D2E0f0d069A6D2E100d069A6D2E110d06ffffff120d06000000130d06BA81360a0c06BA81360b0c06BA81360c0c06ffffff0d0c060000000e0c06BA81360f0c06BA8136100c06BA8136110c06ffffff120c06000000130c06BA81360a0b06BA81360b0b06BA81360c0b06BA81360d0b06BA81360e0b06BA81360f0b06BA8136100b06BA8136110b06BA8136120b06BA8136130b06BA81360a0a06BA81360b0a06BA81360c0a06BA81360d0a06BA81360e0a06BA81360f0a06BA8136100a06BA8136110a06BA8136120a06BA8136130a06BA81360b0906BA81360c0906BA81360d0906BA81360e0906BA81360f0906BA8136100906BA8136110906BA8136120906BA8136090d059A6D2E090c059A6D2E");
-        main.addNewBody(2, 'Skin Tone 3',hex"0b178a5e240c178a5e2410178a5e2411178a5e240b158a5e240c158a5e240d158a5e240e158a5e240f158a5e2410158a5e2411158a5e240b168a5e240c168a5e240d168a5e240f168a5e2410168a5e2411168a5e240b118a5e240c118a5e240d118a5e240e118a5e240f118a5e2410118a5e2411118a5e240b128a5e240c1277511e0e128a5e240f128a5e24101277511e0b138a5e240b148a5e240c148a5e240d148a5e240e148a5e240f148a5e2410148a5e2411148a5e240c138a5e240d138a5e240e138a5e240f138a5e2410138a5e2411138a5e2412118a5e2412128a5e2413128a5e24121377511e121477511e13138a5e2413148a5e240a118a5e2409128a5e2409138a5e2409148a5e240a1377511e0a1477511e0a128a5e240d128a5e2411128a5e240b1077511e0c1077511e0d1077511e0e1077511e0f1077511e101077511e111077511e0f0f8a5e24100f8a5e240b098a5e240e0c8a5e240c098a5e240d098a5e240e098a5e240f098a5e2410098a5e2411098a5e2412098a5e240a0a8a5e240b0a8a5e240c0a8a5e240d0a8a5e240e0a8a5e240f0a8a5e24100a8a5e24110a8a5e24120a8a5e24130a8a5e240a0b8a5e240b0b8a5e240c0b8a5e240d0b8a5e240e0b8a5e240f0b8a5e24100b8a5e24110b8a5e24120b8a5e24130b8a5e240a0c8a5e240b0c8a5e240f0c8a5e24100c8a5e240a0d8a5e240b0d8a5e240a0e8a5e240b0e8a5e240d0e8a5e240e0e8a5e240f0e8a5e24100e8a5e24110e8a5e24120e8a5e24130e8a5e240b0f8a5e240c0f8a5e240d0f8a5e240e0f8a5e24110f8a5e24120f8a5e240c0e8a5e24130d8a5e24130c8a5e24090c77511e090d77511e120c000000120d000000110dffffff110cffffff0d0c0000000c0cffffff0c0dffffff0d0d0000000f0d77511e0e0d77511e100d77511e", "15120615b1371612060fca3717120615b1371413060fca37151306622253161306bd339c1713066222531813060fca37141406bd339c151406d051b2161406622253171406d051b2181406d051b2151506bd339c161506d051b2171506d051b2161606bd339c");
-        main.addNewBody(3, 'Skin Tone 4',hex"0b17ead9d80c17ead9d81017ead9d81117ead9d80b15ead9d80c15ead9d80d15ead9d80e15ead9d80f15ead9d81015ead9d81115ead9d80b16ead9d80c16ead9d80d16ead9d80f16ead9d81016ead9d81116ead9d80b11ead9d80c11ead9d80d11ead9d80e11ead9d80f11ead9d81011ead9d81111ead9d80b12ead9d80c12e2caca0e12ead9d80f12ead9d81012e2caca0b13ead9d80b14ead9d80c14ead9d80d14ead9d80e14ead9d80f14ead9d81014ead9d81114ead9d80c13ead9d80d13ead9d80e13ead9d80f13ead9d81013ead9d81113ead9d81211ead9d81212ead9d81312ead9d81213e2caca1214e2caca1313ead9d81314ead9d80a11ead9d80912ead9d80913ead9d80914ead9d80a13e2caca0a14e2caca0a12ead9d80d12ead9d81112ead9d80b10e2caca0c10e2caca0d10e2caca0e10e2caca0f10e2caca1010e2caca1110e2caca0f0fead9d8100fead9d80b09ead9d80e0cead9d80c09ead9d80d09ead9d80e09ead9d80f09ead9d81009ead9d81109ead9d81209ead9d80a0aead9d80b0aead9d80c0aead9d80d0aead9d80e0aead9d80f0aead9d8100aead9d8110aead9d8120aead9d8130aead9d80a0bead9d80b0bead9d80c0bead9d80d0bead9d80e0bead9d80f0bead9d8100bead9d8110bead9d8120bead9d8130bead9d80a0cead9d80b0cead9d80f0cead9d8100cead9d80a0dead9d80b0dead9d80a0eead9d80b0eead9d80d0eead9d80e0eead9d80f0eead9d8100eead9d8110eead9d8120eead9d8130eead9d80b0fead9d80c0fead9d80d0fead9d80e0fead9d8110fead9d8120fead9d80c0eead9d8130dead9d8130cead9d8090ce2caca090de2caca120c000000120d000000110dffffff110cffffff0d0c0000000c0cffffff0c0dffffff0d0d0000000f0de2caca0e0de2caca100de2caca", "0b1705EAD9D80c1705EAD9D8101705EAD9D8111705EAD9D80b1605EAD9D80c1605EAD9D80d1605EAD9D80f1605EAD9D8101605EAD9D8111605EAD9D80b1505EAD9D80c1505EAD9D80d1505EAD9D80e1505EAD9D80f1505EAD9D8101505EAD9D8111505EAD9D8091405EAD9D80a1405E2CACA0b1405EAD9D80c1405EAD9D80d1405EAD9D80e1405EAD9D80f1405EAD9D8101405EAD9D8111405EAD9D8121405E2CACA131405EAD9D8091305EAD9D80a1305E2CACA0b1305EAD9D80c1305EAD9D80d1305EAD9D80e1305EAD9D80f1305EAD9D8101305EAD9D8111305EAD9D8121305E2CACA131305EAD9D8091205EAD9D80a1205EAD9D80b1205EAD9D80c1205E2CACA0d1205EAD9D80e1205EAD9D80f1205EAD9D8101205E2CACA111205EAD9D8121205EAD9D8131205EAD9D80a1105EAD9D80b1105EAD9D80c1105EAD9D80d1105EAD9D80e1105EAD9D80f1105EAD9D8101105EAD9D8111105EAD9D8121105EAD9D80b1706EAD9D80c1706EAD9D8101706EAD9D8111706EAD9D80b1504EAD9D80c1504EAD9D80d1504EAD9D80e1504EAD9D80f1504EAD9D8101504EAD9D8111504EAD9D80b1404EAD9D80c1404EAD9D80d1404EAD9D80e1404EAD9D80f1404EAD9D8101404EAD9D8111404EAD9D80b1304EAD9D80c1304EAD9D80d1304EAD9D80e1304EAD9D80f1304EAD9D8101304EAD9D8111304EAD9D80b1204EAD9D80c1204EAD9D80d1204EAD9D80e1204EAD9D80f1204EAD9D8101204EAD9D8111204EAD9D80b1104EAD9D80c1104EAD9D80d1104EAD9D80e1104EAD9D80f1104EAD9D8101104EAD9D8111104EAD9D80b1005E2CACA0c1005E2CACA0d1005E2CACA0e1005E2CACA0f1005E2CACA101005E2CACA111005E2CACA0b1004E2CACA0c1004E2CACA0d1004E2CACA0e1004E2CACA0f1004E2CACA101004E2CACA111004E2CACA0b0f05EAD9D80c0f05EAD9D80d0f05EAD9D80e0f05EAD9D80f0f05EAD9D8100f05EAD9D8110f05EAD9D8120f05EAD9D80a0e05EAD9D80b0e05EAD9D80c0e05EAD9D80d0e05EAD9D80e0e05EAD9D80f0e05EAD9D8100e05EAD9D8110e05EAD9D8120e05EAD9D8130e05EAD9D80a0d05EAD9D80b0d05EAD9D80c0d05EAD9D80d0d05EAD9D80e0d05EAD9D80f0d05EAD9D8100d05EAD9D8110d05EAD9D8120d05EAD9D8130d05EAD9D80a0c05EAD9D80b0c05EAD9D80c0c05EAD9D80d0c05EAD9D80e0c05EAD9D80f0c05EAD9D8100c05EAD9D8110c05EAD9D8120c05EAD9D8130c05EAD9D80a0b05EAD9D80b0b05EAD9D80c0b05EAD9D80d0b05EAD9D80e0b05EAD9D80f0b05EAD9D8100b05EAD9D8110b05EAD9D8120b05EAD9D8130b05EAD9D80a0a05EAD9D80b0a05EAD9D80c0a05EAD9D80d0a05EAD9D80e0a05EAD9D80f0a05EAD9D8100a05EAD9D8110a05EAD9D8120a05EAD9D8130a05EAD9D80b0905EAD9D80c0905EAD9D80d0905EAD9D80e0905EAD9D80f0905EAD9D8100905EAD9D8110905EAD9D8120905EAD9D80b0f04EAD9D80c0f04EAD9D80d0f04EAD9D80e0f04EAD9D80f0f04EAD9D8100f04EAD9D8110f04EAD9D8120f04EAD9D80a0e04EAD9D80b0e04EAD9D80c0e04EAD9D80d0e04EAD9D80e0e04EAD9D80f0e04EAD9D8100e04EAD9D8110e04EAD9D8120e04EAD9D8130e04EAD9D80a0d04EAD9D80b0d04EAD9D80c0d04EAD9D80d0d04EAD9D80e0d04EAD9D80f0d04EAD9D8100d04EAD9D8110d04EAD9D8120d04EAD9D8130d04EAD9D80a0c04EAD9D80b0c04EAD9D80c0c04EAD9D80d0c04EAD9D80e0c04EAD9D80f0c04EAD9D8100c04EAD9D8110c04EAD9D8120c04EAD9D8130c04EAD9D80a0b04EAD9D80b0b04EAD9D80c0b04EAD9D80d0b04EAD9D80e0b04EAD9D80f0b04EAD9D8100b04EAD9D8110b04EAD9D8120b04EAD9D8130b04EAD9D80a0a04EAD9D80b0a04EAD9D80c0a04EAD9D80d0a04EAD9D80e0a04EAD9D80f0a04EAD9D8100a04EAD9D8110a04EAD9D8120a04EAD9D8130a04EAD9D80b0904EAD9D80c0904EAD9D80d0904EAD9D80e0904EAD9D80f0904EAD9D8100904EAD9D8110904EAD9D8120904EAD9D80b0f03EAD9D80c0f03EAD9D80d0f03EAD9D80e0f03EAD9D80f0f03EAD9D8100f03EAD9D8110f03EAD9D80a0e03EAD9D80b0e03EAD9D80c0e03EAD9D80d0e03EAD9D80e0e03EAD9D80f0e03EAD9D8100e03EAD9D8110e03EAD9D8120e03EAD9D8130e03EAD9D80a0d03EAD9D80b0d03EAD9D80c0d03EAD9D80d0d03EAD9D80e0d03EAD9D80f0d03EAD9D8100d03EAD9D8110d03EAD9D8120d03EAD9D8130d03EAD9D80a0c03EAD9D80b0c03EAD9D80c0c03EAD9D80d0c03EAD9D80e0c03EAD9D80f0c03EAD9D8100c03EAD9D8110c03EAD9D8120c03EAD9D8130c03EAD9D80a0b03EAD9D80b0b03EAD9D80c0b03EAD9D80d0b03EAD9D80e0b03EAD9D80f0b03EAD9D8100b03EAD9D8110b03EAD9D8120b03EAD9D8130b03EAD9D80b0a03EAD9D80c0a03EAD9D80d0a03EAD9D80e0a03EAD9D80f0a03EAD9D8100a03EAD9D8110a03EAD9D8120a03EAD9D80b0f06EAD9D80c0f06EAD9D80d0f06EAD9D80e0f06EAD9D80f0f06EAD9D8100f06EAD9D8110f06EAD9D8120f06EAD9D80a0e06EAD9D80b0e06EAD9D80c0e06EAD9D80d0e06EAD9D80e0e06EAD9D80f0e06EAD9D8100e06EAD9D8110e06EAD9D8120e06EAD9D8130e06EAD9D80a0d06EAD9D80b0d06EAD9D80c0d06ffffff0d0d060000000e0d06E2CACA0f0d06E2CACA100d06E2CACA110d06ffffff120d06000000130d06EAD9D80a0c06EAD9D80b0c06EAD9D80c0c06ffffff0d0c060000000e0c06EAD9D80f0c06EAD9D8100c06EAD9D8110c06ffffff120c06000000130c06EAD9D80a0b06EAD9D80b0b06EAD9D80c0b06EAD9D80d0b06EAD9D80e0b06EAD9D80f0b06EAD9D8100b06EAD9D8110b06EAD9D8120b06EAD9D8130b06EAD9D80a0a06EAD9D80b0a06EAD9D80c0a06EAD9D80d0a06EAD9D80e0a06EAD9D80f0a06EAD9D8100a06EAD9D8110a06EAD9D8120a06EAD9D8130a06EAD9D80b0906EAD9D80c0906EAD9D80d0906EAD9D80e0906EAD9D80f0906EAD9D8100906EAD9D8110906EAD9D8120906EAD9D8090d05E2CACA090c05E2CACA");
-        main.addNewBody(4, 'Skin Tone 5', hex"0b174932130c17493213101749321311174932130b154932130c154932130d154932130e154932130f15493213101549321311154932130b164932130c164932130d164932130f16493213101649321311164932130b114932130c114932130d114932130e114932130f11493213101149321311114932130b124932130c12291D0B0e124932130f124932131012291D0B0b134932130b144932130c144932130d144932130e144932130f14493213101449321311144932130c134932130d134932130e134932130f13493213101349321311134932131211493213121249321313124932131213291D0B1214291D0B131349321313144932130a114932130912493213091349321309144932130a13291D0B0a14291D0B0a124932130d1249321311124932130b10291D0B0c10291D0B0d10291D0B0e10291D0B0f10291D0B1010291D0B1110291D0B0f0f493213100f4932130b094932130e0c4932130c094932130d094932130e094932130f094932131009493213110949321312094932130a0a4932130b0a4932130c0a4932130d0a4932130e0a4932130f0a493213100a493213110a493213120a493213130a4932130a0b4932130b0b4932130c0b4932130d0b4932130e0b4932130f0b493213100b493213110b493213120b493213130b4932130a0c4932130b0c4932130f0c493213100c4932130a0d4932130b0d4932130a0e4932130b0e4932130d0e4932130e0e4932130f0e493213100e493213110e493213120e493213130e4932130b0f4932130c0f4932130d0f4932130e0f493213110f493213120f4932130c0e493213130d493213130c493213090c291D0B090d291D0B120c000000120d000000110dffffff110cffffff0d0c0000000c0cffffff0c0dffffff0d0d0000000f0d291D0B0e0d291D0B100d291D0B","0b17054932130c17054932131017054932131117054932130b16054932130c16054932130d16054932130f16054932131016054932131116054932130b15054932130c15054932130d15054932130e15054932130f15054932131015054932131115054932130914054932130a1405291D0B0b14054932130c14054932130d14054932130e14054932130f1405493213101405493213111405493213121405291D0B1314054932130913054932130a1305291D0B0b13054932130c13054932130d13054932130e13054932130f1305493213101305493213111305493213121305291D0B1313054932130912054932130a12054932130b12054932130c1205291D0B0d12054932130e12054932130f1205493213101205291D0B1112054932131212054932131312054932130a11054932130b11054932130c11054932130d11054932130e11054932130f11054932131011054932131111054932131211054932130b17064932130c17064932131017064932131117064932130b15044932130c15044932130d15044932130e15044932130f15044932131015044932131115044932130b14044932130c14044932130d14044932130e14044932130f14044932131014044932131114044932130b13044932130c13044932130d13044932130e13044932130f13044932131013044932131113044932130b12044932130c12044932130d12044932130e12044932130f12044932131012044932131112044932130b11044932130c11044932130d11044932130e11044932130f11044932131011044932131111044932130b1005291D0B0c1005291D0B0d1005291D0B0e1005291D0B0f1005291D0B101005291D0B111005291D0B0b1004291D0B0c1004291D0B0d1004291D0B0e1004291D0B0f1004291D0B101004291D0B111004291D0B0b0f054932130c0f054932130d0f054932130e0f054932130f0f05493213100f05493213110f05493213120f054932130a0e054932130b0e054932130c0e054932130d0e054932130e0e054932130f0e05493213100e05493213110e05493213120e05493213130e054932130a0d054932130b0d054932130c0d054932130d0d054932130e0d054932130f0d05493213100d05493213110d05493213120d05493213130d054932130a0c054932130b0c054932130c0c054932130d0c054932130e0c054932130f0c05493213100c05493213110c05493213120c05493213130c054932130a0b054932130b0b054932130c0b054932130d0b054932130e0b054932130f0b05493213100b05493213110b05493213120b05493213130b054932130a0a054932130b0a054932130c0a054932130d0a054932130e0a054932130f0a05493213100a05493213110a05493213120a05493213130a054932130b09054932130c09054932130d09054932130e09054932130f09054932131009054932131109054932131209054932130b0f044932130c0f044932130d0f044932130e0f044932130f0f04493213100f04493213110f04493213120f044932130a0e044932130b0e044932130c0e044932130d0e044932130e0e044932130f0e04493213100e04493213110e04493213120e04493213130e044932130a0d044932130b0d044932130c0d044932130d0d044932130e0d044932130f0d04493213100d04493213110d04493213120d04493213130d044932130a0c044932130b0c044932130c0c044932130d0c044932130e0c044932130f0c04493213100c04493213110c04493213120c04493213130c044932130a0b044932130b0b044932130c0b044932130d0b044932130e0b044932130f0b04493213100b04493213110b04493213120b04493213130b044932130a0a044932130b0a044932130c0a044932130d0a044932130e0a044932130f0a04493213100a04493213110a04493213120a04493213130a044932130b09044932130c09044932130d09044932130e09044932130f09044932131009044932131109044932131209044932130b0f034932130c0f034932130d0f034932130e0f034932130f0f03493213100f03493213110f034932130a0e034932130b0e034932130c0e034932130d0e034932130e0e034932130f0e03493213100e03493213110e03493213120e03493213130e034932130a0d034932130b0d034932130c0d034932130d0d034932130e0d034932130f0d03493213100d03493213110d03493213120d03493213130d034932130a0c034932130b0c034932130c0c034932130d0c034932130e0c034932130f0c03493213100c03493213110c03493213120c03493213130c034932130a0b034932130b0b034932130c0b034932130d0b034932130e0b034932130f0b03493213100b03493213110b03493213120b03493213130b034932130b0a034932130c0a034932130d0a034932130e0a034932130f0a03493213100a03493213110a03493213120a034932130b0f064932130c0f064932130d0f064932130e0f064932130f0f06493213100f06493213110f06493213120f064932130a0e064932130b0e064932130c0e064932130d0e064932130e0e064932130f0e06493213100e06493213110e06493213120e06493213130e064932130a0d064932130b0d064932130c0d06ffffff0d0d060000000e0d06291D0B0f0d06291D0B100d06291D0B110d06ffffff120d06000000130d064932130a0c064932130b0c064932130c0c06ffffff0d0c060000000e0c064932130f0c06493213100c06493213110c06ffffff120c06000000130c064932130a0b064932130b0b064932130c0b064932130d0b064932130e0b064932130f0b06493213100b06493213110b06493213120b06493213130b064932130a0a064932130b0a064932130c0a064932130d0a064932130e0a064932130f0a06493213100a06493213110a06493213120a06493213130a064932130b09064932130c09064932130d09064932130e09064932130f0906493213100906493213110906493213120906493213090d05291D0B090c05291D0B");
+    function setUp() public override {
+        super.setUp();
     }
 
     function test_setTraitsContract() public {
         assertEq(address(main.traitsContract()), address(0));
-        vm.prank(address(1));
+
+        vm.startPrank(deployer);
         main.setTraitsContract(traits);
         assertEq(address(main.traitsContract()), address(traits));
+        vm.stopPrank();
     }
 
     function test_setTraitsContractRevert() public {
         assertEq(address(main.traitsContract()), address(0));
+
         vm.startPrank(address(2));
-        vm.expectRevert(Unauthorized.selector);
+        vm.expectRevert(bytes4(keccak256("Unauthorized()")));
         main.setTraitsContract(traits);
         vm.stopPrank();
     }
 
     function test_setFirstSeasonRenderMinter() public {
         assertEq(address(main.firstSeasonRenderMinter()), address(0));
-        vm.prank(address(1));
-        main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
-        assertEq(address(main.firstSeasonRenderMinter()), address(firstSeasonMinter));
+
+        vm.startPrank(deployer);
+        main.setFirstSeasonRenderMinter(address(dataContract));
+        assertEq(address(main.firstSeasonRenderMinter()), address(dataContract));
+        vm.stopPrank();
+    }
+
+    function test_setMarketplace() public {
+        assertEq(address(main.marketplace()), address(0));
+
+        vm.startPrank(deployer);
+        main.setMarketplace(address(market));
+        assertEq(address(main.marketplace()), address(market));
+        vm.stopPrank();
+    }
+
+    function test_setMarketplaceRevert() public {
+        assertEq(address(main.marketplace()), address(0));
+
+        vm.startPrank(address(2));
+        vm.expectRevert(bytes4(keccak256("Unauthorized()")));
+        main.setMarketplace(address(market));
+        vm.stopPrank();
     }
 
     function test_setFirstSeasonRenderMinterRevert() public {
         assertEq(address(main.firstSeasonRenderMinter()), address(0));
+       
         vm.startPrank(address(2));
-        vm.expectRevert(Unauthorized.selector);
-        main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
+        vm.expectRevert(bytes4(keccak256("Unauthorized()")));
+        main.setFirstSeasonRenderMinter(address(dataContract));
         vm.stopPrank();
     }
 
     function test_setPrice() public {
         assertEq(main.price(), 0);
-        vm.prank(address(1));
+        vm.startPrank(deployer);
         main.setPrice(1000000000000000000);
         assertEq(main.price(), 1000000000000000000);
+        vm.stopPrank();
     }
 
     function test_setPriceRevert() public {
         assertEq(main.price(), 0);
         vm.startPrank(address(2));
-        vm.expectRevert(Unauthorized.selector);
+        vm.expectRevert(bytes4(keccak256("Unauthorized()")));
         main.setPrice(1000000000000000000);
         vm.stopPrank();
     }
 
     function test_addNewBody() public {
-        vm.startPrank(address(1));
+       
+        vm.startPrank(deployer);
+
         addBodyTraits();
-        vm.stopPrank();
 
         (uint256 bodyIndex, string memory bodyName, bytes memory colorMap, bytes memory zMap) = main.bodyIndexToMetadata(0);
         assertEq(bodyName, "Skin Tone 1");
@@ -106,20 +110,106 @@ contract PetersMainTest is Test {
         assertEq(bodyName, "Skin Tone 5");
         (bodyIndex, bodyName, colorMap, zMap) = main.bodyIndexToMetadata(5);
         assertEq(bodyName, "");
+        vm.stopPrank();
     }
 
+    function test_addNewBodyRevert() public {
+        vm.startPrank(address(2));
+        vm.expectRevert(bytes4(keccak256("Unauthorized()")));
+        main.addNewBody(0, "Skin Tone 1", hex"", hex"");
+        vm.stopPrank();
+    }
+
+    function test_setPetersMainInTraitsContract() public {
+        vm.startPrank(deployer);
+        traits.setPetersMain(address(main));
+        assertEq(address(traits.petersMain()), address(main));
+        vm.stopPrank();
+    }
+
+    function test_setMarketplaceInTraitsContract() public {
+        vm.startPrank(deployer);
+        traits.setMarketplace(address(market));
+        assertEq(address(traits.marketplace()), address(market));
+        vm.stopPrank(); 
+    }
+    
+
     function test_mint() public {
-        // Set up the render minter
-        vm.prank(address(1));
-        main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
-        assertEq(address(main.firstSeasonRenderMinter()), address(firstSeasonMinter));
+
+        vm.startPrank(deployer);
+        test_setTraitsContract();
+        test_setFirstSeasonRenderMinter();
+        test_addNewBody();
+        test_setMarketplace();
+        test_setPetersMainInTraitsContract();
+        test_setMarketplaceInTraitsContract();
+        vm.stopPrank();
+
+        // mint 5 traits
+        uint8 amount = 5;
+        address user = address(2);
+        vm.startPrank(user);
+        main.mint(amount);
+        vm.stopPrank();
+
+        // validate data
+        assertEq(main.balanceOf(user), 1);
+        address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
+        assertFalse(tbaWallet == user);
+        assertEq(traits.balanceOf(tbaWallet), amount);
+    }
+
+    function test_mintThenTransfer() public {
+
+        vm.startPrank(deployer);
+        test_setTraitsContract();
+        test_setFirstSeasonRenderMinter();
+        test_addNewBody();
+        test_setMarketplace();
+        test_setPetersMainInTraitsContract();
+        test_setMarketplaceInTraitsContract();
+        vm.stopPrank();
+
+        // mint 5 traits
+        uint8 amount = 5;
+        address user1 = address(1);
+        address user2 = address(2);
+        vm.startPrank(user1);
+        main.mint(amount);
+        vm.stopPrank();
+
+        // validate data    
+        assertEq(main.balanceOf(user1), 1);
+        address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
+        assertFalse(tbaWallet == user1);
+        assertEq(traits.balanceOf(tbaWallet), amount);
+
+        // transfer to user 1
+        vm.startPrank(user1);
+        main.transferFrom(user1, user2, 1);
+        vm.stopPrank();
+
+        // assertEq(main.balanceOf(user1), 0);
+        assertEq(main.balanceOf(user2), 1);
+    }
+
+    function test_equipUnequipShirt() public {
+
+        vm.startPrank(deployer);
+        test_setTraitsContract();
+        test_setFirstSeasonRenderMinter();
+        test_addNewBody();
+        test_setMarketplace();
+        test_setPetersMainInTraitsContract();
+        test_setMarketplaceInTraitsContract();
         vm.stopPrank();
 
         // mint 5 traits
         address user = address(2);
         vm.startPrank(user);
-        main.mint();
-        firstSeasonMinter.safeMintMany(user,3);
+        main.mint(5);
+        dataContract.safeMintMany(user,3);
         vm.stopPrank();
 
         // validate data
@@ -127,106 +217,210 @@ contract PetersMainTest is Test {
         address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
         assertFalse(tbaWallet == user);
         assertEq(traits.balanceOf(tbaWallet), 5);
+
+        // Get StoredPeter & ShirtId
+        IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
+        uint256 topTokenId = storedPeter.topId;
+
+        ITraitStorage.StoredTrait memory trait = traits.getTrait(topTokenId); // tid 4,
+        TraitCategory.Name name = trait.traitType;
+        assertEq(TraitCategory.toString(name), "Top");
+
+        // Unequip Top and validate
+        vm.startPrank(user);
+        storedPeter = main.getPeter(1);
+        assertEq(topTokenId, 3);
+        main.unequipTop(1);
+        storedPeter = main.getPeter(1);
+        assertEq(storedPeter.topId, 0);
+        vm.stopPrank();
+
+        // Admin, set traits contract and assert
+        vm.prank(deployer);
+        main.setTraitsContract(traits);
+        assertEq(address(main.traitsContract()), address(traits));
+
+        // Equip Top
+        vm.startPrank(user);
+        main.equipTop(1, 3);
+        storedPeter = main.getPeter(1);
+        assertEq(topTokenId, 3);
+        vm.stopPrank();
     }
 
-    // function test_equipUnequipShirt() public {
-    //     // Set up the render minter
-    //     vm.prank(address(1));
-    //     main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
-    //     assertEq(address(main.firstSeasonRenderMinter()), address(firstSeasonMinter));
-    //     vm.stopPrank();
-
-    //     // mint 5 traits
-    //     address user = address(2);
-    //     vm.startPrank(user);
-    //     main.mint();
-    //     firstSeasonMinter.safeMintMany(user,3);
-    //     vm.stopPrank();
-
-    //     // validate data
-    //     assertEq(main.balanceOf(user), 1);
-    //     address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
-    //     assertFalse(tbaWallet == user);
-    //     assertEq(traits.balanceOf(tbaWallet), 5);
-
-    //     // Get StoredPeter & ShirtId
-    //     IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
-    //     uint256 topTokenId = storedPeter.topId;
-
-    //     ITraitStorage.StoredTrait memory trait = traits.getTrait(topTokenId); // tid 4,
-    //     TraitCategory.Name name = trait.traitType;
-    //     assertEq(TraitCategory.toString(name), "Top");
-
-    //     // Unequip Top and validate
-    //     vm.startPrank(user);
-    //     storedPeter = main.getPeter(1);
-    //     assertEq(topTokenId, 1);
-    //     main.unequipTop(1);
-    //     storedPeter = main.getPeter(1);
-    //     assertEq(storedPeter.topId, 0);
-    //     vm.stopPrank();
-
-    //     // Admin, set traits contract and assert
-    //     vm.prank(address(1));
-    //     main.setTraitsContract(traits);
-    //     assertEq(address(main.traitsContract()), address(traits));
-
-    //     // Equip Top
-    //     vm.startPrank(user);
-    //     main.equipTop(1, 1);
-    //     storedPeter = main.getPeter(1);
-    //     assertEq(topTokenId, 1);
-    //     vm.stopPrank();
-    // }
-
-    // function test_unequipAll() public {
-    //     // Set up the render minter
-    //     vm.prank(address(1));
-    //     main.setFirstSeasonRenderMinter(address(firstSeasonMinter));
-    //     assertEq(address(main.firstSeasonRenderMinter()), address(firstSeasonMinter));
-    //     vm.stopPrank();
-
-    //     // mint 5 traits
-    //     address user = address(2);
-    //     vm.startPrank(user);
-    //     main.mint();
-    //     firstSeasonMinter.safeMintMany(user,3);
-    //     vm.stopPrank();
-
-    //     // validate data
-    //     assertEq(main.balanceOf(user), 1);
-    //     address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
-    //     assertFalse(tbaWallet == user);
-    //     assertEq(traits.balanceOf(tbaWallet), 5);
-
-    //     // Ensure bottom and top are equipped
-    //     IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
-    //     assertGt(storedPeter.topId, 0);
-    //     assertGt(storedPeter.bottomId, 0);
-
-    //     vm.prank(user);
-    //     main.unequipAll(1);
-    //     storedPeter = main.getPeter(1);
-    //     assertEq(storedPeter.headId, 0);
-    //     assertEq(storedPeter.hairId, 0);
-    //     assertEq(storedPeter.faceId, 0);
-    //     assertEq(storedPeter.accessoryId, 0);
-    //     assertEq(storedPeter.topId, 0);
-    //     assertEq(storedPeter.bottomId, 0);
-    //     assertEq(storedPeter.shoesId, 0);
-    // }
-
-    // function testIncrementApprovals() public {
-    //     uint256 chonkId = 1;
-    //     address operator1 = address(0x1);
-    //     address operator2 = address(0x2);
+    function test_unequipAll() public {
         
-    //     _incrementApprovals(chonkId, operator1);
-    //     _incrementApprovals(chonkId, operator2);
+        vm.startPrank(deployer);
+        test_setTraitsContract();
+        test_setFirstSeasonRenderMinter();
+        test_addNewBody();
+        test_setMarketplace();
+        test_setPetersMainInTraitsContract();
+        test_setMarketplaceInTraitsContract();
+        vm.stopPrank();
+
+
+        // mint 5 traits
+        address user = address(2);
+        vm.startPrank(user);
+        main.mint(5);
+        // dataContract.safeMintMany(user,3);
+        vm.stopPrank();
+
+        // validate data
+        assertEq(main.balanceOf(user), 1);
+        address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
+        assertFalse(tbaWallet == user);
+        assertEq(traits.balanceOf(tbaWallet), 5);
+
+        // Ensure bottom and top are equipped
+        IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
+        assertGt(storedPeter.topId, 0);
+        assertGt(storedPeter.bottomId, 0);
+
+        vm.prank(user);
+        main.unequipAll(1);
+        storedPeter = main.getPeter(1);
+        assertEq(storedPeter.headId, 0);
+        assertEq(storedPeter.hairId, 0);
+        assertEq(storedPeter.faceId, 0);
+        assertEq(storedPeter.accessoryId, 0);
+        assertEq(storedPeter.topId, 0);
+        assertEq(storedPeter.bottomId, 0);
+        assertEq(storedPeter.shoesId, 0);
+    }
+
+    function test_TBAApprovalForAll() public {
+        vm.startPrank(deployer);
+        test_setTraitsContract();
+        test_setFirstSeasonRenderMinter();
+        test_addNewBody();
+        test_setMarketplace();
+        test_setPetersMainInTraitsContract();
+        test_setMarketplaceInTraitsContract();
+        vm.stopPrank();
+
+        vm.startPrank(address(1));
+        main.mint(5);
         
-    //     address[] memory operators = chonkIdToApprovedOperators[chonkId];
-    //     assert(operators.length == 2);
-    //     assert(operators[0] == operator1);
-    //     assert(operators[1] == operator2);
-    // }
+        // Get the TBA address
+        (address owner, address tba) = main.getOwnerAndTBAAddressForChonkId(1);
+        
+        // Test approvalForAll for PetersMain for Marketplace
+        main.setApprovalForAll(address(market), true);
+        assertTrue(main.isApprovedForAll(owner, address(market)));
+        
+        // Test revoking approvalForAll for PetersMain
+        main.setApprovalForAll(address(market), false);
+        assertFalse(main.isApprovedForAll(owner, address(market)));
+
+        // Test TBA approvalForAll for traits
+        vm.startPrank(tba);
+        traits.setApprovalForAll(address(market), true);
+        assertTrue(traits.isApprovedForAll(tba, address(market)));
+
+        traits.setApprovalForAll(address(2), true);
+
+        // Test getting approved operators for a trait token
+        uint256 traitId = 1;
+        address[] memory operators = traits.getApprovedOperators(traitId);
+        assertEq(operators.length, 2);
+        assertEq(operators[0], address(market));
+        
+        // Test revoking TBA approvalForAll for traits
+        traits.setApprovalForAll(address(market), false); 
+        assertFalse(traits.isApprovedForAll(tba, address(market)));
+
+        // should only be one operator left
+        assertEq(traits.getApprovedOperatorsLength(traitId), 1);
+
+        vm.stopPrank();
+    }
+
+    function test_TBAApprovalForAllRevert() public {
+
+        vm.startPrank(deployer);
+        test_setTraitsContract();
+        test_setFirstSeasonRenderMinter();
+        // test_addNewBody();
+        test_setMarketplace();
+        test_setPetersMainInTraitsContract();
+        test_setMarketplaceInTraitsContract();
+        vm.stopPrank();
+
+        vm.startPrank(address(1));
+        main.mint(5);
+        
+        // Get the TBA address
+        (address owner, address tba) = main.getOwnerAndTBAAddressForChonkId(1);
+        
+        // Try to transfer without approval
+        vm.expectRevert(); // i wonder why we get no data, just Revert
+        IERC721(address(market)).transferFrom(address(1), address(2), 1);
+
+        // try to setApprovalForAll by owner of Chonk, not trait
+        traits.setApprovalForAll(address(market), true); /// actually, this works because anyone can setApprovalForAll for a collection even if they don't own a token
+        
+        vm.stopPrank();
+    }
+
+    // wip but mintThenTransfer needs to be finalised first
+    function test_TBAApprovalForAllExploit() public {
+
+       vm.startPrank(deployer);
+        test_setTraitsContract();
+        test_setFirstSeasonRenderMinter();
+        test_addNewBody();
+        test_setMarketplace();
+        test_setPetersMainInTraitsContract();
+        test_setMarketplaceInTraitsContract();
+        vm.stopPrank();
+
+
+        address user1 = address(1);
+        address user2 = address(2);
+        vm.startPrank(user1);
+        main.mint(5);
+        
+        // Get the TBA address
+        (address owner, address tba) = main.getOwnerAndTBAAddressForChonkId(1);
+        
+        // Test approvalForAll for PetersMain for Marketplace
+        main.setApprovalForAll(address(market), true);
+        assertTrue(main.isApprovedForAll(owner, address(market)));
+        
+        // Test revoking approvalForAll for PetersMain
+        main.setApprovalForAll(address(market), false);
+        assertFalse(main.isApprovedForAll(owner, address(market)));
+
+        // Test TBA approvalForAll for traits
+        vm.startPrank(tba);
+        traits.setApprovalForAll(address(market), true);
+        assertTrue(traits.isApprovedForAll(tba, address(market)));
+
+        // also set approval for all for address(2)
+        traits.setApprovalForAll(address(2), true);
+
+        // Test getting approved operators for a trait token
+        uint256 traitId = 1;
+        address[] memory operators = traits.getApprovedOperators(traitId);
+        assertEq(operators.length, 2);
+        assertEq(operators[0], address(market));
+
+        vm.stopPrank();
+       
+        // now let's move Chonk to address(2)
+        vm.startPrank(address(1));
+        assertEq(main.balanceOf(user1), 1);
+        
+        
+        main.transferFrom(user1, user2, 1);
+
+        // IERC721(address(main)).transferFrom(user1, user2, 1);
+        // assertEq(main.balanceOf(user2), 1);
+        vm.stopPrank();
+
+    }
+    
+    
 }

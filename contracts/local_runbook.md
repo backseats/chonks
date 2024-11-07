@@ -37,4 +37,8 @@ Test Notes:
 1. Need to run anvil and fork url when running tests: 
     forge test --fork-url http://localhost:8545 --match-path test/PetersMainRenderer.t.sol
     forge test --fork-url http://localhost:8545 (seems to stall and failing on some curently)
-2. Make sure you add this to .env or testSvgRenderer will fail: NFT_ID=1
+2. OR, have this in your tests: vm.createSelectFork("base_sepolia", 17419761);
+3. Make sure you add this to .env or testSvgRenderer will fail: NFT_ID=1
+
+forge test --match-path test/PetersMain.t.sol --match-test test_mint
+

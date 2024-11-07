@@ -61,7 +61,11 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     address public signer;
 
     mapping(uint256 => TraitMetadata) public traitIndexToMetadata;
+
     mapping(uint256 traitId => address[] operators) public traitIdToApprovedOperators;
+    //note, getter function for this would be: 
+    // function traitIdToApprovedOperators(uint256 traitId, uint256 index) public view returns (address);
+
 
     PetersMain public petersMain;
 
@@ -98,8 +102,8 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         _initializeOwner(msg.sender);
         _localDeploy = localDeploy_;
 
-        console.log("PeterTraits Constructor called with localDeploy:", localDeploy_);
-        console.log("PeterTraits Owner set to:", msg.sender);
+        // console.log("PeterTraits Constructor called with localDeploy:", localDeploy_);
+        // console.log("PeterTraits Owner set to:", msg.sender);
     }
 
     function getTraitIndexToMetadata(uint256 _traitIndex) public view returns (TraitMetadata memory) {
@@ -588,7 +592,16 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
         // TODO: ensure not equipped
 
+        console.log('_beforeTokenTransfer Traits', from, to, tokenId);
+
+        if (from == address(0)) {
+            console.log('from is 0 so call super and return');
+            super._beforeTokenTransfer(from, to, tokenId);
+            return;
+        }
+
         (, address seller,,) = marketplace.traitOffers(tokenId);
+        console.log('seller', seller);
         if (seller != address(0)) {
             if (msg.sender != address(marketplace)) revert CantTransfer();
         }
@@ -611,8 +624,13 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // Remove an active ChonkOffer if Chonk token ID because owned Traits changed
     function _afterTokenTransfer(address, address, uint256 _traitTokenId) internal override(ERC721) {
+        console.log('_afterTokenTransfer Traits', _traitTokenId);
+
         address tba = ownerOf(_traitTokenId);
+        console.log('tba', tba);
+        console.log('petersMain', address(petersMain));
         uint256 chonkId = petersMain.tbaAddressToTokenId(tba);
+        console.log('chonkId', chonkId);
         marketplace.removeChonkOfferOnTraitTransfer(chonkId);
     }
 
@@ -632,7 +650,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         if (_operator == address(0)) {
             // Remove the operator from the array
             address[] storage operators = traitIdToApprovedOperators[_tokenId];
-            for (uint256 i; i < operators.length; ++i {
+            for (uint256 i; i < operators.length; ++i) {
                 if (operators[i] == _operator) {
                     // Replace with last element and pop
                     operators[i] = operators[operators.length - 1];
@@ -664,6 +682,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     function setApprovalForAll(address _operator, bool _approved) public override(ERC721, IERC721) {
         // CHECKS //
 
+        console.log('setApprovalForAll', _operator, _approved);
         // Cannot approve self as operator
         require(_operator != msg.sender, "ERC721: approve to caller");
 
@@ -705,11 +724,17 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         super.setApprovalForAll(_operator, _approved);
     }
 
+
     /// @notice Invalidates all operator approvals for a specific token
     function invalidateAllOperatorApprovals(uint256 _tokenId) public {
         // CHECKS
+
+        console.log('=== invalidateAllOperatorApprovals ===', _tokenId);
+        console.log('ownerOf(_tokenId)', ownerOf(_tokenId));
+        console.log('msg.sender', msg.sender);
+        
         if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
-        if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait();
+        if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait(); 
 
         // EFFECTS
         // Clear our tracking array
@@ -717,7 +742,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         // INTERACTIONS
         // Remove individual token approval
-        super.approve(address(0), _tokenId);
+        super.approve(address(0), _tokenId); // this will fail unless this method is called by the TBA
 
         // Remove all operator approvals for this token
         address[] memory operators = traitIdToApprovedOperators[_tokenId];
@@ -731,6 +756,16 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     // DEPLOY: remove/just for testing
     function onERC721Received(address, address, uint256, bytes calldata) pure external returns (bytes4) {
         return IERC721Receiver.onERC721Received.selector;
+    }
+
+     // Function to get the entire array of approved operators for a traitId
+    function getApprovedOperators(uint256 traitId) public view returns (address[] memory) {
+        return traitIdToApprovedOperators[traitId];
+    }
+
+    // Function to get the length of the approved operators array for a traitId
+    function getApprovedOperatorsLength(uint256 traitId) public view returns (uint256) {
+        return traitIdToApprovedOperators[traitId].length;
     }
 
 }

@@ -95,6 +95,4 @@ interface IPeterStorage {
     event BackgroundColor(address indexed owner, uint256 indexed tokenId, string color);
     event BodyIndex(address indexed owner, uint256 indexed tokenId, uint8 _bodyIndex);
     event RenderZ(address indexed owner, uint256 indexed tokenId, bool renderZ);
-
-
 }

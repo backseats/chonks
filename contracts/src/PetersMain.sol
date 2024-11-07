@@ -37,6 +37,15 @@ import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
+
+interface ITokenBoundAccount {
+    function executeCall(
+        address to,
+        uint256 value,
+        bytes calldata data
+    ) external payable returns (bytes memory);
+}
+
 // TODO: withdraw or send us the ETH per each txn
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
 
@@ -54,28 +63,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // The address of the ChonksMarket contract
     ChonksMarket public marketplace;
 
-    uint256 _nextTokenId;
-
-    uint256 public price;
-
-    // ERC-6551 Boilerplate addresses
-    IRegistry constant REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
-    address constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
-    address constant ACCOUNT_IMPLEMENTATION = 0x41C8f39463A868d3A88af00cd0fe7102F30E44eC;
-
-    // Backpack stuff
-    uint256 maxTraitsToOutput = 99;
-    string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
-
-    // Mapping of tokenID to the TBA account address
-    mapping(uint256 => address) public tokenIdToTBAAccountAddress;
-
-    // Mapping of the TBA account address to its tokenId. Great for getting from Trait Token ID to Chonk Token ID or Owner
-    mapping(address => uint256) public tbaAddressToTokenId;
-
-    // Chonk ID to approved addresses
-    mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators;
-
     // The contract that handles rendering and minting the first season of traits
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
 
@@ -85,10 +72,36 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // The render contract that handles 3d generation
     ZRenderer public zRenderer;
 
+    uint256 _nextTokenId;
+
+    uint256 public price;
+
+    address systemAddress;
+
+    // ERC-6551 Boilerplate addresses
+    IRegistry constant REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
+    address constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
+    address constant ACCOUNT_IMPLEMENTATION = 0x41C8f39463A868d3A88af00cd0fe7102F30E44eC;
+
+   
+    // Mapping of tokenID to the TBA account address
+    mapping(uint256 => address) public tokenIdToTBAAccountAddress;
+
+    // Mapping of the TBA account address to its tokenId. Great for getting from Trait Token ID to Chonk Token ID or Owner
+    mapping(address => uint256) public tbaAddressToTokenId;
+
+    // Chonk ID to approved addresses
+    mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators;
+
     // Tracking which nonces have been used from the server
     mapping (string => bool) usedNonces;
 
-    address systemAddress;
+    
+
+     // Backpack stuff
+    uint256 maxTraitsToOutput = 99;
+    string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
+
 
     /// Errors
 
@@ -117,7 +130,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         console.log('localDeploy:', _localDeploy);
         if (_localDeploy) {
             for (uint i; i < 1; ++i) {
-                mint(); // Mints N bodies/tokens
+                mint(4); // Mints N bodies/tokens
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
             }
@@ -126,9 +139,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
     }
 
-    function mint() public payable { // TODO amount, check price
+    function mint(uint8 _amount) public payable { // TODO amount, check price
         console.log('minting...');
-        _mintAmount(4);
+        _mintAmount(_amount);
     }
 
     // just popping this in here for now, we can decide full spec later
@@ -242,123 +255,100 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Equip/Unequip clothing traits
 
-    function equipFace(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+    function equipFace(uint256 _peterTokenId, uint256 _traitTokenId) public onlyPeterOwner(_peterTokenId) {
         _validateTraitType(_traitTokenId, TraitCategory.Name.Face);
+        _validateTBAOwnership(_peterTokenId, _traitTokenId);
 
         peterTokens.all[_peterTokenId].faceId = _traitTokenId;
-
         emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Face");
     }
 
-    function unequipFace(uint256 _peterTokenId) public {
-        _validatePeterOwnership(_peterTokenId);
+    function unequipFace(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
         peterTokens.all[_peterTokenId].faceId = 0;
-
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Face");
     }
 
-    function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+    function equipAccessory(uint256 _peterTokenId, uint256 _traitTokenId) public onlyPeterOwner(_peterTokenId) {
         _validateTraitType(_traitTokenId, TraitCategory.Name.Accessory);
+        _validateTBAOwnership(_peterTokenId, _traitTokenId);
 
         peterTokens.all[_peterTokenId].accessoryId = _traitTokenId;
-
         emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Accessory");
     }
 
-    function unequipAccessory(uint256 _peterTokenId) public {
-        _validatePeterOwnership(_peterTokenId);
+    function unequipAccessory(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
         peterTokens.all[_peterTokenId].accessoryId = 0;
-
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Accessory");
     }
 
-    function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+    function equipHair(uint256 _peterTokenId, uint256 _traitTokenId) public onlyPeterOwner(_peterTokenId) {
         _validateTraitType(_traitTokenId, TraitCategory.Name.Hair);
+        _validateTBAOwnership(_peterTokenId, _traitTokenId);
 
         peterTokens.all[_peterTokenId].hairId = _traitTokenId;
-
         emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Hair");
     }
 
-    function unequipHair(uint256 _peterTokenId) public {
-        _validatePeterOwnership(_peterTokenId);
+    function unequipHair(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
         peterTokens.all[_peterTokenId].hairId = 0;
-
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Hair");
     }
 
-    function equipHead(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+    function equipHead(uint256 _peterTokenId, uint256 _traitTokenId) public onlyPeterOwner(_peterTokenId) {
         _validateTraitType(_traitTokenId, TraitCategory.Name.Head);
+        _validateTBAOwnership(_peterTokenId, _traitTokenId);
 
         peterTokens.all[_peterTokenId].headId = _traitTokenId;
-
         emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Head");
     }
 
-    function unequipHead(uint256 _peterTokenId) public {
-        _validatePeterOwnership(_peterTokenId);
+    function unequipHead(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
         peterTokens.all[_peterTokenId].headId = 0;
-
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Head");
     }
 
-    function equipTop(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+    function equipTop(uint256 _peterTokenId, uint256 _traitTokenId) public onlyPeterOwner(_peterTokenId) {
         _validateTraitType(_traitTokenId, TraitCategory.Name.Top); // TODO: fix
+        _validateTBAOwnership(_peterTokenId, _traitTokenId);
 
         peterTokens.all[_peterTokenId].topId = _traitTokenId;
-
         emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Top");
     }
 
-    function unequipTop(uint256 _peterTokenId) public {
-        _validatePeterOwnership(_peterTokenId);
+    function unequipTop(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
         peterTokens.all[_peterTokenId].topId = 0;
-
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Top");
     }
 
     // NOTE: We Might want counterpart view functions that just compile the svg without writing to chain
-    function equipBottom(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+    function equipBottom(uint256 _peterTokenId, uint256 _traitTokenId) public onlyPeterOwner(_peterTokenId) {
         _validateTraitType(_traitTokenId, TraitCategory.Name.Bottom);
+        _validateTBAOwnership(_peterTokenId, _traitTokenId);
 
         peterTokens.all[_peterTokenId].bottomId = _traitTokenId;
-
         emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Bottom");
     }
 
-    function unequipBottom(uint256 _peterTokenId) public {
-        _validatePeterOwnership(_peterTokenId);
+    function unequipBottom(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
         peterTokens.all[_peterTokenId].bottomId = 0;
-
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Bottom");
     }
 
-    function equipShoes(uint256 _peterTokenId, uint256 _traitTokenId) public {
-        _validateTokenOwnership(_peterTokenId, _traitTokenId);
+    function equipShoes(uint256 _peterTokenId, uint256 _traitTokenId) public onlyPeterOwner(_peterTokenId) {
         _validateTraitType(_traitTokenId, TraitCategory.Name.Shoes);
+        _validateTBAOwnership(_peterTokenId, _traitTokenId);
 
         peterTokens.all[_peterTokenId].shoesId = _traitTokenId;
-
         emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Shoes");
     }
 
-    function unequipShoes(uint256 _peterTokenId) public {
-        _validatePeterOwnership(_peterTokenId);
+    function unequipShoes(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
         peterTokens.all[_peterTokenId].shoesId = 0;
-
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, "Shoes");
     }
 
     // validate OwnershipHandoverRequested(pendingOwner);
-    function unequipAll(uint256 _peterTokenId) public {
-        _validatePeterOwnership(_peterTokenId);
-
+    function unequipAll(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
         StoredPeter storage peter = peterTokens.all[_peterTokenId];
         peter.headId = 0;
         peter.hairId = 0;
@@ -381,7 +371,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _topTokenId,
         uint256 _bottomTokenId,
         uint256 _shoesTokenId
-    ) public {
+    ) public onlyPeterOwner(_peterTokenId) {
         // Might be able to cut this down gas-wise since it's validating peter ownership each time
         if (_headTokenId != 0) equipHead(_peterTokenId, _headTokenId);
         if (_hairTokenId != 0) equipHair(_peterTokenId, _hairTokenId);
@@ -405,7 +395,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _shoesTokenId,
         uint8 _bodyIndex,
         string memory _backgroundColor
-    ) public {
+    ) public onlyPeterOwner(_peterTokenId) {
         equipAll(_peterTokenId, _headTokenId, _hairTokenId, _faceTokenId, _accessoryTokenId, _topTokenId, _bottomTokenId, _shoesTokenId);
         setBodyIndex(_peterTokenId, _bodyIndex);
         setBackgroundColor(_peterTokenId, _backgroundColor);
@@ -413,13 +403,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Validations
 
-    function _validatePeterOwnership(uint256 _peterId) internal view {
-        if (msg.sender != ownerOf(_peterId)) revert IncorrectPeterOwner(); // Not your Peter
-    }
-
-    function _validateTokenOwnership(uint256 _peterId, uint256 _traitTokenId) internal view {
-        _validatePeterOwnership(_peterId);
-
+    function _validateTBAOwnership(uint256 _peterId, uint256 _traitTokenId) internal view onlyPeterOwner(_peterId) {
         address tbaOfPeter = tokenIdToTBAAccountAddress[_peterId];
         address ownerOfTrait = traitsContract.ownerOf(_traitTokenId);
         if (ownerOfTrait != tbaOfPeter) revert IncorrectTBAOwner();
@@ -743,13 +727,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
       systemAddress = _systemAddress;
     }
 
-    function setBackgroundColor(uint256 _peterTokenId, string memory _color) public {
-        _validatePeterOwnership(_peterTokenId);
-
+    function setBackgroundColor(uint256 _peterTokenId, string memory _color) public onlyPeterOwner(_peterTokenId) {
         bytes memory colorBytes = bytes(_color);
         if (colorBytes.length != 6) revert InvalidColor();
 
-        if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo();
+        if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo(); // todo: either take this out or make it so only marka can do this
+
         // Ensure all characters are valid hex characters (0-9, a-f, A-F)
         for (uint i = 0; i < 6; i++) {
             if (
@@ -765,21 +748,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         emit BackgroundColor(ownerOf(_peterTokenId), _peterTokenId, _color );
     }
 
-    function setBodyIndex(uint256 _peterTokenId, uint8 _bodyIndex) public {
-        _validatePeterOwnership(_peterTokenId);
-        if (_bodyIndex > 3) revert InvalidBodyIndex();    // ensure bodyIndex is not greater than 3
+    function setBodyIndex(uint256 _peterTokenId, uint8 _bodyIndex) public onlyPeterOwner(_peterTokenId) {
+        if (_bodyIndex > 3) revert InvalidBodyIndex();
         if (_bodyIndex != 0) {
-            peterTokens.all[_peterTokenId].bodyIndex = _bodyIndex; // and only set if not 0
+            peterTokens.all[_peterTokenId].bodyIndex = _bodyIndex;
             emit BodyIndex(ownerOf(_peterTokenId), _peterTokenId, _bodyIndex );
         }
     }
 
-    function setTokenRenderZ(uint256 _peterTokenId, bool _renderZ) public {
-        _validatePeterOwnership(_peterTokenId);
+    function setTokenRenderZ(uint256 _peterTokenId, bool _renderZ) public onlyPeterOwner(_peterTokenId) {
         peterTokens.all[_peterTokenId].renderZ = _renderZ;
-
-        // emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, "Accessory");
-        emit RenderZ(ownerOf(_peterTokenId), _peterTokenId, _renderZ );
+        emit RenderZ(ownerOf(_peterTokenId), _peterTokenId, _renderZ);
     }
 
     function setMarketplace(address _marketplace) public onlyOwner {
@@ -795,7 +774,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // TODO: Withdraw function
 
     // Override functions for marketplace compatibility
-    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override nonReentrant {
+    function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
 
         if (from == address(0)) {
             super._beforeTokenTransfer(from, to, tokenId);
@@ -841,17 +820,41 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // Clean up marketplace offers/bids
             marketplace.deleteTraitOffersBeforeTokenTransfer(traitTokenId);
 
-            // Invalidate all approvals for each trait token
-            // Note: This needs to be called from the TBA's context
-            IAccountProxy(payable(tbaAddress)).execute(
-                address(traitsContract), // target
-                0, // value
-                abi.encodeWithSignature(
-                    "invalidateAllOperatorApprovals(uint256)",
-                    traitTokenId
-                ),
-                0 // operation
-            );
+            console.log('PetersMain _beforeTokenTransfer calling invalidateAllOperatorApprovals on traitsContract');
+            
+            uint256 approvedOperatorsLength = traitsContract.getApprovedOperatorsLength(traitTokenId);
+            console.log('- approvedOperatorsLength:', approvedOperatorsLength);
+            if (approvedOperatorsLength > 0) {
+                
+                // Method 1: execute()
+                // IAccountProxy(payable(tbaAddress)).execute(
+                //     address(traitsContract),
+                //     0, // value 
+                //     abi.encodeWithSignature(
+                //         "invalidateAllOperatorApprovals(uint256)",
+                //         traitTokenId
+                //     ),
+                //     0 // operation
+                // );
+
+
+                // Method 2: executeCall()
+                // bytes memory data = abi.encodeWithSelector(
+                //     traitsContract.invalidateAllOperatorApprovals.selector,
+                //     traitTokenId
+                // );
+
+                // // Execute the call via the TBA
+                // IAccountProxy(tbaAddress).executeCall(
+                //     address(traitsContract),
+                //     0,    // No Ether being sent
+                //     data
+                // );
+                
+                // Method 3: direct call - works but will be called by PetersMain
+                traitsContract.invalidateAllOperatorApprovals(traitTokenId);
+            }
+            
 
             marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas);
         }
@@ -862,6 +865,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // Consider if the marketplace contract needs its own reentrancy protection
         // Verify that the traitsContract and marketplace addresses cannot be changed during execution
         // Consider adding emergency pause functionality for critical issues
+    }
+
+    // Modifiers
+
+    modifier onlyPeterOwner(uint256 _peterId) {
+        if (msg.sender != ownerOf(_peterId)) revert IncorrectPeterOwner();
+        _;
     }
 
     // better to invalidate TBA approvals in before or after?
@@ -926,5 +936,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         delete chonkIdToApprovedOperators[_chonkId];
     }
     */
+
+    
 
 }

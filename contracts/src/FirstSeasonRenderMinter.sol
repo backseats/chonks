@@ -233,7 +233,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
         //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin
 
-        _amount = 5; // for testing
+        // _amount = 5; // for testing
 
         uint256[] memory mintedIds = new uint256[](_amount);
 
