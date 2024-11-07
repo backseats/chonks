@@ -14,6 +14,7 @@ import { Utils } from "./common/Utils.sol";
 import { IAccountImplementation } from "./interfaces/TBABoilerplate/IAccountImplementation.sol";
 import { IAccountProxy } from "./interfaces/TBABoilerplate/IAccountProxy.sol";
 import { IRegistry } from  "./interfaces/TBABoilerplate/IRegistry.sol";
+import { IERC6551Executable } from "./interfaces/TBABoilerplate/IERC6551Executable.sol";
 
 // Renderers
 import { RenderHelper } from "./renderers/RenderHelper.sol";
@@ -37,14 +38,6 @@ import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
-
-interface ITokenBoundAccount {
-    function executeCall(
-        address to,
-        uint256 value,
-        bytes calldata data
-    ) external payable returns (bytes memory);
-}
 
 // TODO: withdraw or send us the ETH per each txn
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
@@ -83,7 +76,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     address constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
     address constant ACCOUNT_IMPLEMENTATION = 0x41C8f39463A868d3A88af00cd0fe7102F30E44eC;
 
-   
+
     // Mapping of tokenID to the TBA account address
     mapping(uint256 => address) public tokenIdToTBAAccountAddress;
 
@@ -96,7 +89,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Tracking which nonces have been used from the server
     mapping (string => bool) usedNonces;
 
-    
+
 
      // Backpack stuff
     uint256 maxTraitsToOutput = 99;
@@ -185,7 +178,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
         tbaAddressToTokenId[tokenBoundAccountAddress] = tokenId;
 
-        
+
 
         // initialize : use this address as the implementation parameter when calling initialize on a newly created account
         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
@@ -812,31 +805,30 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // Clean up Chonk Offers and Bids
         marketplace.deleteChonkOfferBeforeTokenTransfer(tokenId);
         marketplace.deleteChonkBidsBeforeTokenTransfer(tokenId, to);
-        
+
         // Loop through all the Trait tokens
         for (uint256 i; i < traitTokenIds.length; ++i) {
             uint256 traitTokenId = traitTokenIds[i];
-            
+
             // Clean up marketplace offers/bids
             marketplace.deleteTraitOffersBeforeTokenTransfer(traitTokenId);
 
             console.log('PetersMain _beforeTokenTransfer calling invalidateAllOperatorApprovals on traitsContract');
-            
+
             uint256 approvedOperatorsLength = traitsContract.getApprovedOperatorsLength(traitTokenId);
             console.log('- approvedOperatorsLength:', approvedOperatorsLength);
             if (approvedOperatorsLength > 0) {
-                
-                // Method 1: execute()
-                // IAccountProxy(payable(tbaAddress)).execute(
-                //     address(traitsContract),
-                //     0, // value 
-                //     abi.encodeWithSignature(
-                //         "invalidateAllOperatorApprovals(uint256)",
-                //         traitTokenId
-                //     ),
-                //     0 // operation
-                // );
 
+                // Corrected the call to execute invalidateAllOperatorApprovals
+                IERC6551Executable(tbaAddress).execute(
+                    address(traitsContract),  // Target contract to call
+                    0,                        // Ether value to send
+                    abi.encodeWithSignature(
+                        "invalidateAllOperatorApprovals(uint256)",
+                        traitTokenId
+                    ),                        // Calldata for the function
+                    0                         // Operation type (0 = CALL)
+                );
 
                 // Method 2: executeCall()
                 // bytes memory data = abi.encodeWithSelector(
@@ -850,11 +842,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 //     0,    // No Ether being sent
                 //     data
                 // );
-                
+
                 // Method 3: direct call - works but will be called by PetersMain
-                traitsContract.invalidateAllOperatorApprovals(traitTokenId);
+                // traitsContract.invalidateAllOperatorApprovals(traitTokenId);
             }
-            
+
 
             marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas);
         }
@@ -875,7 +867,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // better to invalidate TBA approvals in before or after?
-    // i think before.... 
+    // i think before....
     // function _afterTokenTransfer(address, address, uint256 tokenId) internal virtual override {
     //     _invalidateAllOperatorApprovals(tokenId);
     // }
@@ -937,6 +929,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
     */
 
-    
+
 
 }

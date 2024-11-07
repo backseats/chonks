@@ -68,7 +68,7 @@ contract PetersMainTest is PetersBaseTest {
 
     function test_setFirstSeasonRenderMinterRevert() public {
         assertEq(address(main.firstSeasonRenderMinter()), address(0));
-       
+
         vm.startPrank(address(2));
         vm.expectRevert(bytes4(keccak256("Unauthorized()")));
         main.setFirstSeasonRenderMinter(address(dataContract));
@@ -92,7 +92,7 @@ contract PetersMainTest is PetersBaseTest {
     }
 
     function test_addNewBody() public {
-       
+
         vm.startPrank(deployer);
 
         addBodyTraits();
@@ -131,9 +131,9 @@ contract PetersMainTest is PetersBaseTest {
         vm.startPrank(deployer);
         traits.setMarketplace(address(market));
         assertEq(address(traits.marketplace()), address(market));
-        vm.stopPrank(); 
+        vm.stopPrank();
     }
-    
+
 
     function test_mint() public {
 
@@ -179,7 +179,7 @@ contract PetersMainTest is PetersBaseTest {
         main.mint(amount);
         vm.stopPrank();
 
-        // validate data    
+        // validate data
         assertEq(main.balanceOf(user1), 1);
         address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
         assertFalse(tbaWallet == user1);
@@ -249,7 +249,7 @@ contract PetersMainTest is PetersBaseTest {
     }
 
     function test_unequipAll() public {
-        
+
         vm.startPrank(deployer);
         test_setTraitsContract();
         test_setFirstSeasonRenderMinter();
@@ -302,14 +302,14 @@ contract PetersMainTest is PetersBaseTest {
 
         vm.startPrank(address(1));
         main.mint(5);
-        
+
         // Get the TBA address
         (address owner, address tba) = main.getOwnerAndTBAAddressForChonkId(1);
-        
+
         // Test approvalForAll for PetersMain for Marketplace
         main.setApprovalForAll(address(market), true);
         assertTrue(main.isApprovedForAll(owner, address(market)));
-        
+
         // Test revoking approvalForAll for PetersMain
         main.setApprovalForAll(address(market), false);
         assertFalse(main.isApprovedForAll(owner, address(market)));
@@ -326,9 +326,9 @@ contract PetersMainTest is PetersBaseTest {
         address[] memory operators = traits.getApprovedOperators(traitId);
         assertEq(operators.length, 2);
         assertEq(operators[0], address(market));
-        
+
         // Test revoking TBA approvalForAll for traits
-        traits.setApprovalForAll(address(market), false); 
+        traits.setApprovalForAll(address(market), false);
         assertFalse(traits.isApprovedForAll(tba, address(market)));
 
         // should only be one operator left
@@ -350,17 +350,17 @@ contract PetersMainTest is PetersBaseTest {
 
         vm.startPrank(address(1));
         main.mint(5);
-        
+
         // Get the TBA address
         (address owner, address tba) = main.getOwnerAndTBAAddressForChonkId(1);
-        
+
         // Try to transfer without approval
         vm.expectRevert(); // i wonder why we get no data, just Revert
         IERC721(address(market)).transferFrom(address(1), address(2), 1);
 
         // try to setApprovalForAll by owner of Chonk, not trait
         traits.setApprovalForAll(address(market), true); /// actually, this works because anyone can setApprovalForAll for a collection even if they don't own a token
-        
+
         vm.stopPrank();
     }
 
@@ -381,20 +381,22 @@ contract PetersMainTest is PetersBaseTest {
         address user2 = address(2);
         vm.startPrank(user1);
         main.mint(5);
-        
+
         // Get the TBA address
         (address owner, address tba) = main.getOwnerAndTBAAddressForChonkId(1);
-        
+
         // Test approvalForAll for PetersMain for Marketplace
+        assertFalse(main.isApprovedForAll(owner, address(market)));
         main.setApprovalForAll(address(market), true);
         assertTrue(main.isApprovedForAll(owner, address(market)));
-        
+
         // Test revoking approvalForAll for PetersMain
         main.setApprovalForAll(address(market), false);
         assertFalse(main.isApprovedForAll(owner, address(market)));
 
         // Test TBA approvalForAll for traits
         vm.startPrank(tba);
+        assertFalse(traits.isApprovedForAll(tba, address(market)));
         traits.setApprovalForAll(address(market), true);
         assertTrue(traits.isApprovedForAll(tba, address(market)));
 
@@ -408,12 +410,12 @@ contract PetersMainTest is PetersBaseTest {
         assertEq(operators[0], address(market));
 
         vm.stopPrank();
-       
+
         // now let's move Chonk to address(2)
         vm.startPrank(address(1));
         assertEq(main.balanceOf(user1), 1);
-        
-        
+
+        // Transfer Chonk 1 from user1 to user
         main.transferFrom(user1, user2, 1);
 
         // IERC721(address(main)).transferFrom(user1, user2, 1);
@@ -421,6 +423,6 @@ contract PetersMainTest is PetersBaseTest {
         vm.stopPrank();
 
     }
-    
-    
+
+
 }

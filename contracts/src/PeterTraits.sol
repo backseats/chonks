@@ -63,7 +63,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     mapping(uint256 => TraitMetadata) public traitIndexToMetadata;
 
     mapping(uint256 traitId => address[] operators) public traitIdToApprovedOperators;
-    //note, getter function for this would be: 
+    //note, getter function for this would be:
     // function traitIdToApprovedOperators(uint256 traitId, uint256 index) public view returns (address);
 
 
@@ -732,9 +732,9 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         console.log('=== invalidateAllOperatorApprovals ===', _tokenId);
         console.log('ownerOf(_tokenId)', ownerOf(_tokenId));
         console.log('msg.sender', msg.sender);
-        
+
         if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
-        if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait(); 
+        if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait();
 
         // EFFECTS
         // Clear our tracking array
@@ -742,7 +742,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         // INTERACTIONS
         // Remove individual token approval
-        super.approve(address(0), _tokenId); // this will fail unless this method is called by the TBA
+        super.approve(address(0), _tokenId); // this will fail unless this method is called by the TBA // BS: doesnt this happen already in the transfer? I think it does
 
         // Remove all operator approvals for this token
         address[] memory operators = traitIdToApprovedOperators[_tokenId];
@@ -750,7 +750,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             super.setApprovalForAll(operators[i], false);
         }
 
-        emit AllOperatorApprovalsInvalidated(_tokenId);
+        emit ITraitStorage.AllOperatorApprovalsInvalidated(_tokenId);
     }
 
     // DEPLOY: remove/just for testing
