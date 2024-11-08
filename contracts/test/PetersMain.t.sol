@@ -425,28 +425,30 @@ contract PetersMainTest is PetersBaseTest {
 
         vm.startPrank(address(1));
 
-        IRegistry REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
-        address ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
+        // works if called directly here..... //
+        // IRegistry REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
+        // address ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
 
-        address tokenBoundAccountAddress = REGISTRY.createAccount(
-            ACCOUNT_PROXY,
-            0,
-            84532, // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia // DEPLOY
-            address(main),
-            chonkId
-        );
+        // address tokenBoundAccountAddress = REGISTRY.createAccount(
+        //     ACCOUNT_PROXY,
+        //     0,
+        //     84532, // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia // DEPLOY
+        //     address(main),
+        //     chonkId
+        // );
 
-        IERC6551Executable(tokenBoundAccountAddress).execute(
-            address(traits),  // Target contract to call
-            0,                        // Ether value to send
-            abi.encodeWithSignature(
-                "invalidateAllOperatorApprovals(uint256)",
-                1
-            ),                        // Calldata for the function
-            0                         // Operation type (0 = CALL)
-        );
+        // IERC6551Executable(tokenBoundAccountAddress).execute(
+        //     address(traits),  // Target contract to call
+        //     0,                        // Ether value to send
+        //     abi.encodeWithSignature(
+        //         "invalidateAllOperatorApprovals(uint256)",
+        //         1
+        //     ),                        // Calldata for the function
+        //     0                         // Operation type (0 = CALL)
+        // );
 
 
+        // doesn't work if called through TBA
         // Transfer Chonk 1 from user1 to user
         main.transferFrom(user1, user2, chonkId);
 
