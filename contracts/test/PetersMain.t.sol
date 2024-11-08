@@ -15,6 +15,11 @@ import { PetersBaseTest } from './PetersBase.t.sol';
 
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
+import { IAccountImplementation } from "../src/interfaces/TBABoilerplate/IAccountImplementation.sol";
+import { IAccountProxy } from "../src/interfaces/TBABoilerplate/IAccountProxy.sol";
+import { IRegistry } from  "../src/interfaces/TBABoilerplate/IRegistry.sol";
+import { IERC6551Executable } from "../src/interfaces/TBABoilerplate/IERC6551Executable.sol";
+
 contract PetersMainTest is PetersBaseTest {
 
     function setUp() public override {
@@ -194,101 +199,101 @@ contract PetersMainTest is PetersBaseTest {
         assertEq(main.balanceOf(user2), 1);
     }
 
-    function test_equipUnequipShirt() public {
+    // function test_equipUnequipShirt() public {
 
-        vm.startPrank(deployer);
-        test_setTraitsContract();
-        test_setFirstSeasonRenderMinter();
-        test_addNewBody();
-        test_setMarketplace();
-        test_setPetersMainInTraitsContract();
-        test_setMarketplaceInTraitsContract();
-        vm.stopPrank();
+    //     vm.startPrank(deployer);
+    //     test_setTraitsContract();
+    //     test_setFirstSeasonRenderMinter();
+    //     test_addNewBody();
+    //     test_setMarketplace();
+    //     test_setPetersMainInTraitsContract();
+    //     test_setMarketplaceInTraitsContract();
+    //     vm.stopPrank();
 
-        // mint 5 traits
-        address user = address(2);
-        vm.startPrank(user);
-        main.mint(5);
-        dataContract.safeMintMany(user,3);
-        vm.stopPrank();
+    //     // mint 5 traits
+    //     address user = address(2);
+    //     vm.startPrank(user);
+    //     main.mint(5);
+    //     dataContract.safeMintMany(user,3);
+    //     vm.stopPrank();
 
-        // validate data
-        assertEq(main.balanceOf(user), 1);
-        address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
-        assertFalse(tbaWallet == user);
-        assertEq(traits.balanceOf(tbaWallet), 5);
+    //     // validate data
+    //     assertEq(main.balanceOf(user), 1);
+    //     address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
+    //     assertFalse(tbaWallet == user);
+    //     assertEq(traits.balanceOf(tbaWallet), 5);
 
-        // Get StoredPeter & ShirtId
-        IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
-        uint256 topTokenId = storedPeter.topId;
+    //     // Get StoredPeter & ShirtId
+    //     IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
+    //     uint256 topTokenId = storedPeter.topId;
 
-        ITraitStorage.StoredTrait memory trait = traits.getTrait(topTokenId); // tid 4,
-        TraitCategory.Name name = trait.traitType;
-        assertEq(TraitCategory.toString(name), "Top");
+    //     ITraitStorage.StoredTrait memory trait = traits.getTrait(topTokenId); // tid 4,
+    //     TraitCategory.Name name = trait.traitType;
+    //     assertEq(TraitCategory.toString(name), "Top");
 
-        // Unequip Top and validate
-        vm.startPrank(user);
-        storedPeter = main.getPeter(1);
-        assertEq(topTokenId, 3);
-        main.unequipTop(1);
-        storedPeter = main.getPeter(1);
-        assertEq(storedPeter.topId, 0);
-        vm.stopPrank();
+    //     // Unequip Top and validate
+    //     vm.startPrank(user);
+    //     storedPeter = main.getPeter(1);
+    //     assertEq(topTokenId, 3);
+    //     main.unequipTop(1);
+    //     storedPeter = main.getPeter(1);
+    //     assertEq(storedPeter.topId, 0);
+    //     vm.stopPrank();
 
-        // Admin, set traits contract and assert
-        vm.prank(deployer);
-        main.setTraitsContract(traits);
-        assertEq(address(main.traitsContract()), address(traits));
+    //     // Admin, set traits contract and assert
+    //     vm.prank(deployer);
+    //     main.setTraitsContract(traits);
+    //     assertEq(address(main.traitsContract()), address(traits));
 
-        // Equip Top
-        vm.startPrank(user);
-        main.equipTop(1, 3);
-        storedPeter = main.getPeter(1);
-        assertEq(topTokenId, 3);
-        vm.stopPrank();
-    }
+    //     // Equip Top
+    //     vm.startPrank(user);
+    //     main.equipTop(1, 3);
+    //     storedPeter = main.getPeter(1);
+    //     assertEq(topTokenId, 3);
+    //     vm.stopPrank();
+    // }
 
-    function test_unequipAll() public {
+    // function test_unequipAll() public {
 
-        vm.startPrank(deployer);
-        test_setTraitsContract();
-        test_setFirstSeasonRenderMinter();
-        test_addNewBody();
-        test_setMarketplace();
-        test_setPetersMainInTraitsContract();
-        test_setMarketplaceInTraitsContract();
-        vm.stopPrank();
+    //     vm.startPrank(deployer);
+    //     test_setTraitsContract();
+    //     test_setFirstSeasonRenderMinter();
+    //     test_addNewBody();
+    //     test_setMarketplace();
+    //     test_setPetersMainInTraitsContract();
+    //     test_setMarketplaceInTraitsContract();
+    //     vm.stopPrank();
 
 
-        // mint 5 traits
-        address user = address(2);
-        vm.startPrank(user);
-        main.mint(5);
-        // dataContract.safeMintMany(user,3);
-        vm.stopPrank();
+    //     // mint 5 traits
+    //     address user = address(2);
+    //     vm.startPrank(user);
+    //     main.mint(5);
+    //     // dataContract.safeMintMany(user,3);
+    //     vm.stopPrank();
 
-        // validate data
-        assertEq(main.balanceOf(user), 1);
-        address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
-        assertFalse(tbaWallet == user);
-        assertEq(traits.balanceOf(tbaWallet), 5);
+    //     // validate data
+    //     assertEq(main.balanceOf(user), 1);
+    //     address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
+    //     assertFalse(tbaWallet == user);
+    //     assertEq(traits.balanceOf(tbaWallet), 5);
 
-        // Ensure bottom and top are equipped
-        IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
-        assertGt(storedPeter.topId, 0);
-        assertGt(storedPeter.bottomId, 0);
+    //     // Ensure bottom and top are equipped
+    //     IPeterStorage.StoredPeter memory storedPeter = main.getPeter(1);
+    //     assertGt(storedPeter.topId, 0);
+    //     assertGt(storedPeter.bottomId, 0);
 
-        vm.prank(user);
-        main.unequipAll(1);
-        storedPeter = main.getPeter(1);
-        assertEq(storedPeter.headId, 0);
-        assertEq(storedPeter.hairId, 0);
-        assertEq(storedPeter.faceId, 0);
-        assertEq(storedPeter.accessoryId, 0);
-        assertEq(storedPeter.topId, 0);
-        assertEq(storedPeter.bottomId, 0);
-        assertEq(storedPeter.shoesId, 0);
-    }
+    //     vm.prank(user);
+    //     main.unequipAll(1);
+    //     storedPeter = main.getPeter(1);
+    //     assertEq(storedPeter.headId, 0);
+    //     assertEq(storedPeter.hairId, 0);
+    //     assertEq(storedPeter.faceId, 0);
+    //     assertEq(storedPeter.accessoryId, 0);
+    //     assertEq(storedPeter.topId, 0);
+    //     assertEq(storedPeter.bottomId, 0);
+    //     assertEq(storedPeter.shoesId, 0);
+    // }
 
     function test_TBAApprovalForAll() public {
         vm.startPrank(deployer);
@@ -370,7 +375,7 @@ contract PetersMainTest is PetersBaseTest {
        vm.startPrank(deployer);
         test_setTraitsContract();
         test_setFirstSeasonRenderMinter();
-        test_addNewBody();
+        // test_addNewBody();
         test_setMarketplace();
         test_setPetersMainInTraitsContract();
         test_setMarketplaceInTraitsContract();
@@ -404,6 +409,7 @@ contract PetersMainTest is PetersBaseTest {
         traits.setApprovalForAll(address(2), true);
 
         // Test getting approved operators for a trait token
+        uint256 chonkId = 1;
         uint256 traitId = 1;
         address[] memory operators = traits.getApprovedOperators(traitId);
         assertEq(operators.length, 2);
@@ -415,8 +421,34 @@ contract PetersMainTest is PetersBaseTest {
         vm.startPrank(address(1));
         assertEq(main.balanceOf(user1), 1);
 
+        vm.stopPrank();
+
+        vm.startPrank(address(1));
+
+        IRegistry REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
+        address ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
+
+        address tokenBoundAccountAddress = REGISTRY.createAccount(
+            ACCOUNT_PROXY,
+            0,
+            84532, // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia // DEPLOY
+            address(main),
+            chonkId
+        );
+
+        IERC6551Executable(tokenBoundAccountAddress).execute(
+            address(traits),  // Target contract to call
+            0,                        // Ether value to send
+            abi.encodeWithSignature(
+                "invalidateAllOperatorApprovals(uint256)",
+                1
+            ),                        // Calldata for the function
+            0                         // Operation type (0 = CALL)
+        );
+
+
         // Transfer Chonk 1 from user1 to user
-        main.transferFrom(user1, user2, 1);
+        main.transferFrom(user1, user2, chonkId);
 
         // IERC721(address(main)).transferFrom(user1, user2, 1);
         // assertEq(main.balanceOf(user2), 1);

@@ -14,7 +14,7 @@ import { Utils } from "./common/Utils.sol";
 import { IAccountImplementation } from "./interfaces/TBABoilerplate/IAccountImplementation.sol";
 import { IAccountProxy } from "./interfaces/TBABoilerplate/IAccountProxy.sol";
 import { IRegistry } from  "./interfaces/TBABoilerplate/IRegistry.sol";
-import { IERC6551Executable } from "./interfaces/TBABoilerplate/IERC6551Executable.sol";
+// import { IERC6551Executable } from "./interfaces/TBABoilerplate/IERC6551Executable.sol";
 
 // Renderers
 import { RenderHelper } from "./renderers/RenderHelper.sol";
@@ -29,14 +29,14 @@ import { IPeterStorage } from "./interfaces/IPeterStorage.sol";
 import { ITraitStorage } from "./interfaces/ITraitStorage.sol";
 import { IERC4906 } from "./interfaces/IERC4906.sol";
 import { TraitCategory } from "./TraitCategory.sol";
-import { CommitReveal } from "./common/CommitReveal.sol";
+// import { CommitReveal } from "./common/CommitReveal.sol";
 
 import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 
-import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+// import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-import "forge-std/console.sol"; // DEPLOY: remove
+// import "forge-std/console.sol"; // DEPLOY: remove
 
 
 // TODO: withdraw or send us the ETH per each txn
@@ -120,7 +120,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
-        console.log('localDeploy:', _localDeploy);
+        // console.log('localDeploy:', _localDeploy);
         if (_localDeploy) {
             for (uint i; i < 1; ++i) {
                 mint(4); // Mints N bodies/tokens
@@ -133,7 +133,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function mint(uint8 _amount) public payable { // TODO amount, check price
-        console.log('minting...');
+        // console.log('minting...');
         _mintAmount(_amount);
     }
 
@@ -151,17 +151,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function _mintAmount(uint8 amount) internal {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
 
-        console.log('minting amount:', amount);
+        // console.log('minting amount:', amount);
         // uint256 amount = 7;
         // resolveEpochIfNecessary(); // no longer need this as bodies can be changed by holders
 
         uint256 tokenId = ++_nextTokenId;
         _mint(msg.sender, tokenId);
 
-        console.log('minted tokenId:', tokenId);
+        // console.log('minted tokenId:', tokenId);
 
-        console.log('creating tba...');
-        console.log('address(this)', address(this));
+        // console.log('creating tba...');
+        // console.log('address(this)', address(this));
 
         // params: implementation address, salt, chainId, tokenContract, tokenId
         address tokenBoundAccountAddress = REGISTRY.createAccount(
@@ -172,7 +172,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             tokenId
         );
 
-        console.log('tokenBoundAccountAddress:', tokenBoundAccountAddress);
+        // console.log('tokenBoundAccountAddress:', tokenBoundAccountAddress);
 
         // Set the cross-reference between tokenId and TBA account address
         tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
@@ -186,7 +186,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         //TODO: think we need to call this currentSeasonRenderMinter... also, will we ever let people mint bodies again after first mint?
         uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, amount);
 
-        console.log('traitsIds[0]:', traitsIds[0]);
+        // console.log('traitsIds[0]:', traitsIds[0]);
         // Initialize our Peter
         StoredPeter storage peter = peterTokens.all[tokenId];
 
@@ -391,7 +391,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     ) public onlyPeterOwner(_peterTokenId) {
         equipAll(_peterTokenId, _headTokenId, _hairTokenId, _faceTokenId, _accessoryTokenId, _topTokenId, _bottomTokenId, _shoesTokenId);
         setBodyIndex(_peterTokenId, _bodyIndex);
-        setBackgroundColor(_peterTokenId, _backgroundColor);
+        // setBackgroundColor(_peterTokenId, _backgroundColor);
     }
 
     /// Validations
@@ -720,26 +720,26 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
       systemAddress = _systemAddress;
     }
 
-    function setBackgroundColor(uint256 _peterTokenId, string memory _color) public onlyPeterOwner(_peterTokenId) {
-        bytes memory colorBytes = bytes(_color);
-        if (colorBytes.length != 6) revert InvalidColor();
+    // function setBackgroundColor(uint256 _peterTokenId, string memory _color) public onlyPeterOwner(_peterTokenId) {
+    //     bytes memory colorBytes = bytes(_color);
+    //     if (colorBytes.length != 6) revert InvalidColor();
 
-        if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo(); // todo: either take this out or make it so only marka can do this
+    //     if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo(); // todo: either take this out or make it so only marka can do this
 
-        // Ensure all characters are valid hex characters (0-9, a-f, A-F)
-        for (uint i = 0; i < 6; i++) {
-            if (
-                !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
-                !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
-                !(colorBytes[i] >= 0x61 && colorBytes[i] <= 0x66)    // a-f
-            ) {
-                revert InvalidColor(); // Invalid character found
-            }
-        }
-        peterTokens.all[_peterTokenId].backgroundColor = _color;
+    //     // Ensure all characters are valid hex characters (0-9, a-f, A-F)
+    //     for (uint i = 0; i < 6; i++) {
+    //         if (
+    //             !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
+    //             !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
+    //             !(colorBytes[i] >= 0x61 && colorBytes[i] <= 0x66)    // a-f
+    //         ) {
+    //             revert InvalidColor(); // Invalid character found
+    //         }
+    //     }
+    //     peterTokens.all[_peterTokenId].backgroundColor = _color;
 
-        emit BackgroundColor(ownerOf(_peterTokenId), _peterTokenId, _color );
-    }
+    //     emit BackgroundColor(ownerOf(_peterTokenId), _peterTokenId, _color );
+    // }
 
     function setBodyIndex(uint256 _peterTokenId, uint8 _bodyIndex) public onlyPeterOwner(_peterTokenId) {
         if (_bodyIndex > 3) revert InvalidBodyIndex();
@@ -774,7 +774,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             return;
         }
 
-        console.log('PetersMain _beforeTokenTransfer called for token ID:', tokenId);
+        // console.log('PetersMain _beforeTokenTransfer called for token ID:', tokenId);
         // CHECKS
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
@@ -782,14 +782,14 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         // Cache TBA address and trait tokens to minimize external calls
         address tbaAddress = tokenIdToTBAAccountAddress[tokenId];
-        console.log('- tbaAddress:', tbaAddress);
+        // console.log('- tbaAddress:', tbaAddress);
         uint256[] memory traitTokenIds = traitsContract.walletOfOwner(tbaAddress);
-        uint256[] memory chonkIds = walletOfOwner(to);
-        address[] memory tbas = new address[](chonkIds.length);
-        for (uint256 j; j < chonkIds.length; ++j) {
-            tbas[j] = tokenIdToTBAAccountAddress[chonkIds[j]];
-            console.log('- tbas...:', tokenIdToTBAAccountAddress[chonkIds[j]]);
-        }
+        // uint256[] memory chonkIds = walletOfOwner(from);
+        // address[] memory tbas = new address[](chonkIds.length);
+        // for (uint256 j; j < chonkIds.length; ++j) {
+        //     tbas[j] = tokenIdToTBAAccountAddress[chonkIds[j]];
+        //     // console.log('- tbas...:', tokenIdToTBAAccountAddress[chonkIds[j]]);
+        // }
 
         // EFFECTS (if any state changes were needed)
 
@@ -813,21 +813,57 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // Clean up marketplace offers/bids
             marketplace.deleteTraitOffersBeforeTokenTransfer(traitTokenId);
 
-            console.log('PetersMain _beforeTokenTransfer calling invalidateAllOperatorApprovals on traitsContract');
+            // console.log('PetersMain _beforeTokenTransfer calling invalidateAllOperatorApprovals on traitsContract');
 
             uint256 approvedOperatorsLength = traitsContract.getApprovedOperatorsLength(traitTokenId);
-            console.log('- approvedOperatorsLength:', approvedOperatorsLength);
+            // console.log('- approvedOperatorsLength:', approvedOperatorsLength);
+
+            // console.log("Target contract:", address(traitsContract));
+            // console.log("TBA address:", tbaAddress);
+            // console.log("Trait token ID:", traitTokenId);
+            // bytes memory callData = abi.encodeWithSelector(
+            //     PeterTraits.invalidateAllOperatorApprovals.selector,
+            //     traitTokenId
+            // );
+            // console.logBytes(callData);
+
+
             if (approvedOperatorsLength > 0) {
 
+
+                // console.log("About to execute call through TBA");
+                // console.log("Target:", address(traitsContract));
+                // console.log("TBA:", tbaAddress);
+                
+                // // Use executeCall instead of execute
+                // try IAccountProxy(tbaAddress).executeCall(
+                //     address(traitsContract),
+                //     0,
+                //     callData
+                // ) returns (bytes memory result) {
+                //     console.log("Execute call succeeded");
+                //     console.logBytes(result);
+                // } catch Error(string memory reason) {
+                //     console.log("Execute call failed with reason:", reason);
+                //     revert(reason);
+                // } catch Panic(uint errorCode) {
+                //     console.log("Execute call failed with panic code:", errorCode);
+                //     revert();
+                // } catch (bytes memory lowLevelData) {
+                //     console.log("Execute call failed with low level data:");
+                //     console.logBytes(lowLevelData);
+                //     revert();
+                // }
+
                 // Corrected the call to execute invalidateAllOperatorApprovals
-                IERC6551Executable(tbaAddress).execute(
+                IAccountProxy(tbaAddress).execute(
                     address(traitsContract),  // Target contract to call
                     0,                        // Ether value to send
                     abi.encodeWithSignature(
                         "invalidateAllOperatorApprovals(uint256)",
                         traitTokenId
                     ),                        // Calldata for the function
-                    0                         // Operation type (0 = CALL)
+                    1                         // Operation type (0 = CALL)
                 );
 
                 // Method 2: executeCall()
@@ -848,7 +884,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             }
 
 
-            marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas);
+            // marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas); // Todo: do we need this? We're just transferring one chonk token
         }
 
         super._beforeTokenTransfer(from, to, tokenId);
@@ -896,7 +932,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // we could just add the approval to the struct for all of their chonks for good measure and then
 
         // who is msg.sender here? is it the tba or is it the eoa that owns the token?
-        console.log("msg.sender", msg.sender);
+        // console.log("msg.sender", msg.sender);
         if (_approved) {
             uint256[] chonkIds = walletOfOwner(msg.sender);
             for (uint i; i < chonkIds.length; ++i) {
