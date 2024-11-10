@@ -369,6 +369,102 @@ contract PetersMainTest is PetersBaseTest {
         vm.stopPrank();
     }
 
+    function test_TBAApprovalForAllExploit() public {
+
+        vm.startPrank(deployer);
+        test_setTraitsContract();
+        test_setFirstSeasonRenderMinter();
+        // test_addNewBody();
+        test_setMarketplace();
+        test_setPetersMainInTraitsContract();
+        test_setMarketplaceInTraitsContract();
+        vm.stopPrank();
+
+
+        address user1 = address(1);
+        console.log('user1 address is', user1);
+
+        address user2 = address(2);
+
+        // Be User 1
+        vm.startPrank(user1);
+            main.mint(5);
+            // assertEq(main.balanceOf(user1), 5);
+
+            // Get the TBA address
+            (address owner, address tba) = main.getOwnerAndTBAAddressForChonkId(1);
+            console.log('--------------------------------');
+            console.log('test contract address is', address(this));
+            console.log('main contract address is', address(main));
+            console.log('traits contract address is', address(traits));
+            console.log('owner address is', owner);
+            console.log('tba address is', tba);
+            console.log('--------------------------------');
+
+            assertEq(main.balanceOf(user1), 1);
+            assertEq(traits.balanceOf(tba), 5);
+            assertEq(owner, user1);
+
+            // Test approvalForAll for HarveyMain for Marketplace
+            assertFalse(main.isApprovedForAll(owner, address(market)));
+            main.setApprovalForAll(address(market), true);
+            assertTrue(main.isApprovedForAll(owner, address(market)));
+
+            // Test revoking approvalForAll for PetersMain
+            main.setApprovalForAll(address(market), false);
+            assertFalse(main.isApprovedForAll(owner, address(market)));
+        vm.stopPrank();
+
+        // Test TBA approvalForAll for traits
+        vm.startPrank(tba);
+            assertFalse(traits.isApprovedForAll(tba, address(market)));
+            traits.setApprovalForAll(address(market), true);
+            assertTrue(traits.isApprovedForAll(tba, address(market)));
+
+            // also set approval for all for address(2)
+            assertFalse(traits.isApprovedForAll(tba, user2));
+            traits.setApprovalForAll(user2, true); // approve the EOA holding the traits
+                assertTrue(traits.isApprovedForAll(tba, user2));
+
+            // Test getting approved operators for a trait token
+            uint256 traitId = 1;
+            address[] memory operators = traits.getApprovedOperators(traitId);
+            assertEq(operators.length, 2);
+            assertEq(operators[0], address(market));
+            assertEq(operators[1], user2);
+        vm.stopPrank();
+
+        // now let's move Chonk to address(2)
+        vm.startPrank(user1);
+            assertEq(main.balanceOf(user1), 1);
+
+            // Check trait id operators before the transfer
+            operators = traits.getApprovedOperators(traitId);
+            assertEq(operators.length, 2);
+
+            // TBA has both of these addresses approved
+            assertTrue(traits.isApprovedForAll(tba, address(market)));
+                assertTrue(traits.isApprovedForAll(tba, user2));
+
+            // Transfer Chonk 1 from user1 to user2 (this should clear the approvals)
+            main.transferFrom(user1, user2, 1);
+
+            assertEq(main.balanceOf(user1), 0);
+            assertEq(main.balanceOf(user2), 1);
+
+            // Ensure trait id operators are cleared
+            operators = traits.getApprovedOperators(traitId);
+            assertEq(operators.length, 0);
+
+            assertFalse(traits.isApprovedForAll(tba, address(market)));
+            assertFalse(traits.isApprovedForAll(tba, user2));
+        vm.stopPrank();
+    }
+
+    /*
+    // old method...
+
+
     // wip but mintThenTransfer needs to be finalised first
     function test_TBAApprovalForAllExploit() public {
 
@@ -457,6 +553,8 @@ contract PetersMainTest is PetersBaseTest {
         vm.stopPrank();
 
     }
+
+    */
 
 
 }

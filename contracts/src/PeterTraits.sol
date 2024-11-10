@@ -789,16 +789,34 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     /// @notice Invalidates all operator approvals for a specific token
     function invalidateAllOperatorApprovals(uint256 _tokenId) public {
 
-        // console.log("=== START invalidateAllOperatorApprovals ===");
-        // console.log("_tokenId:", _tokenId);
-        // console.log("msg.sender:", msg.sender);
+       
+        if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
 
-        // First check if token exists before anything else
-        if (!_exists(_tokenId)) {
-            // console.log("Token doesn't exist!");
-            revert TraitTokenDoesntExist();
+        // We allow PetersMain to invalidate all operator approvals for a token
+        if (ownerOf(_tokenId) != msg.sender && msg.sender != address(petersMain)) revert NotYourTrait();
+
+        address[] memory operators = traitIdToApprovedOperators[_tokenId];
+        if (operators.length == 0) return;
+
+        // INTERACTIONS
+
+        // Remove individual token approval
+        _approve(address(0), _tokenId);
+
+        // Remove all operator approvals for this token
+        for (uint256 i; i < operators.length; ++i) {
+            _setApprovalForAll(ownerOf(_tokenId), operators[i], false);
         }
 
+        // Clear tracking array
+        delete traitIdToApprovedOperators[_tokenId];
+
+        emit ITraitStorage.AllOperatorApprovalsInvalidated(_tokenId);
+    
+        /*
+
+        // old code...
+        
         address traitOwner = ownerOf(_tokenId);
         // console.log("traitOwner:", traitOwner);
         // console.log("msg.sender:", msg.sender);
@@ -836,6 +854,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         delete traitIdToApprovedOperators[_tokenId];
 
         emit ITraitStorage.AllOperatorApprovalsInvalidated(_tokenId);
+        */
     }
 
     // DEPLOY: remove/just for testing

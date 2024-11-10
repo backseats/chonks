@@ -778,113 +778,31 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // CHECKS
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
-        if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();
+         if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();
 
         // Cache TBA address and trait tokens to minimize external calls
         address tbaAddress = tokenIdToTBAAccountAddress[tokenId];
         // console.log('- tbaAddress:', tbaAddress);
+
         uint256[] memory traitTokenIds = traitsContract.walletOfOwner(tbaAddress);
-        // uint256[] memory chonkIds = walletOfOwner(from);
-        // address[] memory tbas = new address[](chonkIds.length);
-        // for (uint256 j; j < chonkIds.length; ++j) {
-        //     tbas[j] = tokenIdToTBAAccountAddress[chonkIds[j]];
-        //     // console.log('- tbas...:', tokenIdToTBAAccountAddress[chonkIds[j]]);
-        // }
+        uint256[] memory chonkIds = walletOfOwner(to);
+        address[] memory tbas = new address[](chonkIds.length);
+        for (uint256 j; j < chonkIds.length; ++j) {
+            tbas[j] = tokenIdToTBAAccountAddress[chonkIds[j]];
+            // console.log('- tbas...:', tokenIdToTBAAccountAddress[chonkIds[j]]);
+        }
 
         // EFFECTS (if any state changes were needed)
 
-        // INTERACTIONS
-        // Marketplace checks and cleanup
-
-        // check marketplace if tokenId is for sale via offer and msg.sender is the marketplace
-        (, address seller,,,) = marketplace.chonkOffers(tokenId);
-        if (seller != address(0)) {
-            if (msg.sender != address(marketplace)) revert CantTransfer();
-        }
-
-        // Clean up Chonk Offers and Bids
-        marketplace.deleteChonkOfferBeforeTokenTransfer(tokenId);
-        marketplace.deleteChonkBidsBeforeTokenTransfer(tokenId, to);
-
-        // Loop through all the Trait tokens
         for (uint256 i; i < traitTokenIds.length; ++i) {
             uint256 traitTokenId = traitTokenIds[i];
 
             // Clean up marketplace offers/bids
-            marketplace.deleteTraitOffersBeforeTokenTransfer(traitTokenId);
+            // marketplace.deleteTraitOffersBeforeTokenTransfer(traitTokenId);
 
-            // console.log('PetersMain _beforeTokenTransfer calling invalidateAllOperatorApprovals on traitsContract');
+            traitsContract.invalidateAllOperatorApprovals(traitTokenId);
 
-            uint256 approvedOperatorsLength = traitsContract.getApprovedOperatorsLength(traitTokenId);
-            // console.log('- approvedOperatorsLength:', approvedOperatorsLength);
-
-            // console.log("Target contract:", address(traitsContract));
-            // console.log("TBA address:", tbaAddress);
-            // console.log("Trait token ID:", traitTokenId);
-            // bytes memory callData = abi.encodeWithSelector(
-            //     PeterTraits.invalidateAllOperatorApprovals.selector,
-            //     traitTokenId
-            // );
-            // console.logBytes(callData);
-
-
-            if (approvedOperatorsLength > 0) {
-
-
-                // console.log("About to execute call through TBA");
-                // console.log("Target:", address(traitsContract));
-                // console.log("TBA:", tbaAddress);
-                
-                // // Use executeCall instead of execute
-                // try IAccountProxy(tbaAddress).executeCall(
-                //     address(traitsContract),
-                //     0,
-                //     callData
-                // ) returns (bytes memory result) {
-                //     console.log("Execute call succeeded");
-                //     console.logBytes(result);
-                // } catch Error(string memory reason) {
-                //     console.log("Execute call failed with reason:", reason);
-                //     revert(reason);
-                // } catch Panic(uint errorCode) {
-                //     console.log("Execute call failed with panic code:", errorCode);
-                //     revert();
-                // } catch (bytes memory lowLevelData) {
-                //     console.log("Execute call failed with low level data:");
-                //     console.logBytes(lowLevelData);
-                //     revert();
-                // }
-
-                // Corrected the call to execute invalidateAllOperatorApprovals
-                IAccountProxy(tbaAddress).execute(
-                    address(traitsContract),  // Target contract to call
-                    0,                        // Ether value to send
-                    abi.encodeWithSignature(
-                        "invalidateAllOperatorApprovals(uint256)",
-                        traitTokenId
-                    ),                        // Calldata for the function
-                    1                         // Operation type (0 = CALL)
-                );
-
-                // Method 2: executeCall()
-                // bytes memory data = abi.encodeWithSelector(
-                //     traitsContract.invalidateAllOperatorApprovals.selector,
-                //     traitTokenId
-                // );
-
-                // // Execute the call via the TBA
-                // IAccountProxy(tbaAddress).executeCall(
-                //     address(traitsContract),
-                //     0,    // No Ether being sent
-                //     data
-                // );
-
-                // Method 3: direct call - works but will be called by PetersMain
-                // traitsContract.invalidateAllOperatorApprovals(traitTokenId);
-            }
-
-
-            // marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas); // Todo: do we need this? We're just transferring one chonk token
+            // marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas);
         }
 
         super._beforeTokenTransfer(from, to, tokenId);
