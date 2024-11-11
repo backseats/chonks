@@ -8,6 +8,7 @@ import { IPeterStorage } from "../interfaces/IPeterStorage.sol";
 import { Utils } from "../common/Utils.sol";
 
 contract TraitRenderer {
+
     struct Ghost {
         bytes colorMap;
         bytes zMap;
@@ -110,7 +111,6 @@ contract TraitRenderer {
                 );
             }
         }
-
     }
 
     function getTraitImage(bytes memory colorMap) public pure returns (bytes memory) {
@@ -140,8 +140,6 @@ contract TraitRenderer {
         return pixels;
     }
 
-    
-
     function getGhostSvg() public view returns (string memory svg) {
         bytes memory pixels = getTraitImage(ghost.colorMap);
         bytes memory svgParts = createSvgFromPixels(pixels);
@@ -161,7 +159,7 @@ contract TraitRenderer {
     }
 
     function getSvgAndMetadataTrait(
-        ITraitStorage.StoredTrait memory trait, 
+        ITraitStorage.StoredTrait memory trait,
         uint256 traitId,
         ITraitStorage.TraitMetadata memory metadata
     ) public view returns(string memory traitSvg, string memory traitAttributes) {
@@ -179,12 +177,12 @@ contract TraitRenderer {
     }
 
     function getSVGZmapAndMetadataTrait(
-        ITraitStorage.StoredTrait memory trait, 
+        ITraitStorage.StoredTrait memory trait,
         uint256 traitId,
         ITraitStorage.TraitMetadata memory metadata
     ) public view returns(
-        string memory traitSvg, 
-        bytes memory traitZmap, 
+        string memory traitSvg,
+        bytes memory traitZmap,
         string memory traitAttributes
     ) {
         if (trait.isRevealed && traitId > 0) {
@@ -257,25 +255,51 @@ contract TraitRenderer {
         IPeterStorage.StoredPeter memory storedPeter,
         function(uint256, string memory, string memory) external view returns (string memory, string memory) callGetSvgAndMetadataTraitFn
     ) public view returns (string memory traitsSvg, string memory traitsAttributes) {
-        if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.shoesId, traitsSvg, traitsAttributes);
-        if (storedPeter.bottomId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.bottomId, traitsSvg, traitsAttributes);
-        if (storedPeter.topId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.topId, traitsSvg, traitsAttributes);
-        if (storedPeter.faceId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.faceId, traitsSvg, traitsAttributes);
-        if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.hairId, traitsSvg, traitsAttributes);
-        if (storedPeter.headId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.headId, traitsSvg, traitsAttributes);
-        if (storedPeter.accessoryId > 0) (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.accessoryId, traitsSvg, traitsAttributes);
+        if (storedPeter.shoesId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.shoesId, traitsSvg, traitsAttributes);
+
+        if (storedPeter.bottomId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.bottomId, traitsSvg, traitsAttributes);
+
+        if (storedPeter.topId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.topId, traitsSvg, traitsAttributes);
+
+        if (storedPeter.faceId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.faceId, traitsSvg, traitsAttributes);
+
+        if (storedPeter.hairId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.hairId, traitsSvg, traitsAttributes);
+
+        if (storedPeter.headId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.headId, traitsSvg, traitsAttributes);
+
+        if (storedPeter.accessoryId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.accessoryId, traitsSvg, traitsAttributes);
     }
 
     function getSvgZmapsAndMetadata(
         IPeterStorage.StoredPeter memory storedPeter,
         function(uint256, string memory, string memory, bytes memory) external view returns (string memory, string memory, bytes memory) callGetSVGZmapAndMetadataTraitFn
     ) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
-        if (storedPeter.shoesId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.shoesId, traitsSvg, traitsAttributes, traitZMaps);
-        if (storedPeter.bottomId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.bottomId, traitsSvg, traitsAttributes, traitZMaps);
-        if (storedPeter.topId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.topId, traitsSvg, traitsAttributes, traitZMaps);
-        if (storedPeter.faceId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.faceId, traitsSvg, traitsAttributes, traitZMaps);
-        if (storedPeter.hairId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.hairId, traitsSvg, traitsAttributes, traitZMaps);
-        if (storedPeter.headId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.headId, traitsSvg, traitsAttributes, traitZMaps);
-        if (storedPeter.accessoryId > 0) (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.accessoryId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedPeter.shoesId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.shoesId, traitsSvg, traitsAttributes, traitZMaps);
+
+        if (storedPeter.bottomId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.bottomId, traitsSvg, traitsAttributes, traitZMaps);
+
+        if (storedPeter.topId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.topId, traitsSvg, traitsAttributes, traitZMaps);
+
+        if (storedPeter.faceId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.faceId, traitsSvg, traitsAttributes, traitZMaps);
+
+        if (storedPeter.hairId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.hairId, traitsSvg, traitsAttributes, traitZMaps);
+
+        if (storedPeter.headId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.headId, traitsSvg, traitsAttributes, traitZMaps);
+
+        if (storedPeter.accessoryId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.accessoryId, traitsSvg, traitsAttributes, traitZMaps);
     }
-} 
+}

@@ -34,10 +34,7 @@ import { TraitCategory } from "./TraitCategory.sol";
 import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 
-// import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
-
 // import "forge-std/console.sol"; // DEPLOY: remove
-
 
 // TODO: withdraw or send us the ETH per each txn
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
@@ -89,12 +86,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Tracking which nonces have been used from the server
     mapping (string => bool) usedNonces;
 
-
-
      // Backpack stuff
     uint256 maxTraitsToOutput = 99;
     string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
-
 
     /// Errors
 
@@ -220,25 +214,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         peter.backgroundColor = "0D6E9D";
 
         emit Mint(msg.sender, tokenId);
-    }
-
-    // using ECDSA for bytes32;
-    // /// @notice Checks if the private key that singed the nonce matches the system address of the contract
-    // function isValidSignature(bytes32 hash, bytes calldata signature) internal view returns (bool) {
-    //     require(systemAddress != address(0), "Missing system address");
-    //     bytes32 signedHash = hash.toEthSignedMessageHash();
-    //     return signedHash.recover(signature) == systemAddress;
-    // }
-
-    // TODO: payable, this probably actually calls the first season contract to mint
-    function buyTrait(uint256 _tokenId) public {
-        // require(msg.value == price, "Insufficient funds");
-        // require(ownerOf(_tokenId) == msg.sender, "You do not own this Peter");
-
-        address tbaAddress = tokenIdToTBAAccountAddress[_tokenId];
-
-        // Mint a new unequipped trait token to the TBA for this token id
-        traitsContract.safeMint(tbaAddress);
     }
 
     function getOwnerAndTBAAddressForChonkId(uint256 _chonkId) public view returns (address owner, address tbaAddress) {
@@ -880,7 +855,5 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         delete chonkIdToApprovedOperators[_chonkId];
     }
     */
-
-
 
 }
