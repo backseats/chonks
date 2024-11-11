@@ -18,8 +18,8 @@ import { IRegistry } from  "./interfaces/TBABoilerplate/IRegistry.sol";
 
 // Renderers
 import { RenderHelper } from "./renderers/RenderHelper.sol";
-import { MainRenderer } from "./renderers/MainRenderer.sol";
-import { ZRenderer } from "./renderers/ZRenderer.sol";
+import { MainRenderer2D } from "./renderers/MainRenderer2D.sol";
+import { MainRenderer3D } from "./renderers/MainRenderer3D.sol";
 
 // The Traits ERC-721 Contract
 import { PeterTraits } from "./PeterTraits.sol";
@@ -57,10 +57,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
 
     // The render contract that handles SVG generation
-    MainRenderer public mainRenderer;
+    MainRenderer2D public mainRenderer2D;
 
     // The render contract that handles 3d generation
-    ZRenderer public zRenderer;
+    MainRenderer3D public mainRenderer3D;
 
     uint256 _nextTokenId;
 
@@ -203,7 +203,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // if(amount > 6) peter.accessoryId = traitsIds[6];
 
         // set default renderer to 2D
-        peter.renderZ = false;
+        peter.render3D = false;
 
         // on mint, let's make all peter's body index 0, which is then updated in getPeter (even chance)
         // peter.bodyIndex = 0;
@@ -430,7 +430,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // outputs svg for a provided body index
     function getBodyImageSvg(uint256 _index) public view returns (string memory svg) {
         bytes memory colorMap = getBodyImage(bodyIndexToMetadata[_index].colorMap);
-        return mainRenderer.getBodyImageSvg(colorMap);
+        return mainRenderer2D.getBodyImageSvg(colorMap);
     }
 
     function getBodySVGZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory, bytes memory , string memory ) {
@@ -514,7 +514,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         backpackSVGs = string(buffer);
     }
 
-    function renderAsDataUriSVG(uint256 _tokenId) public view returns (string memory) {
+    function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
         string memory bodySvg;
         string memory bodyAttributes;
         string memory traitsSvg;
@@ -534,7 +534,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 
-        return mainRenderer.renderAsDataUriSVG(
+        return mainRenderer2D.renderAsDataUri(
             _tokenId,
             bodySvg,
             bodyAttributes,
@@ -545,7 +545,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         );
     }
 
-    function renderAsDataUriZ(uint256 _tokenId) public view returns (string memory) {
+    function renderAsDataUri3D(uint256 _tokenId) public view returns (string memory) {
         string memory bodySvg;
         string memory traitsSvg;
         bytes  memory bodyZmap;
@@ -572,7 +572,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 
-        return zRenderer.renderAsDataUriZ(
+        return mainRenderer3D.renderAsDataUriZ(
             _tokenId,
             bodySvg,
             bodyAttributes,
@@ -586,7 +586,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
         StoredPeter memory storedPeter = getPeter(_tokenId);
 
-        return (storedPeter.renderZ) ? renderAsDataUriZ(_tokenId) : renderAsDataUriSVG(_tokenId);
+        return (storedPeter.render3D) ? renderAsDataUri3D(_tokenId) : renderAsDataUri2D(_tokenId);
     }
 
     /// Getters
@@ -626,7 +626,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function getTokenRenderZ(uint256 _peterTokenId) public view returns (bool) {
-        return peterTokens.all[_peterTokenId].renderZ;
+        return peterTokens.all[_peterTokenId].render3D;
     }
 
     function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
@@ -683,12 +683,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         firstSeasonRenderMinter = FirstSeasonRenderMinter(_dataContract);
     }
 
-    function setMainRenderer(address _mainRenderer) public onlyOwner {
-        mainRenderer = MainRenderer(_mainRenderer);
+    function setMainRenderer2D(address _mainRenderer2D) public onlyOwner {
+        mainRenderer2D = MainRenderer2D(_mainRenderer2D);
     }
 
-    function setZRenderer(address _zRenderer) public onlyOwner {
-        zRenderer = ZRenderer(_zRenderer);
+    function setMainRenderer3D(address _mainRenderer3D) public onlyOwner {
+        mainRenderer3D = MainRenderer3D(_mainRenderer3D);
     }
 
     function setSystemAddress(address _systemAddress) external onlyOwner {
@@ -724,9 +724,9 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
     }
 
-    function setTokenRenderZ(uint256 _peterTokenId, bool _renderZ) public onlyPeterOwner(_peterTokenId) {
-        peterTokens.all[_peterTokenId].renderZ = _renderZ;
-        emit RenderZ(ownerOf(_peterTokenId), _peterTokenId, _renderZ);
+    function setTokenRender3D(uint256 _peterTokenId, bool _render3D) public onlyPeterOwner(_peterTokenId) {
+        peterTokens.all[_peterTokenId].render3D = _render3D;
+        emit Render3D(ownerOf(_peterTokenId), _peterTokenId, _render3D);
     }
 
     function setMarketplace(address _marketplace) public onlyOwner {

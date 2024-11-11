@@ -7,8 +7,8 @@ import { PetersMain } from '../src/PetersMain.sol';
 import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
 import { ChonksMarket } from '../src/ChonksMarket.sol';
 import { EncodeURI } from '../src/EncodeURI.sol';
-import { MainRenderer } from '../src/renderers/MainRenderer.sol';
-import { ZRenderer } from '../src/renderers/ZRenderer.sol';
+import { MainRenderer2D } from '../src/renderers/MainRenderer2D.sol';
+import { MainRenderer3D } from '../src/renderers/MainRenderer3D.sol';
 
 import { Test, console } from 'forge-std/Test.sol';
 
@@ -17,8 +17,8 @@ contract PetersBaseTest is Test {
     PetersMain public main;
     PeterTraits public traits;
     FirstSeasonRenderMinter public dataContract;
-    MainRenderer public mainRenderer;
-    ZRenderer public zRenderer;
+    MainRenderer2D public mainRenderer2D;
+    MainRenderer3D public mainRenderer3D;
     EncodeURI public encodeURIContract;
     bytes public base64ScriptContent;
     ChonksMarket public market;

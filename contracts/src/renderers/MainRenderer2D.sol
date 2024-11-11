@@ -7,7 +7,7 @@ import { IPeterStorage } from "../interfaces/IPeterStorage.sol";
 import { Utils } from "../common/Utils.sol";
 
 // I don't think this should know about any kind of contracts. It should just get data and render it.
-contract MainRenderer {
+contract MainRenderer2D {
 
     string private constant SVG_START = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">';
     string private constant SVG_STYLE = '<style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
@@ -36,7 +36,7 @@ contract MainRenderer {
         );
     }
 
-    function renderAsDataUriSVG(
+    function renderAsDataUri(
         uint256 _tokenId,
         string memory _bodySvg,
         string memory _bodyAttributes,

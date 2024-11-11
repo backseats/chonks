@@ -152,7 +152,13 @@ contract TraitRenderer {
         ghost.zMap = _zMap;
     }
 
-    function getTraitImageSvg(uint256 index, bytes memory colorMap) public view returns (string memory svg) {
+    // function getTraitImageSvg(uint256 index, bytes memory colorMap) public pure returns (string memory svg) {
+    //     bytes memory pixels = getTraitImage(colorMap);
+    //     bytes memory svgParts = createSvgFromPixels(pixels);
+    //     return string(abi.encodePacked('<g id="Trait">', svgParts, '</g>'));
+    // }
+    
+    function getTraitImageSvg(bytes memory colorMap) public pure returns (string memory svg) {
         bytes memory pixels = getTraitImage(colorMap);
         bytes memory svgParts = createSvgFromPixels(pixels);
         return string(abi.encodePacked('<g id="Trait">', svgParts, '</g>'));
@@ -162,14 +168,14 @@ contract TraitRenderer {
         ITraitStorage.StoredTrait memory trait,
         uint256 traitId,
         ITraitStorage.TraitMetadata memory metadata
-    ) public view returns(string memory traitSvg, string memory traitAttributes) {
+    ) public pure returns(string memory traitSvg, string memory traitAttributes) {
         if (trait.isRevealed && traitId > 0) {
             traitAttributes = RenderHelper.stringTrait(
                 TraitCategory.toString(metadata.traitType),
                 metadata.traitName
             );
 
-            traitSvg = getTraitImageSvg(trait.traitIndex, metadata.colorMap);
+            traitSvg = getTraitImageSvg(metadata.colorMap);
         } else {
             traitAttributes = '{}';
             traitSvg = '<svg></svg>';
@@ -180,13 +186,13 @@ contract TraitRenderer {
         ITraitStorage.StoredTrait memory trait,
         uint256 traitId,
         ITraitStorage.TraitMetadata memory metadata
-    ) public view returns(
+    ) public pure returns(
         string memory traitSvg,
         bytes memory traitZmap,
         string memory traitAttributes
     ) {
         if (trait.isRevealed && traitId > 0) {
-            traitSvg = getTraitImageSvg(trait.traitIndex, metadata.colorMap);
+            traitSvg = getTraitImageSvg(metadata.colorMap);
 
             traitAttributes = RenderHelper.stringTrait(
                 TraitCategory.toString(metadata.traitType),
@@ -207,7 +213,7 @@ contract TraitRenderer {
         string memory _traitsAttributes,
         ITraitStorage.StoredTrait memory storedTrait,
         ITraitStorage.TraitMetadata memory metadata
-    ) public view returns (string memory traitsSvg, string memory traitsAttributes) {
+    ) public pure returns (string memory traitsSvg, string memory traitsAttributes) {
         string memory traitAttribute;
         string memory traitSvg;
 
@@ -229,7 +235,7 @@ contract TraitRenderer {
         bytes memory _traitZMaps,
         ITraitStorage.StoredTrait memory storedTrait,
         ITraitStorage.TraitMetadata memory metadata
-    ) public view returns (
+    ) public pure returns (
         string memory traitsSvg,
         string memory traitsAttributes,
         bytes memory traitZMaps

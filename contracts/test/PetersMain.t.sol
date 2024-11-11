@@ -5,7 +5,8 @@ import { PetersMain } from '../src/PetersMain.sol';
 import { PeterTraits } from "../src/PeterTraits.sol";
 import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
 import { IPeterStorage } from '../src/interfaces/IPeterStorage.sol';
-import { MainRenderer } from '../src/renderers/MainRenderer.sol';
+import { MainRenderer2D } from '../src/renderers/MainRenderer2D.sol';
+import { MainRenderer3D } from '../src/renderers/MainRenderer3D.sol';
 import { ITraitStorage } from '../src/interfaces/ITraitStorage.sol';
 import { TraitCategory } from '../src/TraitCategory.sol';
 
@@ -424,7 +425,7 @@ contract PetersMainTest is PetersBaseTest {
             // also set approval for all for address(2)
             assertFalse(traits.isApprovedForAll(tba, user2));
             traits.setApprovalForAll(user2, true); // approve the EOA holding the traits
-                assertTrue(traits.isApprovedForAll(tba, user2));
+            assertTrue(traits.isApprovedForAll(tba, user2));
 
             // Test getting approved operators for a trait token
             uint256 traitId = 1;
@@ -444,7 +445,7 @@ contract PetersMainTest is PetersBaseTest {
 
             // TBA has both of these addresses approved
             assertTrue(traits.isApprovedForAll(tba, address(market)));
-                assertTrue(traits.isApprovedForAll(tba, user2));
+            assertTrue(traits.isApprovedForAll(tba, user2));
 
             // Transfer Chonk 1 from user1 to user2 (this should clear the approvals)
             main.transferFrom(user1, user2, 1);

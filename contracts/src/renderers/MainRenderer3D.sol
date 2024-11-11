@@ -14,7 +14,7 @@ import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../../lib/
 import "forge-std/console.sol"; // DEPLOY: remove
 
 // I don't think this should know about any kind of contracts. It should just get data and render it.
-contract ZRenderer {
+contract MainRenderer3D {
 
     // Scripty & EthFS for 3D rendering
     address immutable scriptyBuilderAddress = 0xD7587F110E08F4D120A231bA97d3B577A81Df022;

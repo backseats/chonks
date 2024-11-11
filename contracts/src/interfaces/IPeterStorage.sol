@@ -47,7 +47,7 @@ interface IPeterStorage {
         string backgroundColor;
 
         // bool to determine whether to render 3D or not
-        bool renderZ;
+        bool render3D;
     }
 
     struct Peters {
@@ -94,5 +94,5 @@ interface IPeterStorage {
     event UnequipAll(address indexed owner, uint256 indexed tokenId);
     event BackgroundColor(address indexed owner, uint256 indexed tokenId, string color);
     event BodyIndex(address indexed owner, uint256 indexed tokenId, uint8 _bodyIndex);
-    event RenderZ(address indexed owner, uint256 indexed tokenId, bool renderZ);
+    event Render3D(address indexed owner, uint256 indexed tokenId, bool renderZ);
 }
