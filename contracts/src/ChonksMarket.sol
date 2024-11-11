@@ -483,12 +483,10 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     }
 
     function deleteTraitOffersBeforeTokenTransfer(uint256 _traitId) public {
-
         console.log('ChonksMarket deleteTraitOffersBeforeTokenTransfer called for trait ID:', _traitId);
         console.log('- message sender:', msg.sender);
         console.log('- address(PETERS_MAIN)',address(PETERS_MAIN));
         console.log('- address(PETER_TRAITS)',address(PETER_TRAITS));
-        
 
         if (msg.sender != address(PETERS_MAIN) && msg.sender != address(PETER_TRAITS)) {
             console.log('CMUnauthorized');
