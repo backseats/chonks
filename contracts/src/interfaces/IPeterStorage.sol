@@ -88,8 +88,8 @@ interface IPeterStorage {
     /// Events
 
     event Mint(address indexed owner, uint256 indexed tokenId);
-    event Equip(address indexed owner, uint256 indexed tokenId, uint256 indexed traitTokenId, string traitCategory);
-    event Unequip(address indexed owner, uint256 indexed tokenId, string indexed traitCategory);
+    event Equip(address indexed owner, uint256 indexed tokenId, uint256 indexed traitTokenId, uint8 traitCategory);
+    event Unequip(address indexed owner, uint256 indexed tokenId, uint8 traitCategory);
     event EquipAll(address indexed owner, uint256 indexed tokenId);
     event UnequipAll(address indexed owner, uint256 indexed tokenId);
     event BackgroundColor(address indexed owner, uint256 indexed tokenId, string color);
