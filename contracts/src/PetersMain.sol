@@ -17,7 +17,6 @@ import { IRegistry } from  "./interfaces/TBABoilerplate/IRegistry.sol";
 // import { IERC6551Executable } from "./interfaces/TBABoilerplate/IERC6551Executable.sol";
 
 // Renderers
-import { RenderHelper } from "./renderers/RenderHelper.sol";
 import { MainRenderer2D } from "./renderers/MainRenderer2D.sol";
 import { MainRenderer3D } from "./renderers/MainRenderer3D.sol";
 

@@ -10,9 +10,6 @@ import { Ownable } from "solady/auth/Ownable.sol";
 import { Utils } from "./common/Utils.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-// Renderers
-import { RenderHelper } from "./renderers/RenderHelper.sol";
-// import { BodyRenderer } from "./renderers/BodyRenderer.sol";
 
 import { PetersMain } from "./PetersMain.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
