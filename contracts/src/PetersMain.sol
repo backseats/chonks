@@ -730,11 +730,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function setBodyIndex(uint256 _peterTokenId, uint8 _bodyIndex) public onlyPeterOwner(_peterTokenId) {
-        if (_bodyIndex > 3) revert InvalidBodyIndex();
-        if (_bodyIndex != 0) {
-            peterTokens.all[_peterTokenId].bodyIndex = _bodyIndex;
-            emit BodyIndex(ownerOf(_peterTokenId), _peterTokenId, _bodyIndex );
-        }
+        if (_bodyIndex > 4) revert InvalidBodyIndex();
+
+        peterTokens.all[_peterTokenId].bodyIndex = _bodyIndex;
+        emit BodyIndex(ownerOf(_peterTokenId), _peterTokenId, _bodyIndex );
     }
 
     function setTokenRender3D(uint256 _peterTokenId, bool _render3D) public onlyPeterOwner(_peterTokenId) {
