@@ -60,7 +60,7 @@ contract PetersMainScript is Script {
         // traits.setBodyRenderer(bodyRenderer);
 
         // Attach the data contract to PeterTraits
-        firstSeasonRenderMinter = new FirstSeasonRenderMinter(traits, localDeploy);
+        firstSeasonRenderMinter = new FirstSeasonRenderMinter(address(main), address(traits), localDeploy);
         main.setFirstSeasonRenderMinter(address(firstSeasonRenderMinter));
 
         console.log('setup done. minting...');
@@ -247,7 +247,7 @@ contract PetersRenderersScript is Script {
         // traits.setBodyRenderer(bodyRenderer);
 
         // Attach the data contract to PeterTraits
-        firstSeasonRenderMinter = new FirstSeasonRenderMinter(traits, localDeploy);
+        firstSeasonRenderMinter = new FirstSeasonRenderMinter(address(main), address(traits), localDeploy);
         main.setFirstSeasonRenderMinter(address(firstSeasonRenderMinter));
 
         // console.log('setup done. minting...');

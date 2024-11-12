@@ -1,46 +1,52 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-/*
-1. Add in the token indexes for each trait
-^ so we need to know all the trait indexes ahead of time, deploy this, then add traits to the Traits contract with the contract address for this contract
-*/
-
-// import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
+import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { ITraitStorage } from './interfaces/ITraitStorage.sol';
+import { Ownable } from 'solady/auth/Ownable.sol';
 import { PeterTraits } from './PeterTraits.sol';
 import { TraitCategory } from './TraitCategory.sol';
-import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { Utils } from './common/Utils.sol';
-import { console2 } from 'forge-std/console2.sol';
-import "forge-std/console.sol"; // DEPLOY: remove
+
+// DEPLOY: remove
+import "forge-std/console.sol";
 
 // contract FirstSeasonRenderMinter is IRenderMinterV1 { // TODO: ownable, ITraitStorage
-contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
+contract FirstSeasonRenderMinter is Ownable { // TODO: ownable, ITraitStorage
     uint256[] public accessory =                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    uint[] internal accessory_probability =     [12, 24, 32, 44, 54, 64, 72, 80, 84, 92, 96, 98, 100]; 
+    uint[] internal accessory_probability =     [12, 24, 32, 44, 54, 64, 72, 80, 84, 92, 96, 98, 100];
     uint256[] public head =                     [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015];
-    uint[] internal head_probability =          [10, 18, 26, 34, 42, 50, 58, 66, 74, 82, 86, 90, 94, 96, 98, 100]; 
+    uint[] internal head_probability =          [10, 18, 26, 34, 42, 50, 58, 66, 74, 82, 86, 90, 94, 96, 98, 100];
     uint256[] public hair =                     [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015];
     uint256[] public face =                     [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010, 3011, 3012];
     uint256[] public top =                      [4000, 4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 4017, 4018, 4019, 4020, 4021, 4022, 4023, 4024, 4025, 4026, 4027, 4028, 4029, 4030, 4031, 4032, 4033, 4034, 4035, 4036, 4037, 4038, 4039, 4040, 4041, 4042, 4043, 4044, 4045, 4046, 4047, 4048, 4049, 4050, 4051, 4052, 4053, 4054];
     uint256[] public bottom =                   [5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007, 5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018, 5019, 5020, 5021, 5022, 5023, 5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5032, 5033, 5034, 5035];
     uint256[] public shoes =                    [6000, 6001, 6002, 6003, 6004, 6005, 6006, 6007, 6008, 6009, 6010, 6011, 6012, 6013];
-   
+
     bool _localDeploy; // DEPLOY: remove
 
+    // The Main contract address
+    address public petersMain;
+
+    // The Trait contract address
     PeterTraits public peterTraits;
 
-    // uint8 private constant INITIAL_TRAIT_NUMBER = 7; // NOTE, if 4 or less, "panic: array out-of-bounds access" error
+    uint8 private constant INITIAL_TRAIT_NUMBER = 4; // NOTE, if 4 or less, "panic: array out-of-bounds access" error
 
-    mapping (address => bool) public minters;
+    /// Errors
 
-    error OnlyMinters();
+    error CantBeZero();
+    error OnlyPetersMain();
 
-    constructor(PeterTraits _peterTraits, bool localDeploy_) {
-        peterTraits = _peterTraits;
+    /// Constructor
+
+    constructor(address _petersMain, address _peterTraits, bool localDeploy_) {
+        _initializeOwner(msg.sender);
+
+        petersMain = _petersMain;
+        peterTraits = PeterTraits(_peterTraits);
+
         _localDeploy = localDeploy_;
-
         if (_localDeploy) {
             addNewTrait(0, "Torch", TraitCategory.Name.Accessory, "", hex"180bef4015170cef4015170def4015160eef4015170ef2a02e150fef4015160ff2a02e170ff2e82e180fef40151510ef40151610f2a02e1710f2a02e1810ef401515110000001611ef40151711ef401515120000001413000000141400000013150000001316000000", "180b06ef4015170c06ef4015170d06ef4015160e06ef4015170e06f2a02e150f06ef4015160f06f2a02e170f06f2e82e180f06ef4015151006ef4015161006f2a02e171006f2a02e181006ef4015151106000000161106ef4015171106ef4015151206000000141306000000141406000000131506000000131606000000", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
             addNewTrait(1, "Sword", TraitCategory.Name.Accessory, "", hex"190ededede180fdedede190fcccccc1710dedede1810cccccc1611dedede1711cccccc1512dedede1612cccccc1413dcc2001513cccccc1414dcc2001514dcc2001315dcc200", "190e06dedede180f06dedede190f06cccccc171006dedede181006cccccc161106dedede171106cccccc151206dedede161206cccccc141306dcc200151306cccccc141406dcc200151406dcc200131506dcc200", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
@@ -205,54 +211,42 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
             addNewTrait(6011, "Pink", TraitCategory.Name.Shoes, "", hex"0b17FF80CA0c17FF80CA1017FF80CA1117FF80CA", "0b1705FF80CA0c1705FF80CA101705FF80CA111705FF80CA111706FF80CA101706FF80CA0b1706FF80CA0c1706FF80CA", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
             addNewTrait(6012, "Grey", TraitCategory.Name.Shoes, "", hex"0b17A8A8A80c17A8A8A81017A8A8A81117A8A8A8", "0b1705A8A8A80c1705A8A8A8101705A8A8A8111705A8A8A8111706A8A8A8101706A8A8A80b1706A8A8A80c1706A8A8A8", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
             addNewTrait(6013, "White", TraitCategory.Name.Shoes, "", hex"0b17FFFFFF0c17FFFFFF1017FFFFFF1117FFFFFF", "0b1705FFFFFF0c1705FFFFFF101705FFFFFF111705FFFFFF111706FFFFFF101706FFFFFF0b1706FFFFFF0c1706FFFFFF", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
-
-        }
-
-    }
-
-    // DEPLOY: Remove
-    function _debugPostConstructorMint() public {
-        if (_localDeploy) {
-            // for (uint i; i < 5; ++i) { // DEPLOY: remove
-            //     safeMint(_traits); // Mints 3 sets of traits
-            // }
-
-            safeMintMany(msg.sender, 3);
         }
     }
 
-    // function safeMint(address _to) external returns (uint256[] memory) {
-    //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin
-    //     return peterTraits.safeMint(_to);
+    // // DEPLOY: Remove
+    // function _debugPostConstructorMint() public {
+    //     if (_localDeploy) {
+    //         // for (uint i; i < 5; ++i) { // DEPLOY: remove
+    //         //     safeMint(_traits); // Mints 3 sets of traits
+    //         // }
+
+    //         safeMintMany(msg.sender, 3);
+    //     }
     // }
 
-     function safeMintMany(address _to, uint8 _amount) public payable returns (uint256[] memory) { // TODO: add onlyMinter modifier
-        // TODO: check supply?
+    // This just creates a blank trait with a type
+    function safeMintMany(address _toTBA) public returns (uint256[] memory) {
+        if (msg.sender != petersMain) revert OnlyPetersMain();
 
-        console.log('safeMintMany called, _to:', _to, ', _amount:', _amount);
-
-        //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin
-
-        // _amount = 5; // for testing
-
-        uint256[] memory mintedIds = new uint256[](_amount);
-
-        // for(uint i; i < INITIAL_TRAIT_NUMBER; ++i) {
-        for(uint i; i < _amount; ++i) {
-
-            console.log('minting', i);
-            uint tokenId = peterTraits.safeMint(_to); // creates a token without any kind of info
+        uint8 traitCount = INITIAL_TRAIT_NUMBER;
+        uint256[] memory mintedIds = new uint256[](traitCount);
+        for(uint i; i < traitCount; ++i) {
+            // Creates a blank Trait token
+            uint tokenId = peterTraits.safeMint(_toTBA);
             mintedIds[i] = tokenId;
-
-            console.log('tokenId', tokenId);
 
             // Initialize our Trait
             ITraitStorage.StoredTrait memory trait = peterTraits.getStoredTraitForTokenId(tokenId);
 
-            trait.epoch = peterTraits.getCurrentEpoch(); // set the current epoch
-            trait.seed = tokenId; // seed is the tokenId
+            // Set the current epoch
+            trait.epoch = peterTraits.getCurrentEpoch();
+            // Set the seed to the tokenId
+            trait.seed = tokenId;
+            // Set the data render contract to this contract
             trait.renderMinterContract = address(this);
 
+            // Assign the Trait Category
             if (i == 0) {
                 trait.traitType = TraitCategory.Name.Shoes;
             } else if (i == 1) {
@@ -275,14 +269,12 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
             peterTraits.setTraitForTokenId(tokenId, trait);
 
-            emit ITraitStorage.Mint(_to, tokenId);
+            // DEPLOY: I dont think we need this because it emits a Transfer function
+            emit ITraitStorage.Mint(_toTBA, tokenId);
         }
-
-        console.log('finished for...');
 
         return mintedIds;
     }
-
 
     function addNewTrait( // this should go in interface above
         uint256 _traitIndex,
@@ -329,7 +321,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
     function _pickTraitByProbability(uint seed, uint256[] memory traitArray, uint[] memory traitProbability) internal pure returns (uint) {
         require(traitArray.length > 0, "Elements array is empty");
         require(traitArray.length == traitProbability.length, "Elements and weights length mismatch");
-        
+
         for (uint i = 0; i < traitProbability.length; i++) {
             if(seed < traitProbability[i]) {
                 return i;
@@ -360,10 +352,10 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
             // Example of rarity based on 2 tranches, a 90% chance of a "common", a 10% chance of a "rare":
             // n = Utils.random(storedTrait.seed, 'accessory', 100);
             // if(n < 90) {
-            //     storedTrait.traitIndex = 0 + Utils.random(storedTrait.seed, 'accessory-common', 8); 
+            //     storedTrait.traitIndex = 0 + Utils.random(storedTrait.seed, 'accessory-common', 8);
             // } else {
             //     storedTrait.traitIndex = 8 + Utils.random(storedTrait.seed, 'accessory-rare', 5);
-            // } 
+            // }
 
             // using _pickTraitByProbability
             storedTrait.traitIndex = 0 + _pickTraitByProbability( Utils.random(storedTrait.seed, 'acccesory', 100), accessory, accessory_probability);
@@ -391,7 +383,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
                 storedTrait.traitIndex = 3000 + Utils.random(storedTrait.seed, 'face-common', face.length - 3 );
             } else {
                 storedTrait.traitIndex = 3000 + (face.length - 3) + Utils.random(storedTrait.seed, 'face-rare', 3 );
-            } 
+            }
 
         }
 
@@ -404,7 +396,7 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
                 storedTrait.traitIndex = 4000 + Utils.random(storedTrait.seed, 'top-common', top.length - 5 );
             } else {
                 storedTrait.traitIndex = 4000 + (top.length - 5) + Utils.random(storedTrait.seed, 'top-rare', 5 );
-            } 
+            }
         }
 
         // bottoms: even split
@@ -418,16 +410,6 @@ contract FirstSeasonRenderMinter { // TODO: ownable, ITraitStorage
         }
 
         return storedTrait;
-    }
-
-    function setMinterStatus(address _address, bool _status) external { // TODO: onlyOwner
-        minters[_address] = _status;
-    }
-
-    /// Boilerplate
-
-    function safeMint(address) public payable returns (uint256) {
-        // revert NotImplemented();
     }
 
 }

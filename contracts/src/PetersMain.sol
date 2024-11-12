@@ -65,6 +65,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     uint256 public _nextTokenId;
 
+    address public withdrawAddress;
+
+    uint256 public price;
+
+    uint256 public mintStartTime;
+
     // ERC-6551 Boilerplate addresses
     IRegistry constant REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
     address constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
@@ -96,6 +102,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error NonceAlreadyUsed();
     error PeterDoesntExist();
     error UseUnequip();
+    error MintEnded();
+    error MintNotStarted();
+    error InsufficientFunds();
+    error CantBeZero();
+    error WithdrawFailed();
 
     constructor(bool localDeploy_) ERC721("Peter Test", "PETER") {
         _initializeOwner(msg.sender);
@@ -107,18 +118,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // console.log('localDeploy:', _localDeploy);
         if (_localDeploy) {
             for (uint i; i < 1; ++i) {
-                mint(4); // Mints N bodies/tokens
+                mintABody(4); // Mints N bodies/tokens
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
             }
             setBackgroundColor(1, "ffffff");
             // setTokenRenderZ(1, true);
         }
-    }
-
-    function mint(uint8 _amount) public payable { // TODO amount, check price
-        // console.log('minting...');
-        _mintAmount(_amount);
     }
 
     // just popping this in here for now, we can decide full spec later
@@ -132,76 +138,60 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     //     usedNonces[nonce] = true;
     // }
 
-    function _mintAmount(uint8 amount) internal {
+    function mintABody(uint256 _amount) public  {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
+        if (_amount == 0) revert CantBeZero();
+        if (block.timestamp < mintStartTime) revert MintNotStarted();
+        if (block.timestamp > mintStartTime + 24 hours) revert MintEnded();
+        if (msg.value != price * _amount) revert InsufficientFunds();
 
-        // console.log('minting amount:', amount);
-        // uint256 amount = 7;
-        // resolveEpochIfNecessary(); // no longer need this as bodies can be changed by holders
+        for (uint i; i < _amount; ++i) {
+            uint256 tokenId = ++_nextTokenId;
+            _mint(msg.sender, tokenId);
 
-        uint256 tokenId = ++_nextTokenId;
-        _mint(msg.sender, tokenId);
+            address tokenBoundAccountAddress = REGISTRY.createAccount(
+                ACCOUNT_PROXY, // implementation address
+                0, // salt
+                84532, // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia // DEPLOY
+                address(this), // tokenContract
+                tokenId // tokenId
+            );
 
-        // console.log('minted tokenId:', tokenId);
+            // Set the cross-reference between tokenId and TBA account address
+            tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
+            tbaAddressToTokenId[tokenBoundAccountAddress] = tokenId;
 
-        // console.log('creating tba...');
-        // console.log('address(this)', address(this));
+            // Initialize the TBA
+            IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
-        // params: implementation address, salt, chainId, tokenContract, tokenId
-        address tokenBoundAccountAddress = REGISTRY.createAccount(
-            ACCOUNT_PROXY,
-            0,
-            84532, // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia // DEPLOY
-            address(this),
-            tokenId
-        );
+            // TODO: think we need to call this currentSeasonRenderMinter
+            uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress);
 
-        // console.log('tokenBoundAccountAddress:', tokenBoundAccountAddress);
+            // Initialize the Chonk
+            StoredPeter storage peter = peterTokens.all[tokenId];
 
-        // Set the cross-reference between tokenId and TBA account address
-        tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
-        tbaAddressToTokenId[tokenBoundAccountAddress] = tokenId;
+            peter.tokenId = tokenId;
 
+            // level 0: let's give everyone shoes, bottom, top & hair : 4 traits
+            // level 1: shoes, bottom, top, hair AND face: 5 traits
+            // level 3: shoes, bottom, top AND hair AND face AND head AND accessory : 7 traits
 
+            // Here we've gotten a bunch of trait tokens back with their types, then we set them on the Peter. No reason this cant happen in the render minter
 
-        // initialize : use this address as the implementation parameter when calling initialize on a newly created account
-        IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
+            peter.shoesId = traitsIds[0];
+            peter.bottomId = traitsIds[1];
+            peter.topId = traitsIds[2];
+            peter.hairId = traitsIds[3];
 
-        //TODO: think we need to call this currentSeasonRenderMinter... also, will we ever let people mint bodies again after first mint?
-        uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, amount);
+            // This randomly picks your Chonk skin color but you can change it any time.
+            peter.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 5); // even chance for 5 different bodies
 
-        // console.log('traitsIds[0]:', traitsIds[0]);
-        // Initialize our Peter
-        StoredPeter storage peter = peterTokens.all[tokenId];
+            // Set the default background color
+            peter.backgroundColor = "0D6E9D";
+        }
 
-        // peter.epoch = uint32(peterTokens.epoch);
-        // peter.seed = uint16(tokenId);
-        peter.tokenId = uint256(tokenId);
-
-        // level 0: let's give everyone shoes, bottom, top & hair : 4 traits
-        // level 1: shoes, bottom, top, hair AND face: 5 traits
-        // level 3: shoes, bottom, top AND hair AND face AND head AND accessory : 7 traits
-
-        peter.shoesId = traitsIds[0];
-        peter.bottomId = traitsIds[1];
-        peter.topId = traitsIds[2];
-        peter.hairId = traitsIds[3];
-
-        // so we're not going to equip these on initial mint, people will have to equip them
-        // if(amount > 4) peter.faceId = traitsIds[4];
-        // if(amount > 5) peter.headId = traitsIds[5];
-        // if(amount > 6) peter.accessoryId = traitsIds[6];
-
-        // set default renderer to 2D
-        peter.render3D = false;
-
-        // Randomly pick your Chonk skin color but you can change it any time.
-        peter.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 5); // even chance for 5 different bodies
-
-        // set default background color
-        peter.backgroundColor = "0D6E9D";
-
-        emit Mint(msg.sender, tokenId);
+        (bool success,) = payable(withdrawAddress).call{ value: msg.value }("");
+        if (!success) revert WithdrawFailed();
     }
 
     function getOwnerAndTBAAddressForChonkId(uint256 _chonkId) public view returns (address owner, address tbaAddress) {
@@ -683,6 +673,20 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setMarketplace(address _marketplace) public onlyOwner {
         marketplace = ChonksMarket(_marketplace);
     }
+
+    function setMintStartTime(uint256 _mintStartTime) public onlyOwner {
+        mintStartTime = _mintStartTime;
+    }
+
+    function setWithdrawAddress(address _withdrawAddress) public onlyOwner {
+        withdrawAddress = _withdrawAddress;
+    }
+
+    function setPrice(uint256 _priceInWei) public onlyOwner {
+        price = _priceInWei;
+    }
+
+    /// Setters
 
     function setBackgroundColor(uint256 _peterTokenId, string memory _color) public onlyPeterOwner(_peterTokenId) {
         bytes memory colorBytes = bytes(_color);
