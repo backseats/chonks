@@ -11,8 +11,8 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { useAccount } from "wagmi";
 import html2canvas from "html2canvas";
-import traits from '../contracts/csv-conversion/latest.json';
-import bodies from '../contracts/csv-conversion/bodies.json';
+import traits from "../contracts/csv-conversion/latest.json";
+import bodies from "../contracts/csv-conversion/bodies.json";
 
 import BodyPresets from "../components/studio/BodyPresets";
 import {
@@ -52,7 +52,7 @@ const Grid: React.FC = () => {
 
   const { address } = useAccount();
 
-  const [backgroundBody, setBackgroundBody] = useState<string>("skinTone1.svg");
+  const [backgroundBody, setBackgroundBody] = useState<string>("skinTone2.svg");
   const [gridData, setGridData] = useState<Pixel[]>(generateGrid());
   const [selectedColor, setSelectedColor] = useState<string>("#48A6FA"); // a nice blue
   const [additionalColors, setAdditionalColors] = useState<string[]>([]);
@@ -368,33 +368,48 @@ const Grid: React.FC = () => {
 
     let svgContent = `<svg width="${width}" height="${height}"  shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg">`;
 
-    if(showBackgroundAndBody) {
-      
-      svgContent += '<style>body,svg{background-color: ' + backgroundColor + '} .bg{width: ' + width * 30 + 'px; height: ' + height * 30 + 'px; fill: ' + backgroundColor + '}</style>';
-      
+    if (showBackgroundAndBody) {
+      svgContent +=
+        "<style>body,svg{background-color: " +
+        backgroundColor +
+        "} .bg{width: " +
+        width * 30 +
+        "px; height: " +
+        height * 30 +
+        "px; fill: " +
+        backgroundColor +
+        "}</style>";
+
       svgContent += '<rect class="bg"/>';
 
-      const bodySVG = bodies.bodies.find(body => body.path === (backgroundBody === "ghost.svg" ? "skinTone1.svg" : backgroundBody));
+      const bodySVG = bodies.bodies.find(
+        (body) =>
+          body.path ===
+          (backgroundBody === "ghost.svg" ? "skinTone1.svg" : backgroundBody)
+      );
 
       if (bodySVG && bodySVG.colorMap) {
-
-        if(backgroundBody === "ghost.svg") svgContent += '<g opacity="0.5">';
+        if (backgroundBody === "ghost.svg") svgContent += '<g opacity="0.5">';
 
         const byteArray = bodySVG.colorMap.match(/.{1,2}/g) || [];
         let index = 0;
-        
+
         while (index < byteArray.length) {
           const x = parseInt(byteArray[index], 16);
           const y = parseInt(byteArray[index + 1], 16);
-          const color = `#${byteArray[index + 2]}${byteArray[index + 3]}${byteArray[index + 4]}`;
+          const color = `#${byteArray[index + 2]}${byteArray[index + 3]}${
+            byteArray[index + 4]
+          }`;
 
           if (x >= 0 && x < 30 && y >= 0 && y < 30) {
-            svgContent += `<rect x="${x * pixelSize}" y="${y * pixelSize}" width="${pixelSize}" height="${pixelSize}" fill="${color}" />`;
+            svgContent += `<rect x="${x * pixelSize}" y="${
+              y * pixelSize
+            }" width="${pixelSize}" height="${pixelSize}" fill="${color}" />`;
           }
 
           index += 5;
         }
-        if(backgroundBody === "ghost.svg") svgContent += '</g>';
+        if (backgroundBody === "ghost.svg") svgContent += "</g>";
       }
     }
 
@@ -448,12 +463,12 @@ const Grid: React.FC = () => {
 
   const generatePNG = (gridColors: string[][]): Promise<string> => {
     return new Promise((resolve) => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return resolve('');
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return resolve("");
 
       // Set canvas size to 1440x1440 (30 * 48)
-      const pixelScale = 48;  // 1440/30 = 48
+      const pixelScale = 48; // 1440/30 = 48
       canvas.width = gridSize * pixelScale;
       canvas.height = gridSize * pixelScale;
 
@@ -466,9 +481,9 @@ const Grid: React.FC = () => {
           if (color) {
             ctx.fillStyle = color;
             ctx.fillRect(
-              x * pixelScale, 
-              y * pixelScale, 
-              pixelScale, 
+              x * pixelScale,
+              y * pixelScale,
+              pixelScale,
               pixelScale
             );
           }
@@ -476,7 +491,7 @@ const Grid: React.FC = () => {
       });
 
       // Convert to PNG data URL with transparency
-      resolve(canvas.toDataURL('image/png'));
+      resolve(canvas.toDataURL("image/png"));
     });
   };
 
@@ -506,13 +521,19 @@ const Grid: React.FC = () => {
       // Generate both PNG versions
       const screenshotData = await takeScreenshot();
       if (screenshotData) {
-        folder.file("chonk.png", screenshotData.split(",")[1], { base64: true });
+        folder.file("chonk.png", screenshotData.split(",")[1], {
+          base64: true,
+        });
       }
 
       // Add the transparent PNG
       const gridColors = JSON.parse(textAreaContent);
       const transparentPNG = await generatePNG(gridColors);
-      folder.file("chonk-traits-transparent.png", transparentPNG.split(",")[1], { base64: true });
+      folder.file(
+        "chonk-traits-transparent.png",
+        transparentPNG.split(",")[1],
+        { base64: true }
+      );
 
       const readmeContent = `# My Chonk
 
@@ -539,7 +560,10 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     navigator.clipboard.writeText(bytes);
   };
 
-  useEffect(() => updateSVG(), [backgroundBody, textAreaContent, backgroundColor]);
+  useEffect(
+    () => updateSVG(),
+    [backgroundBody, textAreaContent, backgroundColor]
+  );
 
   const saveColorToPalette = () => {
     // TODO: ensure it's hex and not rgb
@@ -652,33 +676,62 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     const mainCategories = ["Shoes", "Bottom", "Top", "Hair"];
     const rngCategories = ["Face", "Head", "Accessory"];
     // const rngCategories = ["Head"]; // looking at just head traits for now....
-    const backgroundColors = ["#EAD9D9", "#E2CACA", "#FF80CA", "#28b143", "#69B8FF", "#F36464"];
-    const backgroundBodies = ["skinTone1.svg", "skinTone2.svg", "skinTone3.svg", "skinTone4.svg", "skinTone5.svg"];
-    
-    if (Math.random() < 0.5) setBackgroundColor(backgroundColors[Math.floor(Math.random() * backgroundColors.length)])
+    const backgroundColors = [
+      "#EAD9D9",
+      "#E2CACA",
+      "#FF80CA",
+      "#28b143",
+      "#69B8FF",
+      "#F36464",
+    ];
+    const backgroundBodies = [
+      "skinTone1.svg",
+      "skinTone2.svg",
+      "skinTone3.svg",
+      "skinTone4.svg",
+      "skinTone5.svg",
+    ];
+
+    if (Math.random() < 0.5)
+      setBackgroundColor(
+        backgroundColors[Math.floor(Math.random() * backgroundColors.length)]
+      );
     else setBackgroundColor("#0D6E9D"); // default background color
     console.log("backgroundColor", backgroundColor);
 
-    let randomBackgroundBody = backgroundBodies[Math.floor(Math.random() * backgroundBodies.length)];
+    let randomBackgroundBody =
+      backgroundBodies[Math.floor(Math.random() * backgroundBodies.length)];
     setBackgroundBody(randomBackgroundBody);
     console.log("backgroundBody", backgroundBody);
 
-     // Load main categories first
-     mainCategories.forEach((category, i) => {
-      const categoryTraits = traits.traits.filter(trait => trait.category === category);
+    // Load main categories first
+    mainCategories.forEach((category, i) => {
+      const categoryTraits = traits.traits.filter(
+        (trait) => trait.category === category
+      );
       if (categoryTraits.length > 0) {
-        const randomTrait = categoryTraits[Math.floor(Math.random() * categoryTraits.length)];
-        console.log("main category trait: ",  randomTrait.name + "(" + randomTrait.category + ")");
+        const randomTrait =
+          categoryTraits[Math.floor(Math.random() * categoryTraits.length)];
+        console.log(
+          "main category trait: ",
+          randomTrait.name + "(" + randomTrait.category + ")"
+        );
         loadTrait(randomTrait.colorMap, 0, 0, i !== 0);
       }
     });
 
-    rngCategories.forEach(category => {
-      if (Math.random() < 0.5) { 
-        const categoryTraits = traits.traits.filter(trait => trait.category === category);
+    rngCategories.forEach((category) => {
+      if (Math.random() < 0.5) {
+        const categoryTraits = traits.traits.filter(
+          (trait) => trait.category === category
+        );
         if (categoryTraits.length > 0) {
-          const randomTrait = categoryTraits[Math.floor(Math.random() * categoryTraits.length)];
-          console.log("rng category trait: ",  randomTrait.name + "(" + randomTrait.category + ")");
+          const randomTrait =
+            categoryTraits[Math.floor(Math.random() * categoryTraits.length)];
+          console.log(
+            "rng category trait: ",
+            randomTrait.name + "(" + randomTrait.category + ")"
+          );
           loadTrait(randomTrait.colorMap, 0, 0, true);
         }
       }
@@ -692,8 +745,12 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
   };
 
   // Translate bytes into a 30x30 grid of colors
-  const loadTrait = (bytes: string, xOffset: number, yOffset: number, affix: boolean = false) => {
-
+  const loadTrait = (
+    bytes: string,
+    xOffset: number,
+    yOffset: number,
+    affix: boolean = false
+  ) => {
     // console.log('affix: ', affix);
     // affix = true;
     // Initialize a 30x30 array filled with empty strings
@@ -722,11 +779,13 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
 
     // Update the gridData state with the new colors
     if (affix) {
-      setGridData(prevGrid => 
+      setGridData((prevGrid) =>
         generateGrid().map((pixel) => ({
           ...pixel,
           // Keep existing color if new color is empty, otherwise use new color
-          color: colorGrid[pixel.y][pixel.x] || prevGrid[pixel.y * gridSize + pixel.x].color
+          color:
+            colorGrid[pixel.y][pixel.x] ||
+            prevGrid[pixel.y * gridSize + pixel.x].color,
         }))
       );
     } else {
@@ -770,10 +829,9 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
         loadRandomChonk={loadRandomChonk}
       />
 
-{/* md:max-w-[1200px] gap-[75px] */}
+      {/* md:max-w-[1200px] gap-[75px] */}
       <div className="flex md:justify-center  md:mx-auto">
         <div className="flex flex-col md:flex-row  md:p-4 md:w-full">
-
           {/* left column */}
           <div className="flex flex-col gap-2 md:max-w-[420px] px-4">
             {/* <SVGPreview
@@ -797,8 +855,8 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
             />
           </div>
 
-           {/* Middle column */}
-           <Canvas
+          {/* Middle column */}
+          <Canvas
             ref={canvasRef} // Pass the ref to the Canvas component
             pixelSize={pixelSize}
             gridRef={gridRef}
@@ -820,14 +878,14 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
 
           <div>
             <div>
-            <SVGPreview
-              address={address}
-              svgContent={svgContent}
-              handleBytes={handleBytes}
-              openModal={openModal}
-            /> 
+              <SVGPreview
+                address={address}
+                svgContent={svgContent}
+                handleBytes={handleBytes}
+                openModal={openModal}
+              />
             </div>
-            
+
             <div className="border-t border-gray-200 pt-6  mt-6">
               <BodyPresets setBackgroundBody={setBackgroundBody} />
 
@@ -839,10 +897,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
                 Keyboard Shortcuts, Tips & Tricks
               </button>
             </div>
-
-
           </div>
-          
         </div>
       </div>
 
