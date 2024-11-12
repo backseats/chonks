@@ -229,6 +229,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ownable, ITraitStorage
     function safeMintMany(address _toTBA) public returns (uint256[] memory) {
         if (msg.sender != petersMain) revert OnlyPetersMain();
 
+        // TODO: change here based on level of their mint, mint be something we pass into this function as well and remove INITIAL_TRAIT_NUMBER
         uint8 traitCount = INITIAL_TRAIT_NUMBER;
         uint256[] memory mintedIds = new uint256[](traitCount);
         for(uint i; i < traitCount; ++i) {
