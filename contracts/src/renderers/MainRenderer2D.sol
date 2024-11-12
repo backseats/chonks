@@ -8,7 +8,7 @@ import { Utils } from "../common/Utils.sol";
 
 // I don't think this should know about any kind of contracts. It should just get data and render it.
 contract MainRenderer2D {
-
+    string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
     string private constant SVG_START = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">';
     string private constant SVG_STYLE = '<style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
     string private constant SVG_BG_MAIN_START = '<rect class="bg"/><g id="main" class="off">';
@@ -141,6 +141,87 @@ contract MainRenderer2D {
         }
 
         return string(abi.encodePacked('<g id="Body">', svgParts, '</g>'));
+    }
+
+    function getBodyImage(bytes memory colorMap) public pure returns (bytes memory) {
+        uint256 length = colorMap.length;
+        require(length > 0 && length % 5 == 0, "Invalid body bytes length");
+
+        bytes memory pixels = new bytes(30 * 30 * 5); // 30x30 grid with 5 bytes per pixel
+        uint256 pixelCount = length / 5;
+
+        for (uint256 i; i < pixelCount; ++i) {
+            uint256 offset = i * 5;
+
+            uint8 x = uint8(colorMap[offset]);
+            uint8 y = uint8(colorMap[offset + 1]);
+            uint256 index = (uint256(y) * 30 + uint256(x)) * 5;
+
+            // Set the pixel data in the pixels array
+            unchecked {
+                pixels[index] = colorMap[offset];
+                pixels[index + 1] = colorMap[offset + 1];
+                pixels[index + 2] = colorMap[offset + 2];
+                pixels[index + 3] = colorMap[offset + 3];
+                pixels[index + 4] = colorMap[offset + 4];
+            }
+        }
+
+        return pixels;
+    }
+
+    function getBackpackSVGs(
+        string memory bodyGhostSvg,
+        string[] memory traitSvgs,
+        uint256 traitCount,
+        uint256 maxTraitsToOutput 
+    ) public pure returns (string memory backpackSVGs) {
+        string memory baseSvgPart = '<svg viewBox="0 0 150 150">';
+        string memory closeSvgTag = '</svg>';
+        bytes memory buffer;
+
+        uint256 numTraits = traitCount < maxTraitsToOutput ? traitCount : maxTraitsToOutput;
+
+        buffer = abi.encodePacked(
+            SVG_BACKPACK,
+            bodyGhostSvg,
+            '<g id="backpackTraits">'
+        );
+
+        for (uint256 i; i < numTraits; ++i) {
+            buffer = abi.encodePacked(
+                buffer,
+                baseSvgPart,
+                traitSvgs[i],
+                closeSvgTag
+            );
+        }
+
+        if(traitCount > maxTraitsToOutput) {
+            buffer = abi.encodePacked(
+                buffer,
+                baseSvgPart,
+                '<g id="MoreTraits"><rect style="width:10px; height:2px;" x="10" y="16" fill="#ffffff"></rect><rect style="height:10px; width:2px;" x="14" y="12" fill="#ffffff"></rect></g>',
+                closeSvgTag
+            );
+        }
+
+        buffer = abi.encodePacked(
+            buffer,
+            '</g>'
+        );
+
+        backpackSVGs = string(buffer);
+    }
+
+    function stringTrait(string memory traitName, string memory traitValue) public pure returns (string memory) {
+        return string.concat(
+            '{"trait_type":"',
+                traitName,
+            '","value":"',
+                traitValue,
+            '"}'
+        );
     }
 
 }

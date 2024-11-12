@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import { RenderHelper } from "./RenderHelper.sol";
 import { TraitCategory } from "../TraitCategory.sol";
 import { ITraitStorage } from "../interfaces/ITraitStorage.sol";
 import { IPeterStorage } from "../interfaces/IPeterStorage.sol";
@@ -31,17 +30,17 @@ contract TraitRenderer {
         if (trait.isRevealed) {
             attributes = string.concat(
                 '"attributes":[',
-                RenderHelper.stringTrait(
+                stringTrait(
                     TraitCategory.toString(trait.traitType),
                     metadata.traitName
                 ),
                 ',',
-                RenderHelper.stringTrait(
+                stringTrait(
                     'Creator',
                     metadata.creatorName
                 ),
                 ',',
-                RenderHelper.stringTrait(
+                stringTrait(
                     'Season',
                     metadata.season
                 ),
@@ -170,7 +169,7 @@ contract TraitRenderer {
         ITraitStorage.TraitMetadata memory metadata
     ) public pure returns(string memory traitSvg, string memory traitAttributes) {
         if (trait.isRevealed && traitId > 0) {
-            traitAttributes = RenderHelper.stringTrait(
+            traitAttributes = stringTrait(
                 TraitCategory.toString(metadata.traitType),
                 metadata.traitName
             );
@@ -194,7 +193,7 @@ contract TraitRenderer {
         if (trait.isRevealed && traitId > 0) {
             traitSvg = getTraitImageSvg(metadata.colorMap);
 
-            traitAttributes = RenderHelper.stringTrait(
+            traitAttributes = stringTrait(
                 TraitCategory.toString(metadata.traitType),
                 metadata.traitName
             );
@@ -307,5 +306,15 @@ contract TraitRenderer {
 
         if (storedPeter.accessoryId > 0)
             (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.accessoryId, traitsSvg, traitsAttributes, traitZMaps);
+    }
+
+    function stringTrait(string memory traitName, string memory traitValue) internal pure returns (string memory) {
+        return string.concat(
+            '{"trait_type":"',
+                traitName,
+            '","value":"',
+                traitValue,
+            '"}'
+        );
     }
 }

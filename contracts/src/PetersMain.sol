@@ -59,6 +59,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // The render contract that handles SVG generation
     MainRenderer2D public mainRenderer2D;
 
+    uint256 maxTraitsToOutput = 99;
+
     // The render contract that handles 3d generation
     MainRenderer3D public mainRenderer3D;
 
@@ -87,9 +89,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     mapping (string => bool) usedNonces;
 
      // Backpack stuff
-    uint256 maxTraitsToOutput = 99;
-    string constant SVG_BACKPACK = '<g id="All Traits"><g id="backpack" class="closed"><path d="M0 0 L30 0 L30 30 L0 30 Z" fill="rgb(12, 109, 157)" /><svg id="backpackUI" viewBox="0 0 120 120"> <style>.ui{width:1px; height: 1px; fill:white}</style> <g id="closeBtn" transform="translate(2,2)"> <rect x="1" y="1" class="ui"></rect> <rect x="2" y="2" class="ui"></rect> <rect x="3" y="3" class="ui"></rect> <rect x="4" y="4" class="ui"></rect> <rect x="5" y="5" class="ui"></rect> <rect x="5" y="1" class="ui"></rect> <rect x="4" y="2" class="ui"></rect> <!-- <rect x="3" y="3" width="1" height="1" fill="white"></rect> --> <rect x="2" y="4" class="ui"></rect> <rect x="1" y="5" class="ui"></rect> </g> <g id="leftBtn" class="button" transform="translate(45,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="2" y="0" class="ui"></rect> <rect x="1" y="1" class="ui"></rect> <rect x="0" y="2" class="ui"></rect> <rect x="1" y="3" class="ui"></rect> <rect x="2" y="4" class="ui"></rect> </g> <g id="rightBtn" class="button" transform="translate(65,110)"> <path d="M0 0 L6 0 L6 6 L0 6 Z" fill="transparent" /> <rect x="3" y="0" class="ui"></rect> <rect x="4" y="1" class="ui"></rect> <rect x="5" y="2" class="ui"></rect> <rect x="4" y="3" class="ui"></rect> <rect x="3" y="4" class="ui"></rect> </g> </svg> ';
-
+    
     /// Errors
 
     error BodyAlreadyExists();
@@ -121,7 +121,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
             }
-            // setBackgroundColor(1, "ffffff");
+            setBackgroundColor(1, "ffffff");
             // setTokenRenderZ(1, true);
         }
     }
@@ -366,7 +366,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     ) public onlyPeterOwner(_peterTokenId) {
         equipAll(_peterTokenId, _headTokenId, _hairTokenId, _faceTokenId, _accessoryTokenId, _topTokenId, _bottomTokenId, _shoesTokenId);
         setBodyIndex(_peterTokenId, _bodyIndex);
-        // setBackgroundColor(_peterTokenId, _backgroundColor);
+        setBackgroundColor(_peterTokenId, _backgroundColor);
     }
 
     /// Validations
@@ -400,36 +400,36 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // receives body colorMap, puts it into a 30x30 grid, with 5 bytes row-major byte array
-    function getBodyImage(bytes memory colorMap) public pure returns (bytes memory) {
-        uint256 length = colorMap.length;
-        require(length > 0 && length % 5 == 0, "Invalid body bytes length");
+    // function getBodyImage(bytes memory colorMap) public pure returns (bytes memory) {
+    //     uint256 length = colorMap.length;
+    //     require(length > 0 && length % 5 == 0, "Invalid body bytes length");
 
-        bytes memory pixels = new bytes(30 * 30 * 5); // 30x30 grid with 5 bytes per pixel
-        uint256 pixelCount = length / 5;
+    //     bytes memory pixels = new bytes(30 * 30 * 5); // 30x30 grid with 5 bytes per pixel
+    //     uint256 pixelCount = length / 5;
 
-        for (uint256 i; i < pixelCount; ++i) {
-            uint256 offset = i * 5;
+    //     for (uint256 i; i < pixelCount; ++i) {
+    //         uint256 offset = i * 5;
 
-            uint8 x = uint8(colorMap[offset]);
-            uint8 y = uint8(colorMap[offset + 1]);
-            uint256 index = (uint256(y) * 30 + uint256(x)) * 5;
+    //         uint8 x = uint8(colorMap[offset]);
+    //         uint8 y = uint8(colorMap[offset + 1]);
+    //         uint256 index = (uint256(y) * 30 + uint256(x)) * 5;
 
-            // Set the pixel data in the pixels array
-            unchecked {
-                pixels[index] = colorMap[offset];
-                pixels[index + 1] = colorMap[offset + 1];
-                pixels[index + 2] = colorMap[offset + 2];
-                pixels[index + 3] = colorMap[offset + 3];
-                pixels[index + 4] = colorMap[offset + 4];
-            }
-        }
+    //         // Set the pixel data in the pixels array
+    //         unchecked {
+    //             pixels[index] = colorMap[offset];
+    //             pixels[index + 1] = colorMap[offset + 1];
+    //             pixels[index + 2] = colorMap[offset + 2];
+    //             pixels[index + 3] = colorMap[offset + 3];
+    //             pixels[index + 4] = colorMap[offset + 4];
+    //         }
+    //     }
 
-        return pixels;
-    }
+    //     return pixels;
+    // }
 
     // outputs svg for a provided body index
     function getBodyImageSvg(uint256 _index) public view returns (string memory svg) {
-        bytes memory colorMap = getBodyImage(bodyIndexToMetadata[_index].colorMap);
+        bytes memory colorMap = mainRenderer2D.getBodyImage(bodyIndexToMetadata[_index].colorMap);
         return mainRenderer2D.getBodyImageSvg(colorMap);
     }
 
@@ -437,14 +437,14 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return (
             getBodyImageSvg(storedPeter.bodyIndex),
             bodyIndexToMetadata[storedPeter.bodyIndex].zMap,
-            RenderHelper.stringTrait('Body Type', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
+            mainRenderer2D.stringTrait('Body Type', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
         );
     }
 
     function getBodySvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory, string memory) {
         return (
             getBodyImageSvg(storedPeter.bodyIndex),
-            RenderHelper.stringTrait('Body Type', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
+            mainRenderer2D.stringTrait('Body Type', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
         );
     }
 
@@ -469,50 +469,64 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         traitTokens = getTraitTokens(tbaAddress);
     }
 
-    function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
+    function getBackpackSVGs(uint256 _tokenId) public view returns (string memory) {
         uint256[] memory traitTokens = getTraitsForChonkId(_tokenId);
-
-        string memory baseSvgPart = '<svg viewBox="0 0 150 150">';
-        string memory closeSvgTag = '</svg>';
-        bytes memory buffer;
-
         string memory bodyGhostSvg = traitsContract.getGhostSvg();
-
-        uint256 numTraits = traitTokens.length < maxTraitsToOutput ? traitTokens.length : maxTraitsToOutput; // this means if they are the same, the exact amount will ouput
-
-        buffer = abi.encodePacked(
-            SVG_BACKPACK,
-            bodyGhostSvg,
-            '<g id="backpackTraits">'
-        );
-
+        
+        uint256 numTraits = traitTokens.length < maxTraitsToOutput ? traitTokens.length : maxTraitsToOutput;
+        
+        string[] memory traitSvgs = new string[](numTraits);
         for (uint256 i; i < numTraits; ++i) {
-            string memory traitSvg = traitsContract.getSvgForTokenId(traitTokens[i]);
-            buffer = abi.encodePacked(
-                buffer,
-                baseSvgPart,
-                traitSvg,
-                closeSvgTag
-            );
+            traitSvgs[i] = traitsContract.getSvgForTokenId(traitTokens[i]);
         }
-
-        if(traitTokens.length > maxTraitsToOutput ) {
-            buffer = abi.encodePacked(
-                buffer,
-                baseSvgPart,
-                '<g id="MoreTraits"><rect style="width:10px; height:2px;" x="10" y="16" fill="#ffffff"></rect><rect style="height:10px; width:2px;" x="14" y="12" fill="#ffffff"></rect></g>',
-                closeSvgTag
-            );
-        }
-
-        buffer = abi.encodePacked(
-            buffer,
-            '</g>'
-            // '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
-        );
-
-        backpackSVGs = string(buffer);
+        
+        return mainRenderer2D.getBackpackSVGs(bodyGhostSvg, traitSvgs, traitTokens.length, maxTraitsToOutput);
     }
+
+    // function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
+    //     uint256[] memory traitTokens = getTraitsForChonkId(_tokenId);
+
+    //     string memory baseSvgPart = '<svg viewBox="0 0 150 150">';
+    //     string memory closeSvgTag = '</svg>';
+    //     bytes memory buffer;
+
+    //     string memory bodyGhostSvg = traitsContract.getGhostSvg();
+
+    //     uint256 numTraits = traitTokens.length < maxTraitsToOutput ? traitTokens.length : maxTraitsToOutput; // this means if they are the same, the exact amount will ouput
+
+    //     buffer = abi.encodePacked(
+    //         SVG_BACKPACK,
+    //         bodyGhostSvg,
+    //         '<g id="backpackTraits">'
+    //     );
+
+    //     for (uint256 i; i < numTraits; ++i) {
+    //         string memory traitSvg = traitsContract.getSvgForTokenId(traitTokens[i]);
+    //         buffer = abi.encodePacked(
+    //             buffer,
+    //             baseSvgPart,
+    //             traitSvg,
+    //             closeSvgTag
+    //         );
+    //     }
+
+    //     if(traitTokens.length > maxTraitsToOutput ) {
+    //         buffer = abi.encodePacked(
+    //             buffer,
+    //             baseSvgPart,
+    //             '<g id="MoreTraits"><rect style="width:10px; height:2px;" x="10" y="16" fill="#ffffff"></rect><rect style="height:10px; width:2px;" x="14" y="12" fill="#ffffff"></rect></g>',
+    //             closeSvgTag
+    //         );
+    //     }
+
+    //     buffer = abi.encodePacked(
+    //         buffer,
+    //         '</g>'
+    //         // '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
+    //     );
+
+    //     backpackSVGs = string(buffer);
+    // }
 
     function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
         string memory bodySvg;
@@ -572,7 +586,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 
-        return mainRenderer3D.renderAsDataUriZ(
+        return mainRenderer3D.renderAsDataUri(
             _tokenId,
             bodySvg,
             bodyAttributes,
@@ -695,26 +709,26 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
       systemAddress = _systemAddress;
     }
 
-    // function setBackgroundColor(uint256 _peterTokenId, string memory _color) public onlyPeterOwner(_peterTokenId) {
-    //     bytes memory colorBytes = bytes(_color);
-    //     if (colorBytes.length != 6) revert InvalidColor();
+    function setBackgroundColor(uint256 _peterTokenId, string memory _color) public onlyPeterOwner(_peterTokenId) {
+        bytes memory colorBytes = bytes(_color);
+        if (colorBytes.length != 6) revert InvalidColor();
 
-    //     if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo(); // todo: either take this out or make it so only marka can do this
+        if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo(); // todo: either take this out or make it so only marka can do this
 
-    //     // Ensure all characters are valid hex characters (0-9, a-f, A-F)
-    //     for (uint i = 0; i < 6; i++) {
-    //         if (
-    //             !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
-    //             !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
-    //             !(colorBytes[i] >= 0x61 && colorBytes[i] <= 0x66)    // a-f
-    //         ) {
-    //             revert InvalidColor(); // Invalid character found
-    //         }
-    //     }
-    //     peterTokens.all[_peterTokenId].backgroundColor = _color;
+        // Ensure all characters are valid hex characters (0-9, a-f, A-F)
+        for (uint i = 0; i < 6; i++) {
+            if (
+                !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
+                !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
+                !(colorBytes[i] >= 0x61 && colorBytes[i] <= 0x66)    // a-f
+            ) {
+                revert InvalidColor(); // Invalid character found
+            }
+        }
+        peterTokens.all[_peterTokenId].backgroundColor = _color;
 
-    //     emit BackgroundColor(ownerOf(_peterTokenId), _peterTokenId, _color );
-    // }
+        emit BackgroundColor(ownerOf(_peterTokenId), _peterTokenId, _color );
+    }
 
     function setBodyIndex(uint256 _peterTokenId, uint8 _bodyIndex) public onlyPeterOwner(_peterTokenId) {
         if (_bodyIndex > 3) revert InvalidBodyIndex();

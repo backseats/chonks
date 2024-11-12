@@ -88,7 +88,7 @@ contract MainRenderer3D {
         }
     }
 
-    function renderAsDataUriZ(
+    function renderAsDataUri(
         uint256 _tokenId,
         string memory _bodySvg,
         string memory _bodyAttributes,
