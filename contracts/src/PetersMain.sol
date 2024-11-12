@@ -58,22 +58,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // The render contract that handles SVG generation
     MainRenderer2D public mainRenderer2D;
 
-    uint256 maxTraitsToOutput = 99;
-
     // The render contract that handles 3d generation
     MainRenderer3D public mainRenderer3D;
 
-    uint256 _nextTokenId;
+    uint256 public maxTraitsToOutput = 99;
 
-    uint256 public price;
-
-    address systemAddress;
+    uint256 public _nextTokenId;
 
     // ERC-6551 Boilerplate addresses
     IRegistry constant REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
     address constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
     address constant ACCOUNT_IMPLEMENTATION = 0x41C8f39463A868d3A88af00cd0fe7102F30E44eC;
-
 
     // Mapping of tokenID to the TBA account address
     mapping(uint256 => address) public tokenIdToTBAAccountAddress;
@@ -83,11 +78,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // Chonk ID to approved addresses
     mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators;
-
-    // Tracking which nonces have been used from the server
-    mapping (string => bool) usedNonces;
-
-     // Backpack stuff
 
     /// Errors
 
@@ -219,13 +209,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         tbaAddress = tokenIdToTBAAccountAddress[_chonkId];
     }
 
-    /// Equip/Unequip clothing traits
-
-    function _equipValidation(uint256 _peterTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
-        _validateTBAOwnership(_peterTokenId, _traitTokenId);
-        traitType = traitsContract.getTraitType(_traitTokenId);
-        _validateTraitType(_traitTokenId, traitType);
-    }
+    /// Equip/Unequip Traits
 
     function equip(uint256 _peterTokenId, uint256 _traitTokenId) public onlyPeterOwner(_peterTokenId) {
         if (_traitTokenId == 0) revert UseUnequip();
@@ -255,7 +239,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         emit Unequip(ownerOf(_peterTokenId), _peterTokenId, uint8(traitType));
     }
 
-    // validate OwnershipHandoverRequested(pendingOwner);
     function unequipAll(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
         StoredPeter storage peter = peterTokens.all[_peterTokenId];
 
@@ -286,48 +269,61 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             _validateTBAOwnership(_peterTokenId, _headTokenId);
             _validateTraitType(_headTokenId, TraitCategory.Name.Head);
             peterTokens.all[_peterTokenId].headId = _headTokenId;
+
+            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _headTokenId, uint8(TraitCategory.Name.Head));
         }
 
         if (_hairTokenId != 0) {
             _validateTBAOwnership(_peterTokenId, _hairTokenId);
             _validateTraitType(_hairTokenId, TraitCategory.Name.Hair);
             peterTokens.all[_peterTokenId].hairId = _hairTokenId;
+
+            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _hairTokenId, uint8(TraitCategory.Name.Hair));
         }
 
         if (_faceTokenId != 0) {
             _validateTBAOwnership(_peterTokenId, _faceTokenId);
             _validateTraitType(_faceTokenId, TraitCategory.Name.Face);
             peterTokens.all[_peterTokenId].faceId = _faceTokenId;
+
+            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _faceTokenId, uint8(TraitCategory.Name.Face));
         }
 
         if (_accessoryTokenId != 0) {
             _validateTBAOwnership(_peterTokenId, _accessoryTokenId);
             _validateTraitType(_accessoryTokenId, TraitCategory.Name.Accessory);
             peterTokens.all[_peterTokenId].accessoryId = _accessoryTokenId;
+
+            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _accessoryTokenId, uint8(TraitCategory.Name.Accessory));
         }
 
         if (_topTokenId != 0) {
             _validateTBAOwnership(_peterTokenId, _topTokenId);
             _validateTraitType(_topTokenId, TraitCategory.Name.Top);
             peterTokens.all[_peterTokenId].topId = _topTokenId;
+
+            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _topTokenId, uint8(TraitCategory.Name.Top));
         }
 
         if (_bottomTokenId != 0) {
             _validateTBAOwnership(_peterTokenId, _bottomTokenId);
             _validateTraitType(_bottomTokenId, TraitCategory.Name.Bottom);
             peterTokens.all[_peterTokenId].bottomId = _bottomTokenId;
+
+            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _bottomTokenId, uint8(TraitCategory.Name.Bottom));
         }
 
         if (_shoesTokenId != 0) {
             _validateTBAOwnership(_peterTokenId, _shoesTokenId);
             _validateTraitType(_shoesTokenId, TraitCategory.Name.Shoes);
             peterTokens.all[_peterTokenId].shoesId = _shoesTokenId;
+
+            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _shoesTokenId, uint8(TraitCategory.Name.Shoes));
         }
 
         emit EquipAll(ownerOf(_peterTokenId), _peterTokenId);
     }
 
-    // TODO: Do we need this?
     function peterMakeover(
         uint256 _peterTokenId,
         uint256 _headTokenId,
@@ -337,7 +333,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _topTokenId,
         uint256 _bottomTokenId,
         uint256 _shoesTokenId,
-        uint8 _bodyIndex,
+        uint8 _bodyIndex, // Note, this must be set even if you want to keep the Chonk's current skin tone
         string memory _backgroundColor
     ) public onlyPeterOwner(_peterTokenId) {
         equipAll(_peterTokenId, _headTokenId, _hairTokenId, _faceTokenId, _accessoryTokenId, _topTokenId, _bottomTokenId, _shoesTokenId);
@@ -359,6 +355,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // Checks the fetched TraitCategory.Name against the one we send in
         if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))
             revert IncorrectTraitType();
+    }
+
+    function _equipValidation(uint256 _peterTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
+        _validateTBAOwnership(_peterTokenId, _traitTokenId);
+        traitType = traitsContract.getTraitType(_traitTokenId);
+        _validateTraitType(_traitTokenId, traitType);
     }
 
     /// tokenURI/Rendering
@@ -647,7 +649,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function addNewBody(uint256 _bodyIndex, string memory _bodyName, bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
         BodyMetadata storage metadata = bodyIndexToMetadata[_bodyIndex];
 
-        // if (metadata.bodyIndex != 0) revert BodyAlreadyExists(); // TODO: look at what we want to do here - potentially a "timelock"
+        // TODO: look at what we want to do here - potentially a "timelock"
+        // if (metadata.bodyIndex != 0) revert BodyAlreadyExists();
 
         metadata.bodyIndex = _bodyIndex;
         metadata.bodyName = _bodyName;
@@ -659,10 +662,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function setMaxTraitsToOutput(uint256 _maxTraitsToOutput) public onlyOwner {
         maxTraitsToOutput = _maxTraitsToOutput;
-    }
-
-    function setPrice(uint256 _priceInWei) public onlyOwner {
-        price = _priceInWei;
     }
 
     function setTraitsContract(PeterTraits _address) public onlyOwner {
@@ -681,8 +680,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         mainRenderer3D = MainRenderer3D(_mainRenderer3D);
     }
 
-    function setSystemAddress(address _systemAddress) external onlyOwner {
-      systemAddress = _systemAddress;
+    function setMarketplace(address _marketplace) public onlyOwner {
+        marketplace = ChonksMarket(_marketplace);
     }
 
     function setBackgroundColor(uint256 _peterTokenId, string memory _color) public onlyPeterOwner(_peterTokenId) {
@@ -716,10 +715,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setTokenRender3D(uint256 _peterTokenId, bool _render3D) public onlyPeterOwner(_peterTokenId) {
         peterTokens.all[_peterTokenId].render3D = _render3D;
         emit Render3D(ownerOf(_peterTokenId), _peterTokenId, _render3D);
-    }
-
-    function setMarketplace(address _marketplace) public onlyOwner {
-        marketplace = ChonksMarket(_marketplace);
     }
 
     // Boilerplate
