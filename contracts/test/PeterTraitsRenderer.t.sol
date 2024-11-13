@@ -32,7 +32,7 @@ contract PeterTraitsRendererTest is AbstractTest {
 
         dataContract = new FirstSeasonRenderMinter(address(main), address(traits), localDeploy); // if true, addNewTrait called for all traits
         // dataContract._debugPostConstructorMint(address(traits)); // this calls safeMint of 5 traits
-        dataContract._debugPostConstructorMint();
+        main._debugPostConstructorMint();
 
         vm.stopPrank();
     }

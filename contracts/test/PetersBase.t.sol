@@ -41,7 +41,7 @@ contract PetersBaseTest is Test {
         traits = new PeterTraits(true);
         // console.log('traits address', address(traits));
 
-        dataContract = new FirstSeasonRenderMinter(traits, localDeploy);
+        dataContract = new FirstSeasonRenderMinter(address(main), address(traits), localDeploy);
         // console.log('FirstSeasonRenderMinter address', address(dataContract));
 
         market = new ChonksMarket(

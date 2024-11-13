@@ -118,7 +118,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // console.log('localDeploy:', _localDeploy);
         if (_localDeploy) {
             for (uint i; i < 1; ++i) {
-                mintABody(4); // Mints N bodies/tokens
+                mint(4); // Mints N bodies/tokens
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
             }
@@ -138,11 +138,12 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     //     usedNonces[nonce] = true;
     // }
 
-    function mintABody(uint256 _amount) public  {
+    function mint(uint256 _amount) public payable {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
         if (_amount == 0) revert CantBeZero();
-        if (block.timestamp < mintStartTime) revert MintNotStarted();
-        if (block.timestamp > mintStartTime + 24 hours) revert MintEnded();
+        // TODO: bring these back in
+        // if (block.timestamp < mintStartTime) revert MintNotStarted();
+        // if (block.timestamp > mintStartTime + 24 hours) revert MintEnded();
         if (msg.value != price * _amount) revert InsufficientFunds();
 
         for (uint i; i < _amount; ++i) {
@@ -152,7 +153,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             address tokenBoundAccountAddress = REGISTRY.createAccount(
                 ACCOUNT_PROXY, // implementation address
                 0, // salt
-                84532, // chainId (8453 for Base), chainId (84532 for Base Sepolia), chain Id 11155111 for Sepolia // DEPLOY
+                84532, // chainId // DEPLOY
                 address(this), // tokenContract
                 tokenId // tokenId
             );
