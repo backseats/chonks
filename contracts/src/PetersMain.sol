@@ -33,7 +33,7 @@ import { TraitCategory } from "./TraitCategory.sol";
 import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 
-// import "forge-std/console.sol"; // DEPLOY: remove
+import "forge-std/console.sol"; // DEPLOY: remove
 
 // TODO: withdraw or send us the ETH per each txn
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
@@ -115,7 +115,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
-        // console.log('localDeploy:', _localDeploy);
         if (_localDeploy) {
             for (uint i; i < 1; ++i) {
                 mint(4); // Mints N bodies/tokens

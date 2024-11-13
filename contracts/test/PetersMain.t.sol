@@ -51,6 +51,8 @@ contract PetersMainTest is PetersBaseTest {
         vm.startPrank(deployer);
         main.setFirstSeasonRenderMinter(address(dataContract));
         assertEq(address(main.firstSeasonRenderMinter()), address(dataContract));
+
+        traits.addMinter(address(dataContract));
         vm.stopPrank();
     }
 
@@ -140,7 +142,6 @@ contract PetersMainTest is PetersBaseTest {
         vm.stopPrank();
     }
 
-
     function test_mint() public {
 
         vm.startPrank(deployer);
@@ -152,18 +153,16 @@ contract PetersMainTest is PetersBaseTest {
         test_setMarketplaceInTraitsContract();
         vm.stopPrank();
 
-        // mint 5 traits
-        uint8 amount = 5;
         address user = address(2);
         vm.startPrank(user);
-        main.mint(amount);
+        main.mint(1);
         vm.stopPrank();
 
         // validate data
         assertEq(main.balanceOf(user), 1);
         address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
         assertFalse(tbaWallet == user);
-        assertEq(traits.balanceOf(tbaWallet), amount);
+        assertEq(traits.balanceOf(tbaWallet), 4); // mints 4 to a regular minter
     }
 
     function test_mintThenTransfer() public {
@@ -177,26 +176,25 @@ contract PetersMainTest is PetersBaseTest {
         test_setMarketplaceInTraitsContract();
         vm.stopPrank();
 
-        // mint 5 traits
-        uint8 amount = 5;
+
         address user1 = address(1);
         address user2 = address(2);
         vm.startPrank(user1);
-        main.mint(amount);
+        main.mint(1);
         vm.stopPrank();
 
         // validate data
         assertEq(main.balanceOf(user1), 1);
         address tbaWallet = address(main.tokenIdToTBAAccountAddress(1));
         assertFalse(tbaWallet == user1);
-        assertEq(traits.balanceOf(tbaWallet), amount);
+        assertEq(traits.balanceOf(tbaWallet), 4);
 
         // transfer to user 1
         vm.startPrank(user1);
         main.transferFrom(user1, user2, 1);
         vm.stopPrank();
 
-        // assertEq(main.balanceOf(user1), 0);
+        assertEq(main.balanceOf(user1), 0);
         assertEq(main.balanceOf(user2), 1);
     }
 
@@ -371,7 +369,6 @@ contract PetersMainTest is PetersBaseTest {
     }
 
     function test_TBAApprovalForAllExploit() public {
-
         vm.startPrank(deployer);
         test_setTraitsContract();
         test_setFirstSeasonRenderMinter();
@@ -380,7 +377,6 @@ contract PetersMainTest is PetersBaseTest {
         test_setPetersMainInTraitsContract();
         test_setMarketplaceInTraitsContract();
         vm.stopPrank();
-
 
         address user1 = address(1);
         console.log('user1 address is', user1);
@@ -402,8 +398,8 @@ contract PetersMainTest is PetersBaseTest {
             console.log('tba address is', tba);
             console.log('--------------------------------');
 
-            assertEq(main.balanceOf(user1), 1);
-            assertEq(traits.balanceOf(tba), 5);
+            assertEq(main.balanceOf(user1), 5);
+            assertEq(traits.balanceOf(tba), 4);
             assertEq(owner, user1);
 
             // Test approvalForAll for HarveyMain for Marketplace
@@ -437,7 +433,7 @@ contract PetersMainTest is PetersBaseTest {
 
         // now let's move Chonk to address(2)
         vm.startPrank(user1);
-            assertEq(main.balanceOf(user1), 1);
+            assertEq(main.balanceOf(user1), 5);
 
             // Check trait id operators before the transfer
             operators = traits.getApprovedOperators(traitId);
@@ -450,7 +446,7 @@ contract PetersMainTest is PetersBaseTest {
             // Transfer Chonk 1 from user1 to user2 (this should clear the approvals)
             main.transferFrom(user1, user2, 1);
 
-            assertEq(main.balanceOf(user1), 0);
+            assertEq(main.balanceOf(user1), 4);
             assertEq(main.balanceOf(user2), 1);
 
             // Ensure trait id operators are cleared

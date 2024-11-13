@@ -10,7 +10,6 @@ import { Ownable } from "solady/auth/Ownable.sol";
 import { Utils } from "./common/Utils.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-
 import { PetersMain } from "./PetersMain.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 
@@ -27,7 +26,7 @@ import { IRenderMinterV1 } from "./interfaces/IRenderMinterV1.sol";
 
 import { TraitRenderer } from "./renderers/TraitRenderer.sol";
 
-// import "forge-std/console.sol"; // DEPLOY: remove
+import "forge-std/console.sol"; // DEPLOY: remove
 
 // modifier onlyAuthorizedMinter() {
 //     require(authorizedMinters[msg.sender], "Caller is not an authorized minter");
@@ -42,8 +41,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     Traits public traitTokens;
 
     TraitRenderer public traitRenderer;
-
-    address public minter;
 
     // An address that will be used to sign newly incoming traits
     address public signer;
@@ -102,11 +99,8 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         traitIndexToMetadata[_traitIndex] = _metadata;
     }
 
-    // TODO: move this mint logic into FirstSeasonRenderMinter
-
     /// @dev NOTE: Mints to a smart contract address that implements onERC721Received
-    function safeMint(address _to) public returns (uint256) { // TODO: add onlyMinter modifier | rename to initial mint or something?
-        // TODO: check supply?
+    function safeMint(address _to) public onlyMinter(msg.sender) returns (uint256) {
         resolveEpochIfNecessary();
 
         uint tokenId = totalSupply() + 1;
@@ -126,11 +120,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             _burn(tokenIds[i]);
         }
     }
-
-    // TODO: onlyMinter and set minters in a mapping
-    // function externalMint(address _to) public returns (uint256[] memory) {
-    //     return safeMint(_to);
-    // }
 
     /// @notice Initializes and closes epochs. Thank you jalil & mouseDev.
     /// @dev Based on the commit-reveal scheme proposed by MouseDev.
@@ -238,7 +227,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         StoredTrait memory trait = getTrait(_tokenId);
         string memory traitSvg = trait.isRevealed ? getTraitImageSvg(trait.traitIndex) : '<svg></svg>';
-        
+
         return traitRenderer.renderAsDataUri(
             _tokenId,
             trait,
@@ -367,9 +356,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // TODO: PUT BACK IN
     /*
-    function setMinter(address _mainContractAddress) public onlyOwner {
-        minter = _mainContractAddress;
-    }
 
     // TODO: look at other contracts for signing logic, import ECDSA, etc.
     function setSigner(address _signer) public onlyOwner {
