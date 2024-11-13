@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { FaEthereum } from "react-icons/fa6";
 import { VscListFilter, VscSearch } from "react-icons/vsc";
 import Stats from '../components/marketplace/Stats';
+import Tabs from '../components/marketplace/Tabs';
 
 export default function Marketplace() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,6 +16,7 @@ export default function Marketplace() {
     const [isSidebarVisible, setIsSidebarVisible] = useState(true);
     const [searchId, setSearchId] = useState('');
     const [sortOrder, setSortOrder] = useState<'low-to-high' | 'high-to-low' | ''>('');
+    const [activeTab, setActiveTab] = useState('Chonks');
      
     return (
         <>
@@ -35,7 +37,7 @@ export default function Marketplace() {
             <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
 
                 <MenuBar />
-                <main className="w-full "> 
+                <main className="w-full border-t border-gray-300 "> 
                 {/* overflow-x-hidden: this caused issue with sticky sidebar, need to put in a fix for the border */}
 
                     {/* guide lines, deploy: remove */}
@@ -50,15 +52,7 @@ export default function Marketplace() {
 
                     </div>
 
-                    <section className={`tabs text-[1vw] borderTopFull  flex flex-col bg-white py-[1.725vw] px-[3.45vw]`}>
-                        <div className="flex">  
-                            <button className="px-4 mr-2 py-2 border border-black bg-[#2F7BA7] text-white">Chonks</button>
-                            <button className="px-4 mr-2 py-2 border border-black">Traits</button>
-                            <button className="px-4 mr-2 py-2 border border-black">Offers</button>
-                            <button className="px-4 mr-2 py-2 border border-black">Activity</button>
-                        </div>
-                        
-                    </section>
+                    <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
 
                     <section className={`actions flex flex-col bg-white py-[1.725vw] px-[3.45vw]`}>
                         <div className="flex justify-between items-center mb-4">
@@ -71,7 +65,7 @@ export default function Marketplace() {
                             
                             <div className="flex items-center gap-4">
                                 <div className="relative">
-                                    <VscSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                                    <VscSearch className="absolute left-3 max-w-[1vw] top-1/2 transform -translate-y-1/2 text-gray-400" />
                                     <input
                                         type="number"
                                         placeholder="Search by Chonk ID"
@@ -136,7 +130,7 @@ export default function Marketplace() {
                                                 </summary>
                                                 <div className="mt-4 space-y-2">
                                                     {['Torch', 'Sword', 'Red Lightsaber',  'Green Lightsaber'].map((trait) => (
-                                                        <label key={trait} className="flex items-center space-x-2">
+                                                        <label key={trait} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 transition-colors py-[0.5vw] px-[1vw]">
                                                             <input type="checkbox" className="form-checkbox" />
                                                             <span className="text-[1vw]">{trait}</span>
                                                         </label>
@@ -158,7 +152,7 @@ export default function Marketplace() {
                                                 </summary>
                                                 <div className="mt-4 space-y-2">
                                                     {['Common', 'Rare', 'Legendary'].map((trait) => (
-                                                        <label key={trait} className="flex items-center space-x-2">
+                                                        <label key={trait} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 transition-colors py-[0.5vw] px-[1vw]">
                                                             <input type="checkbox" className="form-checkbox" />
                                                             <span className="text-[1vw]">{trait}</span>
                                                         </label>
@@ -180,7 +174,7 @@ export default function Marketplace() {
                                                 </summary>
                                                 <div className="mt-4 space-y-2">
                                                     {['Common', 'Rare', 'Legendary'].map((trait) => (
-                                                        <label key={trait} className="flex items-center space-x-2">
+                                                        <label key={trait} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 transition-colors py-[0.5vw] px-[1vw]">
                                                             <input type="checkbox" className="form-checkbox" />
                                                             <span className="text-[1vw]">{trait}</span>
                                                         </label>
@@ -202,7 +196,7 @@ export default function Marketplace() {
                                                 </summary>
                                                 <div className="mt-4 space-y-2">
                                                     {['Common', 'Rare', 'Legendary'].map((trait) => (
-                                                        <label key={trait} className="flex items-center space-x-2">
+                                                        <label key={trait} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 transition-colors py-[0.5vw] px-[1vw]">
                                                             <input type="checkbox" className="form-checkbox" />
                                                             <span className="text-[1vw]">{trait}</span>
                                                         </label>
@@ -224,7 +218,7 @@ export default function Marketplace() {
                                                 </summary>
                                                 <div className="mt-4 space-y-2">
                                                     {['Common', 'Rare', 'Legendary'].map((trait) => (
-                                                        <label key={trait} className="flex items-center space-x-2">
+                                                        <label key={trait} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 transition-colors py-[0.5vw] px-[1vw]">
                                                             <input type="checkbox" className="form-checkbox" />
                                                             <span className="text-[1vw]">{trait}</span>
                                                         </label>
@@ -246,7 +240,7 @@ export default function Marketplace() {
                                                 </summary>
                                                 <div className="mt-4 space-y-2">
                                                     {['Common', 'Rare', 'Legendary'].map((trait) => (
-                                                        <label key={trait} className="flex items-center space-x-2">
+                                                        <label key={trait} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 transition-colors py-[0.5vw] px-[1vw]">
                                                             <input type="checkbox" className="form-checkbox" />
                                                             <span className="text-[1vw]">{trait}</span>
                                                         </label>
@@ -268,7 +262,7 @@ export default function Marketplace() {
                                                 </summary>
                                                 <div className="mt-4 space-y-2">
                                                     {['Common', 'Rare', 'Legendary'].map((trait) => (
-                                                        <label key={trait} className="flex items-center space-x-2">
+                                                        <label key={trait} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 transition-colors py-[0.5vw] px-[1vw]">
                                                             <input type="checkbox" className="form-checkbox" />
                                                             <span className="text-[1vw]">{trait}</span>
                                                         </label>
@@ -290,7 +284,7 @@ export default function Marketplace() {
                                                 </summary>
                                                 <div className="mt-4 space-y-2">
                                                     {['Common', 'Rare', 'Legendary'].map((trait) => (
-                                                        <label key={trait} className="flex items-center space-x-2">
+                                                        <label key={trait} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-100 transition-colors py-[0.5vw] px-[1vw]">
                                                             <input type="checkbox" className="form-checkbox" />
                                                             <span className="text-[1vw]">{trait}</span>
                                                         </label>
@@ -306,7 +300,7 @@ export default function Marketplace() {
                                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
                                     {[...Array(20)].map((_, index) => (
                                         <Link 
-                                            href={`/chonk/${index + 1}`} 
+                                            href={`/marketplace/chonk/${index + 1}`} 
                                             key={index}
                                             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
                                         >
@@ -316,7 +310,7 @@ export default function Marketplace() {
                                                 className="w-full h-auto"
                                             />
                                             <div className="mt-4 space-y-2 p-4">
-                                                <h3 className="text-[1.2vw] font-bold">Chonks #{index + 1}</h3>
+                                                <h3 className="text-[1.2vw] font-bold">Chonk #{index + 1}</h3>
                                                 <span className="text-[1vw]">0.45</span>
                                                 <button 
                                                     className="w-full text-[1vw] border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"

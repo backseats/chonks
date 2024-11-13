@@ -2,7 +2,8 @@ import { FaEthereum } from "react-icons/fa6";
 
 export default function Stats() {
     return (
-        <section className={`mpStats borderTopFull border-l border-r flex flex-col bg-white py-[3.45vw]`}>
+        <section className={`mpStats  border-l border-r flex flex-col bg-white py-[3.45vw]`}> 
+        {/* borderTopFull */}
             <div className="col-span-full flex flex-row flex-wrap gap-[3.45vw] ">
                 <div className="w-auto flex-row items-center mx-[1.725vw]">
                     <h1 className="font-source-code-pro text-[2vw] font-weight-600 mb-1 font-bold">
