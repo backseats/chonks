@@ -50,20 +50,26 @@ export default function Marketplace() {
 
                     </div>
 
-                    <section className={`actions borderTopFull flex flex-col bg-white py-[1.725vw] px-[3.45vw]`}>
-                        {/* Add state for sidebar visibility */}
+                    <section className={`tabs text-[1vw] borderTopFull  flex flex-col bg-white py-[1.725vw] px-[3.45vw]`}>
+                        <div className="flex">  
+                            <button className="px-4 mr-2 py-2 border border-black bg-[#2F7BA7] text-white">Chonks</button>
+                            <button className="px-4 mr-2 py-2 border border-black">Traits</button>
+                            <button className="px-4 mr-2 py-2 border border-black">Offers</button>
+                            <button className="px-4 mr-2 py-2 border border-black">Activity</button>
+                        </div>
                         
+                    </section>
 
+                    <section className={`actions flex flex-col bg-white py-[1.725vw] px-[3.45vw]`}>
                         <div className="flex justify-between items-center mb-4">
+                            <button 
+                                onClick={() => setIsSidebarVisible(!isSidebarVisible)}
+                                className="flex items-center gap-2 px-4 py-2 border border-black hover:bg-gray-100"
+                            >
+                                <VscListFilter />
+                            </button>
+                            
                             <div className="flex items-center gap-4">
-                                <button 
-                                    onClick={() => setIsSidebarVisible(!isSidebarVisible)}
-                                    className="flex items-center gap-2 px-4 py-2 border border-black  hover:bg-gray-100"
-                                >
-                                    <VscListFilter />
-                                    {/* <span className="text-[1vw]">Filters</span> */}
-                                </button>
-                                
                                 <div className="relative">
                                     <VscSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                     <input
@@ -71,12 +77,12 @@ export default function Marketplace() {
                                         placeholder="Search by Chonk ID"
                                         value={searchId}
                                         onChange={(e) => setSearchId(e.target.value)}
-                                        className="pl-10 px-4 py-2 border border-black  text-[1vw] w-[30vw]"
+                                        className="pl-10 px-4 py-2 border border-black text-[1vw] w-[40vw]"
                                     />
                                 </div>
 
                                 <select 
-                                    className="px-4 py-2 border border-black  text-[1vw] bg-white"
+                                    className="px-4 py-2 border border-black text-[1vw] bg-white"
                                     value={sortOrder}
                                     onChange={(e) => setSortOrder(e.target.value as 'low-to-high' | 'high-to-low' | '')}
                                 >
@@ -87,6 +93,8 @@ export default function Marketplace() {
                             </div>
                         </div>
                     </section>
+
+                   
 
                     <section className={`listingsAndFilters flex flex-col bg-white py-[1.725vw] px-[3.45vw]`}>
                         <div className="flex relative">
@@ -295,7 +303,7 @@ export default function Marketplace() {
                             </div>
 
                             <div className={`${isSidebarVisible ? 'w-3/4' : 'w-full'} `}>
-                                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
                                     {[...Array(20)].map((_, index) => (
                                         <Link 
                                             href={`/chonk/${index + 1}`} 
