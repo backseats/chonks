@@ -108,6 +108,15 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error CantBeZero();
     error WithdrawFailed();
 
+    /// Modifier
+
+    modifier onlyPeterOwner(uint256 _peterId) {
+        if (msg.sender != ownerOf(_peterId)) revert IncorrectPeterOwner();
+        _;
+    }
+
+    /// Constructor
+
     constructor(bool localDeploy_) ERC721("Peter Test", "PETER") {
         _initializeOwner(msg.sender);
         _localDeploy = localDeploy_;
@@ -189,9 +198,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // Set the default background color
             peter.backgroundColor = "0D6E9D";
         }
-
-        (bool success,) = payable(withdrawAddress).call{ value: msg.value }("");
-        if (!success) revert WithdrawFailed();
     }
 
     function getOwnerAndTBAAddressForChonkId(uint256 _chonkId) public view returns (address owner, address tbaAddress) {
@@ -636,10 +642,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Ownable Functions
 
+    // TODO: Timelock
     function addNewBody(uint256 _bodyIndex, string memory _bodyName, bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
         BodyMetadata storage metadata = bodyIndexToMetadata[_bodyIndex];
 
-        // TODO: look at what we want to do here - potentially a "timelock"
         // if (metadata.bodyIndex != 0) revert BodyAlreadyExists();
 
         metadata.bodyIndex = _bodyIndex;
@@ -774,13 +780,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // Consider adding emergency pause functionality for critical issues
     }
 
-    // Modifiers
-
-    modifier onlyPeterOwner(uint256 _peterId) {
-        if (msg.sender != ownerOf(_peterId)) revert IncorrectPeterOwner();
-        _;
-    }
-
     // better to invalidate TBA approvals in before or after?
     // i think before....
     // function _afterTokenTransfer(address, address, uint256 tokenId) internal virtual override {
@@ -843,5 +842,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         delete chonkIdToApprovedOperators[_chonkId];
     }
     */
+
+   function withdraw() public onlyOwner {
+        (bool success,) = payable(withdrawAddress).call{ value: address(this).balance }("");
+        if (!success) revert WithdrawFailed();
+    }
 
 }

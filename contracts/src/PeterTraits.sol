@@ -72,6 +72,8 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     error NotATBA();
     error NotAValidMinterContract();
     error NotYourTrait();
+    error SetPetersMainAddress();
+    error SetMarketplaceAddress();
     error TraitNotFound(uint256 _tokenId);
     error TraitTokenDoesntExist();
 
@@ -104,7 +106,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         resolveEpochIfNecessary();
 
         uint tokenId = totalSupply() + 1;
-        _safeMint(_to, tokenId); // NOTE: This is failing in `test/PeterTraitsRenderer.t.sol` |  // creates a token without any kind of info, info is filled in in the render contract
+        _safeMint(_to, tokenId);
         emit BatchMetadataUpdate(0, type(uint256).max);
 
         return tokenId;
@@ -407,6 +409,9 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // Remove an active ChonkOffer if Chonk token ID because owned Traits changed
     function _afterTokenTransfer(address, address, uint256 _traitTokenId) internal override(ERC721) {
+        if (address(petersMain) == address(0)) revert SetPetersMainAddress();
+        if (address(marketplace) == address(0)) revert SetMarketplaceAddress();
+
         address tba = ownerOf(_traitTokenId);
         uint256 chonkId = petersMain.tbaAddressToTokenId(tba);
         marketplace.removeChonkOfferOnTraitTransfer(chonkId);

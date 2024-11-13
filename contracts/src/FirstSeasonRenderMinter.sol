@@ -225,6 +225,11 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ownable, ITraitStorage
     //     }
     // }
 
+    // DEPLOY: remove, just for testing
+    function setPetersMain(address _petersMain) public {
+        petersMain = _petersMain;
+    }
+
     // This just creates a blank trait with a type
     function safeMintMany(address _toTBA) public returns (uint256[] memory) {
         if (msg.sender != petersMain) revert OnlyPetersMain();
