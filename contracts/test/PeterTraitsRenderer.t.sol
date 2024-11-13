@@ -2,7 +2,6 @@
 pragma solidity ^0.8.22;
 
 import { AbstractTest } from "./AbstractTest.t.sol";
-// import { BodyRenderer } from '../src/renderers/BodyRenderer.sol';
 import { PetersMain } from '../src/PetersMain.sol';
 import { PeterTraits } from '../src/PeterTraits.sol';
 import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
@@ -12,7 +11,6 @@ import "forge-std/console.sol"; // DEPLOY: remove
 
 contract PeterTraitsRendererTest is AbstractTest {
 
-    // BodyRenderer public bodyRenderer;
     PetersMain public main;
     PeterTraits public traits;
     FirstSeasonRenderMinter public dataContract;
@@ -37,10 +35,11 @@ contract PeterTraitsRendererTest is AbstractTest {
         traits.addMinter(address(dataContract));
         main.setFirstSeasonRenderMinter(address(dataContract));
         main._debugPostConstructorMint();
+
         vm.stopPrank();
     }
 
-    function renderContract(uint tokenId) internal override returns(string memory svg) {
+    function renderContract(uint tokenId) internal view override returns(string memory svg) {
         return traits.renderAsDataUri(tokenId);
     }
 

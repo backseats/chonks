@@ -104,8 +104,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         resolveEpochIfNecessary();
 
         uint tokenId = totalSupply() + 1;
-        _safeMint(_to, tokenId); // creates a token without any kind of info, info is filled in in the render contract
-
+        _safeMint(_to, tokenId); // NOTE: This is failing in `test/PeterTraitsRenderer.t.sol` |  // creates a token without any kind of info, info is filled in in the render contract
         emit BatchMetadataUpdate(0, type(uint256).max);
 
         return tokenId;
