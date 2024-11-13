@@ -1,11 +1,11 @@
 import Head from 'next/head'
-import MenuBar from '../components/marketplace/MenuBar';
+import MenuBar from '@/components/marketplace/MenuBar';
 import { useState } from 'react';
 import Link from 'next/link';
 import { FaEthereum } from "react-icons/fa6";
 import { VscListFilter, VscSearch } from "react-icons/vsc";
-import Stats from '../components/marketplace/Stats';
-import Tabs from '../components/marketplace/Tabs';
+import Stats from '@/components/marketplace/Stats';
+import Tabs from '@/components/marketplace/Tabs';
 
 export default function Marketplace() {
     const [isModalOpen, setIsModalOpen] = useState(false);

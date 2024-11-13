@@ -1,20 +1,311 @@
-import { useRouter } from 'next/router'
 import Head from 'next/head'
-import MenuBar from '../../../components/marketplace/MenuBar';
+import MenuBar from '@/components/marketplace/MenuBar';
 import Link from 'next/link';
-import { VscRefresh, VscShare } from "react-icons/vsc";
-import { IoCartOutline, IoSparklesOutline, IoBriefcaseOutline, IoExitOutline } from "react-icons/io5";
-import { Tooltip } from 'react-tooltip'
-import { FaEthereum } from "react-icons/fa6";
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import { baseSepolia } from "viem/chains";
+import { useReadContract, useWalletClient, useAccount } from "wagmi";
+import { TokenboundClient } from "@tokenbound/sdk";
+import { Chonk } from "@/types/Chonk";
+import {
+    mainABI,
+    mainContract,
+    traitsContract,
+    tokenURIABI,
+    traitsABI,
+} from "@/contract_data";
+import { StoredPeter } from "@/types/StoredPeter";
+import { Category } from "@/types/Category";
+import OwnershipSection from "@/components/marketplace/OwnershipSection";
+import TraitsSection from '@/components/marketplace/TraitsSection';
+import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
+import PriceAndActionsSection from '@/components/marketplace/PriceAndActionsSection';
 
 
-export default function ChonkDetails() {
-    const router = useRouter()
-    const { id } = router.query
+
+type CurrentChonk = {
+    tokenId: number;
+    hat: {
+        tokenId: number; // 0 if not equipped
+        category: Category;
+        isEquipped: boolean;
+    };
+    hair: {
+        tokenId: number;
+        category: Category;
+        isEquipped: boolean;
+    };
+    glasses: {
+        tokenId: number;
+        category: Category;
+        isEquipped: boolean;
+    };
+    handheld: {
+        tokenId: number;
+        category: Category;
+        isEquipped: boolean;
+    };
+    shirt: {
+        tokenId: number;
+        category: Category;
+        isEquipped: boolean;
+    };
+    pants: {
+        tokenId: number;
+        category: Category;
+        isEquipped: boolean;
+    };
+    shoes: {
+        tokenId: number;
+        category: Category;
+        isEquipped: boolean;
+    };
+};
+
+
+export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
+    // const decodedContent = decodeURIComponent(data);
+    // const base64String = decodedContent.split("data:application/json,")[1];
+    // // Parse as JSON and stringify with proper formatting
+    // const jsonData = JSON.parse(base64String);
+
+    // console.log(jsonData);
+
+    const base64String = data.split(",")[1];
+    const jsonString = atob(base64String);
+    const jsonData = JSON.parse(jsonString) as Chonk;
+
+    console.log(jsonData);
+
+    setData(jsonData);
+}
+
+export default function ChonkDetail({ id }: { id: string }) {
+    // const router = useRouter()
+    // const { id } = router.query
     const [isActivityOpen, setIsActivityOpen] = useState(true);
     const [isOffersOpen, setIsOffersOpen] = useState(true);
     const [isTraitsOpen, setIsTraitsOpen] = useState(true);
+
+    const TOKEN_URI = "tokenURI";
+
+    const { address } = useAccount();
+
+    const { data: walletClient } = useWalletClient();
+    const tokenboundClient = new TokenboundClient({
+        walletClient,
+        chainId: baseSepolia.id,
+    });
+
+    const [tokenData, setTokenData] = useState<Chonk | null>(null);
+    const [filteredTraitTokenIds, setFilteredTraitTokenIds] = useState<BigInt[]>(
+        []
+    );
+
+    const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
+
+    // Get main body tokenURI
+    const { data: tokenURIData } = useReadContract({
+        address: mainContract,
+        abi: tokenURIABI,
+        functionName: TOKEN_URI,
+        args: [BigInt(id)],
+        chainId: baseSepolia.id,
+    }) as { data: string };
+
+    const { data: owner } = useReadContract({
+        address: mainContract,
+        abi: mainABI,
+        functionName: "ownerOf",
+        args: [BigInt(id)],
+        chainId: baseSepolia.id,
+    }) as { data: string };
+
+    useEffect(() => {
+        if (tokenURIData) {
+            decodeAndSetData(tokenURIData, setTokenData);
+        }
+        // else {
+        //   console.log("No tokenURI data");
+        // }
+    }, [tokenURIData]);
+
+    // Get the trait ids that are equipped to the body
+    const { data: storedPeter } = useReadContract({
+        address: mainContract,
+        abi: mainABI,
+        functionName: "getPeter",
+        args: [BigInt(id)],
+        chainId: baseSepolia.id,
+    }) as { data: StoredPeter };
+
+    useEffect(() => {
+        if (!storedPeter) return;
+
+        console.log("storedPeter", storedPeter);
+
+        setCurrentChonk({
+            tokenId: parseInt(id),
+            hat: {
+                tokenId:
+                    storedPeter.hatId === 0n ? 0 : parseInt(storedPeter.hatId.toString()),
+                category: Category.Hat,
+                isEquipped: storedPeter.hatId !== 0n,
+            },
+            hair: {
+                tokenId:
+                    storedPeter.hairId === 0n
+                        ? 0
+                        : parseInt(storedPeter.hairId.toString()),
+                category: Category.Shirt,
+                isEquipped: storedPeter.hairId !== 0n,
+            },
+            glasses: {
+                tokenId:
+                    storedPeter.glassesId === 0n
+                        ? 0
+                        : parseInt(storedPeter.glassesId.toString()),
+                category: Category.Glasses,
+                isEquipped: storedPeter.glassesId !== 0n,
+            },
+            handheld: {
+                tokenId:
+                    storedPeter.handheldId === 0n
+                        ? 0
+                        : parseInt(storedPeter.handheldId.toString()),
+                category: Category.Handheld,
+                isEquipped: storedPeter.handheldId !== 0n,
+            },
+            shirt: {
+                tokenId:
+                    storedPeter.shirtId === 0n
+                        ? 0
+                        : parseInt(storedPeter.shirtId.toString()),
+                category: Category.Shirt,
+                isEquipped: storedPeter.shirtId !== 0n,
+            },
+            pants: {
+                tokenId:
+                    storedPeter.pantsId === 0n
+                        ? 0
+                        : parseInt(storedPeter.pantsId.toString()),
+                category: Category.Pants,
+                isEquipped: storedPeter.pantsId !== 0n,
+            },
+            shoes: {
+                tokenId:
+                    storedPeter.shoesId === 0n
+                        ? 0
+                        : parseInt(storedPeter.shoesId.toString()),
+                category: Category.Shoes,
+                isEquipped: storedPeter.shoesId !== 0n,
+            },
+        });
+    }, [storedPeter]);
+
+    useEffect(() => {
+        console.log("currentChonk", currentChonk);
+    }, [currentChonk]);
+
+    const account = tokenboundClient.getAccount({
+        tokenContract: mainContract,
+        tokenId: id.toString(),
+    });
+
+    // if (address) {
+    //   console.log("address is", address);
+    //   console.log("tba address is", account);
+    // }
+
+    // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
+    const { data: allTraitTokenIds } = useReadContract({
+        address: traitsContract,
+        abi: traitsABI,
+        functionName: "walletOfOwner",
+        args: [account],
+        chainId: baseSepolia.id,
+    }) as { data: BigInt[] };
+
+    console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
+
+    // This gets the ids that are equipped to the chonk
+    useEffect(() => {
+        if (!storedPeter) return;
+
+        console.log("storedPeter", storedPeter);
+
+        const hatIdIndex =
+            // @ts-ignore
+            storedPeter.hatId === 0n
+                ? null
+                : allTraitTokenIds.findIndex(
+                    (tokenId) => tokenId === storedPeter.hatId
+                );
+
+        const hairIdIndex =
+            // @ts-ignore
+            storedPeter.hairId === 0n
+                ? null
+                : allTraitTokenIds.findIndex(
+                    (tokenId) => tokenId === storedPeter.hairId
+                );
+
+        const glassesIdIndex =
+            // @ts-ignore
+            storedPeter.glassesId === 0n
+                ? null
+                : allTraitTokenIds.findIndex(
+                    (tokenId) => tokenId === storedPeter.glassesId
+                );
+
+        const handheldIdIndex =
+            // @ts-ignore
+            storedPeter.handheldId === 0n
+                ? null
+                : allTraitTokenIds.findIndex(
+                    (tokenId) => tokenId === storedPeter.handheldId
+                );
+
+        const shirtIdIndex =
+            // @ts-ignore
+            storedPeter.shirtId === 0n
+                ? null
+                : allTraitTokenIds.findIndex(
+                    (tokenId) => tokenId === storedPeter.shirtId
+                );
+
+        const pantsIdIndex =
+            // @ts-ignore
+            storedPeter.pantsId === 0n
+                ? null
+                : allTraitTokenIds.findIndex(
+                    (tokenId) => tokenId === storedPeter.pantsId
+                );
+
+        const shoesIdIndex =
+            // @ts-ignore
+            storedPeter.shoesId === 0n
+                ? null
+                : allTraitTokenIds.findIndex(
+                    (tokenId) => tokenId === storedPeter.shoesId
+                );
+
+        const filteredTraitTokenIds = allTraitTokenIds.filter((tokenId, index) => {
+            return (
+                index !== hatIdIndex &&
+                index !== hairIdIndex &&
+                index !== glassesIdIndex &&
+                index !== handheldIdIndex &&
+                index !== shirtIdIndex &&
+                index !== pantsIdIndex &&
+                index !== shoesIdIndex
+            );
+        });
+
+        // [] means everything is equipped
+        console.log("filteredTraitTokenIds", filteredTraitTokenIds);
+
+        setFilteredTraitTokenIds(filteredTraitTokenIds);
+    }, [allTraitTokenIds, storedPeter]);
 
     return (
 
@@ -38,322 +329,82 @@ export default function ChonkDetails() {
                 <MenuBar />
 
                 <main className="w-full border-t border-gray-300">
+                    {tokenData ? (
+                        <div>
+                            <section className="flex pt-[1.725vw] px-[3.45vw]">
+                                <Link href="/marketplace" className="flex items-center gap-2 mb-4 hover:opacity-70 transition-opacity">
+                                    <span className="text-[1.2vw]">←</span>
+                                    <span className="text-[1.2vw]">Back</span>
+                                </Link>
+                            </section>
 
-                    <section className="flex pt-[1.725vw] px-[3.45vw]">
-                        <Link href="/marketplace" className="flex items-center gap-2 mb-4 hover:opacity-70 transition-opacity">
-                            <span className="text-[1.2vw]">←</span>
-                            <span className="text-[1.2vw]">Back</span>
-                        </Link>
-                    </section>
+                            <section className="flex flex-row gap-[3.45vw] py-[1.725vw] px-[3.45vw]">
+                                <div className="w-2/5">
 
-                    <section className="flex flex-row gap-[3.45vw] py-[1.725vw] px-[3.45vw]">
-                        <div className="w-2/5">
-                           
-                            <img src={`/marka/marka-chonk.svg`} alt={`Chonk ${id}`} className="w-full h-auto" />
-                            
-                            <div className="mt-[1.725vw]  pt-[1.725vw]">
-                                <div 
-                                    className="flex items-center justify-between cursor-pointer"
-                                    onClick={() => setIsTraitsOpen(!isTraitsOpen)}
-                                >
-                                    <h3 className="text-[1.2vw] font-bold">Traits</h3>
-                                    <svg 
-                                        className={`w-4 h-4 transform transition-transform ${isTraitsOpen ? 'rotate-180' : ''}`} 
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
+                                    <img
+                                        src={tokenData.image}
+                                        alt={`Chonk ${id}`}
+                                        className="w-full h-auto"
+                                    />
+
+                                    <TraitsSection
+                                        id={id}
+                                        tokenData={tokenData}
+                                        isOpen={isTraitsOpen}
+                                        onToggle={() => setIsTraitsOpen(!isTraitsOpen)}
+                                    />
+
                                 </div>
+                                <div className="w-3/5">
 
-                                {isTraitsOpen && (
-                                    <div className="mt-[1.725vw] grid grid-cols-2 gap-[1.725vw]">
-                                        {/* Trait Card 1 */}
-                                        <div className="border border-black p-[1.15vw]">
-                                            <div className="text-[0.8vw] text-gray-600">Accessory</div>
-                                            <div className="text-[1.2vw] font-bold mb-2">Green Lightsaber</div>
-                                            <div className="flex justify-between text-[0.8vw] text-gray-600">
-                                                <div>193 (2%)</div>
-                                                <div>0.4 ETH</div>
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Repeat similar cards as needed */}
-                                        <div className="border border-black p-[1.15vw]">
-                                            <div className="text-[0.8vw] text-gray-600">Head</div>
-                                            <div className="text-[1.2vw] font-bold mb-2">Cap Forward</div>
-                                            <div className="flex justify-between text-[0.8vw] text-gray-600">
-                                                <div>245 (3%)</div>
-                                                <div>0.6 ETH</div>
-                                            </div>
-                                        </div>
+                                    <OwnershipSection
+                                        id={id}
+                                        tokenData={tokenData}
+                                        owner={owner}
+                                        address={address}
+                                    />
 
-                                        <div className="border border-black p-[1.15vw]">
-                                            <div className="text-[0.8vw] text-gray-600">Head</div>
-                                            <div className="text-[1.2vw] font-bold mb-2">Cap Forward</div>
-                                            <div className="flex justify-between text-[0.8vw] text-gray-600">
-                                                <div>245 (3%)</div>
-                                                <div>0.6 ETH</div>
-                                            </div>
-                                        </div>
+                                    <PriceAndActionsSection 
+                                        price={10.25}
+                                        priceUSD={23222}
+                                    />
 
-                                        <div className="border border-black p-[1.15vw]">
-                                            <div className="text-[0.8vw] text-gray-600">Head</div>
-                                            <div className="text-[1.2vw] font-bold mb-2">Cap Forward</div>
-                                            <div className="flex justify-between text-[0.8vw] text-gray-600">
-                                                <div>245 (3%)</div>
-                                                <div>0.6 ETH</div>
-                                            </div>
-                                        </div>
+                                    <ActivityAndOffersSection
+                                        isActivityOpen={isActivityOpen}
+                                        setIsActivityOpen={setIsActivityOpen}
+                                        isOffersOpen={isOffersOpen}
+                                        setIsOffersOpen={setIsOffersOpen}
+                                    />
 
-                                        <div className="border border-black p-[1.15vw]">
-                                            <div className="text-[0.8vw] text-gray-600">Head</div>
-                                            <div className="text-[1.2vw] font-bold mb-2">Cap Forward</div>
-                                            <div className="flex justify-between text-[0.8vw] text-gray-600">
-                                                <div>245 (3%)</div>
-                                                <div>0.6 ETH</div>
-                                            </div>
-                                        </div>
-
-                                        <div className="border border-black p-[1.15vw]">
-                                            <div className="text-[0.8vw] text-gray-600">Head</div>
-                                            <div className="text-[1.2vw] font-bold mb-2">Cap Forward</div>
-                                            <div className="flex justify-between text-[0.8vw] text-gray-600">
-                                                <div>245 (3%)</div>
-                                                <div>0.6 ETH</div>
-                                            </div>
-                                        </div>
-
-                                        <div className="border border-black p-[1.15vw]">
-                                            <div className="text-[0.8vw] text-gray-600">Head</div>
-                                            <div className="text-[1.2vw] font-bold mb-2">Cap Forward</div>
-                                            <div className="flex justify-between text-[0.8vw] text-gray-600">
-                                                <div>245 (3%)</div>
-                                                <div>0.6 ETH</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
+                                </div>
+                            </section>
                         </div>
-                        <div className="w-3/5">
-                            <div className="flex justify-between items-center">
-                                <h1 className="text-[2vw] font-bold">Chonk #{id}</h1>
-                                <div className="flex gap-4">
-                                    
-                                    <button  data-tooltip-id="tooltip-refresh" className="border border-black  p-2 hover:opacity-30 transition-opacity">
-                                        <VscRefresh />
-                                    </button>
-                                    <button data-tooltip-id="tooltip-share"  className="border border-black  p-2 hover:opacity-30 transition-opacity">
-                                        <VscShare />
-                                    </button>
-                                   
-                                    <Tooltip 
-                                        id="tooltip-refresh"
-                                        style={{ backgroundColor: "#f2f2f2", color: "#000000" , fontSize: "1vw"}}
-                                        content="Refresh metadata"
-                                        place="top"
-                                    />
-                                     <Tooltip 
-                                        id="tooltip-share"
-                                        style={{ backgroundColor: "#f2f2f2", color: "#000000" , fontSize: "1vw"}}
-                                        content="Share"
-                                        place="top"
-                                    />
-                                </div>
-                            </div>
 
-                            <div className="flex items-center mt-6 mb-8">
-                                <div className="w-12 h-12 rounded-full overflow-hidden">
-                                    <img 
-                                        src="https://placehold.co/600x400" 
-                                        alt="Owner Avatar"
-                                        className="w-full h-full object-cover"
-                                    />
-                                </div>
-                                <div className="ml-4">
-                                    <div className="text-[1vw] text-gray-600">Owned by</div>
-                                    <div className="text-[1.2vw]">0x8xbb....a1e1</div>
-                                </div>
+                    ) : (
+                        <section className="flex pt-[1.725vw] px-[3.45vw]">
+                            <span className="text-[1.2vw]">Loading...</span>
+                        </section>
+                    )}
 
-                                
-                            </div>
-
-                          
-                            <div className="border border-black p-[1.725vw]">
-                                <div className="flex items-center mb-[1.725vw]">
-                                {/* <h3 className="text-[1.2vw] font-bold mb-4 flex items-center">Price Range <FaEthereum className="ml-1 text-[1vw]" /></h3> */}
-                                    <span className="text-[2vw] font-bold mr-1">10.25</span>
-                                    <FaEthereum className="mr-2 text-[2vw]" />
-                                    <span className="text-[1.2vw] text-gray-600">($23,222)</span>
-                                </div>
-                                <div className="flex gap-2">
-                                    <button className="px-4 py-2 bg-[#2F7BA7] text-white text-[1.2vw] hover:opacity-80 transition-opacity">
-                                        Buy Now
-                                    </button>
-                                    <button className="px-4 py-2 border border-black text-[1.2vw] hover:bg-gray-100 transition-colors">
-                                        Make an Offer
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div className="mt-[3.45vw] border border-black p-[1.725vw]">
-                                <div 
-                                    className="flex items-center justify-between cursor-pointer"
-                                    onClick={() => setIsActivityOpen(!isActivityOpen)}
-                                >
-                                    <h3 className="text-[1.2vw] font-bold">Activity</h3>
-                                    <svg 
-                                        className={`w-4 h-4 transform transition-transform ${isActivityOpen ? 'rotate-180' : ''}`} 
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-
-                                {isActivityOpen && (
-                                    <div className="mt-[1.725vw] overflow-x-auto">
-                                        <table className="w-full text-[1vw]">
-                                            <thead>
-                                                <tr className="border-b border-gray-200">
-                                                    <th className="text-left py-2">Event</th>
-                                                    <th className="text-left py-2">Price</th>
-                                                    <th className="text-left py-2">Royalties</th>
-                                                    <th className="text-left py-2">From</th>
-                                                    <th className="text-left py-2">To</th>
-                                                    <th className="text-right py-2">Time</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr className="border-b border-gray-200">
-                                                    <td className="py-2 flex items-center"><IoCartOutline className="mr-2" /> Sale</td>
-                                                    <td className="py-2"><span className="inline-flex items-center whitespace-nowrap">0.4 <FaEthereum className="ml-1 text-[1vw]" /></span></td>
-                                                    <td className="py-2 text-green-500">Paid</td>
-                                                    <td className="py-2">marka.eth</td>
-                                                    <td className="py-2">backseats.eth</td>
-                                                    <td className="py-2 flex items-center justify-end">
-                                                        <Link 
-                                                            href="https://basescan.com" 
-                                                            target="_blank" 
-                                                            rel="noopener noreferrer" 
-                                                            className="flex items-center hover:underline"
-                                                        >
-                                                            3 mins ago <IoExitOutline className="ml-2" />
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr className="border-b border-gray-200">
-                                                    <td className="py-2 flex items-center"><IoBriefcaseOutline className="mr-2" /> Offer</td>
-                                                    <td className="py-2"><span className="inline-flex items-center whitespace-nowrap">0.4 <FaEthereum className="ml-1 text-[1vw]" /></span></td>
-                                                    <td className="py-2">-</td>
-                                                    <td className="py-2">0x9232...2322</td>
-                                                    <td className="py-2">-</td>
-                                                    <td className="py-2 flex items-center justify-end">
-                                                        <Link 
-                                                            href="https://basescan.com" 
-                                                            target="_blank" 
-                                                            rel="noopener noreferrer" 
-                                                            className="flex items-center hover:underline"
-                                                        >
-                                                            3 hours ago <IoExitOutline className="ml-2" />
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                                <tr className="border-b border-gray-200">
-                                                    <td className="py-2 flex items-center"><IoSparklesOutline className="mr-2" /> Mint</td>
-                                                    <td className="py-2"><span className="inline-flex items-center whitespace-nowrap">0.4 <FaEthereum className="ml-1 text-[1vw]" /></span></td>
-                                                    <td className="py-2 text-green-500">Paid</td>
-                                                    <td className="py-2">0x0000...0000</td>
-                                                    <td className="py-2">backseats.eth</td>
-                                                    <td className="py-2 flex items-center justify-end">
-                                                        <Link 
-                                                            href="https://basescan.com" 
-                                                            target="_blank" 
-                                                            rel="noopener noreferrer" 
-                                                            className="flex items-center hover:underline"
-                                                        >
-                                                            3 days ago <IoExitOutline className="ml-2" />
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="mt-[3.45vw] border border-black p-[1.725vw]">
-                                <div 
-                                    className="flex items-center justify-between cursor-pointer"
-                                    onClick={() => setIsOffersOpen(!isOffersOpen)}
-                                >
-                                    <h3 className="text-[1.2vw] font-bold">Offers</h3>
-                                    <svg 
-                                        className={`w-4 h-4 transform transition-transform ${isOffersOpen ? 'rotate-180' : ''}`} 
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </div>
-
-                                {isOffersOpen && (
-                                    <div className="mt-[1.725vw] overflow-x-auto">
-                                        <table className="w-full text-[1vw]">
-                                            <thead>
-                                                <tr className="border-b border-gray-200">
-                                                    <th className="text-left py-2">Price</th>
-                                                    <th className="text-left py-2">By</th>
-                                                    <th className="text-left py-2">Staus</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr className="border-b border-gray-200">
-                                                    <td className="py-2">
-                                                        <span className="inline-flex items-center whitespace-nowrap">0.4 <FaEthereum className="ml-1 text-[1vw]" /></span>
-                                                    </td>
-                                                   
-                                                    <td className="py-2">marka.eth</td>
-                                                    <td className="py-2 text-green-500">Active</td>
-                                                  
-                                                </tr>
-                                                <tr className="border-b border-gray-200">
-                                                    <td className="py-2">
-                                                        <span className="inline-flex items-center whitespace-nowrap">0.34 <FaEthereum className="ml-1 text-[1vw]" /></span></td>
-                                                    <td className="py-2">marka.eth</td>
-                                                    <td className="py-2">Cancelled</td>
-                                                 
-                                                </tr>
-                                                <tr className="border-b border-gray-200">
-                                                    <td className="py-2">
-                                                        <span className="inline-flex items-center whitespace-nowrap">0.3 <FaEthereum className="ml-1 text-[1vw]" /></span>
-                                                    </td>
-                                                    <td className="py-2">marka.eth</td>
-                                                    <td className="py-2">Cancelled</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
-                            </div>
-                               
-                            
-                            {/* <button className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">Action Button</button>
-                            <div className="mt-4">
-                                <p>Chart goes here</p>
-                            </div> */}
-                        </div>
-                    </section>
                 </main>
             </div>
 
-                    
-            
         </>
-        
+
     )
-} 
+}
+
+// @ts-ignore
+export async function getServerSideProps(context) {
+    const { id } = context.params;
+
+    if (!id) {
+        return {
+            notFound: true,
+        };
+    }
+
+    return {
+        props: { id },
+    };
+}
