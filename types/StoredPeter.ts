@@ -1,14 +1,14 @@
 export type StoredPeter = {
-  hatId: BigInt;
+  headId: BigInt;
   hairId: BigInt;
-  glassesId: BigInt;
-  handheldId: BigInt;
-  shirtId: BigInt;
-  pantsId: BigInt;
+  faceId: BigInt;
+  accessoryId: BigInt;
+  topId: BigInt;
+  bottomId: BigInt;
   shoesId: BigInt;
   tokenId: number;
   bodyIndex: BigInt;
   isRevealed: boolean;
   backgroundColor: string;
-  renderZ: boolean;
+  render3D: boolean;
 }

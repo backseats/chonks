@@ -151,49 +151,49 @@ export default function ChonkDetail({ id }: { id: string }) {
       tokenId: parseInt(id),
       hat: {
         tokenId:
-          storedPeter.hatId === 0n ? 0 : parseInt(storedPeter.hatId.toString()),
-        category: Category.Hat,
-        isEquipped: storedPeter.hatId !== 0n,
+          storedPeter.headId === 0n ? 0 : parseInt(storedPeter.headId.toString()),
+        category: Category.Head,
+        isEquipped: storedPeter.headId !== 0n,
       },
       hair: {
         tokenId:
           storedPeter.hairId === 0n
             ? 0
             : parseInt(storedPeter.hairId.toString()),
-        category: Category.Shirt,
+        category: Category.Top,
         isEquipped: storedPeter.hairId !== 0n,
       },
       glasses: {
         tokenId:
-          storedPeter.glassesId === 0n
+          storedPeter.faceId === 0n
             ? 0
-            : parseInt(storedPeter.glassesId.toString()),
-        category: Category.Glasses,
-        isEquipped: storedPeter.glassesId !== 0n,
+            : parseInt(storedPeter.faceId.toString()),
+        category: Category.Face,
+        isEquipped: storedPeter.faceId !== 0n,
       },
       handheld: {
         tokenId:
-          storedPeter.handheldId === 0n
+          storedPeter.accessoryId === 0n
             ? 0
-            : parseInt(storedPeter.handheldId.toString()),
-        category: Category.Handheld,
-        isEquipped: storedPeter.handheldId !== 0n,
+            : parseInt(storedPeter.accessoryId.toString()),
+        category: Category.Accessory,
+        isEquipped: storedPeter.accessoryId !== 0n,
       },
       shirt: {
         tokenId:
-          storedPeter.shirtId === 0n
+          storedPeter.topId === 0n
             ? 0
-            : parseInt(storedPeter.shirtId.toString()),
-        category: Category.Shirt,
-        isEquipped: storedPeter.shirtId !== 0n,
+            : parseInt(storedPeter.topId.toString()),
+        category: Category.Top,
+        isEquipped: storedPeter.topId !== 0n,
       },
       pants: {
         tokenId:
-          storedPeter.pantsId === 0n
+          storedPeter.bottomId === 0n
             ? 0
-            : parseInt(storedPeter.pantsId.toString()),
-        category: Category.Pants,
-        isEquipped: storedPeter.pantsId !== 0n,
+            : parseInt(storedPeter.bottomId.toString()),
+        category: Category.Bottom,
+        isEquipped: storedPeter.bottomId !== 0n,
       },
       shoes: {
         tokenId:
@@ -239,10 +239,10 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     const hatIdIndex =
       // @ts-ignore
-      storedPeter.hatId === 0n
+      storedPeter.headId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedPeter.hatId
+            (tokenId) => tokenId === storedPeter.headId
           );
 
     const hairIdIndex =
@@ -255,34 +255,34 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     const glassesIdIndex =
       // @ts-ignore
-      storedPeter.glassesId === 0n
+      storedPeter.faceId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedPeter.glassesId
+            (tokenId) => tokenId === storedPeter.faceId
           );
 
     const handheldIdIndex =
       // @ts-ignore
-      storedPeter.handheldId === 0n
+      storedPeter.accessoryId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedPeter.handheldId
+            (tokenId) => tokenId === storedPeter.accessoryId
           );
 
     const shirtIdIndex =
       // @ts-ignore
-      storedPeter.shirtId === 0n
+      storedPeter.topId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedPeter.shirtId
+            (tokenId) => tokenId === storedPeter.topId
           );
 
     const pantsIdIndex =
       // @ts-ignore
-      storedPeter.pantsId === 0n
+      storedPeter.bottomId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedPeter.pantsId
+            (tokenId) => tokenId === storedPeter.bottomId
           );
 
     const shoesIdIndex =

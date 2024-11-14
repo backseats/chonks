@@ -6,6 +6,9 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/dist/ScrollTrigger';
 import SplitType from 'split-type';
 import Chonk3d from '../components/home/Chonk3d';
+import Footer from '../components/layout/Footer';
+import LFC from '../components/layout/LFC';
+import Team from '../components/home/Team';
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -714,50 +717,7 @@ export default function Home() {
             ***************************************************
             */}
 
-            <section id="team" className={`ourTeam border-l border-r flex flex-col justify-center items-center bg-[#0D6E9D] text-white py-[13.8vw]`}>
-
-              <h2 className="font-source-code-pro text-[6vw] font-weight-600 mx-[6.9vw] mb-[3.45vw]  ">
-                Our Team
-              </h2>
-              {/* <p className="font-source-code-pro font-weight-600 mx-[3.45vw] ">
-                2 passionate builders, no bullsh*t.
-              </p> */}
-
-              <div className='flex flex-col sm:flex-row w-full  justify-center items-center'>
-                <div className={`sm:w-1/2 px-[3.45vw] py-[3.45vw] flex flex-col items-center`}>
-                  <a href="https://twitter.com/backseats_eth" target="_blank" rel="noopener noreferrer" className="block">
-                    <div className="w-[50vw] h-[50vw] sm:w-[30vw] sm:h-[30vw] bg-gray-200 border border-white-300 hover:bg-gray-600 transition-colors duration-300 flex items-center justify-center overflow-hidden">
-                      <Image
-                        src="/backseats/backseats-transparent-chonk.svg"
-                        alt="backseats"
-                        width={3000}
-                        height={3000}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  </a>
-                  <p className="mt-4"><a className="hover:underline" href="https://twitter.com/backseats_eth" target="_blank" rel="noopener noreferrer">backseats</a></p>
-                </div>
-                <div className={`sm:w-1/2 px-[3.45vw] py-[6.9vw] flex flex-col items-center`}>
-                  <a href="https://twitter.com/marka_eth" target="_blank" rel="noopener noreferrer" className="block">
-                    <div className="w-[50vw] h-[50vw] sm:w-[30vw] sm:h-[30vw] bg-gray-200 border border-white-300 hover:bg-gray-600  transition-colors duration-300 flex items-center justify-center overflow-hidden">
-                      <Image
-                        src="/marka/marka-transparent-chonk.svg"
-                        alt="marka"
-                        width={3000}
-                        height={3000}
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  </a>
-                  <p className="mt-4"><a className="hover:underline" href="https://twitter.com/marka_eth" target="_blank" rel="noopener noreferrer">marka</a></p>
-                </div>
-              </div>
-
-              <p className="font-source-code-pro text-[2.5vw] md:text-[1.5vw] font-weight-600 mx-[3.45vw] ">
-                A special thank you <a href="https://twitter.com/theharveydean" target="_blank" rel="noopener noreferrer" className="underline">Dean Harvey</a>, who designed the original Chonk and many of the Season 1 Traits. Thank you to <a href="https://x.com/NaimePakniyat" target="_blank" rel="noopener noreferrer" className="underline">Naime</a> and <a href="https://x.com/nahidpakniyat" target="_blank" rel="noopener noreferrer" className="underline">Nahid</a>, who helped with additional Season 1 Traits.
-              </p>
-            </section>
+            <Team />
 
             
 
@@ -785,56 +745,10 @@ export default function Home() {
             </div> 
           {/* end of edges */}
 
-
-          <section className="bg-black text-white overflow-hidden">
-            <div className="marquee-wrapper relative flex whitespace-nowrap my-[3.45vw]">
-              <div className="marquee-text inline-flex">
-                <span className="font-source-code-pro text-[12vw] font-weight-600 mx-[1.725vw]">
-                  LET&apos;S F*CKING CHONK! &nbsp;
-                </span>
-                <span className="font-source-code-pro text-[12vw] font-weight-600 mx-[1.725vw]">
-                  LET&apos;S F*CKING CHONK! &nbsp;
-                </span>
-              </div>
-            </div>
-          </section>
+          <LFC />
         </main>
 
-
-         {/* <div className="marquee-text flex whitespace-nowrap my-[3.45vw]">
-                <span className="font-source-code-pro text-[12vw] font-weight-600 mx-[1.725vw] block">
-                LET&apos;S F*CKING CHONK!
-                </span>
-                
-              </div> */}
-
-        {/* 
-          ***************************************************
-          ********************** FOOTER *********************
-          ***************************************************
-        */}
-
-        <footer className={`w-full flex flex-col sm:flex-row justify-between px-[3.45vw] py-[3.45vw] border-t text-[2vw] md:text-[1vw] bg-white`}>
-          <div className="text-left mb-2 sm:mb-0 flex items-start">
-            <a href="#home" onClick={(e) => scrollToSection(e, '#top')} className="hover:opacity-70 transition-opacity">
-              <Image
-                src="/chonks-head-outline.svg"
-                alt="Chonks Head"
-                width={48}
-                height={48}
-                className="h-12 md:h-12 w-auto"
-              />
-            </a>
-            <span className="ml-[3.45vw] md:ml-[1.725vw]">
-              Chonks are cc0. <br />
-              We&apos;ll have some terms in here... eventually.
-            </span>
-          </div>
-          <div className="text-center sm:text-right my-[3.45vw] md:my-0">
-          <a href="https://x.com/chonksxyz" target="_blank" rel="noopener noreferrer" className="hover:underline">Follow us on X - do it!</a>
-          </div>
-        </footer>
-
+        <Footer scrollToSection={scrollToSection} />
       </div>
 
       <div className="fixed inset-0 z-[-1]">

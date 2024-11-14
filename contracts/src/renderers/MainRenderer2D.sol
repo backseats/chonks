@@ -103,7 +103,7 @@ contract MainRenderer2D {
                 fullAttributes,
                 ',', generateChonkdata(_chonkdata),
                 ',', image,
-                // ',', animationURL, // comment out for qa collection
+                ',', animationURL, // comment out for qa collection
             '}'
         );
 

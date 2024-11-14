@@ -12,7 +12,7 @@ import { createPublicClient } from 'viem'
 // });
 
 export const config = createConfig({
-  chains: [base, baseSepolia],
+  chains: [baseSepolia, base],
   transports: {
     [base.id]: http(),
     [baseSepolia.id]: http(),

@@ -1,9 +1,9 @@
 export enum Category {
-  Hat = "Hat",
+  Head = "Head",
   Hair = "Hair",
-  Glasses = "Glasses",
-  Handheld = "Handheld",
-  Shirt = "Shirt",
-  Pants = "Pants",
+  Face = "Face",
+  Accessory = "Accessory",
+  Top = "Top",
+  Bottom = "Bottom",
   Shoes = "Shoes",
 }

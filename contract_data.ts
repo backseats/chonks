@@ -1,8 +1,9 @@
 import mainAbiImport from './contracts/out/PetersMain.sol/PetersMain.json'
 import traitsAbiImport from './contracts/out/PeterTraits.sol/PeterTraits.json'
 
-export const mainContract = "0x2d0a8a6ac37bf95cd728b2d79e6a9f190efb4b95";
-export const traitsContract = "0x4e167e431123f17154b974a5e442e2a39d776396";
+export const mainContract = "0x7a2155d0e80CBd309442e65edeCA34171C32f5c6";
+export const traitsContract = "0x780364Fc073D41246E559305d03bED31ca6DF106";
+export const marketplaceContract = "0xdD31162d512c55deaf5Dd20CB7C7fD4aafE731C3";
 
 export const mainABI = mainAbiImport.abi;
 export const traitsABI = traitsAbiImport.abi;
