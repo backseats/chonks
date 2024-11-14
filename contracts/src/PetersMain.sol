@@ -125,13 +125,17 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
         if (_localDeploy) {
-            for (uint i; i < 1; ++i) {
+            for (uint i; i < 10; ++i) {
                 mint(4); // Mints N bodies/tokens
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
+                // setTokenRender3D(i, true);
             }
             setBackgroundColor(1, "ffffff");
-            // setTokenRenderZ(1, true);
+            setTokenRender3D(1, true);
+            setTokenRender3D(2, true);
+            setTokenRender3D(3, true);
+            setTokenRender3D(4, true);
         }
     }
 
