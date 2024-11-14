@@ -312,7 +312,12 @@ export default function ChonkDetail({ id }: { id: string }) {
         <>
             <Head>
                 <title>Chonk #{id} - Marketplace - Chonks</title>
-                <meta name="description" content="Welcome to my homepage" />
+                <meta name="description" content="View Chonk #${id} on the Chonks marketplace" />
+                <meta property="og:title" content={`Chonk #${id} - Marketplace - Chonks`} />
+                <meta property="og:description" content={`View Chonk #${id} on the Chonks marketplace`} />
+                {tokenData && <meta property="og:image" content={tokenData.image} />}
+                <meta property="og:url" content={`https://chonks.xyz/marketplace/chonk/${id}`} />
+                <meta property="og:type" content="website" />
                 <meta
                     name="viewport"
                     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
