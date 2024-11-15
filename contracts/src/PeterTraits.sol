@@ -327,10 +327,13 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     function walletOfOwner(address _owner) public view returns(uint256[] memory) {
+
+        console.log("balanceOf(_owner)", balanceOf(_owner));
         uint256 tokenCount = balanceOf(_owner);
 
         uint256[] memory tokensId = new uint256[](tokenCount);
         for(uint256 i; i < tokenCount; ++i){
+            console.log("tokenOfOwnerByIndex(_owner, i)", tokenOfOwnerByIndex(_owner, i));
             tokensId[i] = tokenOfOwnerByIndex(_owner, i);
         }
 
@@ -408,9 +411,11 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     // Remove an active ChonkOffer if Chonk token ID because owned Traits changed
-    function _afterTokenTransfer(address, address, uint256 _traitTokenId) internal override(ERC721) {
+    function _afterTokenTransfer(address from , address, uint256 _traitTokenId) internal override(ERC721) {
         if (address(petersMain) == address(0)) revert SetPetersMainAddress();
         if (address(marketplace) == address(0)) revert SetMarketplaceAddress();
+
+        if(from == address(0)) return;
 
         address tba = ownerOf(_traitTokenId);
         uint256 chonkId = petersMain.tbaAddressToTokenId(tba);

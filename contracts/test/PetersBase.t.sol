@@ -14,6 +14,8 @@ import { Test, console } from 'forge-std/Test.sol';
 
 contract PetersBaseTest is Test {
 
+     address public constant TREASURY = address(0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D);
+
     PetersMain public main;
     PeterTraits public traits;
     FirstSeasonRenderMinter public dataContract;
@@ -48,7 +50,7 @@ contract PetersBaseTest is Test {
             address(main),
             address(traits),
             250, // fee basis points
-            address(deployer)
+            TREASURY
         );
 
         // main.setMarketplace(address(market));

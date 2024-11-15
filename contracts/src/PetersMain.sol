@@ -372,6 +372,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function getTraitTokens(address _tbaAddress) public view returns (uint256[] memory) {
         uint256[] memory traitTokens = traitsContract.walletOfOwner(_tbaAddress);
 
+        console.log("traitTokens[0]", traitTokens[0]);
+
         return traitTokens;
     }
 
