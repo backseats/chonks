@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { useReadContract, useWriteContract } from "wagmi";
-// import { decodeAndSetData } from "@/pages/chonk/[id]";
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+
 import {
   mainContract,
   mainABI,
@@ -125,25 +125,4 @@ export function useEquipFunction(chonkId: string, traitTokenId: string, traitTyp
   }, [writeContract, functionNameString, chonkId]);
 
   return { equip, unequip };
-}
-
-export function useMintFunction() {
-  const { writeContract, isPending } = useWriteContract();
-
-  const mint = async (amount: number = 1) => {
-    try {
-      await writeContract({
-        address: mainContract,
-        abi: mainABI,
-        functionName: 'mint',
-        args: [amount],
-        chainId: baseSepolia.id,
-      });
-    } catch (error) {
-      console.error("Error minting:", error);
-      throw error;
-    }
-  };
-
-  return { mint, isPending };
 }

@@ -8,6 +8,10 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        'chonk-blue': '#2F7BA7',
+        'chonk-orange': '#efb15e',
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

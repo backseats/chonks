@@ -2,11 +2,11 @@ import Link from 'next/link';
 
 interface ListingsProps {
     isSidebarVisible: boolean;
-    setSelectedChonk: (chonk: number) => void;
-    setIsModalOpen: (isOpen: boolean) => void;
+    // setSelectedChonk: (chonk: number) => void;
+    // setIsModalOpen: (isOpen: boolean) => void;
 }
 
-export default function Listings({ isSidebarVisible, setSelectedChonk, setIsModalOpen }: ListingsProps) {
+export default function Listings({ isSidebarVisible }: ListingsProps) {
     return (
         <div className={`${isSidebarVisible ? 'w-3/4' : 'w-full'} `}>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
@@ -28,8 +28,8 @@ export default function Listings({ isSidebarVisible, setSelectedChonk, setIsModa
                                 className="w-full text-[1vw] border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
                                 onClick={(e) => {
                                     e.preventDefault(); // Prevent link navigation
-                                    setSelectedChonk(index + 1);
-                                    setIsModalOpen(true);
+                                    // setSelectedChonk(index + 1);
+                                    // setIsModalOpen(true);
                                 }}
                             >
                                 Buy Now

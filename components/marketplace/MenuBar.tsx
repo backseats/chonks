@@ -33,7 +33,7 @@ export default function MenuBar(props: Props) {
           Home
         </Link>
 
-       
+
         <Link href="/marketplace" className="hover:opacity-70 transition-opacity underline">
           Marketplace
         </Link>
@@ -42,9 +42,31 @@ export default function MenuBar(props: Props) {
           Studio
         </Link>
 
+        <div> | </div>
+
+        <Link href="/mint-harvey" className="hover:opacity-70 transition-opacity">
+          Mint
+        </Link>
+
       </div>
 
-      <ConnectKitButton />
+      <ConnectKitButton
+        // theme="web"
+        customTheme={{
+          "--ck-font-family": "'Source Code Pro', monospace",
+          "--ck-primary-button-background": "#FFFFFF",
+          "--ck-primary-button-hover-background": "#2F7BA7",
+          "--ck-primary-button-hover-color": "#FFFFFF",
+          "--ck-primary-button-border-radius": "0px",
+          "--ck-primary-button-font-weight": "600",
+          "--ck-connectbutton-background": "#FFFFFF",
+          "--ck-connectbutton-hover-background": "#2F7BA7",
+          "--ck-connectbutton-hover-color": "#FFFFFF",
+          "--ck-connectbutton-border-radius": "0px",
+          "--ck-connectbutton-color": "#000000",
+          "--ck-connectbutton-font-weight": "600",
+        }}
+      />
 
       {/* <button
           disabled
