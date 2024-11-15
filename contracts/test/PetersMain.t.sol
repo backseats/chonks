@@ -31,6 +31,8 @@ contract PetersMainTest is PetersBaseTest {
 
     // Basic Contract Setup Tests
     function test_constructor() public {
+
+        console.log('test_constructor called');
         // Create new instance without local deploy
         PetersMain newMain = new PetersMain(false);
 
