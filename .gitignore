@@ -15,6 +15,7 @@
 /out/*
 !/out/PetersMain.sol/
 !/out/PeterTraits.sol/
+!/out/ChonksMarket.sol/
 
 # production
 /build
