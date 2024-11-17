@@ -22,6 +22,7 @@ import TraitsSection from '@/components/marketplace/TraitsSection';
 import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
 import PriceAndActionsSection from '@/components/marketplace/PriceAndActionsSection';
 import { formatEther } from "viem";
+import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 
 type CurrentChonk = {
     tokenId: number;
@@ -111,7 +112,10 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
 
-    //get Chonk Offers
+    const { hasActiveBid, chonkBid } = useMarketplaceActions(parseInt(id));
+
+    //get Chonk Offers - accessing the offers directly from mapping
+    // but we now have : getChonkOffer
     const { data: chonkOfferArray } = useReadContract({
         address: marketplaceContract,
         abi: marketplaceABI,
@@ -480,6 +484,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                                                 canAcceptOffer={canAcceptOffer}
                                                 isOwner={isOwner}
                                                 hasActiveOffer={hasActiveOffer}
+                                                hasActiveBid={hasActiveBid}
+                                                chonkBid={chonkBid}
                                             />
 
                                     <ActivityAndOffersSection
