@@ -147,10 +147,10 @@ contract ChonksMarketTest is PetersBaseTest {
         (
             uint256 offerPrice,
             address seller,
-            address,
-            address,
-            uint256[] memory,
-            bytes memory
+            address sellerTBA,
+            address onlySellTo,
+            uint256[] memory traitIds,
+            bytes memory encodedTraitIds
         ) = market.getChonkOffer(chonkId);
 
         assertEq(offerPrice, price);
@@ -173,35 +173,35 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
     }
 
-    function test_revokePausablity() public() {
+    function test_revokePausablity() public {
         assertEq(market.pausabilityRevoked(), false);
         vm.prank(deployer);
-        market.revokePausability(true);
+        market.revokePausability();
         assertEq(market.pausabilityRevoked(), true);
     }
 
-    function test_revokePausablityAuthorization() public() {
+    function test_revokePausablityAuthorization() public {
         assertEq(market.pausabilityRevoked(), false);
         vm.prank(address(1));
         vm.expectRevert(Unauthorized.selector);
-        market.revokePausability(true);
+        market.revokePausability();
     }
 
-    function test_revokePausablityAgain() public() {
+    function test_revokePausablityAgain() public {
         assertEq(market.pausabilityRevoked(), false);
         vm.prank(deployer);
-        market.revokePausability(true);
+        market.revokePausability();
         assertEq(market.pausabilityRevoked(), true);
         vm.prank(deployer);
         vm.expectRevert(PausabilityRevoked.selector);
-        market.revokePausability(true);
+        market.revokePausability();
     }
 
-    function test_cantPauseAfterPauseRevoked() public() {
+    function test_cantPauseAfterPauseRevoked() public {
         assertEq(market.paused(), false);
         assertEq(market.pausabilityRevoked(), false);
         vm.prank(deployer);
-        market.revokePausability(true);
+        market.revokePausability();
         assertEq(market.pausabilityRevoked(), true);
         vm.prank(deployer);
         vm.expectRevert(PausabilityRevoked.selector);
@@ -229,30 +229,30 @@ contract ChonksMarketTest is PetersBaseTest {
     }
 
     function test_setRoyalties() public {
-        assertEq(market.royaltyPercentage, 250);
+        assertEq(market.royaltyPercentage(), 250);
         vm.prank(deployer);
-        vm.setRoyaltyPercentage(200);
-        assertEq(market.royaltyPercentage, 200);
+        market.setRoyaltyPercentage(200);
+        assertEq(market.royaltyPercentage(), 200);
     }
 
     function test_setRoyaltiesAgain() public {
-        assertEq(market.royaltyPercentage, 250);
+        assertEq(market.royaltyPercentage(), 250);
 
         vm.prank(deployer);
-        vm.setRoyaltyPercentage(200);
-        assertEq(market.royaltyPercentage, 200);
+        market.setRoyaltyPercentage(200);
+        assertEq(market.royaltyPercentage(), 200);
 
         vm.prank(deployer);
-        vm.setRoyaltyPercentage(250);
-        assertEq(market.royaltyPercentage, 250);
+        market.setRoyaltyPercentage(250);
+        assertEq(market.royaltyPercentage(), 250);
     }
 
     function test_setRoyaltiesUnauthorized() public {
-        assertEq(market.royaltyPercentage, 250);
+        assertEq(market.royaltyPercentage(), 250);
         vm.prank(address(2));
         vm.expectRevert(Unauthorized.selector);
-        vm.setRoyaltyPercentage(0);
-        assertEq(market.royaltyPercentage, 250);
+        market.setRoyaltyPercentage(0);
+        assertEq(market.royaltyPercentage(), 250);
     }
 
     function test_offerChonk() public {
@@ -300,7 +300,7 @@ contract ChonksMarketTest is PetersBaseTest {
         // Create offer
         vm.startPrank(address(2));
             vm.expectRevert(CantBeZero.selector);
-            market.offerChonkToAddress(1, 0);
+            market.offerChonkToAddress(1, 0, address(3));
         vm.stopPrank();
 
     }
