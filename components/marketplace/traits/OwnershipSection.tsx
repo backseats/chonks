@@ -12,12 +12,13 @@ interface Props {
   tokenData: Trait | null;
   owner: Address | string | null;
   tbaOwner: Address | string | null;
-  tokenIdOfTBA: number;
+  tokenIdOfTBA: string | null;
   address: Address | undefined;
+  isEquipped: boolean | undefined;
 }
 
 export default function OwnershipSection(props: Props) {
-  const { id, tokenData, owner, tbaOwner, tokenIdOfTBA, address } = props;
+  const { id, tokenData, owner, tbaOwner, tokenIdOfTBA, address, isEquipped } = props;
 
   // Add ENS resolution
   const { data: ensName } = useEnsName({
@@ -58,7 +59,7 @@ export default function OwnershipSection(props: Props) {
               {" "}(Owned by: {address && address === tbaOwner
                 ? "You"
                 : ensName || truncateEthAddress(tbaOwner as Address)}
-              )
+              , {isEquipped ? 'Equipped' : 'Unequipped'})
               </Link>
             </div>
           </div>

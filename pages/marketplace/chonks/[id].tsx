@@ -20,7 +20,7 @@ import { Category } from "@/types/Category";
 import OwnershipSection from "@/components/marketplace/chonks/OwnershipSection";
 import TraitsSection from '@/components/marketplace/TraitsSection';
 import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
-import PriceAndActionsSection from '@/components/marketplace/PriceAndActionsSection';
+import PriceAndActionsSection from '@/components/marketplace/chonks/PriceAndActionsSection';
 import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { CurrentChonk } from "@/types/CurrentChonk";

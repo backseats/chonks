@@ -21,17 +21,16 @@ import { Category } from "@/types/Category";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from '@/components/marketplace/TraitsSection';
 import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
-import PriceAndActionsSection from '@/components/marketplace/PriceAndActionsSection';
+import PriceAndActionsSection from '@/components/marketplace/traits/PriceAndActionsSection';
 import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 
 
-type ChonkOffer = {
+type TraitOffer = {
     priceInWei: bigint;
     seller: string;
     sellerTBA: string;
     onlySellTo: string;
-    encodedTraitIds: string;
 }
 
 export function decodeAndSetData(data: string, setData: (data: Trait) => void) {
@@ -62,7 +61,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         chainId: baseSepolia.id,
     });
 
-    const [tokenData, setTokenData] = useState<Chonk | null>(null);
+    const [tokenData, setTokenData] = useState<Trait | null>(null);
     const [filteredTraitTokenIds, setFilteredTraitTokenIds] = useState<BigInt[]>(
         []
     );
@@ -71,58 +70,57 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     const { hasActiveBid, chonkBid } = useMarketplaceActions(parseInt(id));
 
-    //get Chonk Offers - accessing the offers directly from mapping
-    // but we now have : getChonkOffer
-    const { data: chonkOfferArray } = useReadContract({
+    //get Trait Offers - accessing the offers directly from mapping
+    // but we now have : getTraitOffer
+    const { data: traitOfferArray } = useReadContract({
         address: marketplaceContract,
         abi: marketplaceABI,
-        functionName: "chonkOffers",
+        functionName: "traitOffers",
         args: [BigInt(id)],
         chainId: baseSepolia.id,
     }) as { data: [bigint, string, string, string, string] };
 
     // Convert array to object
-    const chonkOffer: ChonkOffer | null = useMemo(() => {
-        if (!chonkOfferArray) return null;
+    const traitOffer: TraitOffer | null = useMemo(() => {
+        if (!traitOfferArray) return null;
         return {
-            priceInWei: chonkOfferArray[0],
-            seller: chonkOfferArray[1],
-            sellerTBA: chonkOfferArray[2],
-            onlySellTo: chonkOfferArray[3],
-            encodedTraitIds: chonkOfferArray[4],
+            priceInWei: traitOfferArray[0],
+            seller: traitOfferArray[1],
+            sellerTBA: traitOfferArray[2],
+            onlySellTo: traitOfferArray[3],
         };
-    }, [chonkOfferArray]);
+    }, [traitOfferArray]);
 
     // Add this console log to see the raw response
     useEffect(() => {
         console.group("Raw Response");
-        console.log("Raw chonkOffer:", chonkOffer);
-        if (Array.isArray(chonkOffer)) {
-            console.log("Is array, length:", chonkOffer.length);
-            chonkOffer.forEach((item, index) => {
+        console.log("Raw traitOffer:", traitOffer);
+        if (Array.isArray(traitOffer)) {
+            console.log("Is array, length:", traitOffer.length);
+            traitOffer.forEach((item, index) => {
                 console.log(`Item ${index}:`, item);
             });
         } else {
-            console.log("Is not array, type:", typeof chonkOffer);
+            console.log("Is not array, type:", typeof traitOffer);
         }
         console.groupEnd();
-    }, [chonkOffer]);
+    }, [traitOffer]);
 
     const formattedPrice = useMemo(() => {
-        if (!chonkOffer?.priceInWei) return null;
-        console.log("Price in Wei before formatting:", chonkOffer.priceInWei);
-        return parseFloat(formatEther(chonkOffer.priceInWei));
-    }, [chonkOffer]);
+        if (!traitOffer?.priceInWei) return null;
+        console.log("Price in Wei before formatting:", traitOffer.priceInWei);
+        return parseFloat(formatEther(traitOffer.priceInWei));
+    }, [traitOffer]);
 
     const isOfferSpecific = useMemo(() => {
-        if (!chonkOffer?.onlySellTo) return false;
-        return chonkOffer.onlySellTo !== "0x0000000000000000000000000000000000000000";
-    }, [chonkOffer]);
+        if (!traitOffer?.onlySellTo) return false;
+        return traitOffer.onlySellTo !== "0x0000000000000000000000000000000000000000";
+    }, [traitOffer]);
 
     const canAcceptOffer = useMemo(() => {
-        if (!chonkOffer?.onlySellTo || !address || !isOfferSpecific) return false;
-        return chonkOffer.onlySellTo.toLowerCase() === address.toLowerCase();
-    }, [chonkOffer, address, isOfferSpecific]);
+        if (!traitOffer?.onlySellTo || !address || !isOfferSpecific) return false;
+        return traitOffer.onlySellTo.toLowerCase() === address.toLowerCase();
+    }, [traitOffer, address, isOfferSpecific]);
 
     // Get main body tokenURI
     const { data: tokenURIData } = useReadContract({
@@ -133,35 +131,74 @@ export default function ChonkDetail({ id }: { id: string }) {
         chainId: baseSepolia.id,
     }) as { data: string };
 
-    const { data: owner } = useReadContract({
-        address: traitsContract,
-        abi: traitsABI,
-        functionName: "ownerOf",
+    // const { data: owner } = useReadContract({
+    //     address: traitsContract,
+    //     abi: traitsABI,
+    //     functionName: "ownerOf",
+    //     args: [BigInt(id)],
+    //     chainId: baseSepolia.id,
+    // }) as { data: string };
+
+    // // Add this new query to get the tokenId from the TBA address
+    // const { data: tokenIdOfTBA } = useReadContract({
+    //     address: mainContract,
+    //     abi: mainABI,
+    //     functionName: "tbaAddressToTokenId",
+    //     args: [owner],
+    //     chainId: baseSepolia.id,
+    // }) as { data: bigint };
+
+    // const { data: ownerOfTraitOwner } = useReadContract({
+    //     address: mainContract,
+    //     abi: mainABI,
+    //     functionName: "ownerOf",
+    //     args: [tokenIdOfTBA ? BigInt(tokenIdOfTBA) : undefined],
+    //     chainId: baseSepolia.id,
+    // }) as { data: string };
+
+    // console.log("owner (TBA address)", owner);
+    // console.log("tokenId of owning Chonk", tokenIdOfTBA?.toString());
+    // console.log("owner of trait owner", ownerOfTraitOwner);
+
+
+    //getFullPictureForTrait
+    const { data: fullPictureForTrait } = useReadContract({
+        address: mainContract,
+        abi: mainABI,
+        functionName: "getFullPictureForTrait",
         args: [BigInt(id)],
         chainId: baseSepolia.id,
-    }) as { data: string };
+    }) as { data: [string, bigint, string] };
 
-    // Add this new query to get the tokenId from the TBA address
-    const { data: tokenIdOfTBA } = useReadContract({
+    
+    
+    const [owner, tokenIdOfTBA, ownerOfTraitOwner] = fullPictureForTrait || [];
+
+    console.log("traitOwnerTBA", owner);
+    console.log("chonkTokenId", tokenIdOfTBA?.toString());
+    console.log("chonkOwner", ownerOfTraitOwner);
+
+
+    // function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
+    //     IPeterStorage.StoredPeter memory storedPeter = getPeter(_chonkId);
+    //     return storedPeter.headId == _traitId ||
+    //         storedPeter.hairId == _traitId ||
+    //         storedPeter.faceId == _traitId ||
+    //         storedPeter.accessoryId == _traitId ||
+    //         storedPeter.topId == _traitId ||
+    //         storedPeter.bottomId == _traitId ||
+    //         storedPeter.shoesId == _traitId;
+    // }
+
+    const { data: isEquipped } = useReadContract({
         address: mainContract,
         abi: mainABI,
-        functionName: "tbaAddressToTokenId",
-        args: [owner],
+        functionName: "checkIfTraitIsEquipped",
+        args: [tokenIdOfTBA, BigInt(id)],
         chainId: baseSepolia.id,
-    }) as { data: bigint };
+    }) as { data: boolean };
 
-    const { data: ownerOfTraitOwner } = useReadContract({
-        address: mainContract,
-        abi: mainABI,
-        functionName: "ownerOf",
-        args: [tokenIdOfTBA ? BigInt(tokenIdOfTBA) : undefined],
-        chainId: baseSepolia.id,
-    }) as { data: string };
-
-    console.log("owner (TBA address)", owner);
-    console.log("tokenId of owning Chonk", tokenIdOfTBA?.toString());
-    console.log("owner of trait owner", ownerOfTraitOwner);
-
+   
     useEffect(() => {
         if (tokenURIData) {
             decodeAndSetData(tokenURIData, setTokenData);
@@ -193,37 +230,36 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     // Add these console logs
     useEffect(() => {
-        console.log("Raw contract response:", chonkOffer);
-        if (chonkOffer) {
+        console.log("Raw contract response:", traitOffer);
+        if (traitOffer) {
             try {
                 // Log each property individually
                 console.group("Chonk Offer Details");
-                if (chonkOffer.priceInWei) {
-                    console.log("Price in Wei:", chonkOffer.priceInWei.toString());
+                if (traitOffer.priceInWei) {
+                    console.log("Price in Wei:", traitOffer.priceInWei.toString());
                 } else {
                     console.log("Price in Wei: undefined");
                 }
-                console.log("Seller:", chonkOffer.seller || "undefined");
-                console.log("Seller TBA:", chonkOffer.sellerTBA || "undefined");
-                console.log("Only sell to:", chonkOffer.onlySellTo || "undefined");
-                console.log("Encoded trait IDs:", chonkOffer.encodedTraitIds || "undefined");
+                console.log("Seller:", traitOffer.seller || "undefined");
+                console.log("Seller TBA:", traitOffer.sellerTBA || "undefined");
+                console.log("Only sell to:", traitOffer.onlySellTo || "undefined");
                 console.groupEnd();
 
                 if (address) {
                     console.group("Wallet Info");
                     console.log("Connected wallet:", address);
-                    console.log("Can accept offer:", chonkOffer.onlySellTo?.toLowerCase() === address.toLowerCase());
+                    console.log("Can accept offer:", traitOffer.onlySellTo?.toLowerCase() === address.toLowerCase());
                     console.groupEnd();
                 }
             } catch (error) {
-                console.error("Error accessing chonkOffer properties:", error);
-                console.log("chonkOffer type:", typeof chonkOffer);
-                console.log("chonkOffer keys:", Object.keys(chonkOffer));
+                console.error("Error accessing traitOffer properties:", error);
+                console.log("traitOffer type:", typeof traitOffer);
+                console.log("traitOffer keys:", Object.keys(traitOffer));
             }
         } else {
             console.log("No offer found for this Chonk");
         }
-    }, [chonkOffer, address]);
+    }, [traitOffer, address]);
 
     const isOwner = useMemo(() => {
         if (!owner || !address) return false;
@@ -231,8 +267,8 @@ export default function ChonkDetail({ id }: { id: string }) {
     }, [owner, address]);
 
     const hasActiveOffer = useMemo(() => {
-        return Boolean(chonkOffer && chonkOffer.priceInWei > 0n);
-    }, [chonkOffer]);
+        return Boolean(traitOffer && traitOffer.priceInWei > 0n);
+    }, [traitOffer]);
 
     return (
 
@@ -296,21 +332,25 @@ export default function ChonkDetail({ id }: { id: string }) {
                                         tokenData={tokenData}
                                         owner={owner}
                                         tbaOwner={ownerOfTraitOwner}
-                                        tokenIdOfTBA={tokenIdOfTBA}
+                                        tokenIdOfTBA={tokenIdOfTBA?.toString()}
                                         address={address}
+                                        isEquipped={isEquipped}
                                     />
 
                                     <PriceAndActionsSection 
-                                                chonkId={parseInt(id)}
-                                                price={formattedPrice}
-                                                priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
-                                                isOfferSpecific={isOfferSpecific}
-                                                canAcceptOffer={canAcceptOffer}
-                                                isOwner={isOwner}
-                                                hasActiveOffer={hasActiveOffer}
-                                                hasActiveBid={hasActiveBid}
-                                                chonkBid={chonkBid}
-                                            />
+                                        traitId={parseInt(id)}
+                                        tokenIdOfTBA={tokenIdOfTBA?.toString()}
+                                        price={formattedPrice}
+                                        priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
+                                        isOfferSpecific={isOfferSpecific}
+                                        canAcceptOffer={canAcceptOffer}
+                                        isOwner={isOwner}
+                                        hasActiveOffer={hasActiveOffer}
+                                        hasActiveBid={hasActiveBid}
+                                        chonkBid={chonkBid}
+                                        tbaOwner={ownerOfTraitOwner}
+                                        isEquipped={isEquipped}
+                                    />
 
                                     <ActivityAndOffersSection
                                         isActivityOpen={isActivityOpen}
