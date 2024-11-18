@@ -363,6 +363,7 @@ contract ChonksMarketTest is PetersBaseTest {
     function test_cantBuyYourOwnChonk() public {
         // First mint a token
         address seller = address(1);
+        vm.deal(seller, 1 ether);
         vm.startPrank(seller);
             main.mint(1);
 
@@ -427,6 +428,7 @@ contract ChonksMarketTest is PetersBaseTest {
     function test_cantBuyYourOwnChonkOfferWithAddress() public {
         // First mint a token
         address seller = address(1);
+        vm.deal(seller, 1 ether);
         vm.startPrank(seller);
             main.mint(1);
 
