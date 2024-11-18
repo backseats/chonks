@@ -238,7 +238,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256[] memory traitIds,
         bytes memory encodedTraitIds
     ) {
-        ChonkOffer storage offer = chonkOffers[_chonkId];
+        ChonkOffer memory offer = chonkOffers[_chonkId];
         return (
             offer.priceInWei,
             offer.seller,
@@ -255,7 +255,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         address sellerTBA,
         address onlySellTo
     ) {
-        TraitOffer storage offer = traitOffers[_traitId];
+        TraitOffer memory offer = traitOffers[_traitId];
         return (
             offer.priceInWei,
             offer.seller,
@@ -270,7 +270,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256[] memory traitIds,
         bytes memory encodedTraitIds
     ) {
-        ChonkBid storage bid = chonkBids[_chonkId];
+        ChonkBid memory bid = chonkBids[_chonkId];
         return (
             bid.bidder,
             bid.amountInWei,
@@ -284,7 +284,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         address bidderTBA,
         uint256 amountInWei
     ) {
-        TraitBid storage bid = traitBids[_traitId];
+        TraitBid memory bid = traitBids[_traitId];
         return (
             bid.bidder,
             bid.bidderTBA,
@@ -426,7 +426,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (msg.value <= existingBid.amountInWei) revert BidIsTooLow();
 
         ( uint256[] memory traitIds , bytes memory encodedTraitIds ) = getTraitIdsAndEncodingForChonk(_chonkId);
-        
+
         chonkBids[_chonkId] = ChonkBid(
             msg.sender,
             msg.value,
