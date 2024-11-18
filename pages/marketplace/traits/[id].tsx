@@ -6,6 +6,7 @@ import { baseSepolia } from "viem/chains";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
+import { Trait } from "@/types/Trait";
 import {
     mainABI,
     mainContract,
@@ -17,51 +18,13 @@ import {
 } from "@/contract_data";
 import { StoredPeter } from "@/types/StoredPeter";
 import { Category } from "@/types/Category";
-import OwnershipSection from "@/components/marketplace/OwnershipSection";
+import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from '@/components/marketplace/TraitsSection';
 import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
 import PriceAndActionsSection from '@/components/marketplace/PriceAndActionsSection';
 import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 
-type CurrentChonk = {
-    tokenId: number;
-    head: {
-        tokenId: number; // 0 if not equipped
-        category: Category;
-        isEquipped: boolean;
-    };
-    hair: {
-        tokenId: number;
-        category: Category;
-        isEquipped: boolean;
-    };
-    face: {
-        tokenId: number;
-        category: Category;
-        isEquipped: boolean;
-    };
-    accessory: {
-        tokenId: number;
-        category: Category;
-        isEquipped: boolean;
-    };
-    shirt: {
-        tokenId: number;
-        category: Category;
-        isEquipped: boolean;
-    };
-    bottom: {
-        tokenId: number;
-        category: Category;
-        isEquipped: boolean;
-    };
-    shoes: {
-        tokenId: number;
-        category: Category;
-        isEquipped: boolean;
-    };
-};
 
 type ChonkOffer = {
     priceInWei: bigint;
@@ -71,17 +34,11 @@ type ChonkOffer = {
     encodedTraitIds: string;
 }
 
-export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
-    // const decodedContent = decodeURIComponent(data);
-    // const base64String = decodedContent.split("data:application/json,")[1];
-    // // Parse as JSON and stringify with proper formatting
-    // const jsonData = JSON.parse(base64String);
-
-    // console.log(jsonData);
+export function decodeAndSetData(data: string, setData: (data: Trait) => void) {
 
     const base64String = data.split(",")[1];
     const jsonString = atob(base64String);
-    const jsonData = JSON.parse(jsonString) as Chonk;
+    const jsonData = JSON.parse(jsonString) as Trait;
 
     console.log(jsonData);
 
@@ -110,7 +67,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         []
     );
 
-    const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
+    // const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
 
     const { hasActiveBid, chonkBid } = useMarketplaceActions(parseInt(id));
 
@@ -169,7 +126,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     // Get main body tokenURI
     const { data: tokenURIData } = useReadContract({
-        address: mainContract,
+        address: traitsContract,
         abi: tokenURIABI,
         functionName: TOKEN_URI,
         args: [BigInt(id)],
@@ -177,12 +134,33 @@ export default function ChonkDetail({ id }: { id: string }) {
     }) as { data: string };
 
     const { data: owner } = useReadContract({
-        address: mainContract,
-        abi: mainABI,
+        address: traitsContract,
+        abi: traitsABI,
         functionName: "ownerOf",
         args: [BigInt(id)],
         chainId: baseSepolia.id,
     }) as { data: string };
+
+    // Add this new query to get the tokenId from the TBA address
+    const { data: tokenIdOfTBA } = useReadContract({
+        address: mainContract,
+        abi: mainABI,
+        functionName: "tbaAddressToTokenId",
+        args: [owner],
+        chainId: baseSepolia.id,
+    }) as { data: bigint };
+
+    const { data: ownerOfTraitOwner } = useReadContract({
+        address: mainContract,
+        abi: mainABI,
+        functionName: "ownerOf",
+        args: [tokenIdOfTBA ? BigInt(tokenIdOfTBA) : undefined],
+        chainId: baseSepolia.id,
+    }) as { data: string };
+
+    console.log("owner (TBA address)", owner);
+    console.log("tokenId of owning Chonk", tokenIdOfTBA?.toString());
+    console.log("owner of trait owner", ownerOfTraitOwner);
 
     useEffect(() => {
         if (tokenURIData) {
@@ -193,183 +171,25 @@ export default function ChonkDetail({ id }: { id: string }) {
         // }
     }, [tokenURIData]);
 
-    // Get the trait ids that are equipped to the body
-    const { data: storedPeter } = useReadContract({
-        address: mainContract,
-        abi: mainABI,
-        functionName: "getPeter",
-        args: [BigInt(id)],
-        chainId: baseSepolia.id,
-    }) as { data: StoredPeter };
+    // const account = tokenboundClient.getAccount({
+    //     tokenContract: mainContract,
+    //     tokenId: id.toString(),
+    // });
 
-    useEffect(() => {
-        if (!storedPeter) return;
+    // console.log(" ===== account (this is the TBA of the main token id, not trait)", account);
 
-        console.log("storedPeter", storedPeter);
+   
 
-        setCurrentChonk({
-            tokenId: parseInt(id),
-            head: {
-                tokenId:
-                    storedPeter.headId === 0n ? 0 : parseInt(storedPeter.headId.toString()),
-                category: Category.Head,
-                isEquipped: storedPeter.headId !== 0n,
-            },
-            hair: {
-                tokenId:
-                    storedPeter.hairId === 0n
-                        ? 0
-                        : parseInt(storedPeter.hairId.toString()),
-                category: Category.Top,
-                isEquipped: storedPeter.hairId !== 0n,
-            },
-            face: {
-                tokenId:
-                    storedPeter.accessoryId === 0n
-                        ? 0
-                        : parseInt(storedPeter.accessoryId.toString()),
-                category: Category.Face,
-                isEquipped: storedPeter.accessoryId !== 0n,
-            },
-            accessory: {
-                tokenId:
-                    storedPeter.accessoryId === 0n
-                        ? 0
-                        : parseInt(storedPeter.accessoryId.toString()),
-                category: Category.Accessory,
-                isEquipped: storedPeter.accessoryId !== 0n,
-            },
-            shirt: {
-                tokenId:
-                    storedPeter.topId === 0n
-                        ? 0
-                        : parseInt(storedPeter.topId.toString()),
-                category: Category.Top,
-                isEquipped: storedPeter.topId !== 0n,
-            },
-            bottom: {
-                tokenId:
-                    storedPeter.bottomId === 0n
-                        ? 0
-                        : parseInt(storedPeter.bottomId.toString()),
-                category: Category.Bottom,
-                isEquipped: storedPeter.bottomId !== 0n,
-            },
-            shoes: {
-                tokenId:
-                    storedPeter.shoesId === 0n
-                        ? 0
-                        : parseInt(storedPeter.shoesId.toString()),
-                category: Category.Shoes,
-                isEquipped: storedPeter.shoesId !== 0n,
-            },
-        });
-    }, [storedPeter]);
+    // // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
+    // const { data: allTraitTokenIds } = useReadContract({
+    //     address: traitsContract,
+    //     abi: traitsABI,
+    //     functionName: "walletOfOwner",
+    //     args: [account],
+    //     chainId: baseSepolia.id,
+    // }) as { data: BigInt[] };
 
-    useEffect(() => {
-        console.log("currentChonk", currentChonk);
-    }, [currentChonk]);
-
-    const account = tokenboundClient.getAccount({
-        tokenContract: mainContract,
-        tokenId: id.toString(),
-    });
-
-    // if (address) {
-    //   console.log("address is", address);
-    //   console.log("tba address is", account);
-    // }
-
-    // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
-    const { data: allTraitTokenIds } = useReadContract({
-        address: traitsContract,
-        abi: traitsABI,
-        functionName: "walletOfOwner",
-        args: [account],
-        chainId: baseSepolia.id,
-    }) as { data: BigInt[] };
-
-    console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
-
-    // This gets the ids that are equipped to the chonk
-    useEffect(() => {
-        if (!storedPeter) return;
-
-        console.log("storedPeter", storedPeter);
-
-        const hatIdIndex =
-            // @ts-ignore
-            storedPeter.headId === 0n
-                ? null
-                : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.headId
-                );
-
-        const hairIdIndex =
-            // @ts-ignore
-            storedPeter.hairId === 0n
-                ? null
-                : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.hairId
-                );
-
-        const glassesIdIndex =
-            // @ts-ignore
-            storedPeter.accessoryId === 0n
-                ? null
-                : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.accessoryId
-                );
-
-        const handheldIdIndex =
-            // @ts-ignore
-            storedPeter.accessoryId === 0n
-                ? null
-                : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.accessoryId
-                );
-
-        const shirtIdIndex =
-            // @ts-ignore
-            storedPeter.topId === 0n
-                ? null
-                : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.topId
-                );
-
-        const pantsIdIndex =
-            // @ts-ignore
-            storedPeter.bottomId === 0n
-                ? null
-                : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.bottomId
-                );
-
-        const shoesIdIndex =
-            // @ts-ignore
-            storedPeter.shoesId === 0n
-                ? null
-                : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.shoesId
-                );
-
-        const filteredTraitTokenIds = allTraitTokenIds.filter((tokenId, index) => {
-            return (
-                index !== hatIdIndex &&
-                index !== hairIdIndex &&
-                index !== glassesIdIndex &&
-                index !== handheldIdIndex &&
-                index !== shirtIdIndex &&
-                index !== pantsIdIndex &&
-                index !== shoesIdIndex
-            );
-        });
-
-        // [] means everything is equipped
-        console.log("filteredTraitTokenIds", filteredTraitTokenIds);
-
-        setFilteredTraitTokenIds(filteredTraitTokenIds);
-    }, [allTraitTokenIds, storedPeter]);
+    // console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
 
     // Add these console logs
     useEffect(() => {
@@ -418,10 +238,10 @@ export default function ChonkDetail({ id }: { id: string }) {
 
         <>
             <Head>
-                <title>Chonk #{id} - Marketplace - Chonks</title>
-                <meta name="description" content="View Chonk #${id} on the Chonks marketplace" />
-                <meta property="og:title" content={`Chonk #${id} - Marketplace - Chonks`} />
-                <meta property="og:description" content={`View Chonk #${id} on the Chonks marketplace`} />
+                <title>Trait #{id} - Marketplace - Chonks</title>
+                <meta name="description" content="View Trait #${id} on the Chonks marketplace" />
+                <meta property="og:title" content={`Trait #${id} - Marketplace - Chonks`} />
+                <meta property="og:description" content={`View Trait #${id} on the Chonks marketplace`} />
                 {tokenData && <meta property="og:image" content={tokenData.image} />}
                 <meta property="og:url" content={`https://chonks.xyz/marketplace/chonk/${id}`} />
                 <meta property="og:type" content="website" />
@@ -444,7 +264,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                     {tokenData ? (
                         <div>
                             <section className="flex pt-[1.725vw] px-[3.45vw]">
-                                <Link href="/marketplace" className="flex items-center gap-2 mb-4 hover:opacity-70 transition-opacity">
+                                <Link href="/marketplace/traits" className="flex items-center gap-2 mb-4 hover:opacity-70 transition-opacity">
                                     <span className="text-[1.2vw]">←</span>
                                     <span className="text-[1.2vw]">Back</span>
                                 </Link>
@@ -462,8 +282,10 @@ export default function ChonkDetail({ id }: { id: string }) {
                                     <TraitsSection
                                         id={id}
                                         tokenData={tokenData}
+                                        equippedTraits={null}
                                         isOpen={isTraitsOpen}
                                         onToggle={() => setIsTraitsOpen(!isTraitsOpen)}
+                                        type="trait"
                                     />
 
                                 </div>
@@ -473,6 +295,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                                         id={id}
                                         tokenData={tokenData}
                                         owner={owner}
+                                        tbaOwner={ownerOfTraitOwner}
+                                        tokenIdOfTBA={tokenIdOfTBA}
                                         address={address}
                                     />
 

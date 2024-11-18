@@ -1,6 +1,7 @@
 import { VscListFilter, VscSearch } from "react-icons/vsc";
 
 interface ActionsProps {
+    type: 'chonk' | 'trait';
     isSidebarVisible: boolean;
     setIsSidebarVisible: (visible: boolean) => void;
     searchId: string;
@@ -10,6 +11,7 @@ interface ActionsProps {
 }
 
 export default function Actions({
+    type,
     isSidebarVisible,
     setIsSidebarVisible,
     searchId,
@@ -32,7 +34,7 @@ export default function Actions({
                         <VscSearch className="absolute left-3 max-w-[1vw] top-1/2 transform -translate-y-1/2 text-gray-400" />
                         <input
                             type="number"
-                            placeholder="Search by Chonk ID"
+                            placeholder={`Search by ${type.charAt(0).toUpperCase() + type.slice(1)} ID`}
                             value={searchId}
                             onChange={(e) => setSearchId(e.target.value)}
                             className="pl-10 px-4 py-2 border border-black text-[1vw] w-[40vw]"

@@ -1,21 +1,25 @@
 import { useState } from 'react';
 import { Chonk } from "@/types/Chonk";
+import { CurrentChonk } from "@/types/CurrentChonk";
 import EquippedAttributes from "@/components/marketplace/EquippedAttributes";
+
 interface TraitsSectionProps {
     id: string;
+    type: 'chonk' | 'trait';
     tokenData: Chonk | null;
+    equippedTraits: CurrentChonk | null;
     isOpen: boolean;
     onToggle: () => void;
 }
 
-export default function TraitsSection({ id, tokenData, isOpen, onToggle }: TraitsSectionProps) {
+export default function TraitsSection({ id, tokenData, equippedTraits, isOpen, onToggle, type }: TraitsSectionProps) {
     return (
         <div className="mt-[1.725vw] pt-[1.725vw]">
             <div
                 className="flex items-center justify-between cursor-pointer"
                 onClick={onToggle}
             >
-                <h3 className="text-[1.2vw] font-bold">Traits</h3>
+                <h3 className="text-[1.2vw] font-bold">Traits {type === 'chonk' ? '(NFTs owned by this Chonk)' : ''}</h3>
                 <svg
                     className={`w-4 h-4 transform transition-transform ${isOpen ? 'rotate-180' : ''}`}
                     fill="none"
@@ -27,7 +31,7 @@ export default function TraitsSection({ id, tokenData, isOpen, onToggle }: Trait
             </div>
 
             {isOpen && (
-                <EquippedAttributes tokenData={tokenData} />
+                <EquippedAttributes tokenData={tokenData} equippedTraits={equippedTraits} type={type} />
             )}
         </div>
     );

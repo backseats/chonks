@@ -1,20 +1,23 @@
 import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
-import { Chonk } from "@/types/Chonk";
+import { Trait } from "@/types/Trait";
 import { Address } from "viem";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { useEnsName, useEnsAvatar } from 'wagmi'
 import { normalize } from 'viem/ens'
-import RefreshAndShare from "./RefreshAndShare";
+import RefreshAndShare from "../RefreshAndShare";
+import Link from "next/link";
 
 interface Props {
   id: string;
-  tokenData: Chonk | null;
+  tokenData: Trait | null;
   owner: Address | string | null;
+  tbaOwner: Address | string | null;
+  tokenIdOfTBA: number;
   address: Address | undefined;
 }
 
 export default function OwnershipSection(props: Props) {
-  const { id, tokenData, owner, address } = props;
+  const { id, tokenData, owner, tbaOwner, tokenIdOfTBA, address } = props;
 
   // Add ENS resolution
   const { data: ensName } = useEnsName({
@@ -28,7 +31,7 @@ export default function OwnershipSection(props: Props) {
   return (
     <>
       <div className="flex justify-between items-center">
-        <h1 className="text-[2vw] font-bold">Chonk #{id}</h1>
+        <h1 className="text-[2vw] font-bold">Trait #{id}</h1>
         <RefreshAndShare />
       </div>
 
@@ -44,10 +47,19 @@ export default function OwnershipSection(props: Props) {
           </div>
           <div className="ml-4">
             <div className="text-[1vw] text-gray-600">Owned by</div>
-            <div className="text-[1.2vw]">
-              {address && address === owner
+            <div className="text-[1.2vw]">TBA: {address && address === owner
                 ? "You"
                 : ensName || truncateEthAddress(owner)}
+            </div>
+            <div className="text-[1.2vw]">
+              <Link href={`/marketplace/chonks/${tokenIdOfTBA}`} className="hover:underline">
+                Chonk #{tokenIdOfTBA?.toString() ?? 'N/A'}
+              
+              {" "}(Owned by: {address && address === tbaOwner
+                ? "You"
+                : ensName || truncateEthAddress(tbaOwner as Address)}
+              )
+              </Link>
             </div>
           </div>
         </div>

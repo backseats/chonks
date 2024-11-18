@@ -1,21 +1,22 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useReadContract } from 'wagmi';
-import { mainContract, mainABI, tokenURIABI } from '@/contract_data';
+import { mainContract, mainABI, traitsContract, traitsABI, tokenURIABI } from '@/contract_data';
 import { baseSepolia } from 'viem/chains';
 import { Chonk } from '@/types/Chonk';
+import { Trait } from '@/types/Trait';
 
 interface ListingsProps {
     isSidebarVisible: boolean;
 }
 
 export default function Listings({ isSidebarVisible }: ListingsProps) {
-    const [chonks, setChonks] = useState<Array<{ id: number; data: Chonk | null }>>([]);
+    const [traits, setTraits] = useState<Array<{ id: number; data: Trait | null }>>([]);
 
     // Get total supply of tokens
     const { data: totalSupply } = useReadContract({
-        address: mainContract,
-        abi: mainABI,
+        address: traitsContract,
+        abi: traitsABI,
         functionName: 'totalSupply',
         chainId: baseSepolia.id,
     }) as { data: bigint };
@@ -24,41 +25,42 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
     useEffect(() => {
         if (!totalSupply) return;
 
-        const fetchChonks = async () => {
-            const chonksArray = [];
-            for (let i = 1; i <= Number(totalSupply); i++) {
-                chonksArray.push({ id: i, data: null });
+        const fetchTraits = async () => {
+            const traitsArray = [];
+            // for (let i = 1; i <= Number(totalSupply); i++) {
+            for (let i = 1; i <= Number(4); i++) { // just get 4 for now
+                traitsArray.push({ id: i, data: null });
             }
-            setChonks(chonksArray);
+            setTraits(traitsArray);
         };
 
-        fetchChonks();
+        fetchTraits();
     }, [totalSupply]);
 
     // Fetch token URI data for each token
     useEffect(() => {
         const fetchTokenURIs = async () => {
-            const updatedChonks = [...chonks];
+            const updatedTraits = [...traits];
             
-            for (const chonk of updatedChonks) {
-                if (chonk.data === null) {
+            for (const trait of updatedTraits) {
+                if (trait.data === null) {
                     try {
-                        const response = await fetch(`/api/tokenURI/${chonk.id}`);
+                        const response = await fetch(`/api/traits/tokenURI/${trait.id}`);
                         const data = await response.json();
-                        chonk.data = data;
+                        trait.data = data;
                     } catch (error) {
-                        console.error(`Error fetching token URI for Chonk #${chonk.id}:`, error);
+                        console.error(`Error fetching token URI for Trait #${trait.id}:`, error);
                     }
                 }
             }
 
-            setChonks(updatedChonks);
+            setTraits(updatedTraits);
         };
 
-        if (chonks.length > 0 && chonks.some(chonk => chonk.data === null)) {
+        if (traits.length > 0 && traits.some(trait => trait.data === null)) {
             fetchTokenURIs();
         }
-    }, [chonks]);
+    }, [traits]);
 
     const LoadingCard = () => (
         <div className="flex flex-col border border-black bg-white p-4 h-[300px] justify-center items-center">
@@ -69,22 +71,22 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
     return (
         <div className={`${isSidebarVisible ? 'w-3/4' : 'w-full'} `}>
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
-                {chonks.map(({ id, data }) => (
+                {traits.map(({ id, data }) => (
                     data === null ? (
                         <LoadingCard key={id} />
                     ) : (
                         <Link 
-                            href={`/marketplace/chonk/${id}`} 
+                            href={`/marketplace/traits/${id}`} 
                             key={id}
                             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
                         >
                             <img 
                                 src={data.image || "/marka/marka-chonk.svg"}
-                                alt={`Chonk #${id}`}
+                                alt={`Trait #${id}`}
                                 className="w-full h-auto"
                             />
                             <div className="mt-4 space-y-2 p-4">
-                                <h3 className="text-[1.2vw] font-bold">Chonk #{id}</h3>
+                                <h3 className="text-[1.2vw] font-bold">Trait #{id}</h3>
                                 <span className="text-[1vw]">[price to go here]</span>
                                 <button 
                                     className="w-full text-[1vw] border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
