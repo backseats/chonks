@@ -54,7 +54,7 @@ contract PetersMainTest is PetersBaseTest {
 
     function test_constructorWithLocalDeploy() public {
         // Create new instance with local deploy
-        address deployer = vm.addr(1);
+        address deployer = vm.addr(69);
         vm.startPrank(deployer);
 
         PetersMain newMain = new PetersMain(true);

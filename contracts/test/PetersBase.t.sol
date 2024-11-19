@@ -33,7 +33,7 @@ contract PetersBaseTest is Test {
     error NotATBA();
 
     function setUp() public virtual {
-        deployer = vm.addr(1);
+        deployer = vm.addr(69);
         vm.createSelectFork("base_sepolia", 17419761);
         vm.startPrank(deployer);
 
