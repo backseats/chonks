@@ -103,6 +103,11 @@ export function useEquipFunction(chonkId: string, traitTokenId: string, traitTyp
   }, [writeContract, chonkId, traitTokenId]);
 
   const unequip = useCallback(() => {
+    if (!traitType) {
+      console.log("no trait type");
+      return;
+    }
+
     const categoryIndex = Object.values(Category).indexOf(traitType!);
     writeContract({
       address: mainContract,

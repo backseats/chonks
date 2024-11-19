@@ -13,10 +13,12 @@ interface Props {
   traitTokenId: string;
   isEquipped: boolean;
   selectedCategory: string;
+  isYours: boolean;
 }
 
 export default function Trait(props: Props) {
-  const { chonkId, traitTokenId, isEquipped, selectedCategory } = props;
+  const { chonkId, traitTokenId, isEquipped, selectedCategory, isYours } =
+    props;
 
   // A data object w/ name, desc, image, attributes
   const traitData = useTraitData(traitTokenId);
@@ -42,15 +44,27 @@ export default function Trait(props: Props) {
   return traitData ? (
     <div className="relative w-[200px] h-[200px]">
       <img src={traitData.image} className="w-full h-full" />
-      <button
-        className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2"
-        onClick={isEquipped ? unequip : equip}
-        disabled={isEquipped && traitName == ""}
-      >
-        <span className={isEquipped && traitName == "" ? "opacity-50" : ""}>
-          {isEquipped ? "Unequip" : "Equip"} {traitName}
-        </span>
-      </button>
+
+      {isYours ? (
+        <button
+          className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2"
+          onClick={isEquipped ? unequip : equip}
+          disabled={isEquipped && traitName == ""}
+        >
+          <span className={isEquipped && traitName == "" ? "opacity-50" : ""}>
+            {isEquipped ? "Unequip" : "Equip"} {traitName}
+          </span>
+        </button>
+      ) : (
+        <button
+          className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2"
+          onClick={() => {}}
+        >
+          <span className={isEquipped && traitName == "" ? "opacity-50" : ""}>
+            {traitName}
+          </span>
+        </button>
+      )}
     </div>
   ) : null;
 }

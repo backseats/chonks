@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { baseSepolia } from "viem/chains";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
+import { getAddress } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
 import {
@@ -115,6 +116,11 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId: baseSepolia.id,
   }) as { data: string };
 
+  const isOwner = useMemo(() => {
+    if (!owner || !address) return false;
+    return getAddress(owner) === getAddress(address);
+  }, [owner, address]);
+
   useEffect(() => {
     if (tokenURIData) {
       decodeAndSetData(tokenURIData, setTokenData);
@@ -151,7 +157,9 @@ export default function ChonkDetail({ id }: { id: string }) {
       tokenId: parseInt(id),
       hat: {
         tokenId:
-          storedPeter.headId === 0n ? 0 : parseInt(storedPeter.headId.toString()),
+          storedPeter.headId === 0n
+            ? 0
+            : parseInt(storedPeter.headId.toString()),
         category: Category.Head,
         isEquipped: storedPeter.headId !== 0n,
       },
@@ -181,9 +189,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       },
       shirt: {
         tokenId:
-          storedPeter.topId === 0n
-            ? 0
-            : parseInt(storedPeter.topId.toString()),
+          storedPeter.topId === 0n ? 0 : parseInt(storedPeter.topId.toString()),
         category: Category.Top,
         isEquipped: storedPeter.topId !== 0n,
       },
@@ -333,7 +339,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             <div className="flex flex-col mt-12">
               <div>
                 <p className="text-2xl font-bold pb-2 ml-12">
-                  Your Chonk Is Wearing
+                  {isOwner ? "Your" : "This"} Chonk Is Wearing
                 </p>
 
                 <div className="flex flex-row mt-2 gap-4 justify-center">
@@ -363,6 +369,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                             traitTokenId={stored[key].tokenId.toString()}
                             isEquipped={true}
                             selectedCategory={"All"}
+                            isYours={isOwner}
                           />
                         </div>
                       );
