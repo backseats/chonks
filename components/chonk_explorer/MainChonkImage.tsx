@@ -1,6 +1,9 @@
 import Image from "next/image";
 import { Chonk } from "@/types/Chonk";
 import { useRouter } from "next/navigation";
+import { useReadContract } from "wagmi";
+import { mainContract, mainABI } from "@/contract_data";
+import { baseSepolia } from "viem/chains";
 
 interface Props {
   id: string;
@@ -12,10 +15,19 @@ export default function MainChonkImage(props: Props) {
 
   const router = useRouter();
 
+  const { data: totalSupply } = useReadContract({
+    address: mainContract,
+    abi: mainABI,
+    functionName: "totalSupply",
+    chainId: baseSepolia.id,
+  }) as { data: bigint };
+
+  const totalSupplyNumber = totalSupply ? Number(totalSupply) : 0;
+
   const handleNavigation = (direction: "prev" | "next") => {
     let newId = direction === "prev" ? parseInt(id) - 1 : parseInt(id) + 1;
     if (newId < 1) newId = 1;
-    if (newId > 3) newId = 3; // temp
+    if (newId > totalSupplyNumber) newId = totalSupplyNumber;
     router.push(`/chonks/${newId}`);
   };
 

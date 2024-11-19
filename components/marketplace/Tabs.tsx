@@ -11,7 +11,7 @@ export default function Tabs({ activeTab, onTabChange }: TabsProps) {
 
     const handleTabClick = (tab: string) => {
         onTabChange(tab);
-        
+
         // Handle navigation based on tab
         switch (tab) {
             case 'Chonks':
@@ -46,4 +46,4 @@ export default function Tabs({ activeTab, onTabChange }: TabsProps) {
             </div>
         </section>
     );
-} 
+}
