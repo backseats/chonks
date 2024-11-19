@@ -5,7 +5,7 @@
 * Clone
 * Run `yarn` to install deps
 * Run `yarn dev -p 3005` to start the dev server
-* Go to `http://localhost:3005/chonk/[1-3 currently work]`
+* Go to `http://localhost:3005/chonks/[1-3 currently work]`
 * All relevant code in `/chonks/[id].tsx` for now
 
 ## 2D Studio

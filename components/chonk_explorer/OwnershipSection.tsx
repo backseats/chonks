@@ -17,7 +17,7 @@ export default function OwnershipSection(props: Props) {
     <>
       <h1 className="text-2xl font-bold text-center mt-4 mb-1">Chonk #{id}</h1>
 
-      {/* TODO: ENS for owner */}
+      {/* TODO: ENS for owner, heads up on the network, might need to use mainnet ens as well as basename */}
       {owner && (
         <p className="text-center mb-4">
           Owned by{" "}

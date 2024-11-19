@@ -207,7 +207,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         chainId: baseSepolia.id,
     }) as { data: boolean };
 
-   
+
     useEffect(() => {
         if (tokenURIData) {
             decodeAndSetData(tokenURIData, setTokenData);
@@ -224,7 +224,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     // console.log(" ===== account (this is the TBA of the main token id, not trait)", account);
 
-   
+
 
     // // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
     // const { data: allTraitTokenIds } = useReadContract({
@@ -275,12 +275,9 @@ export default function ChonkDetail({ id }: { id: string }) {
         return owner.toLowerCase() === address.toLowerCase();
     }, [owner, address]);
 
-    const hasActiveOffer = useMemo(() => {
-        return Boolean(traitOffer && traitOffer.priceInWei > 0n);
-    }, [traitOffer]);
+    const hasActiveOffer = useMemo(() => Boolean(traitOffer && traitOffer.priceInWei > 0n), [traitOffer]);
 
     return (
-
         <>
             <Head>
                 <title>Trait #{id} - Marketplace - Chonks</title>
@@ -288,7 +285,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                 <meta property="og:title" content={`Trait #${id} - Marketplace - Chonks`} />
                 <meta property="og:description" content={`View Trait #${id} on the Chonks marketplace`} />
                 {tokenData && <meta property="og:image" content={tokenData.image} />}
-                <meta property="og:url" content={`https://chonks.xyz/marketplace/chonk/${id}`} />
+                <meta property="og:url" content={`https://chonks.xyz/marketplace/chonks/${id}`} />
                 <meta property="og:type" content="website" />
                 <meta
                     name="viewport"
@@ -346,7 +343,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                                         isEquipped={isEquipped}
                                     />
 
-                                    <PriceAndActionsSection 
+                                    <PriceAndActionsSection
                                         traitId={parseInt(id)}
                                         tokenIdOfTBA={tokenIdOfTBA?.toString()}
                                         price={formattedPrice}

@@ -221,10 +221,10 @@ export default function ChonkDetail({ id }: { id: string }) {
     tokenId: id.toString(),
   });
 
-  // if (address) {
-  //   console.log("address is", address);
-  //   console.log("tba address is", account);
-  // }
+  if (address) {
+    console.log("address is", address);
+    console.log("tba address is", account);
+  }
 
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
@@ -325,9 +325,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       <div className="w-[1280px] mx-auto ">
         {tokenData ? (
           <div>
-            <div className="flex flex-row justify-center gap-4">
-              <MainChonkImage id={id} tokenData={tokenData} />
-            </div>
+            <MainChonkImage id={id} tokenData={tokenData} />
 
             <OwnershipSection
               id={id}
@@ -336,6 +334,7 @@ export default function ChonkDetail({ id }: { id: string }) {
               address={address}
             />
 
+            {/* Equipped Attributes Grids */}
             <div className="flex flex-col mt-12">
               <div>
                 <p className="text-2xl font-bold pb-2 ml-12">
