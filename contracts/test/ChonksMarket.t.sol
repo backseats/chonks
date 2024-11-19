@@ -107,6 +107,7 @@ contract ChonksMarketTest is PetersBaseTest {
         assertEq(market.paused(), false);
     }
 
+    // Pausability
     function test_pause() public {
         assertEq(market.paused(), false);
         vm.prank(deployer);
@@ -173,6 +174,7 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
     }
 
+    // Revoke Pausability
     function test_revokePausablity() public {
         assertEq(market.pausabilityRevoked(), false);
         vm.prank(deployer);
@@ -209,7 +211,7 @@ contract ChonksMarketTest is PetersBaseTest {
         assertEq(market.paused(), false);
     }
 
-    // setting royalty percentage
+    // Setting royalty percentage
 
     function test_setTeamWallet() public {
        assertEq(market.teamWallet(), TREASURY);
@@ -254,6 +256,8 @@ contract ChonksMarketTest is PetersBaseTest {
         market.setRoyaltyPercentage(0);
         assertEq(market.royaltyPercentage(), 250);
     }
+
+    // Offer Chonk
 
     function test_offerChonk() public {
         // First mint a token

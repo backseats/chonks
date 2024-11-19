@@ -808,13 +808,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _setApprovalForAll(owner, _operator, _approved);
     }
 
-    // Please use the function above
+    // Please use the function above as it's more appropriate. Traditional marketplaces will use this
     function setApprovalForAll(address _operator, bool _approved) public override(IERC721, ERC721) {
-        // here you know msg.sender, you also know which chonkIds they hold using `walletOfOwner`
-        // we could just add the approval to the struct for all of their chonks for good measure and then
-
-        // NOTE: who is msg.sender here? is it the tba or is it the eoa that owns the token?
-        // console.log("msg.sender", msg.sender);
         if (_approved) {
             uint256[] memory chonkIds = walletOfOwner(msg.sender);
 
