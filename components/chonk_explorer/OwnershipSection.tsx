@@ -1,4 +1,5 @@
 import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
+import Approvals from "./Approvals";
 import { Chonk } from "@/types/Chonk";
 import { Address } from "viem";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
@@ -8,10 +9,12 @@ interface Props {
   tokenData: Chonk | null;
   owner: Address | string | null;
   address: Address | undefined;
+  tbaAddress: Address;
+  isYours: boolean;
 }
 
 export default function OwnershipSection(props: Props) {
-  const { id, tokenData, owner, address } = props;
+  const { id, tokenData, owner, address, tbaAddress, isYours } = props;
 
   return (
     <>
@@ -19,13 +22,15 @@ export default function OwnershipSection(props: Props) {
 
       {/* TODO: ENS for owner, heads up on the network, might need to use mainnet ens as well as basename */}
       {owner && (
-        <p className="text-center mb-4">
+        <p className="text-center">
           Owned by{" "}
           <strong>
             {address && address === owner ? "You" : truncateEthAddress(owner)}
           </strong>
         </p>
       )}
+
+      {isYours && <Approvals address={address} tbaAddress={tbaAddress} />}
 
       <EquippedAttributes tokenData={tokenData} />
     </>

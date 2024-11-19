@@ -70,6 +70,8 @@ export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
   const jsonString = atob(base64String);
   const jsonData = JSON.parse(jsonString) as Chonk;
 
+  // console.log(jsonData);
+
   setData(jsonData);
 }
 
@@ -216,14 +218,14 @@ export default function ChonkDetail({ id }: { id: string }) {
     console.log("currentChonk", currentChonk);
   }, [currentChonk]);
 
-  const account = tokenboundClient.getAccount({
+  const tbaAddress = tokenboundClient.getAccount({
     tokenContract: mainContract,
     tokenId: id.toString(),
   });
 
   if (address) {
     console.log("address is", address);
-    console.log("tba address is", account);
+    console.log("tba address is", tbaAddress);
   }
 
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
@@ -231,7 +233,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     address: traitsContract,
     abi: traitsABI,
     functionName: "walletOfOwner",
-    args: [account],
+    args: [tbaAddress],
     chainId: baseSepolia.id,
   }) as { data: BigInt[] };
 
@@ -332,6 +334,8 @@ export default function ChonkDetail({ id }: { id: string }) {
               tokenData={tokenData}
               owner={owner}
               address={address}
+              tbaAddress={tbaAddress}
+              isYours={isOwner}
             />
 
             {/* Equipped Attributes Grids */}
