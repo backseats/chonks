@@ -85,11 +85,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Chonk ID to approved addresses
     mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators;
 
-    // TODO: move me
-    function getChonkIdToApprovedOperators(uint256 _chonkId) public view returns (address[] memory) {
-        return chonkIdToApprovedOperators[_chonkId];
-    }
-
     /// Errors
 
     error BodyAlreadyExists();
@@ -663,8 +658,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         metadata.zMap = _zMap;
     }
 
-    // Setters
-
     function setMaxTraitsToOutput(uint256 _maxTraitsToOutput) public onlyOwner {
         maxTraitsToOutput = _maxTraitsToOutput;
     }
@@ -701,7 +694,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         price = _priceInWei;
     }
 
-    /// Setters
+    /// Public Setters
 
     function setBackgroundColor(uint256 _peterTokenId, string memory _color) public onlyPeterOwner(_peterTokenId) {
         bytes memory colorBytes = bytes(_color);
@@ -710,7 +703,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo(); // todo: either take this out or make it so only marka can do this
 
         // Ensure all characters are valid hex characters (0-9, a-f, A-F)
-        for (uint i = 0; i < 6; i++) {
+        for (uint i; i < 6; i++) {
             if (
                 !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
                 !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
@@ -788,7 +781,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function _afterTokenTransfer(address _from, address, uint256 _tokenId) internal virtual override {
-        console.log("main: after token transfer");
         _invalidateAllOperatorApprovals(_tokenId, _from);
     }
 
@@ -798,6 +790,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // - tbaAddressToTokenId
 
     // for chonk action, get tba, use that address
+
+    function getChonkIdToApprovedOperators(uint256 _chonkId) public view returns (address[] memory) {
+        return chonkIdToApprovedOperators[_chonkId];
+    }
 
     function approve(address _operator, uint256 _chonkId) public override(IERC721, ERC721) {
         _incrementApprovals(_chonkId, _operator);
@@ -821,6 +817,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // console.log("msg.sender", msg.sender);
         if (_approved) {
             uint256[] memory chonkIds = walletOfOwner(msg.sender);
+
+            // Don't approve if the user doesn't own any Chonks
+            if (chonkIds.length == 0) revert Unauthorized();
+
             for (uint i; i < chonkIds.length; ++i) {
                 _incrementApprovals(chonkIds[i], _operator);
             }

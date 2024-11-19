@@ -851,8 +851,39 @@ contract ChonksMarketTest is PetersBaseTest {
         assertEq(main.isApprovedForAll(user4, address(market)), false);
     }
 
+    function test_tbaApprovalShouldFail() public {
+        address user1 = address(1);
+
+        vm.startPrank(user1);
+        main.mint(1);
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        vm.startPrank(tba);
+            vm.expectRevert(Unauthorized.selector);
+            main.setApprovalForAll(address(market), true);
+            vm.expectRevert(Unauthorized.selector);
+            main.setApprovalForAll(tba, true);
+        vm.stopPrank();
+    }
+
+    function test_tbaApprovalMarketplaceShouldFail() public {
+        address user1 = address(1);
+
+        vm.startPrank(user1);
+        main.mint(1);
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        vm.startPrank(tba);
+            vm.expectRevert(Unauthorized.selector);
+            main.setApprovalForAllChonksMarketplace(1, address(market), true);
+            vm.expectRevert(Unauthorized.selector);
+            main.setApprovalForAllChonksMarketplace(1, tba, true);
+        vm.stopPrank();
+    }
+
     /*
     Test:
+    test the stuff in beforeTokenTransfer of PetersMain related to the marketplace
     test the approval attack
     test all the types of offers and bids
     */
