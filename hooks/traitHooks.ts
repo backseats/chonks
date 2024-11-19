@@ -1,5 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useState, useEffect, useCallback } from "react";
+import { useReadContract, useWriteContract } from "wagmi";
 
 import {
   mainContract,
@@ -41,9 +41,9 @@ export function useTraitData(traitTokenId: string) {
     chainId: baseSepolia.id,
   }) as { data: string };
 
-  useEffect(() => {
-    if (traitTokenURIData) decodeAndSetData(traitTokenURIData, setTraitData);
-  }, [traitTokenURIData]);
+  if (traitTokenURIData && !traitData) {
+    decodeAndSetData(traitTokenURIData, setTraitData);
+  }
 
   return traitData;
 }
@@ -92,37 +92,26 @@ export function useTraitName(traitTokenId: string) {
 export function useEquipFunction(chonkId: string, traitTokenId: string, traitType: Category | null, isEquipped: boolean) {
   const { writeContract } = useWriteContract();
 
-  const functionNameString = useMemo(() => {
-    if (isEquipped) {
-      return "unequip" + traitType;
-    } else {
-      return "equip" + traitType;
-    }
-  }, [traitType, isEquipped]);
+  const equip = useCallback(() => {
+    writeContract({
+      address: mainContract,
+      abi: mainABI,
+      functionName: "equip",
+      args: [parseInt(chonkId), parseInt(traitTokenId)],
+      chainId: baseSepolia.id,
+    });
+  }, [writeContract, chonkId, traitTokenId]);
 
-  const equip = useMemo(() => {
-    return () => {
-      writeContract({
-        address: mainContract,
-        abi: mainABI,
-        functionName: functionNameString,
-        args: [parseInt(chonkId), parseInt(traitTokenId)],
-        chainId: baseSepolia.id,
-      });
-    };
-  }, [writeContract, functionNameString, chonkId, traitTokenId]);
-
-  const unequip = useMemo(() => {
-    return () => {
-      writeContract({
-        address: mainContract,
-        abi: mainABI,
-        functionName: functionNameString,
-        args: [parseInt(chonkId)],
-        chainId: baseSepolia.id,
-      });
-    };
-  }, [writeContract, functionNameString, chonkId]);
+  const unequip = useCallback(() => {
+    const categoryIndex = Object.values(Category).indexOf(traitType!);
+    writeContract({
+      address: mainContract,
+      abi: mainABI,
+      functionName: "unequip",
+      args: [parseInt(chonkId), categoryIndex],
+      chainId: baseSepolia.id,
+    });
+  }, [writeContract, chonkId, traitType]);
 
   return { equip, unequip };
 }

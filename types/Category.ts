@@ -1,9 +1,10 @@
 export enum Category {
-  Head = "Head",
-  Hair = "Hair",
-  Face = "Face",
-  Accessory = "Accessory",
-  Top = "Top",
-  Bottom = "Bottom",
-  Shoes = "Shoes",
+  None = "None", // 0
+  Head = "Head", // 1
+  Hair = "Hair", // 2
+  Face = "Face", // 3
+  Accessory = "Accessory", // 4
+  Top = "Top", // 5
+  Bottom = "Bottom", // 6
+  Shoes = "Shoes", // 7
 }
