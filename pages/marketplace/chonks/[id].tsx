@@ -45,7 +45,7 @@ export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
     const jsonString = atob(base64String);
     const jsonData = JSON.parse(jsonString) as Chonk;
 
-    console.log(jsonData);
+    // console.log(jsonData);
 
     setData(jsonData);
 }
@@ -377,7 +377,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     }, [chonkOffer]);
 
     return (
-
         <>
             <Head>
                 <title>Chonk #{id} - Marketplace - Chonks</title>
@@ -385,7 +384,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                 <meta property="og:title" content={`Chonk #${id} - Marketplace - Chonks`} />
                 <meta property="og:description" content={`View Chonk #${id} on the Chonks marketplace`} />
                 {tokenData && <meta property="og:image" content={tokenData.image} />}
-                <meta property="og:url" content={`https://chonks.xyz/marketplace/chonk/${id}`} />
+                <meta property="og:url" content={`https://chonks.xyz/marketplace/chonks/${id}`} />
                 <meta property="og:type" content="website" />
                 <meta
                     name="viewport"
@@ -440,7 +439,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                                         address={address}
                                     />
 
-                                    <PriceAndActionsSection 
+                                    <PriceAndActionsSection
                                                 chonkId={parseInt(id)}
                                                 price={formattedPrice}
                                                 priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
@@ -471,12 +470,9 @@ export default function ChonkDetail({ id }: { id: string }) {
                             <span className="text-[1.2vw]">Loading...</span>
                         </section>
                     )}
-
                 </main>
             </div>
-
         </>
-
     )
 }
 
