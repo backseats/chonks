@@ -357,6 +357,9 @@ export default function ChonkDetail({ id }: { id: string }) {
                                         setIsActivityOpen={setIsActivityOpen}
                                         isOffersOpen={isOffersOpen}
                                         setIsOffersOpen={setIsOffersOpen}
+                                        type="trait"
+                                        tokenId={id}
+                                        address={address}
                                     />
 
                                 </div>
