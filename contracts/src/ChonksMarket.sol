@@ -621,7 +621,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         // Ensure Offer
         TraitOffer memory offer = traitOffers[_traitId];
 
-        if (!PETER_TRAITS.isApprovedForAll(offer.sellerTBA, address(this)))
+        if (!PETER_TRAITS.isApprovedForAll(offer.sellerTBA, address(this)) && PETER_TRAITS.getApproved(_traitId) != address(this))
             revert TBANeedsToApproveMarketplace();
 
         address seller = offer.seller;
