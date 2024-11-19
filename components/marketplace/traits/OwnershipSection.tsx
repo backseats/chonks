@@ -20,6 +20,7 @@ interface Props {
 export default function OwnershipSection(props: Props) {
   const { id, tokenData, owner, tbaOwner, tokenIdOfTBA, address, isEquipped } = props;
 
+  console.log('owner', owner);
   // Add ENS resolution
   const { data: ensName } = useEnsName({
     address: owner as Address

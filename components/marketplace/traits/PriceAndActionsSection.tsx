@@ -4,7 +4,7 @@ import { useMarketplaceActions } from '@/hooks/marketplace/traits/marketplaceAnd
 import { useBalance, useAccount, useEnsAddress } from 'wagmi';
 import { parseEther, isAddress, formatEther } from 'viem';
 import { mainnet } from 'wagmi/chains';
-
+import { useOwnedChonks } from '@/hooks/useOwnedChonks';
 type PriceAndActionsSectionProps = {
     traitId: number;
     tokenIdOfTBA: string | null;
@@ -61,6 +61,11 @@ export default function PriceAndActionsSection({
     const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
     const [offerAmount, setOfferAmount] = useState('');
 
+    const [selectedChonkId, setSelectedChonkId] = useState<string>('');
+    const { ownedChonks } = useOwnedChonks(address); // This hook should fetch owned Chonks
+
+    console.log('ownedChonks', ownedChonks, address);
+
     // Add ENS resolution
     const { data: ensAddress } = useEnsAddress({
         name: recipientAddress.endsWith('.eth') ? recipientAddress.toLowerCase() : undefined,
@@ -116,20 +121,39 @@ export default function PriceAndActionsSection({
                             </button>
                         ) : (
                             <>
+                                {/* {!isOfferSpecific && ( */}
+                                    <div className="mb-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Select your Chonk that the trait will transfer to
+                                        </label>
+                                        <select
+                                            value={selectedChonkId}
+                                            onChange={(e) => setSelectedChonkId(e.target.value)}
+                                            className="w-full text-sm font-medium  p-2 border rounded bg-white"
+                                        >
+                                            <option value="">Select a Chonk</option>
+                                            {ownedChonks?.map((chonk) => (
+                                                <option key={chonk.id} value={chonk.id}>
+                                                    Chonk #{chonk.id}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                {/* )} */}
                                 <button 
                                     className={`w-full py-2 px-4 rounded transition-colors ${
-                                        (!isOfferSpecific || canAcceptOffer) && !hasInsufficientBalance
+                                        (!isOfferSpecific || canAcceptOffer) && !hasInsufficientBalance && (!isOfferSpecific ? selectedChonkId : true)
                                             ? 'bg-blue-500 text-white hover:bg-blue-600' 
                                             : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                                     }`}
-                                    disabled={Boolean((isOfferSpecific && !canAcceptOffer) || hasInsufficientBalance)}
+                                    disabled={Boolean((isOfferSpecific && !canAcceptOffer) || hasInsufficientBalance || (!isOfferSpecific && !selectedChonkId))}
                                     onClick={() => {
-                                        console.log('Buy Now clicked, price:', price);
                                         if (price) {
-                                            console.log('Calling handleBuyTrait with price:', price);
-                                            handleBuyTrait(price, parseInt(tokenIdOfTBA ?? '0'));
-                                        } else {
-                                            console.log('Price is null or undefined');
+                                            if (isOfferSpecific) {
+                                                handleBuyTrait(price, parseInt(tokenIdOfTBA ?? '0'));
+                                            } else {
+                                                handleBuyTrait(price, parseInt(selectedChonkId));
+                                            }
                                         }
                                     }}
                                 >
@@ -137,7 +161,7 @@ export default function PriceAndActionsSection({
                                         ? canAcceptOffer 
                                             ? 'Accept Private Offer' 
                                             : 'Private Offer - Not For You'
-                                        : 'Buy Now (Will need to select a Chonk)'}
+                                        : 'Buy Now'}
                                 </button>
                                 {hasInsufficientBalance && (
                                     <p className="text-red-500 text-sm mt-2">

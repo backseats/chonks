@@ -21,7 +21,6 @@ import PriceAndActionsSection from '@/components/marketplace/traits/PriceAndActi
 import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 
-
 type TraitOffer = {
     priceInWei: bigint;
     seller: string;
@@ -158,16 +157,30 @@ export default function ChonkDetail({ id }: { id: string }) {
 
 
     //getFullPictureForTrait
-    const { data: fullPictureForTrait } = useReadContract({
+    const { data: fullPictureForTrait, error: fullPictureError } = useReadContract({
         address: mainContract,
         abi: mainABI,
         functionName: "getFullPictureForTrait",
         args: [BigInt(id)],
         chainId: baseSepolia.id,
-    }) as { data: [string, bigint, string] };
+    }) as { data: [string, bigint, string], error: Error };
 
-    
-    
+    useEffect(() => {
+        if (fullPictureError) {
+            console.error("Error fetching full picture for trait:", {
+                error: fullPictureError,
+                traitId: id,
+                contractAddress: mainContract
+            });
+        }
+        if (fullPictureForTrait) {
+            console.log("Successfully fetched full picture for trait:", {
+                traitId: id,
+                data: fullPictureForTrait
+            });
+        }
+    }, [fullPictureForTrait, fullPictureError, id]);
+
     const [owner, tokenIdOfTBA, ownerOfTraitOwner] = fullPictureForTrait || [];
 
     console.log("traitOwnerTBA", owner);

@@ -4,7 +4,7 @@ import marketplaceAbiImport from './contracts/out/ChonksMarket.sol/ChonksMarket.
 
 export const mainContract = "0xfBcF6CC39B2168ECc2C6316Bc8d7eda8Ba10C1CE";
 export const traitsContract = "0x65C6253AA00670811cDE94D8A259bd2B6edaa708";
-export const marketplaceContract = "0x6aa8788C8136E364Df95DCFef4C4D64371FFe6e9";
+export const marketplaceContract = "0xe9a24F712B6ff486c8dF1b386338B9750fB42960";
 
 export const mainABI = mainAbiImport.abi;
 export const traitsABI = traitsAbiImport.abi;

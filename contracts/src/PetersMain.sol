@@ -428,13 +428,13 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function getFullPictureForTrait(uint256 _chonkTraitTokenId) public view returns (
         address traitOwnerTBA,
         uint256 chonkTokenId,
-        address chonkOwner,
-        bool isEquipped
+        address chonkOwner
+        // bool isEquipped // todo: reenable this
     ) {
         traitOwnerTBA = traitsContract.ownerOf(_chonkTraitTokenId);
         chonkTokenId = tbaAddressToTokenId[traitOwnerTBA];
         chonkOwner = ownerOf(chonkTokenId);
-        isEquipped = checkIfTraitIsEquipped(chonkTokenId, _chonkTraitTokenId);
+        // isEquipped = checkIfTraitIsEquipped(chonkTokenId, _chonkTraitTokenId);
     }
 
     // Returns the TBA address for a Chonk
