@@ -10,7 +10,7 @@ export const mainABI = mainAbiImport.abi;
 export const traitsABI = traitsAbiImport.abi;
 export const marketplaceABI = marketplaceAbiImport.abi;
 
-export const simpleHashKey = "makingmemark_sk_ab7284sr3v5o19g3iaublzep6sffynfu";
+export const simpleHashKey = "makingmemark_sk_ab7284sr3v5o19g3iaublzep6sffynfu"; // TODO: env var
 
 export const tokenURIABI = [
       {
