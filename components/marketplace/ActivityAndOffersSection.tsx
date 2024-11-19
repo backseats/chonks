@@ -5,7 +5,8 @@ import { useNFTActivity } from '@/hooks/useNFTActivity';
 import { formatDistanceToNow } from 'date-fns';
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { Address } from "viem";
-import { useMarketplaceEvents } from '@/hooks/marketplaceEventsHooks';
+import { useMarketplaceEvents as useTraitMarketplaceEvents } from '@/hooks/marketplace/traits/marketplaceEventsHooks';
+import { useMarketplaceEvents as useChonkMarketplaceEvents } from '@/hooks/marketplace/chonks/marketplaceEventsHooks';
 
 interface ActivityAndOffersSectionProps {
     isActivityOpen: boolean;
@@ -39,11 +40,112 @@ export default function ActivityAndOffersSection({
     tokenId,
     address
 }: ActivityAndOffersSectionProps) {
-    const { data: activity, isLoading } = useNFTActivity(type, tokenId ?? '');
-    const { events, isLoading: isEventsLoading } = useMarketplaceEvents(tokenId ?? '');
 
+    const { data: activity, isLoading } = useNFTActivity(type, tokenId ?? '');
+    const { events, isLoading: isEventsLoading } = type === 'trait' 
+        ? useTraitMarketplaceEvents(tokenId ?? '')
+        : useChonkMarketplaceEvents(tokenId ?? '');
+
+    console.log("events", events)
     return (
         <>
+
+<div className="mt-[3.45vw] border border-black p-[1.725vw]">
+                <div
+                    className="flex items-center justify-between cursor-pointer"
+                    onClick={() => setIsOffersOpen(!isOffersOpen)}
+                >
+                    <h3 className="text-[1.2vw] font-bold">
+                        Listings &amp; Bids {isEventsLoading && "(Loading...)"}
+                    </h3>
+                    <svg
+                        className={`w-4 h-4 transform transition-transform ${isOffersOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </div>
+
+                {isOffersOpen && (
+                    <div className="mt-[1.725vw] overflow-x-auto">
+                        <table className="w-full text-[0.8vw]">
+                            <thead>
+                                <tr className="border-b border-gray-200">
+                                    <th className="text-left py-2">Type</th>
+                                    <th className="text-left py-2">Price</th>
+                                    <th className="text-left py-2">From</th>
+                                    <th className="text-left py-2">To</th>
+                                    <th className="text-right py-2">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {events.map((event) => (
+                                    <tr key={event.id} className="border-b border-gray-200">
+                                        <td className="py-2">
+                                            {
+                                                event.type === 'offer' ? 'Listed' : 
+                                                event.type === 'bought' ? 'Purchased from Listing' :
+                                                event.type === 'bid' ? 'Bid' :
+                                                event.type === 'bidWithdrawn' ? 'Bid Withdrawn' :
+                                                event.type === 'bidAccepted' ? 'Bid Accepted' : 
+                                                event.type === 'offerCanceled' ? 'Listing Cancelled' :
+                                                '-'
+                                            }
+                                        </td>
+                                        <td className="py-2">
+                                            <span className="inline-flex items-center whitespace-nowrap">
+                                                {('price' in event ? (
+                                                    <>
+                                                        {event.price} <FaEthereum className="ml-1 text-[1vw]" />
+                                                    </>
+                                                ) : '-')}
+                                            </span>
+                                        </td>
+                                        {/* FROM */}
+                                        <td className="py-2">
+                                            {
+                                                event.type === 'offer' ? truncateEthAddress(event.seller) : 
+                                                event.type === 'bought' ? '(add Seller to event)' : 
+                                                event.type === 'bid' ? truncateEthAddress(event.bidder) :
+                                                event.type === 'bidWithdrawn' ? truncateEthAddress(event.bidder) :
+                                                event.type === 'bidAccepted' ? truncateEthAddress(event.seller) :
+                                                event.type === 'offerCanceled' ? '(add Seller to event)' :
+                                                '-'
+                                            }
+                                        </td>
+                                        {/* To */}
+                                        <td className="py-2">
+                                            {
+                                                event.type === 'offer' ? ' (add toAddress if private to event)' : 
+                                                event.type === 'bought' ? truncateEthAddress(event.buyer) : 
+                                                event.type === 'bid' ? '-' :
+                                                event.type === 'bidWithdrawn' ? '-' :
+                                                event.type === 'bidAccepted' ? truncateEthAddress(event.buyer) :
+                                                event.type === 'offerCanceled' ? '-' :
+                                                '-'
+                                            }
+                                        </td>
+                                        <td className="py-2 text-right">
+                                            <Link
+                                                href={`https://sepolia.basescan.org/tx/${event.txHash}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-end hover:underline"
+                                            >
+                                                {formatDistanceToNow(new Date(event.timestamp * 1000), { addSuffix: true })}
+                                                <IoExitOutline className="ml-2" />
+                                            </Link>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+
             <div className="mt-[3.45vw] border border-black p-[1.725vw]">
                 <div
                     className="flex items-center justify-between cursor-pointer"
@@ -118,61 +220,7 @@ export default function ActivityAndOffersSection({
                 )}
             </div>
 
-            <div className="mt-[3.45vw] border border-black p-[1.725vw]">
-                <div
-                    className="flex items-center justify-between cursor-pointer"
-                    onClick={() => setIsOffersOpen(!isOffersOpen)}
-                >
-                    <h3 className="text-[1.2vw] font-bold">
-                        Offers &amp; Bids {isEventsLoading && "(Loading...)"}
-                    </h3>
-                    <svg
-                        className={`w-4 h-4 transform transition-transform ${isOffersOpen ? 'rotate-180' : ''}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                </div>
-
-                {isOffersOpen && (
-                    <div className="mt-[1.725vw] overflow-x-auto">
-                        <table className="w-full text-[0.8vw]">
-                            <thead>
-                                <tr className="border-b border-gray-200">
-                                    <th className="text-left py-2">Type</th>
-                                    <th className="text-left py-2">Price</th>
-                                    <th className="text-left py-2">From</th>
-                                    <th className="text-right py-2">Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {events.map((event) => (
-                                    <tr key={event.id} className="border-b border-gray-200">
-                                        <td className="py-2">
-                                            {event.type === 'offer' ? 'Offer' : 'Bid'}
-                                        </td>
-                                        <td className="py-2">
-                                            <span className="inline-flex items-center whitespace-nowrap">
-                                                {event.price} <FaEthereum className="ml-1 text-[1vw]" />
-                                            </span>
-                                        </td>
-                                        <td className="py-2">
-                                            {event.type === 'offer' 
-                                                ? truncateEthAddress(event.seller)
-                                                : truncateEthAddress(event.bidder)}
-                                        </td>
-                                        <td className="py-2 text-right">
-                                            {formatDistanceToNow(new Date(event.timestamp * 1000), { addSuffix: true })}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
+            
         </>
     );
 } 

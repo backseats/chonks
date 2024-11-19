@@ -125,17 +125,28 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     // Chonk Events
 
-    event ChonkOfferCanceled(uint256 indexed chonkId);
+    event ChonkOfferCanceled(
+        uint256 indexed chonkId,
+        address indexed seller
+    );
     event ChonkOffered(
         uint256 indexed chonkId,
         uint256 indexed price,
         address indexed seller,
         address sellerTBA
     );
+    event ChonkOfferedToAddress(
+        uint256 indexed chonkId,
+        uint256 indexed price,
+        address indexed seller,
+        address sellerTBA,
+        address onlySellTo
+    );
     event ChonkBought(
         uint256 indexed chonkId,
         address indexed buyer,
-        uint256 indexed amountInWei
+        uint256 indexed amountInWei,
+        address seller
     );
 
     event ChonkBidWithdrawn(
@@ -157,18 +168,29 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     // Trait Events
 
-    event TraitOfferCanceled(uint256 indexed traitId);
+    event TraitOfferCanceled(
+        uint256 indexed traitId,
+        address indexed seller
+    );
     event TraitOffered(
         uint256 indexed traitId,
         uint256 indexed price,
         address indexed seller,
         address sellerTBA
     );
+    event TraitOfferedToAddress(
+        uint256 indexed traitId,
+        uint256 indexed price,
+        address indexed seller,
+        address sellerTBA,
+        address onlySellTo
+    );
     event TraitBought(
         uint256 indexed traitId,
         address indexed buyerTBA,
         uint256 indexed amountInWei,
-        address buyer
+        address buyer,
+        address seller
     );
 
     event TraitBidWithdrawn(
@@ -304,7 +326,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
         delete chonkOffers[_chonkId];
 
-        emit ChonkOfferCanceled(_chonkId);
+        emit ChonkOfferCanceled(_chonkId, msg.sender);
     }
 
     function offerChonk(
@@ -347,7 +369,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
             encodedTraitIds: encodedTraitIds
         });
 
-        emit ChonkOffered(_chonkId, _priceInWei, owner, tbaAddress);
+        emit ChonkOfferedToAddress(_chonkId, _priceInWei, owner, tbaAddress, _onlySellTo);
     }
 
     function buyChonk(uint256 _chonkId) public payable notPaused nonReentrant {
@@ -397,7 +419,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         // Pay Royalties and Seller
         _calculateRoyaltiesAndTransferFunds(msg.value, seller);
 
-        emit ChonkBought(_chonkId, msg.sender, msg.value);
+        emit ChonkBought(_chonkId, msg.sender, msg.value, seller);
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -489,7 +511,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
         delete traitOffers[_traitId];
 
-        emit TraitOfferCanceled(_traitId);
+        emit TraitOfferCanceled(_traitId, msg.sender);
     }
 
     function offerTrait(
@@ -543,7 +565,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
             _onlySellTo
         );
 
-        emit TraitOffered(_traitId, _priceInWei, tokenOwner, tbaTraitOwner);
+        emit TraitOfferedToAddress(_traitId, _priceInWei, tokenOwner, tbaTraitOwner, _onlySellTo);
     }
 
     // Use instead? Easier to offer to a specific Chonk ID than their TBA
@@ -629,7 +651,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
         _calculateRoyaltiesAndTransferFunds(msg.value, seller);
 
-        emit TraitBought(_traitId, tba, msg.value, msg.sender);
+        emit TraitBought(_traitId, tba, msg.value, msg.sender, seller);
     }
 
     ///////////////////////////////////////////////////////////////////////

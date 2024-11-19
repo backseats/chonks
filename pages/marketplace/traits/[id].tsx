@@ -5,7 +5,6 @@ import { useState, useEffect, useMemo } from "react";
 import { baseSepolia } from "viem/chains";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { TokenboundClient } from "@tokenbound/sdk";
-import { Chonk } from "@/types/Chonk";
 import { Trait } from "@/types/Trait";
 import {
     mainABI,
@@ -14,10 +13,7 @@ import {
     marketplaceABI,
     traitsContract,
     tokenURIABI,
-    traitsABI,
 } from "@/contract_data";
-import { StoredPeter } from "@/types/StoredPeter";
-import { Category } from "@/types/Category";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from '@/components/marketplace/TraitsSection';
 import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
