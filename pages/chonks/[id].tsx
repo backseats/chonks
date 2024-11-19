@@ -388,6 +388,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                     <EquipmentContainer
                       chonkId={id.toString()}
                       traitTokenIds={filteredTraitTokenIds}
+                      isYours={isOwner}
                     />
                   )}
                 </div>

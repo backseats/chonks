@@ -59,7 +59,7 @@ interface MarketplaceOfferCanceled {
 
 type MarketplaceEvent = MarketplaceOffer | MarketplaceBid | MarketplaceBought | MarketplaceBidWithdrawn | MarketplaceBidAccepted | MarketplaceOfferCanceled;
 
-export function useMarketplaceEvents(tokenId: string | number) {
+export function useMarketplaceEvents(tokenId: string) {
     const [events, setEvents] = useState<MarketplaceEvent[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const publicClient = usePublicClient();
@@ -67,7 +67,7 @@ export function useMarketplaceEvents(tokenId: string | number) {
     useEffect(() => {
         async function fetchEvents() {
             if (!tokenId || !publicClient) return;
-            
+
             setIsLoading(true);
             try {
                 // Get all event logs
@@ -253,7 +253,7 @@ export function useMarketplaceEvents(tokenId: string | number) {
                 // Combine and sort all events by timestamp
                 const allEvents = [...offers, ...bids, ...purchases, ...withdrawals, ...acceptedBids, ...offerCancellations]
                     .sort((a, b) => b.timestamp - a.timestamp);
-                
+
                 setEvents(allEvents);
             } catch (error) {
                 console.error('Error fetching marketplace events:', error);
@@ -266,4 +266,4 @@ export function useMarketplaceEvents(tokenId: string | number) {
     }, [tokenId, publicClient]);
 
     return { events, isLoading };
-} 
+}

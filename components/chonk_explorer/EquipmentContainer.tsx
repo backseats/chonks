@@ -5,10 +5,11 @@ import CategoryButton from "./CategoryButton";
 interface Props {
   chonkId: string;
   traitTokenIds: BigInt[];
+  isYours: boolean;
 }
 
 export default function EquipmentContainer(props: Props) {
-  const { chonkId, traitTokenIds } = props;
+  const { chonkId, traitTokenIds, isYours } = props;
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
@@ -54,6 +55,7 @@ export default function EquipmentContainer(props: Props) {
                 traitTokenId={tokenId.toString()}
                 isEquipped={false}
                 selectedCategory={selectedCategory}
+                isYours={isYours}
               />
             ))}
           </div>

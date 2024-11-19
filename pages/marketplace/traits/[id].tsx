@@ -3,8 +3,7 @@ import MenuBar from '@/components/marketplace/MenuBar';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from "react";
 import { baseSepolia } from "viem/chains";
-import { useReadContract, useWalletClient, useAccount } from "wagmi";
-import { TokenboundClient } from "@tokenbound/sdk";
+import { useReadContract, useAccount } from "wagmi";
 import { Trait } from "@/types/Trait";
 import {
     mainABI,
@@ -29,7 +28,6 @@ type TraitOffer = {
 }
 
 export function decodeAndSetData(data: string, setData: (data: Trait) => void) {
-
     const base64String = data.split(",")[1];
     const jsonString = atob(base64String);
     const jsonData = JSON.parse(jsonString) as Trait;
@@ -49,12 +47,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     const TOKEN_URI = "tokenURI";
 
     const { address } = useAccount();
-
-    const { data: walletClient } = useWalletClient();
-    const tokenboundClient = new TokenboundClient({
-        walletClient,
-        chainId: baseSepolia.id,
-    });
 
     const [tokenData, setTokenData] = useState<Trait | null>(null);
     const [filteredTraitTokenIds, setFilteredTraitTokenIds] = useState<BigInt[]>(

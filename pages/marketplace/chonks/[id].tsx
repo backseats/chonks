@@ -431,7 +431,6 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                                 </div>
                                 <div className="w-3/5">
-
                                     <OwnershipSection
                                         id={id}
                                         tokenData={tokenData}

@@ -14,7 +14,7 @@ interface ActivityAndOffersSectionProps {
     isOffersOpen: boolean;
     setIsOffersOpen: (isOpen: boolean) => void;
     type: "chonk" | "trait";
-    tokenId?: string;
+    tokenId: string;
     address?: Address | undefined;
 }
 
@@ -42,15 +42,16 @@ export default function ActivityAndOffersSection({
 }: ActivityAndOffersSectionProps) {
 
     const { data: activity, isLoading } = useNFTActivity(type, tokenId ?? '');
-    const { events, isLoading: isEventsLoading } = type === 'trait' 
-        ? useTraitMarketplaceEvents(tokenId ?? '')
-        : useChonkMarketplaceEvents(tokenId ?? '');
+    const { events: traitEvents, isLoading: isTraitEventsLoading } = useTraitMarketplaceEvents(tokenId ?? '');
+    const { events: chonkEvents, isLoading: isChonkEventsLoading } = useChonkMarketplaceEvents(tokenId ?? '');
+
+    const events = type === 'trait' ? traitEvents : chonkEvents;
+    const isEventsLoading = type === 'trait' ? isTraitEventsLoading : isChonkEventsLoading;
 
     console.log("events", events)
     return (
         <>
-
-<div className="mt-[3.45vw] border border-black p-[1.725vw]">
+            <div className="mt-[3.45vw] border border-black p-[1.725vw]">
                 <div
                     className="flex items-center justify-between cursor-pointer"
                     onClick={() => setIsOffersOpen(!isOffersOpen)}
@@ -85,11 +86,11 @@ export default function ActivityAndOffersSection({
                                     <tr key={event.id} className="border-b border-gray-200">
                                         <td className="py-2">
                                             {
-                                                event.type === 'offer' ? 'Listed' : 
+                                                event.type === 'offer' ? 'Listed' :
                                                 event.type === 'bought' ? 'Purchased from Listing' :
                                                 event.type === 'bid' ? 'Bid' :
                                                 event.type === 'bidWithdrawn' ? 'Bid Withdrawn' :
-                                                event.type === 'bidAccepted' ? 'Bid Accepted' : 
+                                                event.type === 'bidAccepted' ? 'Bid Accepted' :
                                                 event.type === 'offerCanceled' ? 'Listing Cancelled' :
                                                 '-'
                                             }
@@ -106,8 +107,8 @@ export default function ActivityAndOffersSection({
                                         {/* FROM */}
                                         <td className="py-2">
                                             {
-                                                event.type === 'offer' ? truncateEthAddress(event.seller) : 
-                                                event.type === 'bought' ? '(add Seller to event)' : 
+                                                event.type === 'offer' ? truncateEthAddress(event.seller) :
+                                                event.type === 'bought' ? '(add Seller to event)' :
                                                 event.type === 'bid' ? truncateEthAddress(event.bidder) :
                                                 event.type === 'bidWithdrawn' ? truncateEthAddress(event.bidder) :
                                                 event.type === 'bidAccepted' ? truncateEthAddress(event.seller) :
@@ -118,8 +119,8 @@ export default function ActivityAndOffersSection({
                                         {/* To */}
                                         <td className="py-2">
                                             {
-                                                event.type === 'offer' ? ' (add toAddress if private to event)' : 
-                                                event.type === 'bought' ? truncateEthAddress(event.buyer) : 
+                                                event.type === 'offer' ? ' (add toAddress if private to event)' :
+                                                event.type === 'bought' ? truncateEthAddress(event.buyer) :
                                                 event.type === 'bid' ? '-' :
                                                 event.type === 'bidWithdrawn' ? '-' :
                                                 event.type === 'bidAccepted' ? truncateEthAddress(event.buyer) :
@@ -219,12 +220,9 @@ export default function ActivityAndOffersSection({
                     </div>
                 )}
             </div>
-
-            
         </>
     );
-} 
-
+}
 
 // example object returned
 
