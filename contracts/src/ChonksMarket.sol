@@ -518,6 +518,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit TraitOffered(_traitId, _priceInWei, tokenOwner, tbaTraitOwner);
     }
 
+    // Remove?
     function offerTraitToAddress(
         uint256 _traitId,
         uint256 _chonkId,
@@ -540,6 +541,38 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
             tokenOwner,
             tbaTraitOwner,
             _onlySellTo
+        );
+
+        emit TraitOffered(_traitId, _priceInWei, tokenOwner, tbaTraitOwner);
+    }
+
+    // Use instead? Easier to offer to a specific Chonk ID than their TBA
+    function offerTraitToChonkId(
+        uint256 _traitId,
+        uint256 _chonkId,
+        uint256 _priceInWei,
+        uint256 _onlySellToChonkId
+    ) public notPaused ensurePriceIsNotZero(_priceInWei) {
+        if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
+
+        // TODO: ensure onlySellToChonkId is not yours
+
+        // Please unequip the trait if you want to sell it
+        if (PETERS_MAIN.checkIfTraitIsEquipped(_chonkId, _traitId))
+            revert TraitEquipped();
+
+        address tbaTraitOwner = PETER_TRAITS.ownerOf(_traitId);
+        (address tokenOwner, ) = PETERS_MAIN.getOwnerAndTBAAddressForChonkId(
+            _chonkId
+        );
+
+        (, address chonkTBA) = PETERS_MAIN.getOwnerAndTBAAddressForChonkId(_onlySellToChonkId);
+
+        traitOffers[_traitId] = TraitOffer(
+            _priceInWei,
+            tokenOwner,
+            tbaTraitOwner,
+            chonkTBA
         );
 
         emit TraitOffered(_traitId, _priceInWei, tokenOwner, tbaTraitOwner);
@@ -652,11 +685,9 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (bidder == msg.sender) revert CantAcceptYourOwnBid();
         if (bidder != _bidder) revert BidderChanged();
 
-        (address sellerTBA, uint256 chonkId, address seller,) = PETERS_MAIN.getFullPictureForTrait(_traitId);
+        (address sellerTBA, uint256 chonkId, address seller, bool isEquipped) = PETERS_MAIN.getFullPictureForTrait(_traitId);
         if (seller != msg.sender) revert NotYourTrait();
-
-        if (PETERS_MAIN.checkIfTraitIsEquipped(chonkId, _traitId))
-            revert TraitEquipped();
+        if (isEquipped) revert TraitEquipped();
 
         // Delete Offer for trait ID if present, delete Bid you're accepting
         delete traitOffers[_traitId];
