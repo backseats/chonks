@@ -716,6 +716,8 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
     }
 
+    /// Approvals/Approval Clearing
+
     function test_approvalsShouldClearMarketplaceApproval() public {
         address user1 = address(1);
         address user2 = address(2);
@@ -883,6 +885,16 @@ contract ChonksMarketTest is PetersBaseTest {
             vm.expectRevert(Unauthorized.selector);
             main.setApprovalForAllChonksMarketplace(1, tba, true);
         vm.stopPrank();
+    }
+
+    function test_tbaApproveShouldFail() public {
+        vm.prank(address(1));
+        main.mint(1);
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        vm.prank(tba);
+        vm.expectRevert(Unauthorized.selector);
+        main.approve(address(market), 1);
     }
 
     /*

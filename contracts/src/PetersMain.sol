@@ -796,6 +796,8 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function approve(address _operator, uint256 _chonkId) public override(IERC721, ERC721) {
+        if (msg.sender != ownerOf(_chonkId)) revert Unauthorized();
+
         _incrementApprovals(_chonkId, _operator);
         _approve(_operator, _chonkId);
     }
