@@ -356,7 +356,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         // length is the first check
         // then check each id is in there
 
-        if (!PETERS_MAIN.isApprovedForAll(offer.seller, address(this)))
+        if (!PETERS_MAIN.isApprovedForAll(offer.seller, address(this)) && PETERS_MAIN.getApproved(_chonkId) != address(this))
             revert ApproveTheMarketplace();
 
         // Ensure correct price

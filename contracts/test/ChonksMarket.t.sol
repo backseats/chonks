@@ -712,6 +712,145 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
     }
 
+    function test_approvalsShouldClearMarketplaceApproval() public {
+        address user1 = address(1);
+        address user2 = address(2);
+        address user3 = address(3);
+        address user4 = address(4);
+
+        vm.startPrank(user1);
+            // mint and approve a bunch of things
+            main.mint(1);
+            main.setApprovalForAllChonksMarketplace(1, address(market), true);
+            main.setApprovalForAllChonksMarketplace(1, user2, true);
+            main.setApprovalForAllChonksMarketplace(1, user3, true);
+
+            address[] memory operators = main.getChonkIdToApprovedOperators(1);
+            assertEq(operators.length, 3);
+            assertEq(operators[0], address(market));
+            assertEq(operators[1], user2);
+            assertEq(operators[2], user3);
+
+            // sell it
+            market.offerChonkToAddress(1, 1 wei, user4);
+        vm.stopPrank();
+
+        vm.prank(user4);
+        market.buyChonk{value: 1 wei}(1);
+
+        // approvals should be cleared
+        assertEq(main.ownerOf(1), user4);
+
+        operators = main.getChonkIdToApprovedOperators(1);
+        assertEq(operators.length, 0);
+
+        assertEq(main.getApproved(1), address(0));
+        assertEq(main.isApprovedForAll(user1, address(market)), false);
+        assertEq(main.isApprovedForAll(user1, user2), false);
+        assertEq(main.isApprovedForAll(user1, user3), false);
+        assertEq(main.isApprovedForAll(user4, address(market)), false);
+        assertEq(main.isApprovedForAll(user4, user2), false);
+        assertEq(main.isApprovedForAll(user4, user3), false);
+
+        // Attempt the Yoink
+        vm.prank(user1);
+        vm.expectRevert("ERC721: caller is not token owner nor approved");
+        main.transferFrom(user4, user1, 1);
+    }
+
+    function test_approvalsShouldClear() public {
+        address user1 = address(1);
+        address user2 = address(2);
+        address user3 = address(3);
+        address user4 = address(4);
+
+        vm.startPrank(user1);
+            // mint and approve a bunch of things
+            main.mint(2);
+            main.setApprovalForAll(address(market), true);
+            main.setApprovalForAll(user2, true);
+            main.setApprovalForAll(user3, true);
+
+            address[] memory operators = main.getChonkIdToApprovedOperators(1);
+            assertEq(operators.length, 3);
+            assertEq(operators[0], address(market));
+            assertEq(operators[1], user2);
+            assertEq(operators[2], user3);
+
+            address[] memory operators2 = main.getChonkIdToApprovedOperators(2);
+            assertEq(operators2.length, 3);
+            assertEq(operators2[0], address(market));
+            assertEq(operators2[1], user2);
+            assertEq(operators2[2], user3);
+
+            // sell it
+            market.offerChonkToAddress(1, 1 wei, user4);
+        vm.stopPrank();
+
+        vm.prank(user4);
+        market.buyChonk{value: 1 wei}(1);
+
+        // approvals should be cleared
+        assertEq(main.ownerOf(1), user4);
+
+        operators = main.getChonkIdToApprovedOperators(1);
+        assertEq(operators.length, 0);
+
+        // Should still be 3 because we used the non-marketplace approval function which approves all chonks owned by the user
+        operators2 = main.getChonkIdToApprovedOperators(2);
+        assertEq(operators2.length, 3);
+
+        assertEq(main.getApproved(1), address(0));
+
+        assertEq(main.isApprovedForAll(user1, address(market)), false);
+        assertEq(main.isApprovedForAll(user1, user2), false);
+        assertEq(main.isApprovedForAll(user1, user3), false);
+
+        assertEq(main.isApprovedForAll(user4, address(market)), false);
+        assertEq(main.isApprovedForAll(user4, user2), false);
+        assertEq(main.isApprovedForAll(user4, user3), false);
+
+        // // Attempt the Yoink
+        vm.prank(user1);
+        vm.expectRevert("ERC721: caller is not token owner nor approved");
+        main.transferFrom(user4, user1, 1);
+    }
+
+    // Singular
+    function test_approvalShouldClear() public {
+        address user1 = address(1);
+        address user4 = address(4);
+
+        vm.startPrank(user1);
+            // mint and approve a bunch of things
+            main.mint(1);
+            main.approve(address(market), 1);
+
+            address[] memory operators = main.getChonkIdToApprovedOperators(1);
+            assertEq(operators.length, 1);
+            assertEq(operators[0], address(market));
+            assertEq(main.getApproved(1), address(market));
+            assertEq(main.isApprovedForAll(user1, address(market)), false);
+            assertEq(main.isApprovedForAll(user4, address(market)), false);
+
+            // sell it
+            market.offerChonkToAddress(1, 1 wei, user4);
+        vm.stopPrank();
+
+        vm.prank(user4);
+        market.buyChonk{value: 1 wei}(1);
+
+        // approvals should be cleared
+        assertEq(main.ownerOf(1), user4);
+
+        operators = main.getChonkIdToApprovedOperators(1);
+        assertEq(operators.length, 0);
+
+        assertEq(main.getApproved(1), address(0)); // this is reset in the 721 transfer function
+        assertEq(main.isApprovedForAll(user1, address(market)), false);
+        assertEq(main.isApprovedForAll(user4, address(market)), false);
+    }
+
     /*
     Test:
     test the approval attack

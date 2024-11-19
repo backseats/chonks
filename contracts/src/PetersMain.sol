@@ -85,6 +85,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Chonk ID to approved addresses
     mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators;
 
+    // TODO: move me
+    function getChonkIdToApprovedOperators(uint256 _chonkId) public view returns (address[] memory) {
+        return chonkIdToApprovedOperators[_chonkId];
+    }
+
     /// Errors
 
     error BodyAlreadyExists();
@@ -133,7 +138,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             }
             setBackgroundColor(1, "ffffff");
             setTokenRender3D(1, true);
-           
+
         }
     }
 
@@ -737,8 +742,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return super.supportsInterface(interfaceId);
     }
 
-    // TODO: Withdraw function
-
     // Override functions for marketplace compatibility
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
         if (from == address(0)) {
@@ -784,11 +787,10 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // Consider adding emergency pause functionality for critical issues
     }
 
-    // better to invalidate TBA approvals in before or after?
-    // i think before....
-    // function _afterTokenTransfer(address, address, uint256 tokenId) internal virtual override {
-    //     _invalidateAllOperatorApprovals(tokenId);
-    // }
+    function _afterTokenTransfer(address _from, address, uint256 _tokenId) internal virtual override {
+        console.log("main: after token transfer");
+        _invalidateAllOperatorApprovals(_tokenId, _from);
+    }
 
     /// Approvals
 
@@ -797,26 +799,28 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // for chonk action, get tba, use that address
 
-    /*
     function approve(address _operator, uint256 _chonkId) public override(IERC721, ERC721) {
         _incrementApprovals(_chonkId, _operator);
         _approve(_operator, _chonkId);
     }
 
     function setApprovalForAllChonksMarketplace(uint256 _chonkId, address _operator, bool _approved) public {
+        address owner = ownerOf(_chonkId);
+        if (owner != msg.sender) revert Unauthorized();
+
         if (_approved) _incrementApprovals(_chonkId, _operator);
-        _setApprovalForAll(_operator, _operator, _approved);
+        _setApprovalForAll(owner, _operator, _approved);
     }
 
     // Please use the function above
-    function setApprovalForAll(address _operator, bool _approved) public pure override(IERC721, ERC721) {
-        // here you know msg.sedner, you also know wihch chonkIds they hold using `walletOfOwner`
+    function setApprovalForAll(address _operator, bool _approved) public override(IERC721, ERC721) {
+        // here you know msg.sender, you also know which chonkIds they hold using `walletOfOwner`
         // we could just add the approval to the struct for all of their chonks for good measure and then
 
-        // who is msg.sender here? is it the tba or is it the eoa that owns the token?
+        // NOTE: who is msg.sender here? is it the tba or is it the eoa that owns the token?
         // console.log("msg.sender", msg.sender);
         if (_approved) {
-            uint256[] chonkIds = walletOfOwner(msg.sender);
+            uint256[] memory chonkIds = walletOfOwner(msg.sender);
             for (uint i; i < chonkIds.length; ++i) {
                 _incrementApprovals(chonkIds[i], _operator);
             }
@@ -832,22 +836,23 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// @dev – Called on _afterTokenTransfer
     /// Prevents subsequent owners from using the previous owner's approvals
-    function _invalidateAllOperatorApprovals(uint256 _chonkId) private {
+    function _invalidateAllOperatorApprovals(uint256 _chonkId, address _previousOwner) private {
         address[] memory approvals = chonkIdToApprovedOperators[_chonkId];
         address tbaForChonk = tokenIdToTBAAccountAddress[_chonkId];
         // may need to use tbaAddressToTokenId w/ msg.sender value and check that?
 
-        // Invalidate all other approvals, including the ChonksMarket.
-        // Be sure to check if the marketplace has approval for the new owner.
-        for (uint i; i < approvals.operators.length; ++i) {
-            _setApprovalForAll(tbaForChonk, approvals.operators[i], false);
+        // Invalidate all other approvals including the ChonksMarket
+        for (uint256 i; i < approvals.length; ++i) {
+            _setApprovalForAll(_previousOwner, approvals[i], false);
+            _setApprovalForAll(tbaForChonk, approvals[i], false);
         }
 
         delete chonkIdToApprovedOperators[_chonkId];
     }
-    */
 
-   function withdraw() public onlyOwner {
+    /// Withdraw
+
+    function withdraw() public onlyOwner {
         (bool success,) = payable(withdrawAddress).call{ value: address(this).balance }("");
         if (!success) revert WithdrawFailed();
     }
