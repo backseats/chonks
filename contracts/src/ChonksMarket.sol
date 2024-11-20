@@ -392,7 +392,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         // uint256[] memory traitIds = PETERS_MAIN.getTraitTokens(tbaAddress);
         // bytes memory encodedTraitIds = abi.encode(traitIds);
 
-        ( , bytes memory encodedTraitIds ) = getTraitIdsAndEncodingForChonk(_chonkId);
+        (, bytes memory encodedTraitIds) = getTraitIdsAndEncodingForChonk(_chonkId);
 
         // Compare current traits owned by the Chonk's TBA with traits at time of listing
         if (keccak256(encodedTraitIds) != keccak256(offer.encodedTraitIds))
@@ -442,7 +442,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         ChonkBid memory existingBid = chonkBids[_chonkId];
         if (msg.value <= existingBid.amountInWei) revert BidIsTooLow();
 
-        ( uint256[] memory traitIds , bytes memory encodedTraitIds ) = getTraitIdsAndEncodingForChonk(_chonkId);
+        (uint256[] memory traitIds , bytes memory encodedTraitIds) = getTraitIdsAndEncodingForChonk(_chonkId);
 
         chonkBids[_chonkId] = ChonkBid(
             msg.sender,
@@ -895,62 +895,4 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         pausabilityRevoked = true;
     }
 
-    /// Approvals
-
-    // tokenIdToTBAAccountAddress
-    // tbaAddressToTokenId
-
-    // for chonk action, get tba, use that address
-
-    // ML: 05.11.24 - commenting out for now
-    /*
-    function approve(address operator, uint256 _chonkId) public override(IERC721, ERC721) {
-        if (approved) _incrementApprovals(_chonkId);
-        _approve(operator, _chonkId);
-    }
-
-    function setApprovalForAllChonksMarketplace(uint256 _chonkId, address operator, bool approved) public {
-        if (approved) _incrementApprovals(_chonkId);
-        _setApprovalForAll(msg.sender, operator, approved);
-    }
-
-    // Please use the function above
-    function setApprovalForAll(address _operator, bool _approved) public pure override(IERC721, ERC721) {
-        // here you know msg.sedner, you also know wihch chonkIds they hold using `walletOfOwner`
-        // we could just add the approval to the struct for all of their chonks for good measure and then
-
-        // who is msg.sender here? is it the tba or is it the eoa that owns the token?
-        if (approved) {
-            uint256[] chonkIds = walletOfOwner(msg.sender);
-            for (uint i; i < chonkIds.length; ++i) {
-                _incrementApprovals(chonkIds[i]);
-            }
-        }
-
-        _setApprovalForAll(msg.sender, _operator, _approved);
-    }
-
-    function _incrementApprovals(uint256 _chonkId, address _operator) private {
-        address[] operators = chonkIdToApprovedOperators[_chonkId];
-        operators.push(operator);
-        chonkIdToApprovedOperators[_chonkId] = operators; // does this work
-    }
-
-    /// @dev – Called on _afterTokenTransfer
-    /// Prevents subsequent owners from using the previous owner's approvals
-    function _invalidateAllOperatorApprovals(uint256 _chonkId) private {
-        address[] memory approvals = chonkIdToApprovedOperators[_chonkId];
-        address tbaForChonk = tokenIdToTBAAccountAddress[_chonkId];
-        // may need to use tbaAddressToTokenId w/ msg.sender value and check that?
-
-        // Invalidate all other approvals, including the ChonksMarket.
-        // Be sure to check if the marketplace has approval for the new owner.
-        for (uint i; i < approvals.operators.length; ++i) {
-            _setApprovalForAll(tbaForChonk, approvals.operators[i], false);
-        }
-
-        delete chonkIdToApprovedOperators[_chonkId];
-    }
-
-    */
 }

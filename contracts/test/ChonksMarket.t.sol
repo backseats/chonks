@@ -512,11 +512,7 @@ contract ChonksMarketTest is PetersBaseTest {
         assertEq(main.ownerOf(chonkId), intendedBuyer);
 
         // Verify offer was deleted
-        (
-            uint256 offerPrice,
-            address offerSeller,
-            ,,,
-        ) = market.getChonkOffer(chonkId);
+        (uint256 offerPrice, address offerSeller,,,,) = market.getChonkOffer(chonkId);
 
         assertEq(offerPrice, 0);
         assertEq(offerSeller, address(0));
@@ -542,6 +538,8 @@ contract ChonksMarketTest is PetersBaseTest {
             market.buyChonk{value: price}(chonkId);
         vm.stopPrank();
     }
+
+    /// Offer Trait
 
     function test_offerAndBuyTrait() public {
         // First mint tokens for seller and buyer
