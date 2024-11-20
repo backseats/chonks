@@ -5,8 +5,9 @@ import { useNFTActivity } from '@/hooks/useNFTActivity';
 import { formatDistanceToNow } from 'date-fns';
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { Address } from "viem";
-import { useMarketplaceEvents as useTraitMarketplaceEvents } from '@/hooks/marketplace/traits/marketplaceEventsHooks';
 import { useMarketplaceEvents as useChonkMarketplaceEvents } from '@/hooks/marketplace/chonks/marketplaceEventsHooks';
+import { useMarketplaceEvents as useTraitMarketplaceEvents } from '@/hooks/marketplace/traits/marketplaceEventsHooks';
+
 
 interface ActivityAndOffersSectionProps {
     isActivityOpen: boolean;
@@ -87,6 +88,7 @@ export default function ActivityAndOffersSection({
                                         <td className="py-2">
                                             {
                                                 event.type === 'offer' ? 'Listed' :
+                                                event.type === 'offerToAddress' ? 'Private Listed' :
                                                 event.type === 'bought' ? 'Purchased from Listing' :
                                                 event.type === 'bid' ? 'Bid' :
                                                 event.type === 'bidWithdrawn' ? 'Bid Withdrawn' :
@@ -108,18 +110,20 @@ export default function ActivityAndOffersSection({
                                         <td className="py-2">
                                             {
                                                 event.type === 'offer' ? truncateEthAddress(event.seller) :
-                                                event.type === 'bought' ? '(add Seller to event)' :
+                                                event.type === 'offerToAddress' ? truncateEthAddress(event.seller) :
+                                                event.type === 'bought' ? truncateEthAddress(event.seller) :
                                                 event.type === 'bid' ? truncateEthAddress(event.bidder) :
                                                 event.type === 'bidWithdrawn' ? truncateEthAddress(event.bidder) :
                                                 event.type === 'bidAccepted' ? truncateEthAddress(event.seller) :
-                                                event.type === 'offerCanceled' ? '(add Seller to event)' :
+                                                event.type === 'offerCanceled' ? truncateEthAddress(event.seller) :
                                                 '-'
                                             }
                                         </td>
                                         {/* To */}
                                         <td className="py-2">
                                             {
-                                                event.type === 'offer' ? ' (add toAddress if private to event)' :
+                                                event.type === 'offer' ? '-' :
+                                                event.type === 'offerToAddress' ? truncateEthAddress(event.onlySellTo) :
                                                 event.type === 'bought' ? truncateEthAddress(event.buyer) :
                                                 event.type === 'bid' ? '-' :
                                                 event.type === 'bidWithdrawn' ? '-' :
@@ -135,7 +139,7 @@ export default function ActivityAndOffersSection({
                                                 rel="noopener noreferrer"
                                                 className="flex items-center justify-end hover:underline"
                                             >
-                                                {formatDistanceToNow(new Date(event.timestamp * 1000), { addSuffix: true })}
+                                                {formatDistanceToNow(new Date(('timestamp' in event ? event.timestamp : Date.now()) * 1000), { addSuffix: true })}
                                                 <IoExitOutline className="ml-2" />
                                             </Link>
                                         </td>

@@ -13,6 +13,14 @@ interface MarketplaceOffer {
     txHash: string;
 }
 
+interface MarketplaceOfferToAddress {
+    id: string;
+    type: 'offerToAddress';
+    seller: string;
+    sellerTBA: string;
+    onlySellTo: string;
+}
+
 interface MarketplaceBid {
     id: string;
     type: 'bid';
@@ -27,6 +35,7 @@ interface MarketplaceBought {
     type: 'bought';
     price: string;
     buyer: string;
+    seller: string;
     timestamp: number;
     txHash: string;
 }
@@ -53,11 +62,12 @@ interface MarketplaceBidAccepted {
 interface MarketplaceOfferCanceled {
     id: string;
     type: 'offerCanceled';
+    seller: string;
     timestamp: number;
     txHash: string;
 }
 
-type MarketplaceEvent = MarketplaceOffer | MarketplaceBid | MarketplaceBought | MarketplaceBidWithdrawn | MarketplaceBidAccepted | MarketplaceOfferCanceled;
+type MarketplaceEvent = MarketplaceOffer | MarketplaceBid | MarketplaceBought | MarketplaceBidWithdrawn | MarketplaceBidAccepted | MarketplaceOfferCanceled | MarketplaceOfferToAddress;
 
 export function useMarketplaceEvents(tokenId: string | number) {
     const [events, setEvents] = useState<MarketplaceEvent[]>([]);
@@ -71,7 +81,7 @@ export function useMarketplaceEvents(tokenId: string | number) {
             setIsLoading(true);
             try {
                 // Get all event logs
-                const [offerLogs, bidLogs, boughtLogs, bidWithdrawnLogs, bidAcceptedLogs, offerCanceledLogs] = await Promise.all([
+                const [offerLogs, bidLogs, boughtLogs, bidWithdrawnLogs, bidAcceptedLogs, offerCanceledLogs, offerToAddressLogs] = await Promise.all([
                     // Existing offer logs
                     publicClient.getLogs({
                         address: marketplaceContract,
@@ -112,7 +122,8 @@ export function useMarketplaceEvents(tokenId: string | number) {
                             inputs: [
                                 { type: 'uint256', name: 'chonkId', indexed: true },
                                 { type: 'address', name: 'buyer', indexed: true },
-                                { type: 'uint256', name: 'amountInWei', indexed: true }
+                                { type: 'uint256', name: 'amountInWei', indexed: true },
+                                { type: 'address', name: 'seller' }
                             ]
                         },
                         args: { chonkId: BigInt(tokenId) },
@@ -156,7 +167,25 @@ export function useMarketplaceEvents(tokenId: string | number) {
                             type: 'event',
                             name: 'ChonkOfferCanceled',
                             inputs: [
-                                { type: 'uint256', name: 'chonkId', indexed: true }
+                                { type: 'uint256', name: 'chonkId', indexed: true },
+                                { type: 'address', name: 'seller', indexed: true }
+                            ]
+                        },
+                        args: { chonkId: BigInt(tokenId) },
+                        fromBlock: 'earliest'
+                    }),
+                    // Add new offer to address logs
+                    publicClient.getLogs({
+                        address: marketplaceContract,
+                        event: {
+                            type: 'event',
+                            name: 'ChonkOfferedToAddress',
+                            inputs: [
+                                { type: 'uint256', name: 'chonkId', indexed: true },
+                                { type: 'uint256', name: 'price', indexed: true },
+                                { type: 'address', name: 'seller', indexed: true },
+                                { type: 'address', name: 'sellerTBA' },
+                                { type: 'address', name: 'onlySellTo' }
                             ]
                         },
                         args: { chonkId: BigInt(tokenId) },
@@ -171,7 +200,8 @@ export function useMarketplaceEvents(tokenId: string | number) {
                     ...boughtLogs.map(log => publicClient.getBlock({ blockNumber: log.blockNumber })),
                     ...bidWithdrawnLogs.map(log => publicClient.getBlock({ blockNumber: log.blockNumber })),
                     ...bidAcceptedLogs.map(log => publicClient.getBlock({ blockNumber: log.blockNumber })),
-                    ...offerCanceledLogs.map(log => publicClient.getBlock({ blockNumber: log.blockNumber }))
+                    ...offerCanceledLogs.map(log => publicClient.getBlock({ blockNumber: log.blockNumber })),
+                    ...offerToAddressLogs.map(log => publicClient.getBlock({ blockNumber: log.blockNumber }))
                 ]);
 
                 let blockIndex = 0;
@@ -209,6 +239,7 @@ export function useMarketplaceEvents(tokenId: string | number) {
                         type: 'bought' as const,
                         price: formatEther(log.args.amountInWei || 0n),
                         buyer: log.args.buyer || '',
+                        seller: log.args.seller || '',
                         timestamp: Number(blocks[blockIndex - 1].timestamp),
                         txHash: log.transactionHash
                     };
@@ -244,13 +275,28 @@ export function useMarketplaceEvents(tokenId: string | number) {
                     return {
                         id: `${log.blockNumber}-${log.logIndex}`,
                         type: 'offerCanceled' as const,
+                        seller: log.args.seller || '',
+                        timestamp: Number(blocks[blockIndex - 1].timestamp),
+                        txHash: log.transactionHash
+                    };
+                });
+
+                const offersToAddress = offerToAddressLogs.map(log => {
+                    blockIndex++;
+                    return {
+                        id: `${log.blockNumber}-${log.logIndex}`,
+                        type: 'offerToAddress' as const,
+                        price: formatEther(log.args.price || 0n),
+                        seller: log.args.seller || '',
+                        sellerTBA: log.args.sellerTBA || '',
+                        onlySellTo: log.args.onlySellTo || '',
                         timestamp: Number(blocks[blockIndex - 1].timestamp),
                         txHash: log.transactionHash
                     };
                 });
 
                 // Combine and sort all events by timestamp
-                const allEvents = [...offers, ...bids, ...purchases, ...withdrawals, ...acceptedBids, ...offerCancellations]
+                const allEvents = [...offers, ...bids, ...purchases, ...withdrawals, ...acceptedBids, ...offerCancellations, ...offersToAddress]
                     .sort((a, b) => b.timestamp - a.timestamp);
                 
                 setEvents(allEvents);
