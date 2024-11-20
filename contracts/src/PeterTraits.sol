@@ -374,6 +374,11 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     function _cleanUpMarketplaceOffersAndBids(uint256 _tokenId, address _to) internal {
+        // Delete the Offer on Chonk ID before the transfer
+        address tba = ownerOf(_tokenId);
+        uint256 chonkId = petersMain.tbaAddressToTokenId(tba);
+        marketplace.removeChonkOfferOnTraitTransfer(chonkId);
+
         marketplace.deleteTraitOffersBeforeTokenTransfer(_tokenId);
         marketplace.deleteTraitBidsBeforeTokenTransfer(_tokenId, _to);
     }
@@ -383,13 +388,11 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         // TODO: ensure not equipped
 
         if (from == address(0)) {
-            // console.log('from is 0 so call super and return');
             super._beforeTokenTransfer(from, to, tokenId);
             return;
         }
 
         (, address seller,,) = marketplace.traitOffers(tokenId);
-        // console.log('seller', seller);
         if (seller != address(0)) {
             if (msg.sender != address(marketplace)) revert CantTransfer();
         }
@@ -401,22 +404,22 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             return;
         }
 
-        // TODO: ensure mint starts at Token ID 1 for Peters Main, in test
-
         // Ensure the `to` address is a TBA
         if (petersMain.tbaAddressToTokenId(to) == 0) revert NotATBA();
+
         _cleanUpMarketplaceOffersAndBids(tokenId, to);
 
         super._beforeTokenTransfer(from, to, tokenId);
     }
 
-    // Remove an active ChonkOffer if Chonk token ID because owned Traits changed
+    // Remove an active ChonkOffer because owned Traits changed
     function _afterTokenTransfer(address from , address, uint256 _traitTokenId) internal override(ERC721) {
-        if (address(petersMain) == address(0)) revert SetPetersMainAddress();
+        if (address(petersMain)  == address(0)) revert SetPetersMainAddress();
         if (address(marketplace) == address(0)) revert SetMarketplaceAddress();
 
         if(from == address(0)) return;
 
+        // Delete the Offer on Chonk ID after the transfer
         address tba = ownerOf(_traitTokenId);
         uint256 chonkId = petersMain.tbaAddressToTokenId(tba);
         marketplace.removeChonkOfferOnTraitTransfer(chonkId);

@@ -438,24 +438,17 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
 
         // Buyer purchases the chonk
-        vm.startPrank(buyer);
         vm.deal(buyer, price); // Give buyer enough ETH
-
+        vm.prank(buyer);
         market.buyChonk{value: price}(chonkId);
 
         // Verify purchase
         assertEq(main.ownerOf(chonkId), buyer);
 
         // Verify offer was deleted
-        (
-            uint256 offerPrice,
-            address offerSeller,
-            ,,,
-        ) = market.getChonkOffer(chonkId);
-
+        (uint256 offerPrice, address offerSeller,,,,) = market.getChonkOffer(chonkId);
         assertEq(offerPrice, 0);
         assertEq(offerSeller, address(0));
-        vm.stopPrank();
     }
 
     function test_cantBuyYourOwnChonk() public {
@@ -628,7 +621,7 @@ contract ChonksMarketTest is PetersBaseTest {
 
     function test_buyChonkForNonExistentChonk() public {
         vm.prank(address(1));
-        vm.expectRevert("ERC721: invalid token ID");
+        vm.expectRevert(OfferDoesNotExist.selector);
         market.buyChonk(1);
     }
 
@@ -648,8 +641,79 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
     }
 
+    // Tests that Offer clears on Chonk if a Trait transfers
+    function test_offerAndMoveTraitCancelledOffer() public {
+        // mint 2 and change traitIds after the bid
+        address seller = address(1);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(2);
+            main.setApprovalForAll(address(market), true);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        // move traits from chonk 2 to chonk 1
+        address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
+        address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
+        uint256[] memory traitsForChonk1 = main.getTraitTokens(tbaForChonk1);
+        uint256 traitId = traitsForChonk1[0];
+
+        // be the tba of chonk 1, move trait 1
+        vm.prank(tbaForChonk1);
+        traits.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
+
+        // validate offer is gone
+        (uint256 offerPrice, address offerSeller,,,,) = market.getChonkOffer(chonkId);
+        assertEq(offerPrice, 0);
+        assertEq(offerSeller, address(0));
+    }
+
+    // TODO: move to PeterMain.t.sol
+    function test_mintStartsAtTokenId1() public {
+        vm.prank(address(1));
+        main.mint(1);
+        assertEq(main.ownerOf(1), address(1));
+        vm.expectRevert("ERC721: invalid token ID");
+        main.ownerOf(0);
+        vm.expectRevert("ERC721: invalid token ID");
+        main.ownerOf(2);
+    }
+
     function test_buyChonkTraitIdsChanged() public {
-        // CBL
+        // mint 2 and change traitIds after the bid
+        address seller = address(1);
+        address buyer = address(2);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(2);
+            main.setApprovalForAll(address(market), true);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        // move traits from chonk 2 to chonk 1
+        address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
+        address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
+        uint256[] memory traitsForChonk2 = main.getTraitTokens(tbaForChonk2);
+        uint256 traitId = traitsForChonk2[0];
+
+        // be the tba of chonk 2
+        vm.prank(tbaForChonk2);
+        traits.transferFrom(tbaForChonk2, tbaForChonk1, traitId);
+
+        assertEq(main.getTraitTokens(tbaForChonk1).length, 5);
+        assertEq(main.getTraitTokens(tbaForChonk2).length, 3);
+
+        // see marketplace.removeChonkOfferOnTraitTransfer(chonkId); on traits.afterTraitTransfer
+        vm.deal(buyer, 1 ether);
+        vm.prank(buyer);
+        vm.expectRevert(OfferDoesNotExist.selector);
+        market.buyChonk{value: price}(chonkId);
     }
 
     function test_buyChonkAndRefundBid() public {
@@ -741,6 +805,7 @@ contract ChonksMarketTest is PetersBaseTest {
         uint256 indexed amountInWei,
         address seller
     );
+
     function test_buyChonkEmitsEvent() public {
         address seller = address(1);
         address buyer = address(2);
@@ -760,6 +825,10 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.expectEmit(true, true, true, true);
         emit ChonkBought(chonkId, buyer, price, seller);
         market.buyChonk{value: price}(chonkId);
+    }
+
+    function test_buyChonkApprovalsCleared() public {
+        // CBL
     }
 
 
