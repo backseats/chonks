@@ -148,6 +148,30 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
     }
 
+    function test_cantBuyChonkIfPaused() public {
+        assertEq(market.paused(), false);
+
+        address seller = address(1);
+        address buyer = address(2);
+        vm.deal(buyer, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.setApprovalForAll(address(market), true);
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        // pause the market
+        vm.prank(deployer);
+        market.pause(true);
+        assertEq(market.paused(), true);
+
+        vm.prank(buyer);
+        vm.expectRevert(Paused.selector);
+        market.buyChonk{value: price}(chonkId);
+    }
+
     // Revoke Pausability
     function test_revokePausablity() public {
         assertEq(market.pausabilityRevoked(), false);
