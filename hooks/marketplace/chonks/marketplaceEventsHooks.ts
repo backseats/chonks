@@ -19,6 +19,7 @@ interface MarketplaceOfferToAddress {
     seller: string;
     sellerTBA: string;
     onlySellTo: string;
+    txHash: string;
 }
 
 interface MarketplaceBid {
@@ -77,7 +78,7 @@ export function useMarketplaceEvents(tokenId: string | number) {
     useEffect(() => {
         async function fetchEvents() {
             if (!tokenId || !publicClient) return;
-            
+
             setIsLoading(true);
             try {
                 // Get all event logs
@@ -298,7 +299,7 @@ export function useMarketplaceEvents(tokenId: string | number) {
                 // Combine and sort all events by timestamp
                 const allEvents = [...offers, ...bids, ...purchases, ...withdrawals, ...acceptedBids, ...offerCancellations, ...offersToAddress]
                     .sort((a, b) => b.timestamp - a.timestamp);
-                
+
                 setEvents(allEvents);
             } catch (error) {
                 console.error('Error fetching marketplace events:', error);
@@ -311,4 +312,4 @@ export function useMarketplaceEvents(tokenId: string | number) {
     }, [tokenId, publicClient]);
 
     return { events, isLoading };
-} 
+}
