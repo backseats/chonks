@@ -19,6 +19,7 @@ interface MarketplaceOfferToAddress {
     seller: string;
     sellerTBA: string;
     onlySellTo: string;
+    txHash: string;
 }
 
 interface MarketplaceBid {
@@ -130,7 +131,7 @@ export function useMarketplaceEvents(tokenId: string) {
                         args: { traitId: BigInt(tokenId) },
                         fromBlock: 'earliest'
                     }),
-                    
+
                     // New bought logs
                     publicClient.getLogs({
                         address: marketplaceContract,
