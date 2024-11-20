@@ -1,4 +1,5 @@
 import { Chonk } from "@/types/Chonk";
+import { Category } from "@/types/Category";
 
 interface Props {
   tokenData: Chonk | null;
@@ -9,20 +10,18 @@ export default function EquippedAttributes(props: Props) {
 
   if (!tokenData) return null;
 
-  // console.log(tokenData.attributes);
+  console.log(tokenData.attributes);
 
   const categories = [
     "Body", // Not in TraitCategory since it's a body
-    "Hat", // TraitCategory 0
+    "Head", // TraitCategory 0
     "Hair", // TraitCategory 1
-    "Glasses", // TraitCategory 2
-    "Handheld", // TraitCategory 3
-    "Shirt", // TraitCategory 4
-    "Pants", // TraitCategory 5
+    "Face", // TraitCategory 2
+    "Accessory", // TraitCategory 3
+    "Top", // TraitCategory 4
+    "Bottom", // TraitCategory 5
     "Shoes", // TraitCategory 6
   ];
-
-  // if a tokenData.attribute is "Hat" && value "", skip
 
   return (
     <div className="flex grid-cols-3 gap-4 justify-center">

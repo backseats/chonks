@@ -15,12 +15,12 @@ export default function EquipmentContainer(props: Props) {
 
   const categories = [
     "All",
-    "Hats",
+    "Head",
     "Hair",
-    "Glasses",
-    "Handheld",
-    "Shirt",
-    "Pants",
+    "Face",
+    "Accessory",
+    "Top",
+    "Bottom",
     "Shoes",
   ];
 
