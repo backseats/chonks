@@ -383,7 +383,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (!PETERS_MAIN.isApprovedForAll(offer.seller, address(this)) && PETERS_MAIN.getApproved(_chonkId) != address(this))
             revert ApproveTheMarketplace();
 
-        // Compare current traits owned by the Chonk's TBA with traits at time of listing. This is actually redundant since offers are removed on Trait transfer
+        // Compare current traits owned by the Chonk's TBA with traits at time of listing. Prevents front running attack in the same block
         (, bytes memory encodedTraitIds) = getTraitIdsAndEncodingForChonk(_chonkId);
         if (keccak256(encodedTraitIds) != keccak256(offer.encodedTraitIds))
             revert TraitIdsChangedSinceListingRelist();
