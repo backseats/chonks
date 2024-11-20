@@ -354,6 +354,72 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
     }
 
+    /// Cancel Offer
+
+    function test_cancelOffer() public {
+        address user = address(1);
+        vm.startPrank(user);
+            main.mint(1);
+            main.setApprovalForAll(address(market), true);
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonkToAddress(chonkId, price, address(2));
+
+            (
+                uint256 offerPrice,
+                address seller,
+                address sellerTBA,
+                address onlySellTo,
+                uint256[] memory traitIds,
+                bytes memory encodedTraitIds
+            ) = market.getChonkOffer(chonkId);
+        vm.stopPrank();
+
+        assertEq(offerPrice, price);
+        assertEq(seller, user);
+        assertEq(sellerTBA, main.tokenIdToTBAAccountAddress(chonkId));
+        assertEq(onlySellTo, address(2));
+        assertEq(traitIds.length, INITIAL_TRAIT_NUMBER);
+        bytes memory expectedEncoding = abi.encode(traitIds);
+        assertEq(keccak256(encodedTraitIds), keccak256(expectedEncoding));
+
+        vm.prank(user);
+        market.cancelOfferChonk(chonkId);
+
+        (
+            offerPrice,
+            seller,
+            sellerTBA,
+            onlySellTo,
+            traitIds,
+            encodedTraitIds
+        ) = market.getChonkOffer(chonkId);
+
+        assertEq(offerPrice, 0);
+        assertEq(seller, address(0));
+        assertEq(sellerTBA, address(0));
+        assertEq(onlySellTo, address(0));
+        assertEq(traitIds.length, 0);
+        assertEq(keccak256(encodedTraitIds), keccak256(""));
+    }
+
+    function test_cancelOfferUnauthorized() public {
+        address user = address(1);
+        vm.startPrank(user);
+            main.mint(1);
+            main.setApprovalForAll(address(market), true);
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonkToAddress(chonkId, price, address(2));
+        vm.stopPrank();
+
+        vm.prank(address(2));
+        vm.expectRevert(NotYourOffer.selector);
+        market.cancelOfferChonk(chonkId);
+    }
+
+    /// Buy Chonk
+
     function test_offerAndBuyChonk() public {
         // First mint a token
         address seller = address(1);
