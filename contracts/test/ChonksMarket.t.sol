@@ -539,6 +539,234 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
     }
 
+    function test_buyChonkNoApproval() public {
+        address seller = address(1);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonkToAddress(chonkId, price, address(2));
+        vm.stopPrank();
+
+        address buyer = address(2);
+        vm.deal(buyer, 10 ether);
+        vm.startPrank(buyer);
+            vm.expectRevert(ApproveTheMarketplace.selector);
+            market.buyChonk{value: price}(chonkId);
+        vm.stopPrank();
+    }
+
+    function test_buyChonkSingleApproval() public {
+        address seller = address(1);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.setApprovalForAll(address(market), true);
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonkToAddress(chonkId, price, address(2));
+        vm.stopPrank();
+
+        address buyer = address(2);
+        vm.deal(buyer, 10 ether);
+        vm.prank(buyer);
+        market.buyChonk{value: price}(chonkId);
+
+        assertEq(main.ownerOf(chonkId), buyer);
+    }
+
+    function test_buyChonkApprovalForAll() public {
+        address seller = address(1);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.approve(address(market), 1);
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonkToAddress(chonkId, price, address(2));
+        vm.stopPrank();
+
+        address buyer = address(2);
+        vm.deal(buyer, 10 ether);
+        vm.prank(buyer);
+        market.buyChonk{value: price}(chonkId);
+
+        assertEq(main.ownerOf(chonkId), buyer);
+    }
+
+    function test_buyChonkIncorrectPrice() public {
+        address seller = address(1);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.approve(address(market), 1);
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonkToAddress(chonkId, price, address(2));
+        vm.stopPrank();
+
+        address buyer = address(2);
+        vm.deal(buyer, 10 ether);
+        vm.prank(buyer);
+        vm.expectRevert(WrongAmount.selector);
+        market.buyChonk{value: 2 ether}(chonkId);
+    }
+
+    function test_buyChonkNoOffer() public {
+        address seller = address(1);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.approve(address(market), 1);
+        vm.stopPrank();
+
+        vm.prank(address(2));
+        vm.expectRevert(OfferDoesNotExist.selector);
+        market.buyChonk(1);
+    }
+
+    function test_buyChonkForNonExistentChonk() public {
+        vm.prank(address(1));
+        vm.expectRevert("ERC721: invalid token ID");
+        market.buyChonk(1);
+    }
+
+    function test_buyChonkCantBuyOwnChonk() public {
+        address seller = address(1);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.approve(address(market), 1);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonkToAddress(chonkId, price, address(2));
+
+            vm.expectRevert(CantBuyYourOwnChonk.selector);
+            market.buyChonk{value: price}(chonkId);
+        vm.stopPrank();
+    }
+
+    function test_buyChonkTraitIdsChanged() public {
+        // CBL
+    }
+
+    function test_buyChonkAndRefundBid() public {
+        address seller = address(1);
+        address buyer = address(2);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.approve(address(market), 1);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        // bid with user 2, ensure bid
+        vm.deal(buyer, 10 ether);
+        vm.startPrank(buyer);
+            uint startingBal = buyer.balance;
+            console.log("startingBal", startingBal);
+
+            (address bidder, uint256 amountInWei,,) = market.getChonkBid(chonkId);
+            assertEq(bidder, address(0));
+            market.bidOnChonk{value: 0.5 ether}(chonkId);
+            uint endingBal = buyer.balance;
+            console.log("endingBal", endingBal);
+            assertLt(endingBal, startingBal);
+
+            (bidder, amountInWei,,) = market.getChonkBid(chonkId);
+            assertEq(bidder, buyer);
+            assertEq(amountInWei, 0.5 ether);
+
+            // do the buy
+            market.buyChonk{value: price}(chonkId);
+        vm.stopPrank();
+
+        // expect balance to be > what it was before
+        console.log("buyer.balance", buyer.balance);
+        // start: 10
+        // bid .5 (new bal 9.5)
+        // buy (new bal 8.5)
+        // refund .5 (new bal 9)
+        assertEq(startingBal - price, buyer.balance);
+
+        // expect chonkBids for chonk id to be gone
+        (bidder, amountInWei,,) = market.getChonkBid(chonkId);
+        assertEq(bidder, address(0));
+        assertEq(amountInWei, 0);
+
+        assertEq(main.ownerOf(chonkId), buyer);
+    }
+
+    function test_buyChonkAndRefundBidWithMultipleBids() public {
+        // CBL ,, bidders can outbid and refund
+    }
+
+    function test_buyChonkSellerAndWeGetPaid() public {
+        address seller = address(1);
+        address buyer = address(2);
+
+        uint balanceBefore = market.teamWallet().balance;
+        assertEq(market.royaltyPercentage(), 250);
+
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.approve(address(market), 1);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        vm.deal(buyer, 10 ether);
+        vm.prank(buyer);
+        market.buyChonk{value: price}(chonkId);
+
+        assertEq(main.ownerOf(chonkId), buyer);
+
+        uint balanceAfter = market.teamWallet().balance;
+        uint royaltyAmount = (price * market.royaltyPercentage()) / 10000;
+        assertEq(balanceAfter, balanceBefore + royaltyAmount);
+        assertEq(seller.balance, 1 ether + price - royaltyAmount);
+    }
+
+    event ChonkBought(
+        uint256 indexed chonkId,
+        address indexed buyer,
+        uint256 indexed amountInWei,
+        address seller
+    );
+    function test_buyChonkEmitsEvent() public {
+        address seller = address(1);
+        address buyer = address(2);
+
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.approve(address(market), 1);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        vm.deal(buyer, 10 ether);
+        vm.prank(buyer);
+        vm.expectEmit(true, true, true, true);
+        emit ChonkBought(chonkId, buyer, price, seller);
+        market.buyChonk{value: price}(chonkId);
+    }
+
+
+    function test_reentrancy() public {
+
+    }
+
     /// Offer Trait
 
     function test_offerAndBuyTrait() public {
