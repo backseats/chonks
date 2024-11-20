@@ -13,9 +13,9 @@ To deploy Chonks to Base Sepolia:
 9. run `./deploy-z-base-sepolia.sh` (weird, last run it keep getting dns errors for contract verification)
 10. run `./add-traits-base-sepolia.sh`
 11. run `./add-more-traits-base-sepolia.sh`
-12. comment out 1st lot, ucomment 2nd lot, run `./add-traits-base-sepolia.sh`
-13. comment out 2nd lot, ucomment 3rd lot, run `./add-traits-base-sepolia.sh`
-13. comment out 3rd lot, ucomment 4th lot, run `./add-traits-base-sepolia.sh`
+12. comment out 1st lot, ucomment 2nd lot, run `./add-more-traits-base-sepolia.sh`
+13. comment out 2nd lot, ucomment 3rd lot, run `./add-more-traits-base-sepolia.sh`
+13. comment out 3rd lot, ucomment 4th lot, run `./add-more-traits-base-sepolia.sh`
 
 
 NOTE: if (code: -32603, message: replacement transaction underpriced, data: None) error: send a tx in mm, i just transfer another account .0001 eth
