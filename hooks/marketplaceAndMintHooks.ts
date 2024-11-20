@@ -11,8 +11,8 @@ import {
   tokenURIABI,
   traitsABI,
   marketplaceABI,
+  chainId,
 } from "@/contract_data";
-import { baseSepolia } from "viem/chains";
 import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
 
@@ -37,7 +37,7 @@ export function useMintFunction() {
         abi: mainABI,
         functionName: 'mint',
         args: [amount],
-        chainId: baseSepolia.id,
+        chainId,
       });
     } catch (error) {
       console.error("Error minting:", error);
@@ -50,7 +50,7 @@ export function useMintFunction() {
 
 export function useMarketplaceActions(chonkId: number) {
   const { address } = useAccount();
-  
+
   // Add this new hook to get the current bid
   const { data: chonkBidData } = useReadContract({
     address: marketplaceContract,
@@ -100,7 +100,7 @@ export function useMarketplaceActions(chonkId: number) {
   const { writeContract: listChonk } = useWriteContract();
   const handleListChonk = (priceInEth: string) => {
     if (!address || !chonkId) return;
-    
+
     try {
       const priceInWei = parseEther(priceInEth);
       listChonk({
@@ -118,7 +118,7 @@ export function useMarketplaceActions(chonkId: number) {
   const { writeContract: listChonkToAddress } = useWriteContract();
   const handleListChonkToAddress = (priceInEth: string, address: string) => {
     if (!address || !chonkId) return;
-    
+
     try {
       const priceInWei = parseEther(priceInEth);
       listChonkToAddress({
@@ -164,12 +164,12 @@ export function useMarketplaceActions(chonkId: number) {
       console.log('Early return - missing address or chonkId:', { address, chonkId });
       return;
     }
-    
+
     try {
       console.log('Attempting to buy chonk:', { chonkId, priceInEth });
       const priceInWei = parseEther(priceInEth.toString());
       console.log('Price in Wei:', priceInWei);
-      
+
       buyChonk({
         address: marketplaceContract,
         abi: marketplaceABI,
@@ -195,7 +195,7 @@ export function useMarketplaceActions(chonkId: number) {
   //     if (msg.value <= existingBid.amountInWei) revert BidIsTooLow();
 
   //     ( uint256[] memory traitIds , bytes memory encodedTraitIds ) = getTraitIdsAndEncodingForChonk(_chonkId);
-      
+
   //     chonkBids[_chonkId] = ChonkBid(
   //         msg.sender,
   //         msg.value,
@@ -213,7 +213,7 @@ export function useMarketplaceActions(chonkId: number) {
   const { writeContract: bidOnChonk } = useWriteContract();
   const handleBidOnChonk = (chonkId: number, offerInEth: string) => {
     if (!address || !chonkId) return;
-    
+
     try {
         const amountInWei = parseEther(offerInEth);
         bidOnChonk({
@@ -232,7 +232,7 @@ export function useMarketplaceActions(chonkId: number) {
   const { writeContract: acceptBid } = useWriteContract();
   const handleAcceptBidForChonk = (bidder: string) => {
     if (!address || !chonkId) return;
-    
+
     try {
       acceptBid({
         address: marketplaceContract,

@@ -2,7 +2,6 @@ import Head from 'next/head'
 import MenuBar from '@/components/marketplace/MenuBar';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from "react";
-import { baseSepolia } from "viem/chains";
 import { useReadContract, useAccount } from "wagmi";
 import { Trait } from "@/types/Trait";
 import {
@@ -12,6 +11,7 @@ import {
     marketplaceABI,
     traitsContract,
     tokenURIABI,
+    chainId,
 } from "@/contract_data";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from '@/components/marketplace/TraitsSection';
@@ -65,7 +65,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         abi: marketplaceABI,
         functionName: "traitOffers",
         args: [BigInt(id)],
-        chainId: baseSepolia.id,
+        chainId,
     }) as { data: [bigint, string, string, string, string] };
 
     // Convert array to object
@@ -116,7 +116,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         abi: tokenURIABI,
         functionName: TOKEN_URI,
         args: [BigInt(id)],
-        chainId: baseSepolia.id,
+        chainId,
     }) as { data: string };
 
     // const { data: owner } = useReadContract({
@@ -155,7 +155,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         abi: mainABI,
         functionName: "getFullPictureForTrait",
         args: [BigInt(id)],
-        chainId: baseSepolia.id,
+        chainId,
     }) as { data: [string, bigint, string, boolean], error: Error };
 
     useEffect(() => {

@@ -1,8 +1,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useReadContract } from 'wagmi';
-import { mainContract, mainABI, tokenURIABI } from '@/contract_data';
-import { baseSepolia } from 'viem/chains';
+import { mainContract, mainABI, chainId } from '@/contract_data';
 import { Chonk } from '@/types/Chonk';
 
 interface ListingsProps {
@@ -17,7 +16,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
         address: mainContract,
         abi: mainABI,
         functionName: 'totalSupply',
-        chainId: baseSepolia.id,
+        chainId,
     }) as { data: bigint };
 
     // Fetch token URIs for all tokens
@@ -40,7 +39,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
     useEffect(() => {
         const fetchTokenURIs = async () => {
             const updatedChonks = [...chonks];
-            
+
             for (const chonk of updatedChonks) {
                 if (chonk.data === null) {
                     try {
@@ -74,12 +73,12 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
                     data === null ? (
                         <LoadingCard key={id} />
                     ) : (
-                        <Link 
-                            href={`/marketplace/chonks/${id}`} 
+                        <Link
+                            href={`/marketplace/chonks/${id}`}
                             key={id}
                             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
                         >
-                            <img 
+                            <img
                                 src={data.image || "/marka/marka-chonk.svg"}
                                 alt={`Chonk #${id}`}
                                 className="w-full h-auto"
@@ -87,7 +86,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
                             <div className="mt-4 space-y-2 p-4">
                                 <h3 className="text-[1.2vw] font-bold">Chonk #{id}</h3>
                                 <span className="text-[1vw]">[price to go here]</span>
-                                <button 
+                                <button
                                     className="w-full text-[1vw] border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
                                     onClick={(e) => {
                                         e.preventDefault();
@@ -102,4 +101,4 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
             </div>
         </div>
     );
-} 
+}

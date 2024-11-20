@@ -11,8 +11,8 @@ import {
   tokenURIABI,
   traitsABI,
   marketplaceABI,
+  chainId,
 } from "@/contract_data";
-import { baseSepolia } from "viem/chains";
 import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
 
@@ -37,7 +37,7 @@ export function useMintFunction() {
         abi: mainABI,
         functionName: 'mint',
         args: [amount],
-        chainId: baseSepolia.id,
+        chainId,
       });
     } catch (error) {
       console.error("Error minting:", error);
@@ -50,13 +50,14 @@ export function useMintFunction() {
 
 export function useMarketplaceActions(traitId: number) {
   const { address } = useAccount();
-  
+
   // Add this new hook to get the current bid
   const { data: chonkBidData } = useReadContract({
     address: marketplaceContract,
     abi: marketplaceABI,
     functionName: 'getChonkBid',
     args: [BigInt(traitId)],
+    chainId,
   }) as { data: [string, bigint, bigint[], string] }; // matches return types from contract
 
   // Convert array to object
@@ -82,6 +83,7 @@ export function useMarketplaceActions(traitId: number) {
     abi: mainABI,
     functionName: 'isApprovedForAll',
     args: [address, marketplaceContract],
+    chainId,
   });
 
   // Approve marketplace contract
@@ -93,6 +95,7 @@ export function useMarketplaceActions(traitId: number) {
       abi: mainABI,
       functionName: 'setApprovalForAll',
       args: [marketplaceContract, true],
+      chainId,
     });
   };
 
@@ -100,7 +103,7 @@ export function useMarketplaceActions(traitId: number) {
   const { writeContract: listChonk } = useWriteContract();
   const handleListChonk = (priceInEth: string) => {
     if (!address || !traitId) return;
-    
+
     try {
       const priceInWei = parseEther(priceInEth);
       listChonk({
@@ -108,6 +111,7 @@ export function useMarketplaceActions(traitId: number) {
         abi: marketplaceABI,
         functionName: 'offerChonk',
         args: [BigInt(traitId), priceInWei],
+        chainId,
       });
     } catch (error) {
       console.error('Error listing chonk:', error);
@@ -118,7 +122,7 @@ export function useMarketplaceActions(traitId: number) {
   const { writeContract: listChonkToAddress } = useWriteContract();
   const handleListChonkToAddress = (priceInEth: string, address: string) => {
     if (!address || !traitId) return;
-    
+
     try {
       const priceInWei = parseEther(priceInEth);
       listChonkToAddress({
@@ -126,6 +130,7 @@ export function useMarketplaceActions(traitId: number) {
         abi: marketplaceABI,
         functionName: 'offerChonkToAddress',
         args: [BigInt(traitId), priceInWei, address],
+        chainId,
       });
     } catch (error) {
       console.error('Error listing chonk:', error);
@@ -150,6 +155,7 @@ export function useMarketplaceActions(traitId: number) {
     abi: mainABI,
     functionName: 'walletOfOwner',
     args: [address],
+    chainId,
   }) as { data: bigint[] };
 
 //   function offerTrait(
@@ -184,7 +190,7 @@ export function useMarketplaceActions(traitId: number) {
     console.log('handleListTrait', { priceInEth, traitId, address, chonkId });
 
     if (!address || !traitId || chonkId === 0) return;
-    
+
     try {
       const priceInWei = parseEther(priceInEth);
       listTrait({
@@ -192,6 +198,7 @@ export function useMarketplaceActions(traitId: number) {
         abi: marketplaceABI,
         functionName: 'offerTrait',
         args: [BigInt(traitId), BigInt(chonkId), priceInWei],
+        chainId,
       }, {
         onError: (error) => {
           console.error('Contract revert:', error);
@@ -217,7 +224,7 @@ export function useMarketplaceActions(traitId: number) {
   const { writeContract: listTraitToAddress } = useWriteContract();
   const handleListTraitToAddress = (priceInEth: string,  chonkId: number, address: string) => {
     if (!address || !traitId) return;
-    
+
     try {
       const priceInWei = parseEther(priceInEth);
       listTraitToAddress({
@@ -225,6 +232,7 @@ export function useMarketplaceActions(traitId: number) {
         abi: marketplaceABI,
         functionName: 'offerTraitToAddress',
         args: [BigInt(traitId), BigInt(chonkId), priceInWei, address],
+        chainId,
       }, {
         onError: (error) => {
           console.error('Contract revert:', error);
@@ -255,6 +263,7 @@ export function useMarketplaceActions(traitId: number) {
       abi: marketplaceABI,
       functionName: 'cancelOfferChonk',
       args: [BigInt(traitId)],
+      chainId,
     });
   };
 
@@ -263,12 +272,13 @@ export function useMarketplaceActions(traitId: number) {
   const handleCancelOfferTrait = (chonkId: number) => {
     console.log('handleCancelOfferTrait', { traitId, chonkId });
     if (!address || !traitId || chonkId === 0) return;
-    
+
     cancelOfferTrait({
       address: marketplaceContract,
       abi: marketplaceABI,
       functionName: 'cancelOfferTrait',
       args: [BigInt(traitId), BigInt(chonkId)],
+      chainId,
     });
   };
 
@@ -280,18 +290,19 @@ export function useMarketplaceActions(traitId: number) {
       console.log('Early return - missing address or traitId:', { address, traitId });
       return;
     }
-    
+
     try {
       console.log('Attempting to buy chonk:', { traitId, priceInEth });
       const priceInWei = parseEther(priceInEth.toString());
       console.log('Price in Wei:', priceInWei);
-      
+
       buyChonk({
         address: marketplaceContract,
         abi: marketplaceABI,
         functionName: 'buyChonk',
         args: [BigInt(traitId)],
-        value: priceInWei
+        value: priceInWei,
+        chainId,
       }, {
         onSuccess: (data) => console.log('Transaction submitted:', data),
         onError: (error) => console.error('Transaction failed:', error)
@@ -312,22 +323,22 @@ export function useMarketplaceActions(traitId: number) {
     }
 
     // temp solution to just give it to the first chonk in wallet
-  
+
     // chonkId = Number(walletOfOwnerData?.[0] ?? 0);
-    
-    
+
+
     try {
       console.log('Attempting to buy trait:', { traitId, priceInEth, chonkId });
       const priceInWei = parseEther(priceInEth.toString());
       console.log('Price in Wei:', priceInWei);
-      
+
       buyTrait({
         address: marketplaceContract,
         abi: marketplaceABI,
         functionName: 'buyTrait',
         args: [BigInt(traitId), BigInt(chonkId)],
         value: priceInWei,
-        chainId: baseSepolia.id
+        chainId,
       }, {
         onSuccess: (data) => console.log('Transaction submitted:', data),
         onError: (error) => console.error('Transaction failed:', error)
@@ -347,7 +358,7 @@ export function useMarketplaceActions(traitId: number) {
   //     if (msg.value <= existingBid.amountInWei) revert BidIsTooLow();
 
   //     ( uint256[] memory traitIds , bytes memory encodedTraitIds ) = getTraitIdsAndEncodingForChonk(_chonkId);
-      
+
   //     chonkBids[_chonkId] = ChonkBid(
   //         msg.sender,
   //         msg.value,
@@ -365,7 +376,7 @@ export function useMarketplaceActions(traitId: number) {
   const { writeContract: bidOnChonk } = useWriteContract();
   const handleBidOnChonk = (traitId: number, offerInEth: string) => {
     if (!address || !traitId) return;
-    
+
     try {
         const amountInWei = parseEther(offerInEth);
         bidOnChonk({
@@ -373,7 +384,8 @@ export function useMarketplaceActions(traitId: number) {
             abi: marketplaceABI,
             functionName: 'bidOnChonk',
             args: [BigInt(traitId)],
-            value: amountInWei
+            value: amountInWei,
+            chainId,
         });
     } catch (error) {
         console.error('Error placing bid:', error);
@@ -384,13 +396,14 @@ export function useMarketplaceActions(traitId: number) {
   const { writeContract: acceptBid } = useWriteContract();
   const handleAcceptBidForChonk = (bidder: string) => {
     if (!address || !traitId) return;
-    
+
     try {
       acceptBid({
         address: marketplaceContract,
         abi: marketplaceABI,
         functionName: 'acceptBidForChonk',
         args: [BigInt(traitId), bidder],
+        chainId,
       });
     } catch (error) {
       console.error('Error accepting bid:', error);

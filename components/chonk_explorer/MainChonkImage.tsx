@@ -2,8 +2,7 @@ import Image from "next/image";
 import { Chonk } from "@/types/Chonk";
 import { useRouter } from "next/navigation";
 import { useReadContract } from "wagmi";
-import { mainContract, mainABI } from "@/contract_data";
-import { baseSepolia } from "viem/chains";
+import { mainContract, mainABI, chainId } from "@/contract_data";
 
 interface Props {
   id: string;
@@ -19,7 +18,7 @@ export default function MainChonkImage(props: Props) {
     address: mainContract,
     abi: mainABI,
     functionName: "totalSupply",
-    chainId: baseSepolia.id,
+    chainId,
   }) as { data: bigint };
 
   const totalSupplyNumber = totalSupply ? Number(totalSupply) : 0;

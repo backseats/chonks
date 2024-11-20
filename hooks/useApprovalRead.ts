@@ -1,6 +1,5 @@
 import { useReadContract } from "wagmi";
-import { mainContract, mainABI, marketplaceContract, traitsContract, traitsABI } from "@/contract_data";
-import { baseSepolia } from "viem/chains";
+import { mainContract, mainABI, marketplaceContract, traitsContract, traitsABI, chainId } from "@/contract_data";
 import { Address } from "viem";
 
 export function useReadEOAApproval(address: Address | undefined) {
@@ -9,7 +8,7 @@ export function useReadEOAApproval(address: Address | undefined) {
     abi: mainABI,
     functionName: "isApprovedForAll",
     args: [address, marketplaceContract],
-    chainId: baseSepolia.id,
+    chainId,
   }) as { data: boolean };
 
   return { EOAIsApproved };
@@ -21,7 +20,7 @@ export function useReadTBAApproval(tbaAddress: Address) {
     abi: traitsABI,
     functionName: "isApprovedForAll",
     args: [tbaAddress, marketplaceContract],
-    chainId: baseSepolia.id,
+    chainId,
   }) as { data: boolean };
 
   return { TBAIsApproved };

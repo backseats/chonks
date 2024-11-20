@@ -1,6 +1,6 @@
-import { traitsContract, tokenURIABI } from '@/contract_data';
+import { traitsContract, tokenURIABI, chainId } from '@/contract_data';
 import { createPublicClient, http } from 'viem';
-import { baseSepolia } from 'viem/chains';
+import { baseSepolia } from 'viem/chains'; // TODO: Base
 
 const client = createPublicClient({
     chain: baseSepolia,
@@ -29,4 +29,4 @@ export default async function handler(req: any, res: any) {
         console.error('Error fetching token URI:', error);
         res.status(500).json({ error: 'Failed to fetch token URI' });
     }
-} 
+}

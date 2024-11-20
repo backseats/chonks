@@ -1,5 +1,4 @@
-import { mainABI, marketplaceContract, traitsContract } from "@/contract_data";
-import { baseSepolia } from "viem/chains";
+import { mainABI, marketplaceContract, traitsContract, chainId} from "@/contract_data";
 import { Address, encodeFunctionData } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { useWalletClient } from "wagmi";
@@ -9,7 +8,7 @@ export function useTBAApprovalWrite(tbaAddress: Address) {
   const { data: walletClient } = useWalletClient();
   const tokenboundClient = new TokenboundClient({
       walletClient,
-      chainId: baseSepolia.id,
+      chainId,
   });
 
   const encodedData = (value: boolean) => {
@@ -26,7 +25,7 @@ export function useTBAApprovalWrite(tbaAddress: Address) {
       to: traitsContract,
       value: 0n,
       data: encodedData(true),
-      chainId: baseSepolia.id,
+      chainId,
     });
   }
 
@@ -36,7 +35,7 @@ export function useTBAApprovalWrite(tbaAddress: Address) {
       to: traitsContract,
       value: 0n,
       data: encodedData(false),
-      chainId: baseSepolia.id,
+      chainId,
     });
   }
 
