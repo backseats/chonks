@@ -706,6 +706,39 @@ contract ChonksMarketTest is PetersBaseTest {
         main.ownerOf(2);
     }
 
+    function test_buyChonkWithSellerFrontRun() public {
+        address seller = address(1);
+        address buyer = address(2);
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(2);
+            main.setApprovalForAll(address(market), true);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+
+        vm.stopPrank();
+
+        // drain (addr1)
+        address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
+        address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
+        uint256[] memory traitsForChonk1 = main.getTraitTokens(tbaForChonk1);
+        vm.startPrank(tbaForChonk1);
+            for(uint256 i; i < traitsForChonk1.length; i++) {
+                uint256 traitId = traitsForChonk1[i];
+                traits.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
+            }
+        vm.stopPrank();
+
+        // buy from (addr2)
+        // expect fail
+        vm.deal(buyer, 10 ether);
+        vm.prank(buyer);
+        vm.expectRevert(OfferDoesNotExist.selector);
+        market.buyChonk{value: price}(chonkId);
+    }
+
     function test_buyChonkTraitIdsChanged() public {
         // mint 2 and change traitIds after the bid
         address seller = address(1);
