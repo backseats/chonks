@@ -2,7 +2,6 @@ import Head from 'next/head'
 import MenuBar from '@/components/marketplace/MenuBar';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from "react";
-import { baseSepolia } from "viem/chains";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
@@ -14,6 +13,7 @@ import {
     traitsContract,
     tokenURIABI,
     traitsABI,
+    chainId,
 } from "@/contract_data";
 import { StoredPeter } from "@/types/StoredPeter";
 import { Category } from "@/types/Category";
@@ -64,7 +64,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     const { data: walletClient } = useWalletClient();
     const tokenboundClient = new TokenboundClient({
         walletClient,
-        chainId: baseSepolia.id,
+        chainId,
     });
 
     const [tokenData, setTokenData] = useState<Chonk | null>(null);
@@ -83,7 +83,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         abi: marketplaceABI,
         functionName: "chonkOffers",
         args: [BigInt(id)],
-        chainId: baseSepolia.id,
+        chainId,
     }) as { data: [bigint, string, string, string, string] };
 
     // Convert array to object
@@ -135,7 +135,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         abi: tokenURIABI,
         functionName: TOKEN_URI,
         args: [BigInt(id)],
-        chainId: baseSepolia.id,
+        chainId,
     }) as { data: string };
 
     const { data: owner } = useReadContract({
@@ -143,7 +143,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         abi: mainABI,
         functionName: "ownerOf",
         args: [BigInt(id)],
-        chainId: baseSepolia.id,
+        chainId,
     }) as { data: string };
 
     useEffect(() => {
@@ -161,7 +161,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         abi: mainABI,
         functionName: "getPeter",
         args: [BigInt(id)],
-        chainId: baseSepolia.id,
+        chainId,
     }) as { data: StoredPeter };
 
     useEffect(() => {
@@ -248,7 +248,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         abi: traitsABI,
         functionName: "walletOfOwner",
         args: [account],
-        chainId: baseSepolia.id,
+        chainId,
     }) as { data: BigInt[] };
 
     console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
