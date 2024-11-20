@@ -424,17 +424,16 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // Returns all necessary ownership info for a Trait
-    // isEquipped added 18 Nov but not deployed or tested yet
     function getFullPictureForTrait(uint256 _chonkTraitTokenId) public view returns (
         address traitOwnerTBA,
         uint256 chonkTokenId,
-        address chonkOwner
-        // bool isEquipped // todo: reenable this
+        address chonkOwner,
+        bool isEquipped
     ) {
         traitOwnerTBA = traitsContract.ownerOf(_chonkTraitTokenId);
         chonkTokenId = tbaAddressToTokenId[traitOwnerTBA];
         chonkOwner = ownerOf(chonkTokenId);
-        // isEquipped = checkIfTraitIsEquipped(chonkTokenId, _chonkTraitTokenId);
+        isEquipped = checkIfTraitIsEquipped(chonkTokenId, _chonkTraitTokenId);
     }
 
     // Returns the TBA address for a Chonk

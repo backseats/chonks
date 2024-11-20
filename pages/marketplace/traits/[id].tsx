@@ -19,6 +19,7 @@ import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffers
 import PriceAndActionsSection from '@/components/marketplace/traits/PriceAndActionsSection';
 import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
+import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
 
 type TraitOffer = {
     priceInWei: bigint;
@@ -155,7 +156,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         functionName: "getFullPictureForTrait",
         args: [BigInt(id)],
         chainId: baseSepolia.id,
-    }) as { data: [string, bigint, string], error: Error };
+    }) as { data: [string, bigint, string, boolean], error: Error };
 
     useEffect(() => {
         if (fullPictureError) {
@@ -173,7 +174,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         }
     }, [fullPictureForTrait, fullPictureError, id]);
 
-    const [owner, tokenIdOfTBA, ownerOfTraitOwner] = fullPictureForTrait || [];
+    const [owner, tokenIdOfTBA, ownerOfTraitOwner, isEquipped] = fullPictureForTrait || [];
 
     console.log("traitOwnerTBA", owner);
     console.log("chonkTokenId", tokenIdOfTBA?.toString());
@@ -191,13 +192,13 @@ export default function ChonkDetail({ id }: { id: string }) {
     //         storedPeter.shoesId == _traitId;
     // }
 
-    const { data: isEquipped } = useReadContract({
-        address: mainContract,
-        abi: mainABI,
-        functionName: "checkIfTraitIsEquipped",
-        args: [tokenIdOfTBA, BigInt(id)],
-        chainId: baseSepolia.id,
-    }) as { data: boolean };
+    // const { data: isEquipped } = useReadContract({
+    //     address: mainContract,
+    //     abi: mainABI,
+    //     functionName: "checkIfTraitIsEquipped",
+    //     args: [tokenIdOfTBA, BigInt(id)],
+    //     chainId: baseSepolia.id,
+    // }) as { data: boolean };
 
 
     useEffect(() => {

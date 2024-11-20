@@ -633,9 +633,9 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         // Ensure correct price
         if (offer.priceInWei != msg.value) revert WrongAmount();
 
-        (, uint256 chonkId,) = PETERS_MAIN.getFullPictureForTrait(_traitId);
-        if (PETERS_MAIN.checkIfTraitIsEquipped(chonkId, _traitId))
-            revert TraitEquipped();
+        (, uint256 chonkId, , bool isEquipped) = PETERS_MAIN.getFullPictureForTrait(_traitId);
+
+        if(isEquipped) revert TraitEquipped();
 
         // Delete the Offer
         delete traitOffers[_traitId];
@@ -680,7 +680,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (chonkOwner != msg.sender) revert NotYourChonk();
 
         // Ensure  msg.sender does own Chonk or Trait
-        (address traitOwnerTBA, , address traitChonkOwner) = PETERS_MAIN.getFullPictureForTrait(_traitId);
+        (address traitOwnerTBA, , address traitChonkOwner, ) = PETERS_MAIN.getFullPictureForTrait(_traitId);
         if(traitChonkOwner == msg.sender || traitOwnerTBA == msg.sender) revert CantBidOnYourOwnTrait();
 
         TraitBid memory existingBid = traitBids[_traitId];
@@ -707,11 +707,10 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (bidder == msg.sender) revert CantAcceptYourOwnBid();
         if (bidder != _bidder) revert BidderChanged();
 
-        (address sellerTBA, uint256 chonkId, address seller) = PETERS_MAIN.getFullPictureForTrait(_traitId);
+        (address sellerTBA, , address seller, bool isEquipped) = PETERS_MAIN.getFullPictureForTrait(_traitId);
         if (seller != msg.sender) revert NotYourTrait();
 
-        // if (isEquipped) revert TraitEquipped(); // todo: can reenable this when we put isEquipped back in to full picture
-        if (PETERS_MAIN.checkIfTraitIsEquipped(chonkId, _traitId)) revert TraitEquipped();
+        if (isEquipped) revert TraitEquipped(); // todo: can reenable this when we put isEquipped back in to full picture
 
         // Delete Offer for trait ID if present, delete Bid you're accepting
         delete traitOffers[_traitId];

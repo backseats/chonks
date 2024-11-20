@@ -304,18 +304,20 @@ export function useMarketplaceActions(traitId: number) {
   // Buy trait
   const { writeContract: buyTrait } = useWriteContract();
   const handleBuyTrait = (priceInEth: number, chonkId: number) => {
-    if (!address || !traitId) {
+
+    console.log('handleBuyTrait', { priceInEth, traitId, address, chonkId });
+    if (!address || !traitId || chonkId === 0) {
       console.log('Early return - missing address or traitId:', { address, traitId, chonkId });
       return;
     }
 
     // temp solution to just give it to the first chonk in wallet
   
-    chonkId = Number(walletOfOwnerData?.[0] ?? 0);
+    // chonkId = Number(walletOfOwnerData?.[0] ?? 0);
     
     
     try {
-      console.log('Attempting to buy trait:', { traitId, priceInEth });
+      console.log('Attempting to buy trait:', { traitId, priceInEth, chonkId });
       const priceInWei = parseEther(priceInEth.toString());
       console.log('Price in Wei:', priceInWei);
       
@@ -324,7 +326,8 @@ export function useMarketplaceActions(traitId: number) {
         abi: marketplaceABI,
         functionName: 'buyTrait',
         args: [BigInt(traitId), BigInt(chonkId)],
-        value: priceInWei
+        value: priceInWei,
+        chainId: baseSepolia.id
       }, {
         onSuccess: (data) => console.log('Transaction submitted:', data),
         onError: (error) => console.error('Transaction failed:', error)
