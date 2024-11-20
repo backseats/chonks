@@ -67,25 +67,6 @@ contract ChonksMarketTest is PetersBaseTest {
     // address public deployer;
 
     function setUp() public override {
-        // Fork Base Sepolia at a specific block
-        // vm.createSelectFork("base_sepolia", 17419761);
-
-        // // Set up deployer account
-        // deployer = makeAddr("deployer");
-        // vm.startPrank(deployer);
-
-        // // Deploy contracts with localDeploy set to false
-        // traits = new PeterTraits(false);
-        // petersMain = new PetersMain(false);
-        // market = new ChonksMarket(
-        //     address(petersMain),
-        //     address(traits),
-        //     250, // fee basis points
-        //     TREASURY
-        // );
-
-        // vm.stopPrank();
-
         super.setUp();
 
         // Setup contracts for minting (copied from test_mintSingle)
@@ -145,14 +126,7 @@ contract ChonksMarketTest is PetersBaseTest {
             market.offerChonk(chonkId, price);
         vm.stopPrank();
 
-        (
-            uint256 offerPrice,
-            address seller,
-            address sellerTBA,
-            address onlySellTo,
-            uint256[] memory traitIds,
-            bytes memory encodedTraitIds
-        ) = market.getChonkOffer(chonkId);
+        (uint256 offerPrice, address seller,,,,) = market.getChonkOffer(chonkId);
 
         assertEq(offerPrice, price);
         assertEq(seller, user);
@@ -293,6 +267,61 @@ contract ChonksMarketTest is PetersBaseTest {
         vm.stopPrank();
     }
 
+    function test_multipleOffers() public {
+        address user = address(1);
+        vm.startPrank(user);
+        main.mint(1);
+        main.setApprovalForAll(address(market), true);
+
+        uint256 chonkId = 1;
+        uint256 price = 1 ether;
+        market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        (
+            uint256 offerPrice,
+            address seller,
+            address sellerTBA,
+            address onlySellTo,,
+        ) = market.getChonkOffer(chonkId);
+
+        // Verify offer
+        assertEq(offerPrice, price);
+        assertEq(seller, user);
+        assertEq(sellerTBA, main.tokenIdToTBAAccountAddress(chonkId));
+        assertEq(onlySellTo, address(0));
+
+        vm.prank(user);
+        market.offerChonk(chonkId, 2 ether);
+
+        (
+            offerPrice,
+            seller,
+            sellerTBA,
+            onlySellTo,,
+        ) = market.getChonkOffer(chonkId);
+
+        assertEq(offerPrice, 2 ether);
+        assertEq(seller, user);
+        assertEq(sellerTBA, main.tokenIdToTBAAccountAddress(chonkId));
+        assertEq(onlySellTo, address(0));
+
+        vm.prank(user);
+        market.offerChonkToAddress(chonkId, 3 ether, address(3));
+
+        (
+            offerPrice,
+            seller,
+            sellerTBA,
+            onlySellTo,,
+        ) = market.getChonkOffer(chonkId);
+
+        assertEq(offerPrice, 3 ether);
+        assertEq(seller, user);
+        assertEq(sellerTBA, main.tokenIdToTBAAccountAddress(chonkId));
+        assertEq(onlySellTo, address(3));
+    }
+
     function test_cantOfferIfPriceIsZero() public {
         // First mint a token
         address user = address(1);
@@ -306,7 +335,6 @@ contract ChonksMarketTest is PetersBaseTest {
             vm.expectRevert(CantBeZero.selector);
             market.offerChonkToAddress(1, 0, address(3));
         vm.stopPrank();
-
     }
 
     function test_cantOfferIfNotYourChonk() public {

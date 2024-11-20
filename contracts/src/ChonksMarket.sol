@@ -334,18 +334,8 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 _priceInWei
     ) public notPaused ensurePriceIsNotZero(_priceInWei) {
         (address owner, address tbaAddress) = PETERS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
-        if (msg.sender != owner) revert NotYourChonk();
 
-        ( uint256[] memory traitIds , bytes memory encodedTraitIds ) = getTraitIdsAndEncodingForChonk(_chonkId);
-
-        chonkOffers[_chonkId] = ChonkOffer({
-            priceInWei: _priceInWei,
-            seller: owner,
-            sellerTBA: tbaAddress,
-            onlySellTo: address(0),
-            traitIds: traitIds,
-            encodedTraitIds: encodedTraitIds
-        });
+        _offerChonk(_chonkId, _priceInWei, address(0), owner, tbaAddress);
 
         emit ChonkOffered(_chonkId, _priceInWei, owner, tbaAddress);
     }
@@ -356,20 +346,25 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         address _onlySellTo
     ) public notPaused ensurePriceIsNotZero(_priceInWei) {
         (address owner, address tbaAddress) = PETERS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
-        if (msg.sender != owner) revert NotYourChonk();
 
-        ( uint256[] memory traitIds , bytes memory encodedTraitIds ) = getTraitIdsAndEncodingForChonk(_chonkId);
+        _offerChonk(_chonkId, _priceInWei, _onlySellTo, owner, tbaAddress);
+
+        emit ChonkOfferedToAddress(_chonkId, _priceInWei, owner, tbaAddress, _onlySellTo);
+    }
+
+    function _offerChonk(uint256 _chonkId, uint256 _priceInWei, address _onlySellTo, address _seller, address _sellerTBA) internal {
+        if (_seller != msg.sender) revert NotYourChonk();
+
+        (uint256[] memory traitIds , bytes memory encodedTraitIds) = getTraitIdsAndEncodingForChonk(_chonkId);
 
         chonkOffers[_chonkId] = ChonkOffer({
             priceInWei: _priceInWei,
-            seller: owner,
-            sellerTBA: tbaAddress,
+            seller: _seller,
+            sellerTBA: _sellerTBA,
             onlySellTo: _onlySellTo,
             traitIds: traitIds,
             encodedTraitIds: encodedTraitIds
         });
-
-        emit ChonkOfferedToAddress(_chonkId, _priceInWei, owner, tbaAddress, _onlySellTo);
     }
 
     function buyChonk(uint256 _chonkId) public payable notPaused nonReentrant {
