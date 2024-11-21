@@ -29,23 +29,103 @@ export const categoryList = Object.values(Category);
 
 export function useMintFunction() {
   const { writeContract, isPending, data: hash } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess, isError, data: receipt } = useWaitForTransactionReceipt({
+    hash,
+  });
+  const [isRejected, setIsRejected] = useState(false);
+  const [mainContractTokens, setMainContractTokens] = useState<number[]>();
+  const [traitTokens, setTraitTokens] = useState<number[]>();
 
   const mint = async (amount: number = 1) => {
+    if (amount < 1) throw new Error("Amount must be greater than 0");
+    setIsRejected(false);
+    
     try {
-      writeContract({
+      const tx = await writeContract({
         address: mainContract,
         abi: mainABI,
         functionName: 'mint',
         args: [amount],
         chainId,
+      }, {
+        onError: (error) => {
+          console.log('Transaction rejected:', error);
+          setIsRejected(true);
+        },
       });
-    } catch (error) {
-      console.error("Error minting:", error);
+      return tx;
+    } catch (error: any) {
+      console.log('Mint error:', error);
       throw error;
     }
   };
 
-  return { mint, isPending, hash };
+  // Add effect to log receipt and parse minted token IDs
+  useEffect(() => {
+    if (isSuccess && receipt) {
+      console.log('Transaction Receipt:', receipt);
+
+      console.log('mainContract', mainContract);
+      console.log('traitsContract', traitsContract);
+
+      const transferEventSignature = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+      
+      // Parse the logs to find Transfer events
+      const mintedTokenIds = receipt.logs
+        .filter(log => {
+          // Filter for Transfer events (you'll need to match the event signature)
+          // The event signature for Transfer is: Transfer(address,address,uint256)
+          return log.topics[0] === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
+        })
+        .map(log => {
+          if (!log.topics[3]) return 0; // Handle undefined case
+          const tokenId = BigInt(log.topics[3]);
+          return Number(tokenId);
+        });
+
+      console.log('Minted Token IDs:', mintedTokenIds);
+
+
+      const mainContractTokens = receipt.logs
+        .filter(log => log.address.toLowerCase() === mainContract.toLowerCase() && log.topics[0] === transferEventSignature)
+        .map(log => {
+          if (!log.topics[3]) return 0;
+          return Number(BigInt(log.topics[3]));
+        });
+
+      const traitTokens = receipt.logs
+        .filter(log => log.address.toLowerCase() === traitsContract.toLowerCase() && log.topics[0] === transferEventSignature)
+        .map(log => {
+          if (!log.topics[3]) return 0;
+          return Number(BigInt(log.topics[3]));
+        });
+
+      console.log('Minted Main Contract Token IDs:', mainContractTokens );
+      console.log('Minted Trait Token IDs:', traitTokens);
+
+      setMainContractTokens(mainContractTokens);
+      setTraitTokens(traitTokens);
+    }
+  }, [isSuccess, receipt]);
+
+  useEffect(() => {
+    if (isError) {
+      console.log('Transaction Error:', isError);
+    }
+  }, [isError]);
+
+  return { 
+    mint, 
+    isPending,          
+    isConfirming,       
+    isSuccess,          
+    isError,
+    isRejected,            
+    hash,
+    receipt,
+    mainContractTokens,
+    traitTokens
+  };
 }
 
 export function useMarketplaceActions(chonkId: number) {
