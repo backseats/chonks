@@ -1,9 +1,9 @@
 To deploy Chonks to Base Sepolia:
 
 1. run `./deploy-base-sepolia.sh`
-2. update scripts/PetersMain.s.sol with the address of the deployed PetersMain contract - find/replace, 3 instances
+2. update scripts/PetersMain.s.sol with the address of the deployed PetersMain contract - find/replace, x instances
 3. run `./deploy-traits-base-sepolia.sh`
-4. update scripts/PetersMain.s.sol with the address of the deployed PetersTraits contract - find/replace, 2 instances
+4. update scripts/PetersMain.s.sol with the address of the deployed PetersTraits contract - find/replace, x instances
 5. ensure addNewTraits() in localDeploy of FirstSeasonRenderMinter is commented or we get max initcode exceeded issue
 
 
@@ -18,6 +18,14 @@ To deploy Chonks to Base Sepolia:
 12. comment out 1st lot, ucomment 2nd lot, run `./add-more-traits-base-sepolia.sh`
 13. comment out 2nd lot, ucomment 3rd lot, run `./add-more-traits-base-sepolia.sh`
 13. comment out 3rd lot, ucomment 4th lot, run `./add-more-traits-base-sepolia.sh`
+13. comment out 4th lot, ucomment 5th lot, run `./add-more-traits-base-sepolia.sh`
 
 
 NOTE: if (code: -32603, message: replacement transaction underpriced, data: None) error: send a tx in mm, i just transfer another account .0001 eth
+
+Once deployed:
+- mint some chonks
+- mint some more chonks
+- if nothing showing in OS/mp, resolve epoch on traits, mint more chonks, look at tokenURI on etherscan etc
+
+

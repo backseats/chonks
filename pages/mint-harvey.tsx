@@ -43,8 +43,18 @@ export default function Mint() {
         }
     }, [hash]);
 
+    useEffect(() => {
+        if (transactionHash) {
+            setTimeout(() => {
+                setIsModalOpen(false);
+                setTransactionHash(null);
+            }, 5000);
+        }
+    }, [transactionHash]);
+
     const handleMint = async () => {
         try {
+            setIsModalOpen(true);
             await mint(mintAmount);
         } catch (error) {
             console.error("Error minting:", error);
