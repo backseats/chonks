@@ -618,8 +618,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         // Ensure correct price
         if (offer.priceInWei != msg.value) revert WrongAmount();
 
-        (, uint256 chonkId, , bool isEquipped) = PETERS_MAIN.getFullPictureForTrait(_traitId);
-
+        (,,, bool isEquipped) = PETERS_MAIN.getFullPictureForTrait(_traitId);
         if(isEquipped) revert TraitEquipped();
 
         // Delete the Offer

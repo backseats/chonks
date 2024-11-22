@@ -47,8 +47,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     mapping(uint256 => TraitMetadata) public traitIndexToMetadata;
 
     mapping(uint256 traitId => address[] operators) public traitIdToApprovedOperators;
-    //note, getter function for this would be:
-    // function traitIdToApprovedOperators(uint256 traitId, uint256 index) public view returns (address);
 
     PetersMain public petersMain;
 
@@ -558,11 +556,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     // Function to get the entire array of approved operators for a traitId
     function getApprovedOperators(uint256 traitId) public view returns (address[] memory) {
         return traitIdToApprovedOperators[traitId];
-    }
-
-    // Function to get the length of the approved operators array for a traitId
-    function getApprovedOperatorsLength(uint256 traitId) public view returns (uint256) {
-        return traitIdToApprovedOperators[traitId].length;
     }
 
 }

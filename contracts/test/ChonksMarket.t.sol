@@ -885,8 +885,92 @@ contract ChonksMarketTest is PetersBaseTest {
     }
 
     function test_buyChonkApprovalsCleared() public {
-        // CBL
+        address seller = address(1);
+        address buyer = address(2);
+
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.setApprovalForAll(address(market), true);
+            main.setApprovalForAll(address(3), true);
+            main.setApprovalForAll(address(4), true);
+            main.setApprovalForAll(address(5), true);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        address[] memory approvals = main.getChonkIdToApprovedOperators(chonkId);
+        assertEq(approvals.length, 4);
+
+        vm.deal(buyer, 2 ether);
+        vm.prank(buyer);
+        market.buyChonk{value: price}(chonkId);
+
+        // expect approvals to be cleared
+        approvals = main.getChonkIdToApprovedOperators(chonkId);
+        assertEq(approvals.length, 0);
     }
+
+    function test_buyChonkTraitApprovalsCleared() public {
+        address seller = address(1);
+        address buyer = address(2);
+
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.setApprovalForAll(address(market), true);
+            main.setApprovalForAll(address(3), true);
+            main.setApprovalForAll(address(4), true);
+            main.setApprovalForAll(address(5), true);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        address tba = main.tokenIdToTBAAccountAddress(chonkId);
+        vm.startPrank(tba);
+            traits.setApprovalForAll(address(market), true);
+            traits.setApprovalForAll(address(3), true);
+            traits.setApprovalForAll(address(4), true);
+            traits.setApprovalForAll(address(5), true);
+        vm.stopPrank();
+
+        address[] memory approvals = main.getChonkIdToApprovedOperators(chonkId);
+        assertEq(approvals.length, 4);
+
+        uint256[] memory traitIds = traits.walletOfOwner(tba);
+        assertEq(traitIds.length, 4);
+
+        // Each trait should have 4 approvals
+        for(uint i; i < traitIds.length; i++) {
+            uint256 traitId = traitIds[i];
+            address[] memory traitApprovals = traits.getApprovedOperators(traitId);
+            assertEq(traitApprovals.length, 4);
+        }
+
+        vm.deal(buyer, 2 ether);
+        vm.prank(buyer);
+        market.buyChonk{value: price}(chonkId);
+
+        // expect approvals to be cleared
+        approvals = main.getChonkIdToApprovedOperators(chonkId);
+        assertEq(approvals.length, 0);
+
+        traitIds = traits.walletOfOwner(tba);
+        assertEq(traitIds.length, 4);
+
+        // Each trait should have 4 approvals
+        for(uint i; i < traitIds.length; i++) {
+            uint256 traitId = traitIds[i];
+            address[] memory traitApprovals = traits.getApprovedOperators(traitId);
+            assertEq(traitApprovals.length, 0);
+        }
+    }
+
+    // do it for traits
 
 
     function test_reentrancy() public {
@@ -1009,6 +1093,8 @@ contract ChonksMarketTest is PetersBaseTest {
         assertEq(traits.ownerOf(traitId), buyerTBA);
         vm.stopPrank();
     }
+
+    /// Bid on Traits
 
     function test_bidAndAcceptBidForChonk() public {
         // Setup seller with Chonk
