@@ -34,6 +34,44 @@ import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
+/*
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:cllllllllllllllllllllllllllllllllc:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:okOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOko:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:clllxOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOdlllc:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:okOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOko:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:ccldOOOOOOO0KKKxllldOOOOOOOOOOOO0KKKxllldOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:ldxxkOOOOOOOXWMNl   ;kOOOOOOOOOOOXWMWl   ;kOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:ldxxkOOOOOOOXMMWl   ;kkkkkkkkkkkOXMMWl   ;kOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:ldxxkOOOOOOOXMMWl   ,dxxxxxxxxxxxKWMWl   ;kOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:coooxOOOOOOOKNNXd'.'cxkkkxxkkkkkk0XNXd'.'lkOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:;:oOOOOOOOOOOOOOkkOOOOOOOOOOOOOOOOOOkkOOOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:lddxkOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOkxxdl:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;::::oOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOo::::;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:okkkkkkkkkkkkkkkkkkkkkkkkkkkkxxddl:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:lxxxxxxxxxxxxxxxxxxxxxxxxxxxxl::::;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:cllldxkxxxxkkkkkkkkkkkkkkkkkkkkkxdlllc:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:okOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOko:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;clllxOOOOOOOOkkkOOOOOOOOOOOOOOkkkOOOOOOOOdlllc:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:okOOOOOOOOOOkxxxkOOOOOOOOOOOOkxxxkOOOOOOOOOOko:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOOkkkOOOOkkkkkOOOOOOOOOOOOkkxkkOOOOkkkOOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOkxxxkOOOOOOOOOOOOOOOOOOOOOOOOOOOOkxxxkOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOkxxxkOOOOOOOOOOOOOOOOOOOOOOOOOOOOkxxxkOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOkxxxkOOOOOOOOOOOOOOOOOOOOOOOOOOOOkxxxkOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:ldxddoooxOOOOOOOOOOOOOOOOOOOOOOOOOOOOxoooddxdl:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;::::::::oOOOOOOOOOOOOOOOOOOOOOOOOOOOOo::::::::;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOOOOOOOOOkxdxkOOOOOOOOOOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOOOOOOOOOo:::okOOOOOOOOOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOOOOOkxddl:;:lddxxkOOOOOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:oOOOOOOOo::::;;;:::::oOOOOOOOo:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:ldddddxdl:;;;;;;;;;;:ldxxxxxdl:;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;:::::::::;;;;;;;;;;;;:::::::::;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+*/
+
 contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
 
     bool _localDeploy; // DEPLOY: remove
@@ -155,6 +193,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _mintInternal(_to, _amount);
     }
 
+    // TODO: Do we want to limit the _amount here to 30?
     function mint(uint256 _amount) public payable {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
         if (_amount == 0) revert CantBeZero();
@@ -188,8 +227,12 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // Initialize the TBA
             IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
+            uint8 traitCount = 4;
+
+            // TODO: see if `_to` is on any merkle trees, if so increase count
+
             // TODO: think we need to call this currentSeasonRenderMinter
-            uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress);
+            uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, traitCount);
 
             // Initialize the Chonk
             StoredChonk storage chonk = chonkTokens.all[tokenId];
