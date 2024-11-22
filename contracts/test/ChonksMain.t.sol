@@ -89,7 +89,8 @@ contract ChonksMainTest is ChonksBaseTest {
         // Test debug mint functionality
         address user2 = address(2);
         vm.startPrank(user2);
-        newMain.mint(1);
+        bytes32[] memory empty;
+        newMain.mint(1, empty);
 
         // // Verify debug mint results
         assertEq(newMain._nextTokenId(), 1); // Should have minted 1 token
@@ -248,8 +249,9 @@ contract ChonksMainTest is ChonksBaseTest {
 
         address user = address(1);
         vm.startPrank(user);
-        vm.expectRevert(SetChonksMainAddress.selector);
-        main.mint(1);
+            bytes32[] memory empty;
+            vm.expectRevert(SetChonksMainAddress.selector);
+            main.mint(1, empty);
         vm.stopPrank();
     }
 
@@ -262,9 +264,10 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.stopPrank();
 
         address user = address(1);
+        bytes32[] memory empty;
         vm.prank(user);
         vm.expectRevert(SetMarketplaceAddress.selector);
-        main.mint(1);
+        main.mint(1, empty);
         assertEq(main.balanceOf(user), 0);
     }
 
@@ -278,7 +281,8 @@ contract ChonksMainTest is ChonksBaseTest {
 
         address user = address(1);
         vm.startPrank(user);
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
         vm.stopPrank();
         assertEq(main.balanceOf(user), 1);
     }
@@ -293,7 +297,8 @@ contract ChonksMainTest is ChonksBaseTest {
 
         address user = address(1);
         vm.prank(user);
-        main.mint(5);
+        bytes32[] memory empty;
+        main.mint(5, empty);
         assertEq(main.balanceOf(user), 5);
     }
     function test_mintWithInsufficientFunds() public {}

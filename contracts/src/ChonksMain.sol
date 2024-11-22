@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-// OpenZeppelin Imports
+// OpenZeppelin/Solady Imports
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { IERC165 } from  "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import { MerkleProof } from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import { Utils } from "./common/Utils.sol";
 
 // ERC-6551 Imports
 import { IAccountImplementation } from "./interfaces/TBABoilerplate/IAccountImplementation.sol";
@@ -121,6 +121,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Chonk ID to approved addresses
     mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators;
 
+    bytes32 public friendsListMerkleRoot;
+
+    bytes32 public specialCollectionMerkleRoot;
+
     /// Errors
 
     error BodyAlreadyExists();
@@ -163,7 +167,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function _debugPostConstructorMint() public {
         if (_localDeploy) {
             for (uint i; i < 10; ++i) {
-                mint(4); // Mints N bodies/tokens
+                bytes32[] memory empty;
+                mint(4, empty); // Mints N bodies/tokens
                 // setBackgroundColor(i, "28b143");
                 // setTokenRenderZ(i, true);
                 // setTokenRender3D(i, true);
@@ -190,11 +195,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
         if (block.timestamp > mintStartTime + 1 weeks) revert MintEnded();
 
-        _mintInternal(_to, _amount);
+        _mintInternal(_to, _amount, 4);
     }
 
     // TODO: Do we want to limit the _amount here to 30?
-    function mint(uint256 _amount) public payable {
+    function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
         if (_amount == 0) revert CantBeZero();
 
@@ -204,10 +209,18 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         if (msg.value != price * _amount) revert InsufficientFunds();
 
-        _mintInternal(msg.sender, _amount);
+        uint8 traitCount = 4;
+        bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
+        if (MerkleProof.verify(_merkleProof, specialCollectionMerkleRoot, leaf)) {
+            traitCount = 5;
+        } else if (MerkleProof.verify(_merkleProof, friendsListMerkleRoot, leaf)) {
+            traitCount = 7;
+        }
+
+        _mintInternal(msg.sender, _amount, traitCount);
     }
 
-    function _mintInternal(address _to, uint256 _amount) internal {
+    function _mintInternal(address _to, uint256 _amount, uint8 _traitCount) internal {
         for (uint i; i < _amount; ++i) {
             uint256 tokenId = ++_nextTokenId;
             _mint(_to, tokenId);
@@ -227,12 +240,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // Initialize the TBA
             IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
-            uint8 traitCount = 4;
-
-            // TODO: see if `_to` is on any merkle trees, if so increase count
-
             // TODO: think we need to call this currentSeasonRenderMinter
-            uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, traitCount);
+            uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
 
             // Initialize the Chonk
             StoredChonk storage chonk = chonkTokens.all[tokenId];
@@ -714,6 +723,14 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setTokenRender3D(uint256 _chonkTokenId, bool _render3D) public onlyChonkOwner(_chonkTokenId) {
         chonkTokens.all[_chonkTokenId].render3D = _render3D;
         emit Render3D(ownerOf(_chonkTokenId), _chonkTokenId, _render3D);
+    }
+
+    function setFriendsListMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
+        friendsListMerkleRoot = _merkleRoot;
+    }
+
+    function setSpecialCollectionMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
+        specialCollectionMerkleRoot = _merkleRoot;
     }
 
     // Boilerplate

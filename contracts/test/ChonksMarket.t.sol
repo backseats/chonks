@@ -124,7 +124,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         uint256 chonkId = 1;
         uint256 price = 1 ether;
         vm.startPrank(user);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
             market.offerChonk(chonkId, price);
         vm.stopPrank();
@@ -143,7 +144,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         address user = address(2);
         vm.startPrank(user);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
 
             vm.expectRevert(Paused.selector);
@@ -158,7 +160,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address buyer = address(2);
         vm.deal(buyer, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
@@ -264,9 +267,10 @@ contract ChonksMarketTest is ChonksBaseTest {
         // First mint a token
         address user = address(1);
         vm.startPrank(user);
-        main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
 
-        // Approve marketplace
+            // Approve marketplace
         main.setApprovalForAll(address(market), true);
 
         // Create offer
@@ -297,12 +301,13 @@ contract ChonksMarketTest is ChonksBaseTest {
     function test_multipleOffers() public {
         address user = address(1);
         vm.startPrank(user);
-        main.mint(1);
-        main.setApprovalForAll(address(market), true);
+            bytes32[] memory empty;
+            main.mint(1, empty);
+            main.setApprovalForAll(address(market), true);
 
-        uint256 chonkId = 1;
-        uint256 price = 1 ether;
-        market.offerChonk(chonkId, price);
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
         vm.stopPrank();
 
         (
@@ -353,7 +358,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         // First mint a token
         address user = address(1);
         vm.startPrank(user);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
         vm.stopPrank();
 
@@ -368,7 +374,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         // First mint a token
         address user = address(1);
         vm.startPrank(user);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
         vm.stopPrank();
 
@@ -386,7 +393,8 @@ contract ChonksMarketTest is ChonksBaseTest {
     function test_cancelOffer() public {
         address user = address(1);
         vm.startPrank(user);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
@@ -433,7 +441,8 @@ contract ChonksMarketTest is ChonksBaseTest {
     function test_cancelOfferUnauthorized() public {
         address user = address(1);
         vm.startPrank(user);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
@@ -453,7 +462,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address buyer = address(2);
 
         vm.startPrank(seller);
-        main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
 
         // Approve marketplace
         main.setApprovalForAll(address(market), true);
@@ -483,7 +493,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
 
             // Approve marketplace
             main.setApprovalForAll(address(market), true);
@@ -505,7 +516,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address unauthorizedBuyer = address(3);
 
         vm.startPrank(seller);
-        main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
 
         // Approve marketplace
         main.setApprovalForAll(address(market), true);
@@ -544,7 +556,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
 
             // Approve marketplace
             main.setApprovalForAll(address(market), true);
@@ -563,7 +576,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
             market.offerChonkToAddress(chonkId, price, address(2));
@@ -581,7 +595,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
@@ -600,7 +615,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.approve(address(market), 1);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
@@ -619,7 +635,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.approve(address(market), 1);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
@@ -637,7 +654,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.approve(address(market), 1);
         vm.stopPrank();
 
@@ -656,7 +674,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.approve(address(market), 1);
 
             uint256 chonkId = 1;
@@ -674,7 +693,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(2);
+            bytes32[] memory empty;
+            main.mint(2, empty);
             main.setApprovalForAll(address(market), true);
 
             uint256 chonkId = 1;
@@ -701,7 +721,8 @@ contract ChonksMarketTest is ChonksBaseTest {
     // TODO: move to ChonksMain.t.sol
     function test_mintStartsAtTokenId1() public {
         vm.prank(address(1));
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
         assertEq(main.ownerOf(1), address(1));
         vm.expectRevert("ERC721: invalid token ID");
         main.ownerOf(0);
@@ -714,7 +735,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address buyer = address(2);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(2);
+            bytes32[] memory empty;
+            main.mint(2, empty);
             main.setApprovalForAll(address(market), true);
 
             uint256 chonkId = 1;
@@ -748,7 +770,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address buyer = address(2);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(2);
+            bytes32[] memory empty;
+            main.mint(2, empty);
             main.setApprovalForAll(address(market), true);
 
             uint256 chonkId = 1;
@@ -781,7 +804,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address buyer = address(2);
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.approve(address(market), 1);
 
             uint256 chonkId = 1;
@@ -839,7 +863,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.approve(address(market), 1);
 
             uint256 chonkId = 1;
@@ -872,7 +897,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.approve(address(market), 1);
 
             uint256 chonkId = 1;
@@ -893,7 +919,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
             main.setApprovalForAll(address(3), true);
             main.setApprovalForAll(address(4), true);
@@ -922,7 +949,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
             main.setApprovalForAll(address(3), true);
             main.setApprovalForAll(address(4), true);
@@ -980,7 +1008,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         vm.deal(seller, 1 ether);
         vm.startPrank(seller);
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAll(address(market), true);
             main.setApprovalForAll(address(3), true);
             main.setApprovalForAll(address(4), true);
@@ -1030,7 +1059,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address seller = address(1);
         vm.deal(seller, 1 ether);
         vm.prank(seller);
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
 
         address tba = main.tokenIdToTBAAccountAddress(1);
         assertEq(traits.balanceOf(tba), 4);
@@ -1102,7 +1132,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.stopPrank();
 
         vm.prank(address(1));
-        main.mint(1);
+        bytes32[] memory empty;
+main.mint(1, empty);
 
         assertEq(main.ownerOf(1), address(1));
     }
@@ -1110,7 +1141,8 @@ contract ChonksMarketTest is ChonksBaseTest {
     // function test_mintWithoutStartTime() public {
     //     vm.prank(address(1));
     //     vm.expectRevert(MintNotStarted.selector);
-    //     main.mint(1);
+    //     bytes32[] memory empty;
+    //     main.mint(1, empty);
     // }
 
     function test_mintAlmostOver() public {
@@ -1121,7 +1153,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.stopPrank();
 
         vm.prank(address(1));
-        main.mint(1);
+        bytes32[] memory empty;
+main.mint(1, empty);
         assertEq(main.ownerOf(1), address(1));
     }
 
@@ -1134,7 +1167,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
     //     vm.prank(address(1));
     //     vm.expectRevert(MintEnded.selector);
-    //     main.mint(1);
+    //     bytes32[] memory empty;
+    // main.mint(1, empty);
     // }
 
     /// Offer Trait
@@ -1146,7 +1180,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Mint Chonk for seller (which also mints initial traits)
         vm.prank(seller);
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
 
         // Get one of the initial traits that came with the Chonk
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
@@ -1171,8 +1206,9 @@ contract ChonksMarketTest is ChonksBaseTest {
         market.offerTrait(traitId, 1, 1 ether);
 
         // Setup buyer with a Chonk
-        vm.prank(buyer);
-        main.mint(2);
+        vm.startPrank(buyer);
+        main.mint(2, empty);
+        vm.stopPrank();
 
         // Buyer purchases the trait
         vm.startPrank(buyer);
@@ -1198,7 +1234,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Mint Chonk for seller (which also mints initial traits)
         vm.prank(seller);
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
 
         // Get one of the initial traits
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
@@ -1226,7 +1263,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Setup unauthorized buyer with a Chonk
         vm.prank(unauthorizedBuyer);
-        main.mint(2);
+        main.mint(2, empty);
 
         // Try to buy with unauthorized buyer (should revert)
         vm.startPrank(unauthorizedBuyer);
@@ -1237,7 +1274,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Setup intended buyer with a Chonk
         vm.prank(intendedBuyer);
-        main.mint(3);
+        main.mint(2, empty);
 
         // Buy with intended buyer
         vm.startPrank(intendedBuyer);
@@ -1262,7 +1299,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address bidder = address(2);
 
         vm.prank(seller);
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
 
         // Bidder places bid
         vm.startPrank(bidder);
@@ -1298,7 +1336,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Mint Chonk for seller (which also mints initial traits)
         vm.prank(seller);
-        main.mint(1); // adddress 1 owns chonk 1, and traits 1 - 4
+        bytes32[] memory empty;
+main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
 
         // Get one of the initial traits
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
@@ -1308,7 +1347,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Setup bidder with a Chonk
         vm.prank(bidder);
-        main.mint(2); // // adddress 2 owns chonk 2, and traits 5 - 8
+        main.mint(2, empty); // // adddress 2 owns chonk 2, and traits 5 - 8
 
         // Bidder places bid
         vm.startPrank(bidder);
@@ -1354,7 +1393,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Setup seller with Chonk
         vm.prank(seller);
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
 
         // Place bid
         vm.startPrank(bidder);
@@ -1379,8 +1419,9 @@ contract ChonksMarketTest is ChonksBaseTest {
         address bidder = address(2);
 
         // Setup seller with Chonk and initial traits
+        bytes32[] memory empty;
         vm.prank(seller);
-        main.mint(1);
+        main.mint(1, empty);
 
         // Get one of the initial traits
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
@@ -1389,7 +1430,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Setup bidder with Chonk
         vm.prank(bidder);
-        main.mint(2);
+        main.mint(2, empty);
 
         // Place bid
         vm.startPrank(bidder);
@@ -1418,7 +1459,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         vm.startPrank(user1);
             // mint and approve a bunch of things
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.setApprovalForAllChonksMarketplace(1, address(market), true);
             main.setApprovalForAllChonksMarketplace(1, user2, true);
             main.setApprovalForAllChonksMarketplace(1, user3, true);
@@ -1464,7 +1506,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         vm.startPrank(user1);
             // mint and approve a bunch of things
-            main.mint(2);
+            bytes32[] memory empty;
+            main.mint(2, empty);
             main.setApprovalForAll(address(market), true);
             main.setApprovalForAll(user2, true);
             main.setApprovalForAll(user3, true);
@@ -1521,7 +1564,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         vm.startPrank(user1);
             // mint and approve a bunch of things
-            main.mint(1);
+            bytes32[] memory empty;
+            main.mint(1, empty);
             main.approve(address(market), 1);
 
             address[] memory operators = main.getChonkIdToApprovedOperators(1);
@@ -1553,7 +1597,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address user1 = address(1);
 
         vm.startPrank(user1);
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
 
         address tba = main.tokenIdToTBAAccountAddress(1);
         vm.startPrank(tba);
@@ -1568,7 +1613,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         address user1 = address(1);
 
         vm.startPrank(user1);
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
 
         address tba = main.tokenIdToTBAAccountAddress(1);
         vm.startPrank(tba);
@@ -1581,7 +1627,8 @@ contract ChonksMarketTest is ChonksBaseTest {
 
     function test_tbaApproveShouldFail() public {
         vm.prank(address(1));
-        main.mint(1);
+        bytes32[] memory empty;
+        main.mint(1, empty);
 
         address tba = main.tokenIdToTBAAccountAddress(1);
         vm.prank(tba);

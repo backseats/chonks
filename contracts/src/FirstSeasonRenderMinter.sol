@@ -225,19 +225,19 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
     //     }
     // }
 
-    // DEPLOY: remove, just for testing
+    // DEPLOY: remove, just for testing to change the address
     function setChonksMain(address _ChonksMain) public onlyOwner {
         ChonksMain = _ChonksMain;
     }
 
+    // TODO: Do we want a team mint here?
+
     // This just creates a blank trait with a type
-    function safeMintMany(address _toTBA) public returns (uint256[] memory) {
+    function safeMintMany(address _toTBA, uint8 _traitCount) public returns (uint256[] memory) {
         if (msg.sender != ChonksMain) revert OnlyChonksMain();
 
-        // TODO: change here based on level of their mint, mint be something we pass into this function as well and remove INITIAL_TRAIT_NUMBER
-        uint8 traitCount = INITIAL_TRAIT_NUMBER;
-        uint256[] memory mintedIds = new uint256[](traitCount);
-        for(uint i; i < traitCount; ++i) {
+        uint256[] memory mintedIds = new uint256[](_traitCount);
+        for(uint i; i < _traitCount; ++i) {
             // Creates a blank Trait token
             uint tokenId = chonkTraits.safeMint(_toTBA);
             mintedIds[i] = tokenId;
