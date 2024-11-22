@@ -275,7 +275,7 @@ export default function Mint() {
                         {isRejected ? (
                             <div>
                                 <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Transaction Rejected</div>
-                                <div className="text-[vw] mb-4">You rejected the transaction. Please try again if you'd like to mint.</div>
+                                <div className="text-[vw] mb-4">You rejected the transaction. Please try again if you&apos;d like to mint.</div>
                                 <button
                                     onClick={() => setIsModalOpen(false)}
                                     className="mb-2 bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
@@ -292,7 +292,7 @@ export default function Mint() {
                                         <div className="text-sm">
                                             {mainContractTokens.map((id, index) => (
                                                 <React.Fragment key={id}>
-                                                    <Link 
+                                                    <Link
                                                         target="_blank"
                                                         href={`/chonks/${id}`}
                                                         className="text-chonk-blue hover:underline"
@@ -325,7 +325,7 @@ export default function Mint() {
                                 {isError ? (
                                     <>
                                         <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Error!</div>
-                                        <div className="text-[vw] mb-2">There's been an error with your transaction. Please try again.</div> 
+                                        <div className="text-[vw] mb-2">There&apos;s been an error with your transaction. Please try again.</div>
                                         <button
                                             onClick={() => setIsModalOpen(false)}
                                             className="mb-6 bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
@@ -336,10 +336,10 @@ export default function Mint() {
                                 ) : (
                                     <>
                                         <div className="font-bold text-black text-[1.725vw] mb-2">Transaction Submitted</div>
-                                        <div className="text-[vw]">Checking mint status{dots}</div> 
+                                        <div className="text-[vw]">Checking mint status{dots}</div>
                                     </>
                                 )}
-                                
+
                                 <div className="text-sm mt-4 break-all max-w-[80%]">
                                     {/* <div className="font-bold mb-1">Transaction Hash:</div> */}
                                     <button
@@ -353,7 +353,7 @@ export default function Mint() {
                         ) : (
                             <div>
                                 <div className="text-black text-[1.725vw] mb-2">Confirm in Wallet</div>
-                                <div className="text-[vw]">Requesting signature{dots}</div> 
+                                <div className="text-[vw]">Requesting signature{dots}</div>
                             </div>
                         )}
 
