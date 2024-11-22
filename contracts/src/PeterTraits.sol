@@ -319,7 +319,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     function walletOfOwner(address _owner) public view returns(uint256[] memory) {
-
         console.log("balanceOf(_owner)", balanceOf(_owner));
         uint256 tokenCount = balanceOf(_owner);
 
@@ -441,7 +440,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     /// @notice Override approve to track individual token approvals
     function approve(address _operator, uint256 _tokenId) public override(ERC721, IERC721) {
         // CHECKS //
-
         if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
         if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait();
 

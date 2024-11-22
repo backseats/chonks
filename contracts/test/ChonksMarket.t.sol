@@ -970,8 +970,58 @@ contract ChonksMarketTest is PetersBaseTest {
         }
     }
 
-    // do it for traits
+    // TODO: do this on trait buy too
+    function test_buyChonkWithIndividualTraitApprovals() public {
+        address seller = address(1);
+        address buyer = address(2);
 
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.mint(1);
+            main.setApprovalForAll(address(market), true);
+            main.setApprovalForAll(address(3), true);
+            main.setApprovalForAll(address(4), true);
+            main.setApprovalForAll(address(5), true);
+
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price);
+        vm.stopPrank();
+
+        address tba = main.tokenIdToTBAAccountAddress(chonkId);
+        vm.startPrank(tba);
+            traits.approve(address(market), 1);
+            traits.approve(address(market), 2);
+        vm.stopPrank();
+
+        address[] memory traitApprovals = traits.getApprovedOperators(1);
+        assertEq(traitApprovals.length, 1);
+
+        traitApprovals = traits.getApprovedOperators(2);
+        assertEq(traitApprovals.length, 1);
+
+        traitApprovals = traits.getApprovedOperators(3);
+        assertEq(traitApprovals.length, 0);
+
+        uint256[] memory traitIds = traits.walletOfOwner(tba);
+        assertEq(traitIds.length, 4);
+
+        vm.deal(buyer, 2 ether);
+        vm.prank(buyer);
+        market.buyChonk{value: price}(chonkId);
+
+        traitIds = traits.walletOfOwner(tba);
+        assertEq(traitIds.length, 4);
+
+        traitApprovals = traits.getApprovedOperators(1);
+        assertEq(traitApprovals.length, 0);
+
+        traitApprovals = traits.getApprovedOperators(2);
+        assertEq(traitApprovals.length, 0);
+
+        traitApprovals = traits.getApprovedOperators(3);
+        assertEq(traitApprovals.length, 0);
+    }
 
     function test_reentrancy() public {
 
