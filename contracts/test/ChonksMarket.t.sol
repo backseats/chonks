@@ -7,6 +7,8 @@ import { PetersMain } from "../src/PetersMain.sol";
 import { PeterTraits } from "../src/PeterTraits.sol";
 import { ChonksMarket } from "../src/ChonksMarket.sol";
 import { TraitCategory } from "../src/TraitCategory.sol";
+import { SecondSeasonRenderMinter } from "../src/SecondSeasonRenderMinter.sol";
+import { ITraitStorage } from "../src/interfaces/ITraitStorage.sol";
 
 struct ChonkOffer {
     // How much for the Chonk
@@ -1021,6 +1023,38 @@ contract ChonksMarketTest is PetersBaseTest {
 
         traitApprovals = traits.getApprovedOperators(3);
         assertEq(traitApprovals.length, 0);
+    }
+
+    function test_mintMultipleSeasons() public {
+        address seller = address(1);
+        vm.deal(seller, 1 ether);
+        vm.prank(seller);
+        main.mint(1);
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        assertEq(traits.balanceOf(tba), 4);
+
+        SecondSeasonRenderMinter minter = new SecondSeasonRenderMinter(address(main), address(traits), true);
+        vm.prank(deployer);
+        traits.addMinter(address(minter));
+
+        uint256[] memory wallet = traits.walletOfOwner(tba);
+        for(uint i; i < wallet.length; i++) {
+            console.log(wallet[i]);
+        }
+
+        // mint 2 traits to chonk 1
+        vm.prank(seller);
+        minter.safeMintMany(1, 2);
+
+        assertEq(traits.balanceOf(tba), 6);
+        wallet = traits.walletOfOwner(tba);
+
+        for(uint i; i < wallet.length; i++) {
+            console.log(wallet[i]);
+            ITraitStorage.StoredTrait memory trait = traits.getTrait(wallet[i]);
+            console.log('renderMinterContract', trait.renderMinterContract);
+        }
     }
 
     function test_reentrancy() public {

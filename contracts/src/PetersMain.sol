@@ -412,6 +412,11 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return tokenIdToTBAAccountAddress[_chonkId];
     }
 
+    // Returns the ChonkId for a TBA
+    function getChonkIdForTBAAddress(address _tbaAddress) public view returns (uint256) {
+        return tbaAddressToTokenId[_tbaAddress];
+    }
+
     function getTraitsForChonkId(uint256 _chonkId) public view returns (uint256[] memory traitTokens) {
         address tbaAddress = getTBAAddressForChonkId(_chonkId);
         traitTokens = getTraitTokens(tbaAddress);

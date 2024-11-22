@@ -8,94 +8,68 @@ pragma solidity ^0.8.22;
 
 // import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 import { ITraitStorage } from './interfaces/ITraitStorage.sol';
+import { PetersMain } from './PetersMain.sol';
 import { PeterTraits } from './PeterTraits.sol';
 import { TraitCategory } from './TraitCategory.sol';
 import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { Utils } from './common/Utils.sol';
+
+// DEPLOY: remove
 import { console2 } from 'forge-std/console2.sol';
-import "forge-std/console.sol"; // DEPLOY: remove
+import "forge-std/console.sol";
+
+// TODO: withdraw function
 
 // contract FirstSeasonRenderMinter is IRenderMinterV1 { // TODO: ownable, ITraitStorage
 contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
-    uint256[] public accessory =                [0]; // let's just have the torch as a 1/1
-    
+    uint256[] public accessory = [0]; // let's just have the torch as a 1/1
+
     bool _localDeploy; // DEPLOY: remove
+
+    PetersMain public petersMain;
 
     PeterTraits public peterTraits;
 
-    // uint8 private constant INITIAL_TRAIT_NUMBER = 7; // NOTE, if 4 or less, "panic: array out-of-bounds access" error
+    error NotTBAAccount();
 
-    mapping (address => bool) public minters;
-
-    error OnlyMinters();
-
-    constructor(PeterTraits _peterTraits, bool localDeploy_) {
-        peterTraits = _peterTraits;
+    constructor(address _petersMain, address _peterTraits, bool localDeploy_) {
+        petersMain = PetersMain(_petersMain);
+        peterTraits = PeterTraits(_peterTraits);
         _localDeploy = localDeploy_;
 
         if (_localDeploy) {
             addNewTrait(27, "Torch by JB", TraitCategory.Name.Accessory, "", hex"180bef4015170cef4015170def4015160eef4015170ef2a02e150fef4015160ff2a02e170ff2e82e180fef40151510ef40151610f2a02e1710f2a02e1810ef401515110000001611ef40151711ef401515120000001413000000141400000013150000001316000000", "180b06ef4015170c06ef4015170d06ef4015160e06ef4015170e06f2a02e150f06ef4015160f06f2a02e170f06f2e82e180f06ef4015151006ef4015161006f2a02e171006f2a02e181006ef4015151106000000161106ef4015171106ef4015151206000000141306000000141406000000131506000000131606000000", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "jb" );
         }
-
     }
 
-    // DEPLOY: Remove
-    function _debugPostConstructorMint() public {
-        if (_localDeploy) {
-            // for (uint i; i < 5; ++i) { // DEPLOY: remove
-            //     safeMint(_traits); // Mints 3 sets of traits
-            // }
-
-            safeMintMany(msg.sender, 1);
-        }
-    }
-
-    // function safeMint(address _to) external returns (uint256[] memory) {
-    //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin
-    //     return peterTraits.safeMint(_to);
-    // }
-
-     function safeMintMany(address _to, uint8 _amount) public payable returns (uint256[] memory) { // TODO: add onlyMinter modifier
+     function safeMintMany(uint256 _chonkId, uint8 _amount) public payable {
         // TODO: check supply?
+        // TODO: check price
 
-        console.log('safeMintMany called, _to:', _to, ', _amount:', _amount);
+        // when does this close?
 
-        //     if (!minters[msg.sender]) revert OnlyMinters(); // this might need to be tx.origin
-
-        // _amount = 5; // for testing
+        address tba = petersMain.getTBAAddressForChonkId(_chonkId);
 
         uint256[] memory mintedIds = new uint256[](_amount);
 
-        // for(uint i; i < INITIAL_TRAIT_NUMBER; ++i) {
         for(uint i; i < _amount; ++i) {
-
-            console.log('minting', i);
-            uint tokenId = peterTraits.safeMint(_to); // creates a token without any kind of info
+            // Creates a token without any kind of info
+            uint tokenId = peterTraits.safeMint(tba);
             mintedIds[i] = tokenId;
-
-            console.log('tokenId', tokenId);
 
             // Initialize our Trait
             ITraitStorage.StoredTrait memory trait = peterTraits.getStoredTraitForTokenId(tokenId);
 
             trait.epoch = peterTraits.getCurrentEpoch(); // set the current epoch
-            trait.seed = tokenId; // seed is the tokenId
+            trait.seed = tokenId;
             trait.renderMinterContract = address(this);
-
-            if (i == 0) {
-                trait.traitType = TraitCategory.Name.Accessory;
-            } 
+            trait.traitType = TraitCategory.Name.Accessory;
 
             peterTraits.setTraitForTokenId(tokenId, trait);
 
-            emit ITraitStorage.Mint(_to, tokenId);
+            emit ITraitStorage.Mint(tba, tokenId);
         }
-
-        console.log('finished for...');
-
-        return mintedIds;
     }
-
 
     function addNewTrait( // this should go in interface above
         uint256 _traitIndex,
@@ -132,33 +106,16 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
         metadata.renderMinterContract = address(this);
         metadata.creatorAddress = _creatorAddress;
         metadata.creatorName = _creatorName;
-        metadata.season = "1"; // TODO: send this in
+        metadata.season = "2"; // TODO: send this in
 
         peterTraits.setTraitIndexToMetadata(_traitIndex, metadata);
     }
 
-    // shoutout to apex777.eth and Based OnChain Dinos:
-    // "The reason I went with 'cumulative' weighting is because it requires less loops in Solidity, so less gas."
-    function _pickTraitByProbability(uint seed, uint256[] memory traitArray, uint[] memory traitProbability) internal pure returns (uint) {
-        require(traitArray.length > 0, "Elements array is empty");
-        require(traitArray.length == traitProbability.length, "Elements and weights length mismatch");
-        
-        for (uint i = 0; i < traitProbability.length; i++) {
-            if(seed < traitProbability[i]) {
-                return i;
-            }
-        }
-        // Fallback, return first element as a safe default
-        return 0;
-    }
-
-    // TODO finish trait rarity
     function explainTrait(
         bool localDeploy,
         ITraitStorage.StoredTrait memory storedTrait,
         uint128 randomness
-    ) view public returns (ITraitStorage.StoredTrait memory) {
-
+    ) pure public returns (ITraitStorage.StoredTrait memory) {
         storedTrait.seed = uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % type(uint256).max;
 
         storedTrait.isRevealed = localDeploy == true ? true : randomness > 0; // if randomness is > 0, epoch & hence peter is revealed
@@ -166,16 +123,6 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
         storedTrait.traitIndex = 27; // Torch by JB
 
         return storedTrait;
-    }
-
-    function setMinterStatus(address _address, bool _status) external { // TODO: onlyOwner
-        minters[_address] = _status;
-    }
-
-    /// Boilerplate
-
-    function safeMint(address) public payable returns (uint256) {
-        // revert NotImplemented();
     }
 
 }
