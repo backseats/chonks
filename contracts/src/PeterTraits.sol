@@ -50,7 +50,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     //note, getter function for this would be:
     // function traitIdToApprovedOperators(uint256 traitId, uint256 index) public view returns (address);
 
-
     PetersMain public petersMain;
 
     ChonksMarket public marketplace;
@@ -62,6 +61,9 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // NOTE: This maybe too simplistic but it's okay to start with
     mapping (address => bool) public isMinter;
+
+    // These are Chonks-related contracts that are approved to invalidate operator approvals
+    mapping (address => bool) public approvedInvalidators;
 
     bool _localDeploy; // DEPLOY: remove
 
@@ -360,6 +362,14 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         traitRenderer.setGhostMaps(_colorMap, _zMap);
     }
 
+    function addApprovedInvalidator(address _invalidator) public onlyOwner {
+        approvedInvalidators[_invalidator] = true;
+    }
+
+    function removeApprovedInvalidator(address _invalidator) public onlyOwner {
+        approvedInvalidators[_invalidator] = false;
+    }
+
     // TODO: PUT BACK IN
     /*
 
@@ -521,7 +531,8 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
 
         // We allow PetersMain to invalidate all operator approvals for a token
-        if (ownerOf(_tokenId) != msg.sender && msg.sender != address(petersMain)) revert NotYourTrait();
+        if (ownerOf(_tokenId) != msg.sender && msg.sender != address(petersMain) && !approvedInvalidators[msg.sender])
+            revert NotYourTrait();
 
         address[] memory operators = traitIdToApprovedOperators[_tokenId];
         if (operators.length == 0) return;
