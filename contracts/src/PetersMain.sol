@@ -147,17 +147,31 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     //     usedNonces[nonce] = true;
     // }
 
+    // TODO: do we let this go longer than the main mint?
+    function teamMint(address _to, uint256 _amount) public onlyOwner {
+        if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
+        if (block.timestamp > mintStartTime + 1 weeks) revert MintEnded();
+
+        _mintInternal(_to, _amount);
+    }
+
     function mint(uint256 _amount) public payable {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
         if (_amount == 0) revert CantBeZero();
-        // TODO: bring these back in
-        // if (block.timestamp < mintStartTime) revert MintNotStarted();
+
+        // TODO: bring these back in, tested them
+        // if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
         // if (block.timestamp > mintStartTime + 24 hours) revert MintEnded();
+
         if (msg.value != price * _amount) revert InsufficientFunds();
 
+        _mintInternal(msg.sender, _amount);
+    }
+
+    function _mintInternal(address _to, uint256 _amount) internal {
         for (uint i; i < _amount; ++i) {
             uint256 tokenId = ++_nextTokenId;
-            _mint(msg.sender, tokenId);
+            _mint(_to, tokenId);
 
             address tokenBoundAccountAddress = REGISTRY.createAccount(
                 ACCOUNT_PROXY, // implementation address
@@ -630,7 +644,7 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         bytes memory colorBytes = bytes(_color);
         if (colorBytes.length != 6) revert InvalidColor();
 
-        if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo(); // todo: either take this out or make it so only marka can do this
+        if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo(); // TODO: either take this out or make it so only marka can do this
 
         // Ensure all characters are valid hex characters (0-9, a-f, A-F)
         for (uint i; i < 6; i++) {

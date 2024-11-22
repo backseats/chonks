@@ -59,7 +59,8 @@ contract ChonksMarketTest is PetersBaseTest {
     error WrongAmount();
     error YouCantBuyThatChonk();
     error YouCantBuyThatTrait();
-
+    error MintNotStarted();
+    error MintEnded();
 
     // PetersMain public petersMain;
     // PeterTraits public traits;
@@ -1057,9 +1058,84 @@ contract ChonksMarketTest is PetersBaseTest {
         }
     }
 
-    function test_reentrancy() public {
-
+    function test_teamMintNotStarted() public {
+        vm.prank(deployer);
+        vm.expectRevert(MintNotStarted.selector);
+        main.teamMint(address(2), 1);
     }
+
+    function test_teamMint() public {
+        vm.startPrank(deployer);
+            main.setMintStartTime(block.timestamp);
+            // advance time 1 minute
+            vm.warp(block.timestamp + 1 minutes);
+
+            // mint 1 token to address 2
+            main.teamMint(address(2), 1);
+        vm.stopPrank();
+
+        assertEq(main.ownerOf(1), address(2));
+    }
+
+
+    function test_teamMintEnded() public {
+        vm.startPrank(deployer);
+            main.setMintStartTime(block.timestamp);
+            // advance time 1 minute
+            vm.warp(block.timestamp + 1 minutes);
+            main.teamMint(address(2), 1);
+
+            assertEq(main.ownerOf(1), address(2));
+
+            // Move past end date
+            vm.warp(block.timestamp + 1 weeks);
+            vm.expectRevert(MintEnded.selector);
+            main.teamMint(address(3), 1);
+        vm.stopPrank();
+    }
+
+    function test_mintWithStartTime() public {
+        vm.startPrank(deployer);
+            main.setMintStartTime(block.timestamp);
+            // advance time 1 minute
+            vm.warp(block.timestamp + 2 minutes);
+        vm.stopPrank();
+
+        vm.prank(address(1));
+        main.mint(1);
+
+        assertEq(main.ownerOf(1), address(1));
+    }
+
+    // function test_mintWithoutStartTime() public {
+    //     vm.prank(address(1));
+    //     vm.expectRevert(MintNotStarted.selector);
+    //     main.mint(1);
+    // }
+
+    function test_mintAlmostOver() public {
+        vm.startPrank(deployer);
+            main.setMintStartTime(block.timestamp);
+            // advance time 1 minute
+            vm.warp(block.timestamp + 23 hours);
+        vm.stopPrank();
+
+        vm.prank(address(1));
+        main.mint(1);
+        assertEq(main.ownerOf(1), address(1));
+    }
+
+    // function test_mintEnded() public {
+    //     vm.startPrank(deployer);
+    //         main.setMintStartTime(block.timestamp);
+    //         // advance time 1 minute
+    //         vm.warp(block.timestamp + 24 hours + 1 minutes);
+    //     vm.stopPrank();
+
+    //     vm.prank(address(1));
+    //     vm.expectRevert(MintEnded.selector);
+    //     main.mint(1);
+    // }
 
     /// Offer Trait
 
