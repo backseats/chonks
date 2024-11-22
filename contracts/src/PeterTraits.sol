@@ -217,14 +217,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         return traitTokens.epoch;
     }
 
-    function setGhostMaps(bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
-        // ghost.colorMap = _colorMap;
-        // ghost.zMap = _zMap;
-        traitRenderer.setGhostMaps(_colorMap, _zMap);
-    }
-
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
-
         StoredTrait memory trait = getTrait(_tokenId);
         string memory traitSvg = trait.isRevealed ? getTraitImageSvg(trait.traitIndex) : '<svg></svg>';
 
@@ -339,7 +332,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         return tokensId;
     }
 
-    // OnlyOwner
+    /// Setters/OnlyOwner
 
     function setPetersMain(address _petersMain) public onlyOwner {
         petersMain = PetersMain(_petersMain);
@@ -355,6 +348,16 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     function removeMinter(address _minter) public onlyOwner {
         isMinter[_minter] = false;
+    }
+
+    function setTraitRenderer(address _traitRenderer) public onlyOwner {
+        traitRenderer = TraitRenderer(_traitRenderer);
+    }
+
+    function setGhostMaps(bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
+        // ghost.colorMap = _colorMap;
+        // ghost.zMap = _zMap;
+        traitRenderer.setGhostMaps(_colorMap, _zMap);
     }
 
     // TODO: PUT BACK IN
@@ -539,7 +542,9 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         emit ITraitStorage.AllOperatorApprovalsInvalidated(_tokenId);
     }
 
-     // Function to get the entire array of approved operators for a traitId
+    /// Approval Getters
+
+    // Function to get the entire array of approved operators for a traitId
     function getApprovedOperators(uint256 traitId) public view returns (address[] memory) {
         return traitIdToApprovedOperators[traitId];
     }
@@ -547,10 +552,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     // Function to get the length of the approved operators array for a traitId
     function getApprovedOperatorsLength(uint256 traitId) public view returns (uint256) {
         return traitIdToApprovedOperators[traitId].length;
-    }
-
-    function setTraitRenderer(address _traitRenderer) public onlyOwner {
-        traitRenderer = TraitRenderer(_traitRenderer);
     }
 
 }
