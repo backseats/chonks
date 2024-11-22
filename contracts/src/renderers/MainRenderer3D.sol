@@ -73,15 +73,15 @@ contract MainRenderer3D {
         if (bytes(_traitsAttributes).length > 0) {
             // fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
             fullAttributes = string.concat(
-                '"attributes":[', 
-                _traitsAttributes, 
+                '"attributes":[',
+                _traitsAttributes,
                 '],',
                 generateChonkdata(_chonkdata)
             );
         } else {
             fullAttributes = string.concat(
-                '"attributes":[', 
-                _bodyAttributes, 
+                '"attributes":[',
+                _bodyAttributes,
                 '],',
                 generateChonkdata(_chonkdata)
             );
@@ -201,7 +201,7 @@ contract MainRenderer3D {
             scriptyBuilderAddress
         ).getHTMLURLSafe(htmlRequest);
 
-        return 
+        return
             string(
                 abi.encodePacked(
                     "data:application/json,",
@@ -236,7 +236,7 @@ contract MainRenderer3D {
             );
     }
 
-    // TODO: put in onlyOwner here? or call this from PetersMain?
+    // TODO: put in onlyOwner here? or call this from ChonksMain?
     function setEncodeURI(address _encodeURIAddress) public  {
         encodeURIContract = EncodeURI(_encodeURIAddress);
     }

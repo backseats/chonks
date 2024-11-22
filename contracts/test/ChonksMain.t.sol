@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.22;
 
-import { PetersMain } from '../src/PetersMain.sol';
+import { ChonksMain } from '../src/ChonksMain.sol';
 import { PeterTraits } from "../src/PeterTraits.sol";
 import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
 import { IPeterStorage } from '../src/interfaces/IPeterStorage.sol';
@@ -14,7 +14,7 @@ import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 
 import { Test, console } from 'forge-std/Test.sol';
 
-import { PetersBaseTest } from './PetersBase.t.sol';
+import { ChonksBaseTest } from './ChonksBase.t.sol';
 
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
@@ -23,7 +23,7 @@ import { IAccountProxy } from "../src/interfaces/TBABoilerplate/IAccountProxy.so
 import { IRegistry } from  "../src/interfaces/TBABoilerplate/IRegistry.sol";
 import { IERC6551Executable } from "../src/interfaces/TBABoilerplate/IERC6551Executable.sol";
 
-contract PetersMainTest is PetersBaseTest {
+contract ChonksMainTest is ChonksBaseTest {
 
     function setUp() public override {
         super.setUp();
@@ -34,7 +34,7 @@ contract PetersMainTest is PetersBaseTest {
 
         console.log('test_constructor called');
         // Create new instance without local deploy
-        PetersMain newMain = new PetersMain(false);
+        ChonksMain newMain = new ChonksMain(false);
 
         // Check initial state
         assertEq(newMain.owner(), address(this));
@@ -57,7 +57,7 @@ contract PetersMainTest is PetersBaseTest {
         address deployer = vm.addr(69);
         vm.startPrank(deployer);
 
-        PetersMain newMain = new PetersMain(true);
+        ChonksMain newMain = new ChonksMain(true);
 
         // Check initial state
         assertEq(newMain.owner(), deployer);
@@ -69,10 +69,10 @@ contract PetersMainTest is PetersBaseTest {
         newMain.setTraitsContract(traits);
         newMain.setFirstSeasonRenderMinter(address(dataContract));
         newMain.setMarketplace(address(market));
-        traits.setPetersMain(address(newMain));
+        traits.setChonksMain(address(newMain));
         traits.addMinter(address(dataContract));
         traits.setMarketplace(address(market));
-        dataContract.setPetersMain(address(newMain));
+        dataContract.setChonksMain(address(newMain));
 
         // // Add body traits for minting
         bytes memory emptyBytes;
@@ -108,9 +108,9 @@ contract PetersMainTest is PetersBaseTest {
 
     function test_constructorRevert() public {
         // Test that debug mint fails without proper setup
-        PetersMain newMain = new PetersMain(true);
+        ChonksMain newMain = new ChonksMain(true);
 
-        vm.expectRevert(PetersMain.FirstSeasonRenderMinterNotSet.selector);
+        vm.expectRevert(ChonksMain.FirstSeasonRenderMinterNotSet.selector);
         newMain._debugPostConstructorMint();
     }
 
@@ -238,7 +238,7 @@ contract PetersMainTest is PetersBaseTest {
 
     // Minting Tests
 
-    error SetPetersMainAddress();
+    error SetChonksMainAddress();
     function test_contractErrorOnMint() public {
         vm.startPrank(deployer);
         main.setFirstSeasonRenderMinter(address(dataContract));
@@ -248,7 +248,7 @@ contract PetersMainTest is PetersBaseTest {
 
         address user = address(1);
         vm.startPrank(user);
-        vm.expectRevert(SetPetersMainAddress.selector);
+        vm.expectRevert(SetChonksMainAddress.selector);
         main.mint(1);
         vm.stopPrank();
     }
@@ -257,7 +257,7 @@ contract PetersMainTest is PetersBaseTest {
     function test_contractErrorOnMintMarket() public {
         vm.startPrank(deployer);
         main.setFirstSeasonRenderMinter(address(dataContract));
-        traits.setPetersMain(address(main));
+        traits.setChonksMain(address(main));
         traits.addMinter(address(dataContract));
         vm.stopPrank();
 
@@ -271,7 +271,7 @@ contract PetersMainTest is PetersBaseTest {
     function test_mintSingle() public {
         vm.startPrank(deployer);
         main.setFirstSeasonRenderMinter(address(dataContract));
-        traits.setPetersMain(address(main));
+        traits.setChonksMain(address(main));
         traits.addMinter(address(dataContract));
         traits.setMarketplace(address(market));
         vm.stopPrank();
@@ -286,7 +286,7 @@ contract PetersMainTest is PetersBaseTest {
     function test_mintMultiple() public {
         vm.startPrank(deployer);
         main.setFirstSeasonRenderMinter(address(dataContract));
-        traits.setPetersMain(address(main));
+        traits.setChonksMain(address(main));
         traits.addMinter(address(dataContract));
         traits.setMarketplace(address(market));
         vm.stopPrank();

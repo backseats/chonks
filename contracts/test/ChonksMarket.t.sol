@@ -2,8 +2,8 @@
 pragma solidity ^0.8.22;
 
 import { Test, console } from "forge-std/Test.sol";
-import { PetersBaseTest } from "./PetersBase.t.sol";
-import { PetersMain } from "../src/PetersMain.sol";
+import { ChonksBaseTest } from "./ChonksBase.t.sol";
+import { ChonksMain } from "../src/ChonksMain.sol";
 import { PeterTraits } from "../src/PeterTraits.sol";
 import { ChonksMarket } from "../src/ChonksMarket.sol";
 import { TraitCategory } from "../src/TraitCategory.sol";
@@ -26,7 +26,7 @@ struct ChonkOffer {
 }
 
 // Run with forge test --match-path test/ChonksMarket.t.sol -vv
-contract ChonksMarketTest is PetersBaseTest {
+contract ChonksMarketTest is ChonksBaseTest {
 
     uint8 private constant INITIAL_TRAIT_NUMBER = 4; // this is the number of traits that are minted with a chonk, could possibly just make it public in the data contract
 
@@ -62,7 +62,7 @@ contract ChonksMarketTest is PetersBaseTest {
     error MintNotStarted();
     error MintEnded();
 
-    // PetersMain public petersMain;
+    // ChonksMain public ChonksMain;
     // PeterTraits public traits;
     // ChonksMarket public market;
 
@@ -75,7 +75,7 @@ contract ChonksMarketTest is PetersBaseTest {
         // Setup contracts for minting (copied from test_mintSingle)
         vm.startPrank(deployer);
         main.setFirstSeasonRenderMinter(address(dataContract));
-        traits.setPetersMain(address(main));
+        traits.setChonksMain(address(main));
         traits.addMinter(address(dataContract));
         traits.setMarketplace(address(market));
         main.setMarketplace(address(market));
@@ -1591,7 +1591,7 @@ contract ChonksMarketTest is PetersBaseTest {
 
     /*
     Test:
-    test the stuff in beforeTokenTransfer of PetersMain related to the marketplace
+    test the stuff in beforeTokenTransfer of ChonksMain related to the marketplace
     test the approval attack
     test all the types of offers and bids
     */

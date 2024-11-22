@@ -34,8 +34,7 @@ import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
-// TODO: rename to ChonksMain
-contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
+contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
 
     bool _localDeploy; // DEPLOY: remove
 

@@ -1,7 +1,7 @@
 # Compiler files
 cache/
 /out/*
-!/out/PetersMain.sol/
+!/out/ChonksMain.sol/
 !/out/PeterTraits.sol/
 !/out/ChonksMarket.sol/
 

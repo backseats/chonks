@@ -3,7 +3,7 @@
 pragma solidity ^0.8.13;
 
 import "forge-std/Script.sol";
-import "../src/PetersMain.sol";
+import "../src/ChonksMain.sol";
 
 // import { BodyRenderer } from "../src/renderers/BodyRenderer.sol";
 import { PeterTraits } from "../src/PeterTraits.sol";
@@ -15,15 +15,15 @@ import { EncodeURI } from '../src/EncodeURI.sol';
 import { IAccountProxy } from "../src/interfaces/TBABoilerplate/IAccountProxy.sol";
 
 // Deploy locally:
-// forge script --fork-url http://127.0.0.1:8545 script/PetersMain.s.sol:PetersMainScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --broadcast
+// forge script --fork-url http://127.0.0.1:8545 script/ChonksMain.s.sol:ChonksMainScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --broadcast
 
 // To Deploy to Base Sepolia:
-// forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/PetersMain.s.sol:PetersMainScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --broadcast <- use this to deploy
+// forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/ChonksMain.s.sol:ChonksMainScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --broadcast <- use this to deploy
 
-// forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/PetersMain.s.sol:PetersMainScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --etherscan-api-key 'G38JWKVU4XD6VSWJ1RIHTX79A1QM8QJID9' --broadcast --verify (not working, trying to verify)
-contract PetersMainScript is Script {
+// forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/ChonksMain.s.sol:ChonksMainScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --etherscan-api-key 'G38JWKVU4XD6VSWJ1RIHTX79A1QM8QJID9' --broadcast --verify (not working, trying to verify)
+contract ChonksMainScript is Script {
 
-    PetersMain public main;
+    ChonksMain public main;
     // BodyRenderer public bodyRenderer;
     PeterTraits public traits;
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
@@ -32,14 +32,14 @@ contract PetersMainScript is Script {
 
     bool constant localDeploy = false;
 
-    // NOTE: This is the main deploy script, it deploys PetersMain and all associated contracts
+    // NOTE: This is the main deploy script, it deploys ChonksMain and all associated contracts
     // @dev before you run, make sure localDeploy is set to `false` in both contracts
     function run() external {
         // The value below is any private key you grab from your terminal after running `anvil`
         vm.startBroadcast();
 
-        main = new PetersMain(localDeploy);
-        console.log("PetersMain Address:", address(main));
+        main = new ChonksMain(localDeploy);
+        console.log("ChonksMain Address:", address(main));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(main));
 
         mainRenderer2D = new MainRenderer2D();
@@ -76,9 +76,9 @@ contract PetersMainScript is Script {
 }
 
 
-contract PetersMainBodyAndRenderderScript is Script {
+contract ChonksMainBodyAndRenderderScript is Script {
 
-    PetersMain public main;
+    ChonksMain public main;
     // BodyRenderer public bodyRenderer;
     PeterTraits public traits;
     // FirstSeasonRenderMinter public firstSeasonRenderMinter;
@@ -86,14 +86,14 @@ contract PetersMainBodyAndRenderderScript is Script {
 
     bool constant localDeploy = false;
 
-    // NOTE: This is the main deploy script, it deploys PetersMain and all associated contracts
+    // NOTE: This is the main deploy script, it deploys ChonksMain and all associated contracts
     // @dev before you run, make sure localDeploy is set to `false` in both contracts
     function run() external {
         // The value below is any private key you minted body tokenId: 100 grab from your terminal after running `anvil`
         vm.startBroadcast();
 
-        main = new PetersMain(localDeploy);
-        console.log("PetersMain Address:", address(main));
+        main = new ChonksMain(localDeploy);
+        console.log("ChonksMain Address:", address(main));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(main));
 
         main.addNewBody(0, 'Skin Tone 1', hex"0b17ead9d80c17ead9d81017ead9d81117ead9d80b15ead9d80c15ead9d80d15ead9d80e15ead9d80f15ead9d81015ead9d81115ead9d80b16ead9d80c16ead9d80d16ead9d80f16ead9d81016ead9d81116ead9d80b11ead9d80c11ead9d80d11ead9d80e11ead9d80f11ead9d81011ead9d81111ead9d80b12ead9d80c12e2caca0e12ead9d80f12ead9d81012e2caca0b13ead9d80b14ead9d80c14ead9d80d14ead9d80e14ead9d80f14ead9d81014ead9d81114ead9d80c13ead9d80d13ead9d80e13ead9d80f13ead9d81013ead9d81113ead9d81211ead9d81212ead9d81312ead9d81213e2caca1214e2caca1313ead9d81314ead9d80a11ead9d80912ead9d80913ead9d80914ead9d80a13e2caca0a14e2caca0a12ead9d80d12ead9d81112ead9d80b10e2caca0c10e2caca0d10e2caca0e10e2caca0f10e2caca1010e2caca1110e2caca0f0fead9d8100fead9d80b09ead9d80e0cead9d80c09ead9d80d09ead9d80e09ead9d80f09ead9d81009ead9d81109ead9d81209ead9d80a0aead9d80b0aead9d80c0aead9d80d0aead9d80e0aead9d80f0aead9d8100aead9d8110aead9d8120aead9d8130aead9d80a0bead9d80b0bead9d80c0bead9d80d0bead9d80e0bead9d80f0bead9d8100bead9d8110bead9d8120bead9d8130bead9d80a0cead9d80b0cead9d80f0cead9d8100cead9d80a0dead9d80b0dead9d80a0eead9d80b0eead9d80d0eead9d80e0eead9d80f0eead9d8100eead9d8110eead9d8120eead9d8130eead9d80b0fead9d80c0fead9d80d0fead9d80e0fead9d8110fead9d8120fead9d80c0eead9d8130dead9d8130cead9d8090ce2caca090de2caca120c000000120d000000110dffffff110cffffff0d0c0000000c0cffffff0c0dffffff0d0d0000000f0de2caca0e0de2caca100de2caca", "0b1705EAD9D80c1705EAD9D8101705EAD9D8111705EAD9D80b1605EAD9D80c1605EAD9D80d1605EAD9D80f1605EAD9D8101605EAD9D8111605EAD9D80b1505EAD9D80c1505EAD9D80d1505EAD9D80e1505EAD9D80f1505EAD9D8101505EAD9D8111505EAD9D8091405EAD9D80a1405E2CACA0b1405EAD9D80c1405EAD9D80d1405EAD9D80e1405EAD9D80f1405EAD9D8101405EAD9D8111405EAD9D8121405E2CACA131405EAD9D8091305EAD9D80a1305E2CACA0b1305EAD9D80c1305EAD9D80d1305EAD9D80e1305EAD9D80f1305EAD9D8101305EAD9D8111305EAD9D8121305E2CACA131305EAD9D8091205EAD9D80a1205EAD9D80b1205EAD9D80c1205E2CACA0d1205EAD9D80e1205EAD9D80f1205EAD9D8101205E2CACA111205EAD9D8121205EAD9D8131205EAD9D80a1105EAD9D80b1105EAD9D80c1105EAD9D80d1105EAD9D80e1105EAD9D80f1105EAD9D8101105EAD9D8111105EAD9D8121105EAD9D80b1706EAD9D80c1706EAD9D8101706EAD9D8111706EAD9D80b1504EAD9D80c1504EAD9D80d1504EAD9D80e1504EAD9D80f1504EAD9D8101504EAD9D8111504EAD9D80b1404EAD9D80c1404EAD9D80d1404EAD9D80e1404EAD9D80f1404EAD9D8101404EAD9D8111404EAD9D80b1304EAD9D80c1304EAD9D80d1304EAD9D80e1304EAD9D80f1304EAD9D8101304EAD9D8111304EAD9D80b1204EAD9D80c1204EAD9D80d1204EAD9D80e1204EAD9D80f1204EAD9D8101204EAD9D8111204EAD9D80b1104EAD9D80c1104EAD9D80d1104EAD9D80e1104EAD9D80f1104EAD9D8101104EAD9D8111104EAD9D80b1005E2CACA0c1005E2CACA0d1005E2CACA0e1005E2CACA0f1005E2CACA101005E2CACA111005E2CACA0b1004E2CACA0c1004E2CACA0d1004E2CACA0e1004E2CACA0f1004E2CACA101004E2CACA111004E2CACA0b0f05EAD9D80c0f05EAD9D80d0f05EAD9D80e0f05EAD9D80f0f05EAD9D8100f05EAD9D8110f05EAD9D8120f05EAD9D80a0e05EAD9D80b0e05EAD9D80c0e05EAD9D80d0e05EAD9D80e0e05EAD9D80f0e05EAD9D8100e05EAD9D8110e05EAD9D8120e05EAD9D8130e05EAD9D80a0d05EAD9D80b0d05EAD9D80c0d05EAD9D80d0d05EAD9D80e0d05EAD9D80f0d05EAD9D8100d05EAD9D8110d05EAD9D8120d05EAD9D8130d05EAD9D80a0c05EAD9D80b0c05EAD9D80c0c05EAD9D80d0c05EAD9D80e0c05EAD9D80f0c05EAD9D8100c05EAD9D8110c05EAD9D8120c05EAD9D8130c05EAD9D80a0b05EAD9D80b0b05EAD9D80c0b05EAD9D80d0b05EAD9D80e0b05EAD9D80f0b05EAD9D8100b05EAD9D8110b05EAD9D8120b05EAD9D8130b05EAD9D80a0a05EAD9D80b0a05EAD9D80c0a05EAD9D80d0a05EAD9D80e0a05EAD9D80f0a05EAD9D8100a05EAD9D8110a05EAD9D8120a05EAD9D8130a05EAD9D80b0905EAD9D80c0905EAD9D80d0905EAD9D80e0905EAD9D80f0905EAD9D8100905EAD9D8110905EAD9D8120905EAD9D80b0f04EAD9D80c0f04EAD9D80d0f04EAD9D80e0f04EAD9D80f0f04EAD9D8100f04EAD9D8110f04EAD9D8120f04EAD9D80a0e04EAD9D80b0e04EAD9D80c0e04EAD9D80d0e04EAD9D80e0e04EAD9D80f0e04EAD9D8100e04EAD9D8110e04EAD9D8120e04EAD9D8130e04EAD9D80a0d04EAD9D80b0d04EAD9D80c0d04EAD9D80d0d04EAD9D80e0d04EAD9D80f0d04EAD9D8100d04EAD9D8110d04EAD9D8120d04EAD9D8130d04EAD9D80a0c04EAD9D80b0c04EAD9D80c0c04EAD9D80d0c04EAD9D80e0c04EAD9D80f0c04EAD9D8100c04EAD9D8110c04EAD9D8120c04EAD9D8130c04EAD9D80a0b04EAD9D80b0b04EAD9D80c0b04EAD9D80d0b04EAD9D80e0b04EAD9D80f0b04EAD9D8100b04EAD9D8110b04EAD9D8120b04EAD9D8130b04EAD9D80a0a04EAD9D80b0a04EAD9D80c0a04EAD9D80d0a04EAD9D80e0a04EAD9D80f0a04EAD9D8100a04EAD9D8110a04EAD9D8120a04EAD9D8130a04EAD9D80b0904EAD9D80c0904EAD9D80d0904EAD9D80e0904EAD9D80f0904EAD9D8100904EAD9D8110904EAD9D8120904EAD9D80b0f03EAD9D80c0f03EAD9D80d0f03EAD9D80e0f03EAD9D80f0f03EAD9D8100f03EAD9D8110f03EAD9D80a0e03EAD9D80b0e03EAD9D80c0e03EAD9D80d0e03EAD9D80e0e03EAD9D80f0e03EAD9D8100e03EAD9D8110e03EAD9D8120e03EAD9D8130e03EAD9D80a0d03EAD9D80b0d03EAD9D80c0d03EAD9D80d0d03EAD9D80e0d03EAD9D80f0d03EAD9D8100d03EAD9D8110d03EAD9D8120d03EAD9D8130d03EAD9D80a0c03EAD9D80b0c03EAD9D80c0c03EAD9D80d0c03EAD9D80e0c03EAD9D80f0c03EAD9D8100c03EAD9D8110c03EAD9D8120c03EAD9D8130c03EAD9D80a0b03EAD9D80b0b03EAD9D80c0b03EAD9D80d0b03EAD9D80e0b03EAD9D80f0b03EAD9D8100b03EAD9D8110b03EAD9D8120b03EAD9D8130b03EAD9D80b0a03EAD9D80c0a03EAD9D80d0a03EAD9D80e0a03EAD9D80f0a03EAD9D8100a03EAD9D8110a03EAD9D8120a03EAD9D80b0f06EAD9D80c0f06EAD9D80d0f06EAD9D80e0f06EAD9D80f0f06EAD9D8100f06EAD9D8110f06EAD9D8120f06EAD9D80a0e06EAD9D80b0e06EAD9D80c0e06EAD9D80d0e06EAD9D80e0e06EAD9D80f0e06EAD9D8100e06EAD9D8110e06EAD9D8120e06EAD9D8130e06EAD9D80a0d06EAD9D80b0d06EAD9D80c0d06ffffff0d0d060000000e0d06E2CACA0f0d06E2CACA100d06E2CACA110d06ffffff120d06000000130d06EAD9D80a0c06EAD9D80b0c06EAD9D80c0c06ffffff0d0c060000000e0c06EAD9D80f0c06EAD9D8100c06EAD9D8110c06ffffff120c06000000130c06EAD9D80a0b06EAD9D80b0b06EAD9D80c0b06EAD9D80d0b06EAD9D80e0b06EAD9D80f0b06EAD9D8100b06EAD9D8110b06EAD9D8120b06EAD9D8130b06EAD9D80a0a06EAD9D80b0a06EAD9D80c0a06EAD9D80d0a06EAD9D80e0a06EAD9D80f0a06EAD9D8100a06EAD9D8110a06EAD9D8120a06EAD9D8130a06EAD9D80b0906EAD9D80c0906EAD9D80d0906EAD9D80e0906EAD9D80f0906EAD9D8100906EAD9D8110906EAD9D8120906EAD9D8090d05E2CACA090c05E2CACA");
@@ -110,22 +110,22 @@ contract PetersMainBodyAndRenderderScript is Script {
 }
 
 
-contract PetersUpdateBodiesScript is Script {
+contract ChonksUpdateBodiesScript is Script {
 
-    // NOTE: This is the main deploy script, it deploys PetersMain and all associated contracts
+    // NOTE: This is the main deploy script, it deploys ChonksMain and all associated contracts
     // @dev before you run, make sure localDeploy is set to `false` in both contracts
     function run() external {
         // The value below is any private key you grab from your terminal after running `anvil`
         vm.startBroadcast();
 
-        PetersMain main = PetersMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
+        ChonksMain main = ChonksMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
 
         vm.stopBroadcast();
     }
 
 }
 
-contract PetersTraitsScript is Script {
+contract ChonksTraitsScript is Script {
 
     // BodyRenderer public bodyRenderer;
     PeterTraits public traits;
@@ -138,7 +138,7 @@ contract PetersTraitsScript is Script {
         vm.startBroadcast();
 
         // uncomment, add address and run
-        PetersMain main = PetersMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
+        ChonksMain main = ChonksMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
 
          // local deploy: false
         traits = new PeterTraits(localDeploy);
@@ -149,7 +149,7 @@ contract PetersTraitsScript is Script {
 
         main.setTraitsContract(traits);
 
-        traits.setPetersMain(address(main));
+        traits.setChonksMain(address(main));
 
         // Set the body renderer on both contracts
         // bodyRenderer = new BodyRenderer();
@@ -168,8 +168,7 @@ contract PetersTraitsScript is Script {
 }
 
 
-contract PetersMarketplaceScript is Script {
-
+contract ChonksMarketplaceScript is Script {
 
     ChonksMarket public market;
 
@@ -180,7 +179,7 @@ contract PetersMarketplaceScript is Script {
         vm.startBroadcast();
 
         // uncomment, add address and run
-        PetersMain main = PetersMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
+        ChonksMain main = ChonksMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
         PeterTraits traits = PeterTraits(0x58C23901E83eE90e1aa4CddeFebd4D2BE7384782);
 
         //  market = new ChonksMarket(
@@ -217,7 +216,7 @@ contract PetersMarketplaceScript is Script {
 
 }
 
-contract PetersRenderersScript is Script {
+contract ChonksRenderersScript is Script {
 
     // BodyRenderer public bodyRenderer;
     FirstSeasonRenderMinter public firstSeasonRenderMinter;
@@ -229,7 +228,7 @@ contract PetersRenderersScript is Script {
         vm.startBroadcast();
 
         // uncomment, add address and run
-        PetersMain main = PetersMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
+        ChonksMain main = ChonksMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
         PeterTraits traits = PeterTraits(0x58C23901E83eE90e1aa4CddeFebd4D2BE7384782);
 
         //  // local deploy: false
@@ -258,7 +257,7 @@ contract PetersRenderersScript is Script {
 
 }
 
-contract PetersZScript is Script {
+contract ChonksZScript is Script {
 
     MainRenderer3D public mainRenderer3D;
     EncodeURI public encodeURIContract;
@@ -269,7 +268,7 @@ contract PetersZScript is Script {
         vm.startBroadcast();
 
         // uncomment, add address and run
-        PetersMain main = PetersMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
+        ChonksMain main = ChonksMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
 
         mainRenderer3D = new MainRenderer3D();
         main.setMainRenderer3D(address(mainRenderer3D));
@@ -290,7 +289,7 @@ contract PetersZScript is Script {
 
 }
 
-contract PetersUpdateZScript is Script {
+contract ChonksUpdateZScript is Script {
 
     bytes public base64ScriptContent;
 
@@ -320,15 +319,15 @@ contract PetersUpdateZScript is Script {
 
 
 
-// forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/PetersMain.s.sol:PetersMainResolutionScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --broadcast
-contract PetersMainResolutionScript is Script {
+// forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/ChonksMain.s.sol:ChonksMainResolutionScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --broadcast
+contract ChonksMainResolutionScript is Script {
 
     function run() external {
         // The value below is any private key you grab from your terminal after running `anvil`
         vm.startBroadcast();
 
         // uncomment, add address and run
-        PetersMain main = PetersMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
+        ChonksMain main = ChonksMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
         // main.resolveEpochIfNecessary();
 
         // PeterTraits traits = PeterTraits({address here}); // insert contract address here
@@ -505,9 +504,9 @@ contract FirstSeasonRenderMinterAddMoreTraitsScript is Script {
         // fsrm.addNewTrait(4052, "Red and Black Varsity", TraitCategory.Name.Top, "", hex"0a110000000b11d4011b0c11d4011b0d11d4011b0e11d1d1d10f110000001011d1d1d11111d4011b121100000009120000000a120000000b12d4011b0c12d4011b0d12d4011b0e12d4011b0f120000001012d4011b1112d4011b1212000000131200000009130000000a130000000b13d4011b0c13d4011b0d13d4011b0e13d1d1d10f130000001013d1d1d11113d4011b121300000013130000000b14d4011b0c14d4011b0d14d4011b0e14d4011b0f140000001014d4011b1114d4011b", "0a11050000000b1105d4011b0c1105d4011b0d1105d4011b0e1105d1d1d10f1105000000101105d1d1d1111105d4011b1211050000000912050000000a12050000000b1205d4011b0c1205d4011b0d1205d4011b0e1205d4011b0f1205000000101205d4011b111205d4011b1212050000001312050000000913050000000a13050000000b1305d4011b0c1305d4011b0d1305d4011b0e1305d1d1d10f1305000000101305d1d1d1111305d4011b1213050000001313050000000b1405d4011b0c1405d4011b0d1405d4011b0e1405d4011b0f1405000000101405d4011b111405d4011b111104d4011b101104d4011b0f1104d4011b0e1104d4011b0d1104d4011b0c1104d4011b0b1104d4011b0b1204d4011b0b1304d4011b0c1204d4011b0d1204d4011b0e1204d4011b0f1204d4011b101204d4011b111204d4011b111304d4011b101304d4011b0f1304d4011b0e1304d4011b0d1304d4011b0c1304d4011b0b1404d4011b0c1404d4011b0d1404d4011b0e1404d4011b0f1404d4011b101404d4011b111404d4011b", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
         // fsrm.addNewTrait(4053, "Blue and Gray Varsity", TraitCategory.Name.Top, "", hex"0a11d1d1d10b112e58bf0c112e58bf0d112e58bf0e110000000f11d1d1d1101100000011112e58bf1211d1d1d10912d1d1d10a12d1d1d10b122e58bf0c122e58bf0d122e58bf0e122e58bf0f12d1d1d110122e58bf11122e58bf1212d1d1d11312d1d1d10913d1d1d10a13d1d1d10b132e58bf0c132e58bf0d132e58bf0e130000000f13d1d1d1101300000011132e58bf1213d1d1d11313d1d1d10b142e58bf0c142e58bf0d142e58bf0e142e58bf0f14d1d1d110142e58bf11142e58bf", "0a1105d1d1d10b11052e58bf0c11052e58bf0d11052e58bf0e11050000000f1105d1d1d11011050000001111052e58bf121105d1d1d1091205d1d1d10a1205d1d1d10b12052e58bf0c12052e58bf0d12052e58bf0e12052e58bf0f1205d1d1d11012052e58bf1112052e58bf121205d1d1d1131205d1d1d1091305d1d1d10a1305d1d1d10b13052e58bf0c13052e58bf0d13052e58bf0e13050000000f1305d1d1d11013050000001113052e58bf121305d1d1d1131305d1d1d10b14052e58bf0c14052e58bf0d14052e58bf0e14052e58bf0f1405d1d1d11014052e58bf1114052e58bf1111042e58bf1011042e58bf0f11042e58bf0e11042e58bf0d11042e58bf0c11042e58bf0b11042e58bf0b12042e58bf0b13042e58bf0c12042e58bf0d13042e58bf0e12042e58bf0d12042e58bf0c13042e58bf0f13042e58bf0f12042e58bf0e13042e58bf1012042e58bf1013042e58bf1112042e58bf1113042e58bf1014042e58bf1114042e58bf0f14042e58bf0d14042e58bf0e14042e58bf0b14042e58bf0c14042e58bf", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
         // fsrm.addNewTrait(4054, "Face Tee", TraitCategory.Name.Top, "", hex"0a11fff1040b11fff1040c11fff1040d11fff1040e11fff1040f11fff1041011fff1041111fff1041211fff1040912fff1040a12fff1040b12fff1040c12fff1040d12b181370e12fff1040f12fff1041012b181371112fff1041212fff1041312fff1040b13fff1040c13fff1040d13fff1040e13fff1040f13fff1041013fff1041113fff1040b14fff1040c14fff1040d14fff1040e14b181370f14b181371014fff1041114fff104", "0a1105fff1040b1105fff1040c1105fff1040d1105fff1040e1105fff1040f1105fff104101105fff104111105fff104121105fff104091205fff1040a1205fff1040b1205fff1040c1205fff1040d1205b181370e1205fff1040f1205fff104101205b18137111205fff104121205fff104131205fff1040b1305fff1040c1305fff1040d1305fff1040e1305fff1040f1305fff104101305fff104111305fff1040b1405fff1040c1405fff1040d1405fff1040e1405b181370f1405b18137101405fff104111405fff104101104fff104111104fff104111204fff104101204fff1040f1204fff1040f1104fff1040c1104fff1040e1204fff1040e1104fff1040d1204fff1040d1104fff1040b1104fff1040c1204fff1040b1204fff104111304fff104111404fff104101304fff104101404fff1040f1304fff1040f1404fff1040d1304fff1040e1404fff1040e1304fff1040c1304fff1040d1404fff1040b1304fff1040c1404fff1040b1404fff104", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
-        
+
         // 5th lot
-        
+
         fsrm.addNewTrait(5000, "Blue Bottom", TraitCategory.Name.Bottom, "", hex"0b150038CB0c15013FE00d15013FE00e150038CB0f15013FE01015013FE011150038CB0b16013FE00c16013FE00d16013FE00f16013FE01016013FE01116013FE0", "0b15050038CB0c1505013FE00d1505013FE00e15050038CB0f1505013FE0101505013FE01115050038CB0b1605013FE00c1605013FE00d1605013FE00f1605013FE0101605013FE0111605013FE00b1504013FE00c1504013FE00d1504013FE00e1504013FE00f1504013FE0101504013FE0111504013FE0", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
         fsrm.addNewTrait(5001, "White Bottom", TraitCategory.Name.Bottom, "", hex"0b15cecece0c15ffffff0d15ffffff0e15cecece0f15ffffff1015ffffff1115cecece0b16ffffff0c16ffffff0d16ffffff0f16ffffff1016ffffff1116ffffff", "0b1505cecece0c1505ffffff0d1505ffffff0e1505cecece0f1505ffffff101505ffffff111505cecece0b1605ffffff0c1605ffffff0d1605ffffff0f1605ffffff101605ffffff111605ffffff0b1504ffffff0c1504ffffff0d1504ffffff0e1504ffffff0f1504ffffff101504ffffff111504ffffff", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
         fsrm.addNewTrait(5002, "Purple Bottom", TraitCategory.Name.Bottom, "", hex"0b156c0b810c157a0d920d157a0d920e156c0b810f157a0d9210157a0d9211156c0b810b167a0d920c167a0d920d167a0d920f167a0d9210167a0d9211167a0d92", "0b15056c0b810c15057a0d920d15057a0d920e15056c0b810f15057a0d921015057a0d921115056c0b810b16057a0d920c16057a0d920d16057a0d920f16057a0d921016057a0d921116057a0d920b15047a0d920c15047a0d920d15047a0d920e15047a0d920f15047a0d921015047a0d921115047a0d92", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
@@ -575,7 +574,7 @@ contract TBACommandsScript is Script {
 
         vm.startBroadcast();
 
-        PetersMain main = PetersMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
+        ChonksMain main = ChonksMain(0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21); // insert contract address here
         PeterTraits traits = PeterTraits(0x58C23901E83eE90e1aa4CddeFebd4D2BE7384782);
 
         IRegistry REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);

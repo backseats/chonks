@@ -1,4 +1,4 @@
-import mainAbiImport from './contracts/out/PetersMain.sol/PetersMain.json'
+import mainAbiImport from './contracts/out/ChonksMain.sol/ChonksMain.json'
 import traitsAbiImport from './contracts/out/PeterTraits.sol/PeterTraits.json'
 import marketplaceAbiImport from './contracts/out/ChonksMarket.sol/ChonksMarket.json'
 import { baseSepolia, base } from "viem/chains";

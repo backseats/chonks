@@ -34,7 +34,7 @@ interface IPeterStorage {
         // was seed // TODO: make this uint256? | TODO
         uint256 tokenId;
 
-        // randomly set in PetersMain.mint() but can be updated by holder
+        // randomly set in ChonksMain.mint() but can be updated by holder
         uint8 bodyIndex;
 
         // Set in getPeter if epoch is revealed
@@ -43,7 +43,7 @@ interface IPeterStorage {
          // This is the seed that's calculuated in getPeter based on randomness + stored.seed
         // uint256 seed;
 
-        // RRGGBB colour of the background, default blue #0D6E9D set in PetersMain.sol mint(), and setBackgroundColor()
+        // RRGGBB colour of the background, default blue #0D6E9D set in ChonksMain.sol mint(), and setBackgroundColor()
         string backgroundColor;
 
         // bool to determine whether to render 3D or not

@@ -1,14 +1,14 @@
 To deploy Chonks to Base Sepolia:
 
 1. run `./deploy-base-sepolia.sh`
-2. update scripts/PetersMain.s.sol with the address of the deployed PetersMain contract - find/replace, x instances
+2. update scripts/ChonksMain.s.sol with the address of the deployed ChonksMain contract - find/replace, x instances
 3. run `./deploy-traits-base-sepolia.sh`
-4. update scripts/PetersMain.s.sol with the address of the deployed PetersTraits contract - find/replace, x instances
+4. update scripts/ChonksMain.s.sol with the address of the deployed PetersTraits contract - find/replace, x instances
 5. ensure addNewTraits() in localDeploy of FirstSeasonRenderMinter is commented or we get max initcode exceeded issue
 
 
 6. run `./deploy-renderers-base-sepolia.sh` (you are here)
-7. update scripts/PetersMain.s.sol with the address of the deployed FirstSeasonRenderMinter contract - find/replace, 2 instances
+7. update scripts/ChonksMain.s.sol with the address of the deployed FirstSeasonRenderMinter contract - find/replace, 2 instances
 
 8. run `./deploy-marketplace-base-sepolia.sh`
 
@@ -27,5 +27,3 @@ Once deployed:
 - mint some chonks
 - mint some more chonks
 - if nothing showing in OS/mp, resolve epoch on traits, mint more chonks, look at tokenURI on etherscan etc
-
-

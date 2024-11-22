@@ -8,7 +8,7 @@ pragma solidity ^0.8.22;
 
 // import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 import { ITraitStorage } from './interfaces/ITraitStorage.sol';
-import { PetersMain } from './PetersMain.sol';
+import { ChonksMain } from './ChonksMain.sol';
 import { PeterTraits } from './PeterTraits.sol';
 import { TraitCategory } from './TraitCategory.sol';
 import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
@@ -26,14 +26,14 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
     bool _localDeploy; // DEPLOY: remove
 
-    PetersMain public petersMain;
+    ChonksMain public chonksMain;
 
     PeterTraits public peterTraits;
 
     error NotTBAAccount();
 
-    constructor(address _petersMain, address _peterTraits, bool localDeploy_) {
-        petersMain = PetersMain(_petersMain);
+    constructor(address _ChonksMain, address _peterTraits, bool localDeploy_) {
+        chonksMain = ChonksMain(_ChonksMain);
         peterTraits = PeterTraits(_peterTraits);
         _localDeploy = localDeploy_;
 
@@ -48,7 +48,7 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
         // when does this close?
 
-        address tba = petersMain.getTBAAddressForChonkId(_chonkId);
+        address tba = chonksMain.getTBAAddressForChonkId(_chonkId);
 
         uint256[] memory mintedIds = new uint256[](_amount);
 

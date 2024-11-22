@@ -9,7 +9,7 @@ Make sure you have values in your `.env`.
 
 `source .env`
 
-`anvil --fork-url $BASE_SEPOLIA_RPC_URL --fork-block-number 10373769 --fork-chain-id 84532 ` (could be any recent block number, doesn't matter. Replace Base Sepolia with Base if you like). Just make sure the `REGISTRY.createAccount` function in `PetersMain.sol`'s 3rd value is the same.
+`anvil --fork-url $BASE_SEPOLIA_RPC_URL --fork-block-number 10373769 --fork-chain-id 84532 ` (could be any recent block number, doesn't matter. Replace Base Sepolia with Base if you like). Just make sure the `REGISTRY.createAccount` function in `ChonksMain.sol`'s 3rd value is the same.
 
 After running Anvil, you can run the Eto Vass tool using
 
@@ -17,7 +17,7 @@ After running Anvil, you can run the Eto Vass tool using
 
 ## How to see how large a contract is
 
-`forge inspect {Contract Name like PetersMain} bytecode | wc -c | awk '{print $1/2}'` (no need for .sol, just use the contract name)
+`forge inspect {Contract Name like ChonksMain} bytecode | wc -c | awk '{print $1/2}'` (no need for .sol, just use the contract name)
 
 
 ---

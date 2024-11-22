@@ -3,7 +3,7 @@ pragma solidity ^0.8.22;
 
 import {IPeterStorage} from "./interfaces/IPeterStorage.sol";
 import {Ownable} from "solady/auth/Ownable.sol";
-import {PetersMain} from "./PetersMain.sol";
+import {ChonksMain} from "./ChonksMain.sol";
 import {PeterTraits} from "./PeterTraits.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
@@ -62,7 +62,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     // Storage
 
-    PetersMain public immutable PETERS_MAIN;
+    ChonksMain public immutable PETERS_MAIN;
     PeterTraits public immutable PETER_TRAITS;
 
     uint256 public royaltyPercentage; // starts at 250 (for 2.5%)
@@ -235,7 +235,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     /// Constructor
 
     constructor(
-        address _petersMain,
+        address _ChonksMain,
         address _peterTraits,
         uint8 _royaltyPercentage,
         address _teamWallet
@@ -243,7 +243,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         console.log("ChonksMarket constructor called, msg.sender:", msg.sender);
         _initializeOwner(msg.sender);
 
-        PETERS_MAIN = PetersMain(_petersMain);
+        PETERS_MAIN = ChonksMain(_ChonksMain);
         PETER_TRAITS = PeterTraits(_peterTraits);
         royaltyPercentage = _royaltyPercentage;
         teamWallet = _teamWallet;

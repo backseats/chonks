@@ -26,7 +26,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
     bool _localDeploy; // DEPLOY: remove
 
     // The Main contract address
-    address public petersMain;
+    address public ChonksMain;
 
     // The Trait contract address
     PeterTraits public peterTraits;
@@ -36,14 +36,14 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
     /// Errors
 
     error CantBeZero();
-    error OnlyPetersMain();
+    error OnlyChonksMain();
 
     /// Constructor
 
-    constructor(address _petersMain, address _peterTraits, bool localDeploy_) {
+    constructor(address _ChonksMain, address _peterTraits, bool localDeploy_) {
         _initializeOwner(msg.sender);
 
-        petersMain = _petersMain;
+        ChonksMain = _ChonksMain;
         peterTraits = PeterTraits(_peterTraits);
 
         _localDeploy = localDeploy_;
@@ -226,13 +226,13 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
     // }
 
     // DEPLOY: remove, just for testing
-    function setPetersMain(address _petersMain) public onlyOwner {
-        petersMain = _petersMain;
+    function setChonksMain(address _ChonksMain) public onlyOwner {
+        ChonksMain = _ChonksMain;
     }
 
     // This just creates a blank trait with a type
     function safeMintMany(address _toTBA) public returns (uint256[] memory) {
-        if (msg.sender != petersMain) revert OnlyPetersMain();
+        if (msg.sender != ChonksMain) revert OnlyChonksMain();
 
         // TODO: change here based on level of their mint, mint be something we pass into this function as well and remove INITIAL_TRAIT_NUMBER
         uint8 traitCount = INITIAL_TRAIT_NUMBER;

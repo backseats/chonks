@@ -23,7 +23,7 @@ import { TraitRenderer } from "./renderers/TraitRenderer.sol";
 
 // Other Chonks Associated Contracts
 import { ChonksMarket } from "./ChonksMarket.sol";
-import { PetersMain } from "./PetersMain.sol";
+import { ChonksMain } from "./ChonksMain.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
@@ -48,7 +48,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     mapping(uint256 traitId => address[] operators) public traitIdToApprovedOperators;
 
-    PetersMain public petersMain;
+    ChonksMain public chonksMain;
 
     ChonksMarket public marketplace;
 
@@ -71,7 +71,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     error NotATBA();
     error NotAValidMinterContract();
     error NotYourTrait();
-    error SetPetersMainAddress();
+    error SetChonksMainAddress();
     error SetMarketplaceAddress();
     error TraitNotFound(uint256 _tokenId);
     error TraitTokenDoesntExist();
@@ -333,8 +333,8 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     /// Setters/OnlyOwner
 
-    function setPetersMain(address _petersMain) public onlyOwner {
-        petersMain = PetersMain(_petersMain);
+    function setChonksMain(address _ChonksMain) public onlyOwner {
+        chonksMain = ChonksMain(_ChonksMain);
     }
 
     function setMarketplace(address _marketplace) public onlyOwner {
@@ -385,7 +385,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     function _cleanUpMarketplaceOffersAndBids(uint256 _tokenId, address _to) internal {
         // Delete the Offer on Chonk ID before the transfer
         address tba = ownerOf(_tokenId);
-        uint256 chonkId = petersMain.tbaAddressToTokenId(tba);
+        uint256 chonkId = chonksMain.tbaAddressToTokenId(tba);
         marketplace.removeChonkOfferOnTraitTransfer(chonkId);
 
         marketplace.deleteTraitOffersBeforeTokenTransfer(_tokenId);
@@ -414,7 +414,7 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         }
 
         // Ensure the `to` address is a TBA
-        if (petersMain.tbaAddressToTokenId(to) == 0) revert NotATBA();
+        if (chonksMain.tbaAddressToTokenId(to) == 0) revert NotATBA();
 
         _cleanUpMarketplaceOffersAndBids(tokenId, to);
 
@@ -423,14 +423,14 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // Remove an active ChonkOffer because owned Traits changed
     function _afterTokenTransfer(address from , address, uint256 _traitTokenId) internal override(ERC721) {
-        if (address(petersMain)  == address(0)) revert SetPetersMainAddress();
+        if (address(chonksMain)  == address(0)) revert SetChonksMainAddress();
         if (address(marketplace) == address(0)) revert SetMarketplaceAddress();
 
         if(from == address(0)) return;
 
         // Delete the Offer on Chonk ID after the transfer
         address tba = ownerOf(_traitTokenId);
-        uint256 chonkId = petersMain.tbaAddressToTokenId(tba);
+        uint256 chonkId = chonksMain.tbaAddressToTokenId(tba);
         marketplace.removeChonkOfferOnTraitTransfer(chonkId);
     }
 
@@ -526,8 +526,8 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     function invalidateAllOperatorApprovals(uint256 _tokenId) public {
         if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
 
-        // We allow PetersMain to invalidate all operator approvals for a token
-        if (ownerOf(_tokenId) != msg.sender && msg.sender != address(petersMain) && !approvedInvalidators[msg.sender])
+        // We allow ChonksMain to invalidate all operator approvals for a token
+        if (ownerOf(_tokenId) != msg.sender && msg.sender != address(chonksMain) && !approvedInvalidators[msg.sender])
             revert NotYourTrait();
 
         address[] memory operators = traitIdToApprovedOperators[_tokenId];
