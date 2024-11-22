@@ -84,8 +84,8 @@ contract ChonksMarketTest is ChonksBaseTest {
     }
 
     function test_marketDeployment() public {
-        assertEq(address(market.PETERS_MAIN()), address(main));
-        assertEq(address(market.PETER_TRAITS()), address(traits));
+        assertEq(address(market.CHONKS_MAIN()), address(main));
+        assertEq(address(market.CHONK_TRAITS()), address(traits));
         assertEq(market.royaltyPercentage(), 250);
         assertEq(market.teamWallet(), TREASURY);
         assertEq(market.paused(), false);

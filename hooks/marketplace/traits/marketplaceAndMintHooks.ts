@@ -166,11 +166,11 @@ export function useMarketplaceActions(traitId: number) {
 //     if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
 
 //     // Please unequip the trait if you want to sell it
-//     if (PETERS_MAIN.checkIfTraitIsEquipped(_chonkId, _traitId))
+//     if (CHONKS_MAIN.checkIfTraitIsEquipped(_chonkId, _traitId))
 //         revert TraitEquipped();
 
-//     address tbaTraitOwner = PETER_TRAITS.ownerOf(_traitId);
-//     (address tokenOwner, ) = PETERS_MAIN.getOwnerAndTBAAddressForChonkId(
+//     address tbaTraitOwner = CHONK_TRAITS.ownerOf(_traitId);
+//     (address tokenOwner, ) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(
 //         _chonkId
 //     );
 
@@ -351,7 +351,7 @@ export function useMarketplaceActions(traitId: number) {
   // function bidOnChonk(
   //     uint256 _chonkId
   // ) public payable ensurePriceIsNotZero(msg.value) notPaused nonReentrant {
-  //     address owner = PETERS_MAIN.ownerOf(_chonkId);
+  //     address owner = CHONKS_MAIN.ownerOf(_chonkId);
   //     if (owner == msg.sender) revert CantBidOnYourOwnChonk();
 
   //     ChonkBid memory existingBid = chonkBids[_chonkId];
