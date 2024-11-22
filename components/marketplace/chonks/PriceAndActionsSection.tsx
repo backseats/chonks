@@ -1,5 +1,5 @@
 import { FaEthereum } from "react-icons/fa6";
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useMarketplaceActions } from '@/hooks/marketplaceAndMintHooks';
 import { useBalance, useAccount, useEnsAddress } from 'wagmi';
 import { parseEther, isAddress, formatEther } from 'viem';
@@ -7,38 +7,52 @@ import { mainnet } from 'wagmi/chains';
 
 type PriceAndActionsSectionProps = {
     chonkId: number;
-    price: number | null;
-    priceUSD: number;
-    isOfferSpecific: boolean;
-    canAcceptOffer: boolean;
     isOwner: boolean;
-    hasActiveOffer: boolean;
-    hasActiveBid: boolean;
-    chonkBid?: {
-        bidder: string;
-        amountInWei: bigint;
-        traitIds: bigint[];
-        encodedTraitIds: string;
-    } | null;
+    // price: number | null;
+    // priceUSD: number;
+    // isOfferSpecific: boolean;
+    // canAcceptOffer: boolean;
+   
+    // hasActiveOffer: boolean;
+    // hasActiveBid: boolean;
+    // onListingSuccess?: () => void;
+    // chonkBid?: {
+    //     bidder: string;
+    //     amountInWei: bigint;
+    //     traitIds: bigint[];
+    //     encodedTraitIds: string;
+    // } | null;
 };
 
 export default function PriceAndActionsSection({
-    price,
-    priceUSD,
-    isOfferSpecific,
-    canAcceptOffer,
-    isOwner,
-    hasActiveOffer,
     chonkId,
-    hasActiveBid,
-    chonkBid,
+    isOwner,
+    // price,
+    // priceUSD,
+    // isOfferSpecific,
+    // canAcceptOffer,
+    // hasActiveOffer,
+    // hasActiveBid,
+    // chonkBid,
+    // onListingSuccess,
 }: PriceAndActionsSectionProps) {
+    const [dots, setDots] = useState('');
     const { address } = useAccount();
     const { data: balance } = useBalance({ address });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [listingPrice, setListingPrice] = useState('');
     const { 
-        isApproved, 
+        finalIsApproved,
+        isListingRejected,
+        hashListChonk,
+        hasActiveBid,
+        chonkBid,
+        hasActiveOffer,
+        isOfferSpecific,
+        canAcceptOffer,
+        isListChonkError,
+        isListChonkSuccess,
+        price,
         handleApproveMarketplace, 
         handleListChonk,
         handleListChonkToAddress,
@@ -50,14 +64,38 @@ export default function PriceAndActionsSection({
     const [isPrivateListingExpanded, setIsPrivateListingExpanded] = useState(false);
     const [recipientAddress, setRecipientAddress] = useState('');
     const [addressError, setAddressError] = useState('');
+    const [priceError, setPriceError] = useState('');
     const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
     const [offerAmount, setOfferAmount] = useState('');
+    const [localListingRejected, setLocalListingRejected] = useState(false);
+
+    useEffect(() => {
+        if (isListingRejected) {
+            setLocalListingRejected(true); // neeeded because we want to clear the rejection here 
+        }
+    }, [isListingRejected]);
+
+    // useEffect(() => {
+    //     if (isListChonkSuccess) {
+    //         onListingSuccess?.();
+    //     }
+    // }, [isListChonkSuccess, onListingSuccess]);
 
     // Add ENS resolution
     const { data: ensAddress } = useEnsAddress({
         name: recipientAddress.endsWith('.eth') ? recipientAddress.toLowerCase() : undefined,
         chainId: mainnet.id
     });
+
+    useEffect(() => {
+        let interval: NodeJS.Timeout;
+        if (isModalOpen) {
+            interval = setInterval(() => {
+                setDots(prev => prev.length >= 3 ? '' : prev + '.');
+            }, 500);
+        }
+        return () => clearInterval(interval);
+    }, [isModalOpen]);
 
     // Add logging
     // console.log('ENS Debug:', {
@@ -84,15 +122,18 @@ export default function PriceAndActionsSection({
     const hasInsufficientBalance = price && balance && 
         balance.value < parseEther((price + estimatedGasInEth).toString());
 
+    // Add this constant near the top of the component
+    const MIN_LISTING_PRICE = 0.000001; // 1 millionth of an ETH
+
     return (
         <>
-            <div className="border border-black p-4 mb-4">
-                {hasActiveOffer ? (
+            <div className="border border-black p-[1.725vw] mb-[1.725vw]">
+                {hasActiveOffer || isListChonkSuccess ? (
                     <>
                         <div className="flex flex-col mb-4">
                             <div className="flex items-baseline gap-2">
                                 <span className="text-2xl font-bold">{price} ETH</span>
-                                <span className="text-gray-500">(${priceUSD.toLocaleString()})</span>
+                                {/* <span className="text-gray-500">(${priceUSD.toLocaleString()})</span> */}
                             </div>
                             {isOfferSpecific && (
                                 <span className="text-sm text-gray-500">Private Listing</span>
@@ -141,21 +182,21 @@ export default function PriceAndActionsSection({
                     </>
                 ) : (
                     <>
-                        <div className="text-lg text-gray-500 mb-4">Not Listed</div>
+                        <div className="text-[1vw] text-gray-500 mb-[1.725vw]">Not Listed</div>
                         <div className="flex flex-col gap-2">
                             {isOwner && (
                                 <>
                                     <button 
                                         className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
                                         onClick={() => {
-                                            if (!isApproved) {
+                                            if (!finalIsApproved) {
                                                 handleApproveMarketplace();
                                             } else {
                                                 setIsModalOpen(true);
                                             }
                                         }}
                                     >
-                                        {isApproved ? 'List Your Chonk' : 'Approve Marketplace to List Chonk'}
+                                        {finalIsApproved ? 'List Your Chonk' : 'Approve Marketplace to List Chonk'}
                                     </button>
                                     
                                     {hasActiveBid && chonkBid && (
@@ -183,101 +224,177 @@ export default function PriceAndActionsSection({
 
             {/* Listing Modal */}
             {isModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-8 rounded-lg max-w-md w-full mx-4">
-                        <h2 className="text-2xl font-bold mb-4">List Chonk #{chonkId}</h2>
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-[5px]">
+                    <div className="bg-white p-8  max-w-md w-full mx-4">
                         
-                        <div className="mb-4">
-                            <label className="block mb-2">Price (ETH)</label>
-                            <input
-                                type="number"
-                                step="0.000001"
-                                value={listingPrice}
-                                onChange={(e) => setListingPrice(e.target.value)}
-                                className="w-full p-2 border rounded"
-                                placeholder="0.00"
-                            />
-                        </div>
-
-                        {/* New Private Listing Section */}
-                        <div className="mb-4">
-                            <button
-                                className="flex items-center gap-2 text-left w-full"
-                                onClick={() => setIsPrivateListingExpanded(!isPrivateListingExpanded)}
-                            >
-                                <span>{isPrivateListingExpanded ? '▼' : '▶'}</span>
-                                Private Listing
-                            </button>
+                        { localListingRejected ? (
+                            <div>
+                                <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Transaction Rejected</div>
+                                <div className="text-[vw] mb-6">I feel rejected :(</div>
+                                <button
+                                    onClick={() => {
+                                        setIsModalOpen(false);
+                                        setListingPrice('');
+                                        setRecipientAddress('');
+                                        setAddressError('');
+                                        setLocalListingRejected(false);
+                                    }}
+                                    className="mb-2 bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        ) : isListChonkSuccess ? (
+                            <>
+                                <div className="text-green-500 text-[1.725vw] mb-2">Success - Listed!</div>
+                                <button
+                                    onClick={() => setIsModalOpen(false)}
+                                    className="mb-4bg-white text-black border border-black px-4 py-2 text-[0.69vw] hover:bg-gray-100 transition-colors mt-[1.725vw]"
+                                >   
+                                    Close
+                                </button>
+                            </>
+                        ) : hashListChonk ? (
+                            <>
+                                {isListChonkError ? (
+                                    <>
+                                        <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Error!</div>
+                                        <div className="text-[vw] mb-2">There&apos;s been an error with your transaction. Please try again.</div>
+                                        <button
+                                            onClick={() => setIsModalOpen(false)}
+                                            className="mb-6 bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                                        >
+                                            Close
+                                        </button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="font-bold text-black text-[1.725vw] mb-2">Transaction Submitted</div>
+                                        <div className="text-[vw]">Checking mint status{dots}</div>
+                                    </>
+                                )}
                             
-                            {isPrivateListingExpanded && (
-                                <div className="mt-2">
-                                    <label className="block mb-2">Recipient Address</label>
+                                <div className="text-sm mt-4 break-all max-w-[80%]">
+                                    <button
+                                        onClick={() => window.open(`https://sepolia.basescan.org/tx/${hashListChonk}`, '_blank')}
+                                        className="bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                                    >
+                                        View on Basescan
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            // LIST FORM
+                            <div>
+                                <h2 className="text-2xl font-bold mb-4">List Chonk #{chonkId}</h2>
+                                
+                                <div className="mb-4">
+                                    <label className="block mb-2">Price (ETH)</label>
                                     <input
-                                        type="text"
-                                        value={recipientAddress}
-                                        onChange={(e) => {
-                                            setRecipientAddress(e.target.value);
-                                            setAddressError('');
-                                        }}
-                                        className={`w-full p-2 border rounded ${addressError ? 'border-red-500' : ''}`}
-                                        placeholder="0x... or name.eth"
+                                        type="number"
+                                        step="0.000001"
+                                        min="0.000001"
+                                        value={listingPrice}
+                                        onChange={(e) => setListingPrice(e.target.value)}
+                                        className="w-full p-2 border rounded"
+                                        placeholder="0.00"
                                     />
-                                    {addressError && (
-                                        <p className="text-red-500 text-sm mt-1">{addressError}</p>
-                                    )}
-                                    {recipientAddress.endsWith('.eth') && (
-                                        <p className="text-gray-500 text-sm mt-1">
-                                            {!ensAddress 
-                                                ? 'Resolving ENS address...' 
-                                                : `Resolved to: ${ensAddress}`}
-                                        </p>
+                                </div>
+
+                                {/* New Private Listing Section */}
+                                <div className="mb-4">
+                                    <button
+                                        className="flex items-center gap-2 text-left w-full"
+                                        onClick={() => setIsPrivateListingExpanded(!isPrivateListingExpanded)}
+                                    >
+                                        <span>{isPrivateListingExpanded ? '▼' : '▶'}</span>
+                                        Private Listing
+                                    </button>
+                                    
+                                    {isPrivateListingExpanded && (
+                                        <div className="mt-2">
+                                            <label className="block mb-2">Recipient Address</label>
+                                            <input
+                                                type="text"
+                                                value={recipientAddress}
+                                                onChange={(e) => {
+                                                    setRecipientAddress(e.target.value);
+                                                    setAddressError('');
+                                                }}
+                                                className={`w-full p-2 border rounded ${addressError ? 'border-red-500' : ''}`}
+                                                placeholder="0x... or name.eth"
+                                            />
+                                            {addressError && (
+                                                <p className="text-red-500 text-sm mt-1">{addressError}</p>
+                                            )}
+                                            {recipientAddress.endsWith('.eth') && (
+                                                <p className="text-gray-500 text-sm mt-1">
+                                                    {!ensAddress 
+                                                        ? 'Resolving ENS address...' 
+                                                        : `Resolved to: ${ensAddress}`}
+                                                </p>
+                                            )}
+                                           
+                                        </div>
                                     )}
                                 </div>
-                            )}
-                        </div>
 
-                        <div className="flex justify-end space-x-4">
-                            <button
-                                className="px-4 py-2 border border-black hover:bg-gray-100"
-                                onClick={() => {
-                                    setIsModalOpen(false);
-                                    setListingPrice('');
-                                    setRecipientAddress('');
-                                    setAddressError('');
-                                }}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="px-4 py-2 bg-black text-white hover:bg-gray-800"
-                                onClick={() => {
-                                    if (isPrivateListingExpanded && !resolvedAddress) {
-                                        setAddressError('Please enter a valid address or ENS name');
-                                        return;
-                                    }
-                                    
-                                    if (isPrivateListingExpanded && resolvedAddress) {
-                                        handleListChonkToAddress(listingPrice, resolvedAddress);
-                                    } else {
-                                        handleListChonk(listingPrice);
-                                    }
-                                    
-                                    setIsModalOpen(false);
-                                    setListingPrice('');
-                                    setRecipientAddress('');
-                                    setAddressError('');
-                                }}
-                            >
-                                {isPrivateListingExpanded && resolvedAddress ? 'Private List Chonk' : 'List Chonk'}
-                            </button>
-                        </div>
+                                {priceError && listingPrice === '' && (
+                                    <div className="mb-2">
+                                        <p className="text-red-500 text-sm mt-1">{priceError}</p>
+                                    </div>
+                                )}
+
+                                
+
+
+
+                                <div className="flex justify-end space-x-4">
+                                    <button
+                                        className="px-4 py-2 border border-black hover:bg-gray-100"
+                                        onClick={() => {
+                                            setIsModalOpen(false);
+                                            setListingPrice('');
+                                            setRecipientAddress('');
+                                            setAddressError('');
+                                            setPriceError('');
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        className="px-4 py-2 bg-black text-white hover:bg-gray-800"
+                                        onClick={() => {
+                                            const listingPriceNum = Number(listingPrice);
+                                            if (listingPriceNum < MIN_LISTING_PRICE) {
+                                                setPriceError(`Minimum listing price is ${MIN_LISTING_PRICE} ETH`);
+                                                return;
+                                            }
+
+                                            if (isPrivateListingExpanded && !resolvedAddress) {
+                                                setAddressError('Please enter a valid address or ENS name');
+                                                return;
+                                            }
+                                            
+                                            if (isPrivateListingExpanded && resolvedAddress) {
+                                                handleListChonkToAddress(listingPrice, resolvedAddress);
+                                            } else {
+                                                handleListChonk(listingPrice);
+                                            }
+                                        }}
+                                    >
+                                        {isPrivateListingExpanded && resolvedAddress ? 'Private List Chonk' : 'List Chonk'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
 
             {/* Offer Modal */}
             {isOfferModalOpen && (
-                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-[5px]">
                     <div className="bg-white p-8 rounded-lg max-w-md w-full mx-4">
                         <h2 className="text-2xl font-bold mb-4">Make an Offer for Chonk #{chonkId}</h2>
                         

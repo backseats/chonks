@@ -21,17 +21,17 @@ import OwnershipSection from "@/components/marketplace/chonks/OwnershipSection";
 import TraitsSection from '@/components/marketplace/TraitsSection';
 import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
 import PriceAndActionsSection from '@/components/marketplace/chonks/PriceAndActionsSection';
-import { formatEther } from "viem";
-import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
+// import { formatEther } from "viem";
+// import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { CurrentChonk } from "@/types/CurrentChonk";
 
-type ChonkOffer = {
-    priceInWei: bigint;
-    seller: string;
-    sellerTBA: string;
-    onlySellTo: string;
-    encodedTraitIds: string;
-}
+// type ChonkOffer = {
+//     priceInWei: bigint;
+//     seller: string;
+//     sellerTBA: string;
+//     onlySellTo: string;
+//     encodedTraitIds: string;
+// }
 
 export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
     // const decodedContent = decodeURIComponent(data);
@@ -74,60 +74,60 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
 
-    const { hasActiveBid, chonkBid } = useMarketplaceActions(parseInt(id));
+    // const { hasActiveBid, chonkBid } = useMarketplaceActions(parseInt(id));
 
-    //get Chonk Offers - accessing the offers directly from mapping
-    // but we now have : getChonkOffer
-    const { data: chonkOfferArray } = useReadContract({
-        address: marketplaceContract,
-        abi: marketplaceABI,
-        functionName: "chonkOffers",
-        args: [BigInt(id)],
-        chainId,
-    }) as { data: [bigint, string, string, string, string] };
+    // //get Chonk Offers - accessing the offers directly from mapping
+    // // but we now have : getChonkOffer
+    // const { data: chonkOfferArray } = useReadContract({
+    //     address: marketplaceContract,
+    //     abi: marketplaceABI,
+    //     functionName: "chonkOffers",
+    //     args: [BigInt(id)],
+    //     chainId,
+    // }) as { data: [bigint, string, string, string, string] };
 
-    // Convert array to object
-    const chonkOffer: ChonkOffer | null = useMemo(() => {
-        if (!chonkOfferArray) return null;
-        return {
-            priceInWei: chonkOfferArray[0],
-            seller: chonkOfferArray[1],
-            sellerTBA: chonkOfferArray[2],
-            onlySellTo: chonkOfferArray[3],
-            encodedTraitIds: chonkOfferArray[4],
-        };
-    }, [chonkOfferArray]);
+    // // Convert array to object
+    // const chonkOffer: ChonkOffer | null = useMemo(() => {
+    //     if (!chonkOfferArray) return null;
+    //     return {
+    //         priceInWei: chonkOfferArray[0],
+    //         seller: chonkOfferArray[1],
+    //         sellerTBA: chonkOfferArray[2],
+    //         onlySellTo: chonkOfferArray[3],
+    //         encodedTraitIds: chonkOfferArray[4],
+    //     };
+    // }, [chonkOfferArray]);
 
-    // Add this console log to see the raw response
-    useEffect(() => {
-        console.group("Raw Response");
-        console.log("Raw chonkOffer:", chonkOffer);
-        if (Array.isArray(chonkOffer)) {
-            console.log("Is array, length:", chonkOffer.length);
-            chonkOffer.forEach((item, index) => {
-                console.log(`Item ${index}:`, item);
-            });
-        } else {
-            console.log("Is not array, type:", typeof chonkOffer);
-        }
-        console.groupEnd();
-    }, [chonkOffer]);
+    // // Add this console log to see the raw response
+    // useEffect(() => {
+    //     console.group("Raw Response");
+    //     console.log("Raw chonkOffer:", chonkOffer);
+    //     if (Array.isArray(chonkOffer)) {
+    //         console.log("Is array, length:", chonkOffer.length);
+    //         chonkOffer.forEach((item, index) => {
+    //             console.log(`Item ${index}:`, item);
+    //         });
+    //     } else {
+    //         console.log("Is not array, type:", typeof chonkOffer);
+    //     }
+    //     console.groupEnd();
+    // }, [chonkOffer]);
 
-    const formattedPrice = useMemo(() => {
-        if (!chonkOffer?.priceInWei) return null;
-        console.log("Price in Wei before formatting:", chonkOffer.priceInWei);
-        return parseFloat(formatEther(chonkOffer.priceInWei));
-    }, [chonkOffer]);
+    // const formattedPrice = useMemo(() => {
+    //     if (!chonkOffer?.priceInWei) return null;
+    //     console.log("Price in Wei before formatting:", chonkOffer.priceInWei);
+    //     return parseFloat(formatEther(chonkOffer.priceInWei));
+    // }, [chonkOffer]);
 
-    const isOfferSpecific = useMemo(() => {
-        if (!chonkOffer?.onlySellTo) return false;
-        return chonkOffer.onlySellTo !== "0x0000000000000000000000000000000000000000";
-    }, [chonkOffer]);
+    // const isOfferSpecific = useMemo(() => {
+    //     if (!chonkOffer?.onlySellTo) return false;
+    //     return chonkOffer.onlySellTo !== "0x0000000000000000000000000000000000000000";
+    // }, [chonkOffer]);
 
-    const canAcceptOffer = useMemo(() => {
-        if (!chonkOffer?.onlySellTo || !address || !isOfferSpecific) return false;
-        return chonkOffer.onlySellTo.toLowerCase() === address.toLowerCase();
-    }, [chonkOffer, address, isOfferSpecific]);
+    // const canAcceptOffer = useMemo(() => {
+    //     if (!chonkOffer?.onlySellTo || !address || !isOfferSpecific) return false;
+    //     return chonkOffer.onlySellTo.toLowerCase() === address.toLowerCase();
+    // }, [chonkOffer, address, isOfferSpecific]);
 
     // Get main body tokenURI
     const { data: tokenURIData } = useReadContract({
@@ -333,48 +333,54 @@ export default function ChonkDetail({ id }: { id: string }) {
         setFilteredTraitTokenIds(filteredTraitTokenIds);
     }, [allTraitTokenIds, storedPeter]);
 
-    // Add these console logs
-    useEffect(() => {
-        console.log("Raw contract response:", chonkOffer);
-        if (chonkOffer) {
-            try {
-                // Log each property individually
-                console.group("Chonk Offer Details");
-                if (chonkOffer.priceInWei) {
-                    console.log("Price in Wei:", chonkOffer.priceInWei.toString());
-                } else {
-                    console.log("Price in Wei: undefined");
-                }
-                console.log("Seller:", chonkOffer.seller || "undefined");
-                console.log("Seller TBA:", chonkOffer.sellerTBA || "undefined");
-                console.log("Only sell to:", chonkOffer.onlySellTo || "undefined");
-                console.log("Encoded trait IDs:", chonkOffer.encodedTraitIds || "undefined");
-                console.groupEnd();
+    // // Add these console logs
+    // useEffect(() => {
+    //     console.log("Raw contract response:", chonkOffer);
+    //     if (chonkOffer) {
+    //         try {
+    //             // Log each property individually
+    //             console.group("Chonk Offer Details");
+    //             if (chonkOffer.priceInWei) {
+    //                 console.log("Price in Wei:", chonkOffer.priceInWei.toString());
+    //             } else {
+    //                 console.log("Price in Wei: undefined");
+    //             }
+    //             console.log("Seller:", chonkOffer.seller || "undefined");
+    //             console.log("Seller TBA:", chonkOffer.sellerTBA || "undefined");
+    //             console.log("Only sell to:", chonkOffer.onlySellTo || "undefined");
+    //             console.log("Encoded trait IDs:", chonkOffer.encodedTraitIds || "undefined");
+    //             console.groupEnd();
 
-                if (address) {
-                    console.group("Wallet Info");
-                    console.log("Connected wallet:", address);
-                    console.log("Can accept offer:", chonkOffer.onlySellTo?.toLowerCase() === address.toLowerCase());
-                    console.groupEnd();
-                }
-            } catch (error) {
-                console.error("Error accessing chonkOffer properties:", error);
-                console.log("chonkOffer type:", typeof chonkOffer);
-                console.log("chonkOffer keys:", Object.keys(chonkOffer));
-            }
-        } else {
-            console.log("No offer found for this Chonk");
-        }
-    }, [chonkOffer, address]);
+    //             if (address) {
+    //                 console.group("Wallet Info");
+    //                 console.log("Connected wallet:", address);
+    //                 console.log("Can accept offer:", chonkOffer.onlySellTo?.toLowerCase() === address.toLowerCase());
+    //                 console.groupEnd();
+    //             }
+    //         } catch (error) {
+    //             console.error("Error accessing chonkOffer properties:", error);
+    //             console.log("chonkOffer type:", typeof chonkOffer);
+    //             console.log("chonkOffer keys:", Object.keys(chonkOffer));
+    //         }
+    //     } else {
+    //         console.log("No offer found for this Chonk");
+    //     }
+    // }, [chonkOffer, address]);
+
+    // const hasActiveOffer = useMemo(() => {
+    //     return Boolean(chonkOffer && chonkOffer.priceInWei > 0n);
+    // }, [chonkOffer]);
 
     const isOwner = useMemo(() => {
         if (!owner || !address) return false;
         return owner.toLowerCase() === address.toLowerCase();
     }, [owner, address]);
 
-    const hasActiveOffer = useMemo(() => {
-        return Boolean(chonkOffer && chonkOffer.priceInWei > 0n);
-    }, [chonkOffer]);
+    // const [isListingSuccess, setIsListingSuccess] = useState(false);
+
+   
+
+    
 
     return (
         <>
@@ -440,14 +446,18 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                                     <PriceAndActionsSection
                                                 chonkId={parseInt(id)}
-                                                price={formattedPrice}
-                                                priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
-                                                isOfferSpecific={isOfferSpecific}
-                                                canAcceptOffer={canAcceptOffer}
                                                 isOwner={isOwner}
-                                                hasActiveOffer={hasActiveOffer}
-                                                hasActiveBid={hasActiveBid}
-                                                chonkBid={chonkBid}
+                                                // price={formattedPrice}
+                                                // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
+                                                // isOfferSpecific={isOfferSpecific}
+                                                // canAcceptOffer={canAcceptOffer}
+                                               
+                                                // hasActiveOffer={hasActiveOffer}
+                                                // hasActiveBid={hasActiveBid}
+                                                // chonkBid={chonkBid}
+                                                // onListingSuccess={() => {
+                                                //     setIsListingSuccess(true);
+                                                // }}
                                             />
 
                                     <ActivityAndOffersSection

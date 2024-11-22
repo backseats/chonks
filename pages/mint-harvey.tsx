@@ -12,80 +12,80 @@ import Link from 'next/link'
 
 
 // Update the modal content to show different states
-const ModalContent = ({
-    isError,
-    isSuccess,
-    isConfirming,
-    dots,
-    transactionHash,
-    setIsModalOpen
-}: {
-    isError: boolean;
-    isSuccess: boolean;
-    isConfirming: boolean;
-    dots: string;
-    transactionHash: string | null;
-    setIsModalOpen: (open: boolean) => void;
-}) => {
-    if (isError) {
-        console.log("isError");
-        return (
-            <div className="space-y-4">
-                <div className="text-xl text-red-500">Transaction Failed</div>
-                <button
-                    onClick={() => setIsModalOpen(false)}
-                    className="bg-chonk-blue hover:bg-chonk-blue/80 text-white py-2 px-4 rounded"
-                >
-                    Close
-                </button>
-            </div>
-        );
-    }
+// const ModalContent = ({
+//     isMintingError,
+//     isMintingSuccess,
+//     isConfirming,
+//     dots,
+//     transactionhashMinting,
+//     setIsModalOpen
+// }: {
+//     isMintingError: boolean;
+//     isMintingSuccess: boolean;
+//     isConfirming: boolean;
+//     dots: string;
+//     transactionhashMinting: string | null;
+//     setIsModalOpen: (open: boolean) => void;
+// }) => {
+//     if (isMintingError) {
+//         console.log("isMintingError");
+//         return (
+//             <div className="space-y-4">
+//                 <div className="text-xl text-red-500">Transaction Failed</div>
+//                 <button
+//                     onClick={() => setIsModalOpen(false)}
+//                     className="bg-chonk-blue hover:bg-chonk-blue/80 text-white py-2 px-4 rounded"
+//                 >
+//                     Close
+//                 </button>
+//             </div>
+//         );
+//     }
 
-    if (isSuccess) {
-        console.log("isSuccess");
-        return (
-            <div className="space-y-4">
-                <div className="text-xl text-green-500">Success!</div>
-                <div>Your Chonk has been minted</div>
-                <button
-                    onClick={() => setIsModalOpen(false)}
-                    className="bg-chonk-blue hover:bg-chonk-blue/80 text-white py-2 px-4 rounded"
-                >
-                    Close
-                </button>
-            </div>
-        );
-    }
+//     if (isMintingSuccess) {
+//         console.log("isMintingSuccess");
+//         return (
+//             <div className="space-y-4">
+//                 <div className="text-xl text-green-500">Success!</div>
+//                 <div>Your Chonk has been minted</div>
+//                 <button
+//                     onClick={() => setIsModalOpen(false)}
+//                     className="bg-chonk-blue hover:bg-chonk-blue/80 text-white py-2 px-4 rounded"
+//                 >
+//                     Close
+//                 </button>
+//             </div>
+//         );
+//     }
 
-    if (isConfirming && transactionHash) {
-        console.log("isConfirming");
-        return (
-            <>
-                <div className="text-black text-[1.725vw] mb-2">Transaction Submitted</div>
-                <div className="text-[1vw]">Waiting for confirmation{dots}</div>
-                {transactionHash && (
-                    <div className="text-sm mt-4 break-all max-w-[80%] text-center">
-                        {/* <div className="font-bold mb-1">Transaction Hash:</div> */}
-                        <button
-                            onClick={() => window.open(`https://sepolia.basescan.org/tx/${transactionHash}`, '_blank')}
-                            className="bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
-                        >
-                            View on Basescan
-                        </button>
-                    </div>
-                )}
-            </>
-        );
-    }
+//     if (isConfirming && transactionhashMinting) {
+//         console.log("isConfirming");
+//         return (
+//             <>
+//                 <div className="text-black text-[1.725vw] mb-2">Transaction Submitted</div>
+//                 <div className="text-[1vw]">Waiting for confirmation{dots}</div>
+//                 {transactionhashMinting && (
+//                     <div className="text-sm mt-4 break-all max-w-[80%] text-center">
+//                         {/* <div className="font-bold mb-1">Transaction hashMinting:</div> */}
+//                         <button
+//                             onClick={() => window.open(`https://sepolia.basescan.org/tx/${transactionhashMinting}`, '_blank')}
+//                             className="bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+//                         >
+//                             View on Basescan
+//                         </button>
+//                     </div>
+//                 )}
+//             </>
+//         );
+//     }
 
-    return (
-        <>
-            <div className="text-black text-[1.725vw] mb-2">Confirm in Wallet</div>
-            <div className="text-[1vw]">Requesting signature{dots}</div>
-        </>
-    );
-};
+//     return (
+//         <>
+//             <div className="text-black text-[1.725vw] mb-2">Confirm in Wallet</div>
+//             <div className="text-[1vw]">Requesting signature{dots}</div>
+//         </>
+//     );
+// };
 
 export default function Mint() {
     const MAX_MINT_AMOUNT = 100;
@@ -94,10 +94,10 @@ export default function Mint() {
     const [mintAmount, setMintAmount] = useState(1);
     const [mintingTokenId, setMintingTokenId] = useState<number | null>(null);
     const [dots, setDots] = useState('');
-    const [transactionHash, setTransactionHash] = useState<string | null>(null);
+    const [transactionhashMinting, setTransactionhashMinting] = useState<string | null>(null);
 
     const { address } = useAccount();
-    const { mint, isPending, isConfirming, isSuccess, isError, isRejected, hash, mainContractTokens, traitTokens } = useMintFunction();
+    const { mint, isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected, hashMinting, mainContractTokens, traitTokens } = useMintFunction();
     const [mounted, setMounted] = React.useState(false);
 
     React.useEffect(() => {
@@ -115,27 +115,27 @@ export default function Mint() {
     }, [isModalOpen, mintingTokenId]);
 
     useEffect(() => {
-        if (hash) {
-            console.log("hash", hash);
-            setTransactionHash(hash);
+        if (hashMinting) {
+            console.log("hashMinting", hashMinting);
+            setTransactionhashMinting(hashMinting);
         }
-    }, [hash]);
+    }, [hashMinting]);
 
     useEffect(() => {
         if (isPending || isConfirming) {
             setIsModalOpen(true);
-        } else if (isSuccess) {
-            console.log("isSuccess");
+        } else if (isMintingSuccess) {
+            console.log("isMintingSuccess");
             // Keep modal open for success message
             // User can close manually
-        } else if (isError) {
-            console.log("isError");
+        } else if (isMintingError) {
+            console.log("isMintingError");
             // setIsModalOpen(false);
-        } else if ( isRejected) {
-            console.log("isRejected");
+        } else if ( isMintRejected) {
+            console.log("isMintRejected");
             // setIsModalOpen(false);
         }
-    }, [isPending, isConfirming, isSuccess, isError, isRejected]);
+    }, [isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected]);
 
     const handleMint = async () => {
         try {
@@ -173,7 +173,7 @@ export default function Mint() {
     return (
         <>
             <Head>
-                <title>Marketplace - Chonks</title>
+                <title>Mint a Chonk - Chonks</title>
                 <meta name="description" content="Welcome to my homepage" />
                 <meta
                     name="viewport"
@@ -269,13 +269,13 @@ export default function Mint() {
             {/* Update Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 font-weight-60 font-source-code-pro backdrop-blur-[5px]">
-                    <div className="bg-white p-8 max-w-md w-full mx-4 text-left">
+                    <div className="bg-white p-8 min-w-[400px] w-auto mx-4 text-left ">
 
 
-                        {isRejected ? (
+                        {isMintRejected ? (
                             <div>
                                 <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Transaction Rejected</div>
-                                <div className="text-[vw] mb-4">You rejected the transaction. Please try again if you&apos;d like to mint.</div>
+                                <div className="text-[vw] mb-6">You rejected the transaction. <br />Please try again if you&apos;d like to mint.</div>
                                 <button
                                     onClick={() => setIsModalOpen(false)}
                                     className="mb-2 bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
@@ -283,13 +283,13 @@ export default function Mint() {
                                     Close
                                 </button>
                             </div>
-                        ) : isSuccess ? (
+                        ) : isMintingSuccess ? (
                             <div>
                                 <div className="text-green-500 text-[1.725vw] mb-2">Success - LFC!</div>
                                 {mainContractTokens && mainContractTokens.length > 0 && (
-                                    <div className="mt-2">
-                                        <div className="font-bold mb-1"> {mainContractTokens.length > 1 ? 'Chonk IDs:' : 'Chonk ID:'}</div>
-                                        <div className="text-sm">
+                                    <div className="mt-2 text-[1vw]">
+                                        <div className="font-bold  mb-1"> {mainContractTokens.length > 1 ? 'Chonk IDs:' : 'Chonk ID:'}</div>
+                                        <div className="">
                                             {mainContractTokens.map((id, index) => (
                                                 <React.Fragment key={id}>
                                                     <Link
@@ -306,23 +306,23 @@ export default function Mint() {
                                     </div>
                                 )}
                                 {traitTokens && traitTokens.length > 0 && (
-                                    <div className="mt-2">
+                                    <div className="mt-2 text-[1vw]">
                                         <div className="font-bold mb-1"> {traitTokens.length > 1 ? 'Trait IDs:' : 'Trait ID:'}</div>
-                                        <div className="text-sm">
+                                        <div className="">
                                             {traitTokens.join(', ')}
                                         </div>
                                     </div>
                                 )}
-                                 <button
+                                <button
                                     onClick={() => setIsModalOpen(false)}
-                                    className="mb-4bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors mt-4"
+                                    className="mb-4bg-white text-black border border-black px-4 py-2 text-[0.69vw] hover:bg-gray-100 transition-colors mt-[1.725vw]"
                                 >
                                     Close
                                 </button>
                             </div>
-                        ) : transactionHash ? (
+                        ) : transactionhashMinting ? (
                             <div>
-                                {isError ? (
+                                {isMintingError ? (
                                     <>
                                         <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Error!</div>
                                         <div className="text-[vw] mb-2">There&apos;s been an error with your transaction. Please try again.</div>
@@ -341,9 +341,9 @@ export default function Mint() {
                                 )}
 
                                 <div className="text-sm mt-4 break-all max-w-[80%]">
-                                    {/* <div className="font-bold mb-1">Transaction Hash:</div> */}
+                                    {/* <div className="font-bold mb-1">Transaction hashMinting:</div> */}
                                     <button
-                                        onClick={() => window.open(`https://sepolia.basescan.org/tx/${transactionHash}`, '_blank')}
+                                        onClick={() => window.open(`https://sepolia.basescan.org/tx/${transactionhashMinting}`, '_blank')}
                                         className="bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
                                     >
                                         View on Basescan
