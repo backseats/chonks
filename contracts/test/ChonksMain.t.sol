@@ -2,7 +2,7 @@
 pragma solidity ^0.8.22;
 
 import { ChonksMain } from '../src/ChonksMain.sol';
-import { PeterTraits } from "../src/PeterTraits.sol";
+import { ChonkTraits } from "../src/ChonkTraits.sol";
 import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
 import { IChonkStorage } from '../src/interfaces/IChonkStorage.sol';
 import { MainRenderer2D } from '../src/renderers/MainRenderer2D.sol';
@@ -323,7 +323,7 @@ contract ChonksMainTest is ChonksBaseTest {
     function test_equipUnequipSameTrait() public {}
     function test_equipTraitAlreadyEquipped() public {}
 
-    // Peter Makeover Tests
+    // Chonk Makeover Tests
     function test_chonkMakeoverComplete() public {}
     function test_chonkMakeoverPartial() public {}
     function test_chonkMakeoverWithInvalidBody() public {}

@@ -20,7 +20,7 @@ import { MainRenderer2D } from "./renderers/MainRenderer2D.sol";
 import { MainRenderer3D } from "./renderers/MainRenderer3D.sol";
 
 // The Traits ERC-721 Contract
-import { PeterTraits } from "./PeterTraits.sol";
+import { ChonkTraits } from "./ChonkTraits.sol";
 
 // Associated Interfaces and Libraries
 import { IERC4906 } from "./interfaces/IERC4906.sol";
@@ -45,7 +45,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     mapping(uint256 => IChonkStorage.BodyMetadata) public bodyIndexToMetadata;
 
     /// The address of the ERC-721 Traits contract
-    PeterTraits public traitsContract;
+    ChonkTraits public traitsContract;
 
     // The address of the ChonksMarket contract
     ChonksMarket public marketplace;
@@ -606,7 +606,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         maxTraitsToOutput = _maxTraitsToOutput;
     }
 
-    function setTraitsContract(PeterTraits _address) public onlyOwner {
+    function setTraitsContract(ChonkTraits _address) public onlyOwner {
         traitsContract = _address;
     }
 

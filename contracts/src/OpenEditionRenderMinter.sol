@@ -5,7 +5,7 @@ import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { ITraitStorage } from './interfaces/ITraitStorage.sol';
 import { TraitCategory } from './TraitCategory.sol';
 import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol'; // TODO: Solady
-import { PeterTraits } from './PeterTraits.sol';
+import { ChonkTraits } from './ChonkTraits.sol';
 
 // An example OpenEditionRenderMinter that only mints/renders 1 trait
 contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
@@ -14,7 +14,7 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
 
     uint256 public closeContractAt;
 
-    PeterTraits public peterTraits;
+    ChonkTraits public chonkTraits;
 
     mapping (address => bool) public minters;
 
@@ -29,10 +29,10 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
         _;
     }
 
-    constructor(uint256 _openContractAt, uint256 _closeContractAt, PeterTraits _peterTraits) {
+    constructor(uint256 _openContractAt, uint256 _closeContractAt, ChonkTraits _chonkTraits) {
         openContractAt = _openContractAt;
         closeContractAt = _closeContractAt;
-        peterTraits = _peterTraits;
+        chonkTraits = _chonkTraits;
     }
 
     // DEPLOY: Remove
@@ -45,16 +45,16 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
     }
 
     function safeMint(address _to) public payable isOpen returns (uint256) { // payable? where to send funds?
-        uint256 tokenId = peterTraits.safeMint(_to);
+        uint256 tokenId = chonkTraits.safeMint(_to);
 
-        ITraitStorage.StoredTrait memory trait = peterTraits.getStoredTraitForTokenId(tokenId);
-        trait.epoch = peterTraits.getCurrentEpoch(); // set the current epoch
+        ITraitStorage.StoredTrait memory trait = chonkTraits.getStoredTraitForTokenId(tokenId);
+        trait.epoch = chonkTraits.getCurrentEpoch(); // set the current epoch
         trait.seed = tokenId; // seed is the tokenId
         trait.renderMinterContract = address(this);
         trait.isRevealed = true; // BS: I think we can set this in certain instances and be okay, if there's no reveal
         trait.traitType = TraitCategory.Name.Top; // Hardcoded but could be a storage var with a setter
 
-        peterTraits.setTraitForTokenId(tokenId, trait);
+        chonkTraits.setTraitForTokenId(tokenId, trait);
 
         return tokenId;
     }
@@ -80,7 +80,7 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
 
         // trait 4 is Blue top, get existing metadata, should be empty struct, then set below. not associated with any token ids yet
         // can't use storage across contracts
-        ITraitStorage.TraitMetadata memory metadata = peterTraits.getTraitIndexToMetadata(_traitIndex);
+        ITraitStorage.TraitMetadata memory metadata = chonkTraits.getTraitIndexToMetadata(_traitIndex);
 
         /*
         // commenting out for now
@@ -98,7 +98,7 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
         metadata.traitType  = _traitType;
         metadata.renderMinterContract = address(this);
 
-        peterTraits.setTraitIndexToMetadata(_traitIndex, metadata);
+        chonkTraits.setTraitIndexToMetadata(_traitIndex, metadata);
     }
 
     function setOpenContractAt(uint256 _openContractAt) external { // onlyOwner {

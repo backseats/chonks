@@ -4,7 +4,7 @@ pragma solidity ^0.8.22;
 import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { ITraitStorage } from './interfaces/ITraitStorage.sol';
 import { Ownable } from 'solady/auth/Ownable.sol';
-import { PeterTraits } from './PeterTraits.sol';
+import { ChonkTraits } from './ChonkTraits.sol';
 import { TraitCategory } from './TraitCategory.sol';
 import { Utils } from './common/Utils.sol';
 
@@ -29,7 +29,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
     address public ChonksMain;
 
     // The Trait contract address
-    PeterTraits public peterTraits;
+    ChonkTraits public chonkTraits;
 
     uint8 private constant INITIAL_TRAIT_NUMBER = 4; // NOTE, if 4 or less, "panic: array out-of-bounds access" error
 
@@ -40,11 +40,11 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
 
     /// Constructor
 
-    constructor(address _ChonksMain, address _peterTraits, bool localDeploy_) {
+    constructor(address _ChonksMain, address _chonkTraits, bool localDeploy_) {
         _initializeOwner(msg.sender);
 
         ChonksMain = _ChonksMain;
-        peterTraits = PeterTraits(_peterTraits);
+        chonkTraits = ChonkTraits(_chonkTraits);
 
         _localDeploy = localDeploy_;
         if (_localDeploy) {
@@ -239,14 +239,14 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
         uint256[] memory mintedIds = new uint256[](traitCount);
         for(uint i; i < traitCount; ++i) {
             // Creates a blank Trait token
-            uint tokenId = peterTraits.safeMint(_toTBA);
+            uint tokenId = chonkTraits.safeMint(_toTBA);
             mintedIds[i] = tokenId;
 
             // Initialize our Trait
-            ITraitStorage.StoredTrait memory trait = peterTraits.getStoredTraitForTokenId(tokenId);
+            ITraitStorage.StoredTrait memory trait = chonkTraits.getStoredTraitForTokenId(tokenId);
 
             // Set the current epoch
-            trait.epoch = peterTraits.getCurrentEpoch();
+            trait.epoch = chonkTraits.getCurrentEpoch();
             // Set the seed to the tokenId
             trait.seed = tokenId;
             // Set the data render contract to this contract
@@ -273,7 +273,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
                 trait.traitType = TraitCategory.Name.Accessory;
             }
 
-            peterTraits.setTraitForTokenId(tokenId, trait);
+            chonkTraits.setTraitForTokenId(tokenId, trait);
 
             // DEPLOY: I dont think we need this because it emits a Transfer function
             emit ITraitStorage.Mint(_toTBA, tokenId);
@@ -297,7 +297,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
 
         // trait 4 is Blue Top, get existing metadata, should be empty struct, then set below. not associated with any token ids yet
         // can't use storage across contracts
-        ITraitStorage.TraitMetadata memory metadata = peterTraits.getTraitIndexToMetadata(_traitIndex);
+        ITraitStorage.TraitMetadata memory metadata = chonkTraits.getTraitIndexToMetadata(_traitIndex);
 
         /*
         // commenting out for now
@@ -319,7 +319,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
         metadata.creatorName = _creatorName;
         metadata.season = "1"; // TODO: send this in
 
-        peterTraits.setTraitIndexToMetadata(_traitIndex, metadata);
+        chonkTraits.setTraitIndexToMetadata(_traitIndex, metadata);
     }
 
     // shoutout to apex777.eth and Based OnChain Dinos:
@@ -348,7 +348,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
 
         storedTrait.seed = uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % type(uint256).max;
 
-        storedTrait.isRevealed = localDeploy == true ? true : randomness > 0; // if randomness is > 0, epoch & hence peter is revealed
+        storedTrait.isRevealed = localDeploy == true ? true : randomness > 0; // if randomness is > 0, epoch & hence Chonk is revealed
 
         if (storedTrait.traitType == TraitCategory.Name.Accessory) {
 

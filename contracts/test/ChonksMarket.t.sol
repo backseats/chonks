@@ -4,7 +4,7 @@ pragma solidity ^0.8.22;
 import { Test, console } from "forge-std/Test.sol";
 import { ChonksBaseTest } from "./ChonksBase.t.sol";
 import { ChonksMain } from "../src/ChonksMain.sol";
-import { PeterTraits } from "../src/PeterTraits.sol";
+import { ChonkTraits } from "../src/ChonkTraits.sol";
 import { ChonksMarket } from "../src/ChonksMarket.sol";
 import { TraitCategory } from "../src/TraitCategory.sol";
 import { SecondSeasonRenderMinter } from "../src/SecondSeasonRenderMinter.sol";
@@ -63,7 +63,7 @@ contract ChonksMarketTest is ChonksBaseTest {
     error MintEnded();
 
     // ChonksMain public ChonksMain;
-    // PeterTraits public traits;
+    // ChonkTraits public traits;
     // ChonksMarket public market;
 
     // address public constant TREASURY = address(0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D);

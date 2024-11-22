@@ -9,7 +9,7 @@ pragma solidity ^0.8.22;
 // import { Ownable } from '@openzeppelin/contracts/access/Ownable.sol';
 import { ITraitStorage } from './interfaces/ITraitStorage.sol';
 import { ChonksMain } from './ChonksMain.sol';
-import { PeterTraits } from './PeterTraits.sol';
+import { ChonkTraits } from './ChonkTraits.sol';
 import { TraitCategory } from './TraitCategory.sol';
 import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { Utils } from './common/Utils.sol';
@@ -28,13 +28,13 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
     ChonksMain public chonksMain;
 
-    PeterTraits public peterTraits;
+    ChonkTraits public chonkTraits;
 
     error NotTBAAccount();
 
-    constructor(address _ChonksMain, address _peterTraits, bool localDeploy_) {
+    constructor(address _ChonksMain, address _chonkTraits, bool localDeploy_) {
         chonksMain = ChonksMain(_ChonksMain);
-        peterTraits = PeterTraits(_peterTraits);
+        chonkTraits = ChonkTraits(_chonkTraits);
         _localDeploy = localDeploy_;
 
         if (_localDeploy) {
@@ -54,18 +54,18 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
         for(uint i; i < _amount; ++i) {
             // Creates a token without any kind of info
-            uint tokenId = peterTraits.safeMint(tba);
+            uint tokenId = chonkTraits.safeMint(tba);
             mintedIds[i] = tokenId;
 
             // Initialize our Trait
-            ITraitStorage.StoredTrait memory trait = peterTraits.getStoredTraitForTokenId(tokenId);
+            ITraitStorage.StoredTrait memory trait = chonkTraits.getStoredTraitForTokenId(tokenId);
 
-            trait.epoch = peterTraits.getCurrentEpoch(); // set the current epoch
+            trait.epoch = chonkTraits.getCurrentEpoch(); // set the current epoch
             trait.seed = tokenId;
             trait.renderMinterContract = address(this);
             trait.traitType = TraitCategory.Name.Accessory;
 
-            peterTraits.setTraitForTokenId(tokenId, trait);
+            chonkTraits.setTraitForTokenId(tokenId, trait);
 
             emit ITraitStorage.Mint(tba, tokenId);
         }
@@ -86,7 +86,7 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
         // trait 4 is Blue Top, get existing metadata, should be empty struct, then set below. not associated with any token ids yet
         // can't use storage across contracts
-        ITraitStorage.TraitMetadata memory metadata = peterTraits.getTraitIndexToMetadata(_traitIndex);
+        ITraitStorage.TraitMetadata memory metadata = chonkTraits.getTraitIndexToMetadata(_traitIndex);
 
         /*
         // commenting out for now
@@ -108,7 +108,7 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
         metadata.creatorName = _creatorName;
         metadata.season = "2"; // TODO: send this in
 
-        peterTraits.setTraitIndexToMetadata(_traitIndex, metadata);
+        chonkTraits.setTraitIndexToMetadata(_traitIndex, metadata);
     }
 
     function explainTrait(
@@ -118,7 +118,7 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
     ) pure public returns (ITraitStorage.StoredTrait memory) {
         storedTrait.seed = uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % type(uint256).max;
 
-        storedTrait.isRevealed = localDeploy == true ? true : randomness > 0; // if randomness is > 0, epoch & hence peter is revealed
+        storedTrait.isRevealed = localDeploy == true ? true : randomness > 0; // if randomness is > 0, epoch & hence Chonk is revealed
 
         storedTrait.traitIndex = 27; // Torch by JB
 

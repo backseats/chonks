@@ -4,7 +4,7 @@ pragma solidity ^0.8.22;
 import { IChonkStorage } from "./interfaces/IChonkStorage.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { ChonksMain } from "./ChonksMain.sol";
-import { PeterTraits } from "./PeterTraits.sol";
+import { ChonkTraits } from "./ChonkTraits.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 // DEPLOY: remove
@@ -64,7 +64,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     // Storage
 
     ChonksMain public immutable CHONKS_MAIN;
-    PeterTraits public immutable CHONK_TRAITS;
+    ChonkTraits public immutable CHONK_TRAITS;
 
     uint256 public royaltyPercentage; // starts at 250 (for 2.5%)
     address public teamWallet;
@@ -237,7 +237,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     constructor(
         address _ChonksMain,
-        address _peterTraits,
+        address _chonkTraits,
         uint8 _royaltyPercentage,
         address _teamWallet
     ) {
@@ -245,7 +245,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         _initializeOwner(msg.sender);
 
         CHONKS_MAIN = ChonksMain(_ChonksMain);
-        CHONK_TRAITS = PeterTraits(_peterTraits);
+        CHONK_TRAITS = ChonkTraits(_chonkTraits);
         royaltyPercentage = _royaltyPercentage;
         teamWallet = _teamWallet;
     }

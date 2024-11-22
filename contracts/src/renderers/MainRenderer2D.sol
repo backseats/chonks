@@ -97,7 +97,7 @@ contract MainRenderer2D {
         );
 
         string memory json = string.concat(
-            '{"name":"Peter #',
+            '{"name":"Chonk #',
                 Utils.toString(_tokenId),
              '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
                 fullAttributes,

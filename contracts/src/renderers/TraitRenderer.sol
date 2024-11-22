@@ -60,7 +60,7 @@ contract TraitRenderer {
         );
 
         string memory json = string.concat(
-            '{"name":"Peter Trait #',
+            '{"name":"Chonk Trait #',
             Utils.toString(_tokenId),
             '","description":"This is just a test",', //TODO: look at description, we could have a link in here to the site/mp to encourage trading there e.g. chonks.xyz/traits/traitIndex or the likes (maybe make this updateable via contract)
             attributes,

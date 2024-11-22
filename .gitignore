@@ -14,7 +14,7 @@
 /.next/
 /out/*
 !/out/ChonksMain.sol/
-!/out/PeterTraits.sol/
+!/out/ChonkTraits.sol/
 !/out/ChonksMarket.sol/
 
 # production

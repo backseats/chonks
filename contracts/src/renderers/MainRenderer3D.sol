@@ -205,7 +205,7 @@ contract MainRenderer3D {
             string(
                 abi.encodePacked(
                     "data:application/json,",
-                    encodeURIContract.encodeURI('{"name":"Peter #'),
+                    encodeURIContract.encodeURI('{"name":"Chonk #'),
                     Utils.toString(_tokenId),
                     // encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
                     encodeURIContract.encodeURI('", "description":"Left click and drag to rotate, right click to move, mouse wheel to zoom ",'),

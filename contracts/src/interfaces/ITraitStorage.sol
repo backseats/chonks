@@ -44,7 +44,7 @@ interface ITraitStorage {
     // with Body, we just hardcode 3 bodies in contracts
     // but with traits, we want to be able to add them, hence this struct
     struct TraitMetadata {
-        // Refers to the number used in PeterTraits.addNewTrait; not a token ID
+        // Refers to the number used in ChonkTraits.addNewTrait; not a token ID
         uint256 traitIndex;
 
         // e.g. 'Blue top', same as key, redundant for now

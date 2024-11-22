@@ -27,14 +27,14 @@ import { ChonksMain } from "./ChonksMain.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
+// TODO?
 // modifier onlyAuthorizedMinter() {
 //     require(authorizedMinters[msg.sender], "Caller is not an authorized minter");
 //     require(IERC165(msg.sender).supportsInterface(type(IRenderMinterV1).interfaceId), "Caller does not implement IRenderMinterV1");
 //     _;
 // }
 
-// contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage, Ownable, IERC4906, IERC721Receiver, ReentrancyGuard {
-contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage, Ownable, IERC4906, ReentrancyGuard {
+contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage, Ownable, IERC4906, ReentrancyGuard {
 
     /// @dev We use this database for persistent storage
     Traits public traitTokens;
@@ -83,8 +83,8 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         _;
     }
 
-    // DEPLOY: Real name
-    constructor(bool localDeploy_) ERC721("PeterTraits", "PTR") {
+    // DEPLOY: remove localDeploy
+    constructor(bool localDeploy_) ERC721("Chonk Traits", "CHONK TRAITS") {
         _initializeOwner(msg.sender);
         _localDeploy = localDeploy_;
 

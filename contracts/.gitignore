@@ -2,7 +2,7 @@
 cache/
 /out/*
 !/out/ChonksMain.sol/
-!/out/PeterTraits.sol/
+!/out/ChonkTraits.sol/
 !/out/ChonksMarket.sol/
 
 # Ignores development broadcast logs
