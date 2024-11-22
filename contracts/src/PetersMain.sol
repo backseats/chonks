@@ -4,17 +4,16 @@ pragma solidity ^0.8.22;
 // OpenZeppelin Imports
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import { IERC165 } from  "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
-import { IERC165 } from  "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { Utils } from "./common/Utils.sol";
 
 // ERC-6551 Imports
 import { IAccountImplementation } from "./interfaces/TBABoilerplate/IAccountImplementation.sol";
 import { IAccountProxy } from "./interfaces/TBABoilerplate/IAccountProxy.sol";
 import { IRegistry } from  "./interfaces/TBABoilerplate/IRegistry.sol";
-// import { IERC6551Executable } from "./interfaces/TBABoilerplate/IERC6551Executable.sol";
 
 // Renderers
 import { MainRenderer2D } from "./renderers/MainRenderer2D.sol";
@@ -24,18 +23,18 @@ import { MainRenderer3D } from "./renderers/MainRenderer3D.sol";
 import { PeterTraits } from "./PeterTraits.sol";
 
 // Associated Interfaces and Libraries
+import { IERC4906 } from "./interfaces/IERC4906.sol";
 import { IPeterStorage } from "./interfaces/IPeterStorage.sol";
 import { ITraitStorage } from "./interfaces/ITraitStorage.sol";
-import { IERC4906 } from "./interfaces/IERC4906.sol";
 import { TraitCategory } from "./TraitCategory.sol";
-// import { CommitReveal } from "./common/CommitReveal.sol";
 
-import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
+// Other Chonks Associated Contracts
 import { ChonksMarket } from "./ChonksMarket.sol";
+import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
-// TODO: withdraw or send us the ETH per each txn
+// TODO: rename to ChonksMain
 contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
 
     bool _localDeploy; // DEPLOY: remove
@@ -374,34 +373,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return traitTokens;
     }
 
-    // receives body colorMap, puts it into a 30x30 grid, with 5 bytes row-major byte array
-    // function getBodyImage(bytes memory colorMap) public pure returns (bytes memory) {
-    //     uint256 length = colorMap.length;
-    //     require(length > 0 && length % 5 == 0, "Invalid body bytes length");
-
-    //     bytes memory pixels = new bytes(30 * 30 * 5); // 30x30 grid with 5 bytes per pixel
-    //     uint256 pixelCount = length / 5;
-
-    //     for (uint256 i; i < pixelCount; ++i) {
-    //         uint256 offset = i * 5;
-
-    //         uint8 x = uint8(colorMap[offset]);
-    //         uint8 y = uint8(colorMap[offset + 1]);
-    //         uint256 index = (uint256(y) * 30 + uint256(x)) * 5;
-
-    //         // Set the pixel data in the pixels array
-    //         unchecked {
-    //             pixels[index] = colorMap[offset];
-    //             pixels[index + 1] = colorMap[offset + 1];
-    //             pixels[index + 2] = colorMap[offset + 2];
-    //             pixels[index + 3] = colorMap[offset + 3];
-    //             pixels[index + 4] = colorMap[offset + 4];
-    //         }
-    //     }
-
-    //     return pixels;
-    // }
-
     // outputs svg for a provided body index
     function getBodyImageSvg(uint256 _index) public view returns (string memory svg) {
         bytes memory colorMap = mainRenderer2D.getBodyImage(bodyIndexToMetadata[_index].colorMap);
@@ -459,51 +430,6 @@ contract PetersMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         return mainRenderer2D.getBackpackSVGs(bodyGhostSvg, traitSvgs, traitTokens.length, maxTraitsToOutput);
     }
-
-    // function getBackpackSVGs(uint256 _tokenId) public view returns (string memory backpackSVGs) {
-    //     uint256[] memory traitTokens = getTraitsForChonkId(_tokenId);
-
-    //     string memory baseSvgPart = '<svg viewBox="0 0 150 150">';
-    //     string memory closeSvgTag = '</svg>';
-    //     bytes memory buffer;
-
-    //     string memory bodyGhostSvg = traitsContract.getGhostSvg();
-
-    //     uint256 numTraits = traitTokens.length < maxTraitsToOutput ? traitTokens.length : maxTraitsToOutput; // this means if they are the same, the exact amount will ouput
-
-    //     buffer = abi.encodePacked(
-    //         SVG_BACKPACK,
-    //         bodyGhostSvg,
-    //         '<g id="backpackTraits">'
-    //     );
-
-    //     for (uint256 i; i < numTraits; ++i) {
-    //         string memory traitSvg = traitsContract.getSvgForTokenId(traitTokens[i]);
-    //         buffer = abi.encodePacked(
-    //             buffer,
-    //             baseSvgPart,
-    //             traitSvg,
-    //             closeSvgTag
-    //         );
-    //     }
-
-    //     if(traitTokens.length > maxTraitsToOutput ) {
-    //         buffer = abi.encodePacked(
-    //             buffer,
-    //             baseSvgPart,
-    //             '<g id="MoreTraits"><rect style="width:10px; height:2px;" x="10" y="16" fill="#ffffff"></rect><rect style="height:10px; width:2px;" x="14" y="12" fill="#ffffff"></rect></g>',
-    //             closeSvgTag
-    //         );
-    //     }
-
-    //     buffer = abi.encodePacked(
-    //         buffer,
-    //         '</g>'
-    //         // '<script>const numTraits = ', Utils.toString(traitTokens.length), '; const maxTraitsPerScreen = ', Utils.toString(MAX_TRAITS_PER_SCREEN), ';</script>'
-    //     );
-
-    //     backpackSVGs = string(buffer);
-    // }
 
     function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
         string memory bodySvg;

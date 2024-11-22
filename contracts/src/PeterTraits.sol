@@ -3,28 +3,27 @@ pragma solidity ^0.8.22;
 
 // OpenZeppelin Imports
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { ERC721Burnable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
+import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
-import { Utils } from "./common/Utils.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-import { PetersMain } from "./PetersMain.sol";
-import { ChonksMarket } from "./ChonksMarket.sol";
-
 // Associated Interfaces and Libraries
-import { ITraitStorage } from "./interfaces/ITraitStorage.sol";
-import { TraitCategory } from "./TraitCategory.sol";
 import { CommitReveal } from "./common/CommitReveal.sol";
 import { IERC4906 } from "./interfaces/IERC4906.sol";
-import { IERC165 } from "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { IPeterStorage } from "./interfaces/IPeterStorage.sol";
 import { IRenderMinterV1 } from "./interfaces/IRenderMinterV1.sol";
+import { ITraitStorage } from "./interfaces/ITraitStorage.sol";
+import { TraitCategory } from "./TraitCategory.sol";
 
-// import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol"; // DEPLOY: remove, this is just for testing
-
+// Renderer
 import { TraitRenderer } from "./renderers/TraitRenderer.sol";
+
+// Other Chonks Associated Contracts
+import { ChonksMarket } from "./ChonksMarket.sol";
+import { PetersMain } from "./PetersMain.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
@@ -514,7 +513,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         super.setApprovalForAll(_operator, _approved);
     }
 
-
     /// @notice Invalidates all operator approvals for a specific token
     function invalidateAllOperatorApprovals(uint256 _tokenId) public {
         if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
@@ -540,11 +538,6 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         emit ITraitStorage.AllOperatorApprovalsInvalidated(_tokenId);
     }
-
-    // DEPLOY: remove/just for testing
-    // function onERC721Received(address, address, uint256, bytes calldata) pure external returns (bytes4) {
-    //     return IERC721Receiver.onERC721Received.selector;
-    // }
 
      // Function to get the entire array of approved operators for a traitId
     function getApprovedOperators(uint256 traitId) public view returns (address[] memory) {
