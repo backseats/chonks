@@ -2,11 +2,11 @@
 pragma solidity ^0.8.22;
 import { CommitReveal } from '../common/CommitReveal.sol';
 
-/// A shared interface for data storage of the Peter
-interface IPeterStorage {
+/// A shared interface for data storage of the Chonks
+interface IChonkStorage {
 
-    // The token id in the traits contract of each corresponding trait to be layered on the Peter from the PeterTraits contract
-    struct StoredPeter {
+    // The token id in the traits contract of each corresponding trait to be layered on the Chonk from the ChonksTraits contract
+    struct StoredChonk {
         // The token id of the head, if applicable
         uint256 headId;
 
@@ -37,10 +37,12 @@ interface IPeterStorage {
         // randomly set in ChonksMain.mint() but can be updated by holder
         uint8 bodyIndex;
 
-        // Set in getPeter if epoch is revealed
+        // TODO: Do we need these?
+
+        // Set in getChonk if epoch is revealed
         // bool isRevealed;
 
-         // This is the seed that's calculuated in getPeter based on randomness + stored.seed
+         // This is the seed that's calculuated in getChonk based on randomness + stored.seed
         // uint256 seed;
 
         // RRGGBB colour of the background, default blue #0D6E9D set in ChonksMain.sol mint(), and setBackgroundColor()
@@ -50,9 +52,9 @@ interface IPeterStorage {
         bool render3D;
     }
 
-    struct Peters {
-        // Token ID => Peter
-        mapping(uint256 => StoredPeter) all;
+    struct Chonks {
+        // Token ID => Chonk
+        mapping(uint256 => StoredChonk) all;
 
         // All of the epochs
         mapping(uint256 => CommitReveal.Epoch) epochs;
@@ -62,7 +64,7 @@ interface IPeterStorage {
     }
 
     struct BodyMetadata {
-        // Not token id, it refers to the number used in PeterMain.addNewBody
+        // Not token id, it refers to the number used in ChonksMain.addNewBody
         uint256 bodyIndex;
 
         // e.g. 'Body 001'

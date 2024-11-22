@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import {IPeterStorage} from "./interfaces/IPeterStorage.sol";
+import {IChonkStorage} from "./interfaces/IChonkStorage.sol";
 import {Ownable} from "solady/auth/Ownable.sol";
 import {ChonksMain} from "./ChonksMain.sol";
 import {PeterTraits} from "./PeterTraits.sol";

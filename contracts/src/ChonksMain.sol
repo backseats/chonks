@@ -24,7 +24,7 @@ import { PeterTraits } from "./PeterTraits.sol";
 
 // Associated Interfaces and Libraries
 import { IERC4906 } from "./interfaces/IERC4906.sol";
-import { IPeterStorage } from "./interfaces/IPeterStorage.sol";
+import { IChonkStorage } from "./interfaces/IChonkStorage.sol";
 import { ITraitStorage } from "./interfaces/ITraitStorage.sol";
 import { TraitCategory } from "./TraitCategory.sol";
 
@@ -34,15 +34,15 @@ import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
 import "forge-std/console.sol"; // DEPLOY: remove
 
-contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
+contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
 
     bool _localDeploy; // DEPLOY: remove
 
     /// @dev We use this database for persistent storage.
-    Peters peterTokens;
+    Chonks chonkTokens;
 
     // Storage for Body metadata
-    mapping(uint256 => IPeterStorage.BodyMetadata) public bodyIndexToMetadata;
+    mapping(uint256 => IChonkStorage.BodyMetadata) public bodyIndexToMetadata;
 
     /// The address of the ERC-721 Traits contract
     PeterTraits public traitsContract;
@@ -89,7 +89,7 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error CantTransfer();
     error CantTransferToTBAs();
     error FirstSeasonRenderMinterNotSet();
-    error IncorrectPeterOwner();
+    error IncorrectChonkOwner();
     error IncorrectTBAOwner();
     error IncorrectTraitType();
     error InvalidBodyIndex();
@@ -98,7 +98,7 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error InvalidSignature();
     error markaSaysNo();
     error NonceAlreadyUsed();
-    error PeterDoesntExist();
+    error ChonkDoesntExist();
     error UseUnequip();
     error MintEnded();
     error MintNotStarted();
@@ -108,14 +108,15 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Modifier
 
-    modifier onlyPeterOwner(uint256 _peterId) {
-        if (msg.sender != ownerOf(_peterId)) revert IncorrectPeterOwner();
+    modifier onlyChonkOwner(uint256 _chonkId) {
+        if (msg.sender != ownerOf(_chonkId)) revert IncorrectChonkOwner();
         _;
     }
 
     /// Constructor
 
-    constructor(bool localDeploy_) ERC721("Peter Test", "PETER") {
+    // DEPLOY: remove localDeploy_
+    constructor(bool localDeploy_) ERC721("Chonks", "CHONKS") {
         _initializeOwner(msg.sender);
         _localDeploy = localDeploy_;
     }
@@ -191,26 +192,26 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress);
 
             // Initialize the Chonk
-            StoredPeter storage peter = peterTokens.all[tokenId];
+            StoredChonk storage chonk = chonkTokens.all[tokenId];
 
-            peter.tokenId = tokenId;
+            chonk.tokenId = tokenId;
 
             // level 0: let's give everyone shoes, bottom, top & hair : 4 traits
             // level 1: shoes, bottom, top, hair AND face: 5 traits
             // level 3: shoes, bottom, top AND hair AND face AND head AND accessory : 7 traits
 
-            // Here we've gotten a bunch of trait tokens back with their types, then we set them on the Peter. No reason this cant happen in the render minter
+            // Here we've gotten a bunch of trait tokens back with their types, then we set them on the Chonk. No reason this cant happen in the render minter
 
-            peter.shoesId = traitsIds[0];
-            peter.bottomId = traitsIds[1];
-            peter.topId = traitsIds[2];
-            peter.hairId = traitsIds[3];
+            chonk.shoesId = traitsIds[0];
+            chonk.bottomId = traitsIds[1];
+            chonk.topId = traitsIds[2];
+            chonk.hairId = traitsIds[3];
 
             // This randomly picks your Chonk skin color but you can change it any time.
-            peter.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 5); // even chance for 5 different bodies
+            chonk.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 5); // even chance for 5 different bodies
 
             // Set the default background color
-            peter.backgroundColor = "0D6E9D";
+            chonk.backgroundColor = "0D6E9D";
         }
     }
 
@@ -221,51 +222,51 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Equip/Unequip Traits
 
-    function equip(uint256 _peterTokenId, uint256 _traitTokenId) public onlyPeterOwner(_peterTokenId) {
+    function equip(uint256 _chonkTokenId, uint256 _traitTokenId) public onlyChonkOwner(_chonkTokenId) {
         if (_traitTokenId == 0) revert UseUnequip();
 
-        TraitCategory.Name traitType = _equipValidation(_peterTokenId, _traitTokenId);
+        TraitCategory.Name traitType = _equipValidation(_chonkTokenId, _traitTokenId);
 
-        if (traitType == TraitCategory.Name.Head)      peterTokens.all[_peterTokenId].headId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Hair)      peterTokens.all[_peterTokenId].hairId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Face)      peterTokens.all[_peterTokenId].faceId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Accessory) peterTokens.all[_peterTokenId].accessoryId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Top)       peterTokens.all[_peterTokenId].topId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Bottom)    peterTokens.all[_peterTokenId].bottomId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Shoes)     peterTokens.all[_peterTokenId].shoesId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Head)      chonkTokens.all[_chonkTokenId].headId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Hair)      chonkTokens.all[_chonkTokenId].hairId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Face)      chonkTokens.all[_chonkTokenId].faceId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Accessory) chonkTokens.all[_chonkTokenId].accessoryId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Top)       chonkTokens.all[_chonkTokenId].topId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Bottom)    chonkTokens.all[_chonkTokenId].bottomId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Shoes)     chonkTokens.all[_chonkTokenId].shoesId = _traitTokenId;
 
-        emit Equip(ownerOf(_peterTokenId), _peterTokenId, _traitTokenId, uint8(traitType));
+        emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _traitTokenId, uint8(traitType));
     }
 
-    function unequip(uint256 _peterTokenId, TraitCategory.Name traitType) public onlyPeterOwner(_peterTokenId) {
-        if (traitType == TraitCategory.Name.Head)      peterTokens.all[_peterTokenId].headId = 0;
-        if (traitType == TraitCategory.Name.Hair)      peterTokens.all[_peterTokenId].hairId = 0;
-        if (traitType == TraitCategory.Name.Face)      peterTokens.all[_peterTokenId].faceId = 0;
-        if (traitType == TraitCategory.Name.Accessory) peterTokens.all[_peterTokenId].accessoryId = 0;
-        if (traitType == TraitCategory.Name.Top)       peterTokens.all[_peterTokenId].topId = 0;
-        if (traitType == TraitCategory.Name.Bottom)    peterTokens.all[_peterTokenId].bottomId = 0;
-        if (traitType == TraitCategory.Name.Shoes)     peterTokens.all[_peterTokenId].shoesId = 0;
+    function unequip(uint256 _chonkTokenId, TraitCategory.Name traitType) public onlyChonkOwner(_chonkTokenId) {
+        if (traitType == TraitCategory.Name.Head)      chonkTokens.all[_chonkTokenId].headId = 0;
+        if (traitType == TraitCategory.Name.Hair)      chonkTokens.all[_chonkTokenId].hairId = 0;
+        if (traitType == TraitCategory.Name.Face)      chonkTokens.all[_chonkTokenId].faceId = 0;
+        if (traitType == TraitCategory.Name.Accessory) chonkTokens.all[_chonkTokenId].accessoryId = 0;
+        if (traitType == TraitCategory.Name.Top)       chonkTokens.all[_chonkTokenId].topId = 0;
+        if (traitType == TraitCategory.Name.Bottom)    chonkTokens.all[_chonkTokenId].bottomId = 0;
+        if (traitType == TraitCategory.Name.Shoes)     chonkTokens.all[_chonkTokenId].shoesId = 0;
 
-        emit Unequip(ownerOf(_peterTokenId), _peterTokenId, uint8(traitType));
+        emit Unequip(ownerOf(_chonkTokenId), _chonkTokenId, uint8(traitType));
     }
 
-    function unequipAll(uint256 _peterTokenId) public onlyPeterOwner(_peterTokenId) {
-        StoredPeter storage peter = peterTokens.all[_peterTokenId];
+    function unequipAll(uint256 _chonkTokenId) public onlyChonkOwner(_chonkTokenId) {
+        StoredChonk storage chonk = chonkTokens.all[_chonkTokenId];
 
-        peter.headId = 0;
-        peter.hairId = 0;
-        peter.faceId = 0;
-        peter.accessoryId = 0;
-        peter.topId = 0;
-        peter.bottomId = 0;
-        peter.shoesId = 0;
+        chonk.headId = 0;
+        chonk.hairId = 0;
+        chonk.faceId = 0;
+        chonk.accessoryId = 0;
+        chonk.topId = 0;
+        chonk.bottomId = 0;
+        chonk.shoesId = 0;
 
-        emit UnequipAll(ownerOf(_peterTokenId), _peterTokenId);
+        emit UnequipAll(ownerOf(_chonkTokenId), _chonkTokenId);
     }
 
     // If 0, it will ignore
     function equipAll(
-        uint256 _peterTokenId,
+        uint256 _chonkTokenId,
         uint256 _headTokenId,
         uint256 _hairTokenId,
         uint256 _faceTokenId,
@@ -273,69 +274,69 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _topTokenId,
         uint256 _bottomTokenId,
         uint256 _shoesTokenId
-    ) public onlyPeterOwner(_peterTokenId) {
-        // Might be able to cut this down gas-wise since it's validating peter ownership each time
+    ) public onlyChonkOwner(_chonkTokenId) {
+        // TODO: Might be able to cut this down gas-wise since it's validating Chonk ownership each time
         if (_headTokenId != 0) {
-            _validateTBAOwnership(_peterTokenId, _headTokenId);
+            _validateTBAOwnership(_chonkTokenId, _headTokenId);
             _validateTraitType(_headTokenId, TraitCategory.Name.Head);
-            peterTokens.all[_peterTokenId].headId = _headTokenId;
+            chonkTokens.all[_chonkTokenId].headId = _headTokenId;
 
-            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _headTokenId, uint8(TraitCategory.Name.Head));
+            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _headTokenId, uint8(TraitCategory.Name.Head));
         }
 
         if (_hairTokenId != 0) {
-            _validateTBAOwnership(_peterTokenId, _hairTokenId);
+            _validateTBAOwnership(_chonkTokenId, _hairTokenId);
             _validateTraitType(_hairTokenId, TraitCategory.Name.Hair);
-            peterTokens.all[_peterTokenId].hairId = _hairTokenId;
+            chonkTokens.all[_chonkTokenId].hairId = _hairTokenId;
 
-            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _hairTokenId, uint8(TraitCategory.Name.Hair));
+            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _hairTokenId, uint8(TraitCategory.Name.Hair));
         }
 
         if (_faceTokenId != 0) {
-            _validateTBAOwnership(_peterTokenId, _faceTokenId);
+            _validateTBAOwnership(_chonkTokenId, _faceTokenId);
             _validateTraitType(_faceTokenId, TraitCategory.Name.Face);
-            peterTokens.all[_peterTokenId].faceId = _faceTokenId;
+            chonkTokens.all[_chonkTokenId].faceId = _faceTokenId;
 
-            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _faceTokenId, uint8(TraitCategory.Name.Face));
+            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _faceTokenId, uint8(TraitCategory.Name.Face));
         }
 
         if (_accessoryTokenId != 0) {
-            _validateTBAOwnership(_peterTokenId, _accessoryTokenId);
+            _validateTBAOwnership(_chonkTokenId, _accessoryTokenId);
             _validateTraitType(_accessoryTokenId, TraitCategory.Name.Accessory);
-            peterTokens.all[_peterTokenId].accessoryId = _accessoryTokenId;
+            chonkTokens.all[_chonkTokenId].accessoryId = _accessoryTokenId;
 
-            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _accessoryTokenId, uint8(TraitCategory.Name.Accessory));
+            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _accessoryTokenId, uint8(TraitCategory.Name.Accessory));
         }
 
         if (_topTokenId != 0) {
-            _validateTBAOwnership(_peterTokenId, _topTokenId);
+            _validateTBAOwnership(_chonkTokenId, _topTokenId);
             _validateTraitType(_topTokenId, TraitCategory.Name.Top);
-            peterTokens.all[_peterTokenId].topId = _topTokenId;
+            chonkTokens.all[_chonkTokenId].topId = _topTokenId;
 
-            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _topTokenId, uint8(TraitCategory.Name.Top));
+            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _topTokenId, uint8(TraitCategory.Name.Top));
         }
 
         if (_bottomTokenId != 0) {
-            _validateTBAOwnership(_peterTokenId, _bottomTokenId);
+            _validateTBAOwnership(_chonkTokenId, _bottomTokenId);
             _validateTraitType(_bottomTokenId, TraitCategory.Name.Bottom);
-            peterTokens.all[_peterTokenId].bottomId = _bottomTokenId;
+            chonkTokens.all[_chonkTokenId].bottomId = _bottomTokenId;
 
-            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _bottomTokenId, uint8(TraitCategory.Name.Bottom));
+            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _bottomTokenId, uint8(TraitCategory.Name.Bottom));
         }
 
         if (_shoesTokenId != 0) {
-            _validateTBAOwnership(_peterTokenId, _shoesTokenId);
+            _validateTBAOwnership(_chonkTokenId, _shoesTokenId);
             _validateTraitType(_shoesTokenId, TraitCategory.Name.Shoes);
-            peterTokens.all[_peterTokenId].shoesId = _shoesTokenId;
+            chonkTokens.all[_chonkTokenId].shoesId = _shoesTokenId;
 
-            emit Equip(ownerOf(_peterTokenId), _peterTokenId, _shoesTokenId, uint8(TraitCategory.Name.Shoes));
+            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _shoesTokenId, uint8(TraitCategory.Name.Shoes));
         }
 
-        emit EquipAll(ownerOf(_peterTokenId), _peterTokenId);
+        emit EquipAll(ownerOf(_chonkTokenId), _chonkTokenId);
     }
 
-    function peterMakeover(
-        uint256 _peterTokenId,
+    function chonkMakeover(
+        uint256 _chonkTokenId,
         uint256 _headTokenId,
         uint256 _hairTokenId,
         uint256 _faceTokenId,
@@ -345,18 +346,18 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _shoesTokenId,
         uint8 _bodyIndex, // Note, this must be set even if you want to keep the Chonk's current skin tone
         string memory _backgroundColor
-    ) public onlyPeterOwner(_peterTokenId) {
-        equipAll(_peterTokenId, _headTokenId, _hairTokenId, _faceTokenId, _accessoryTokenId, _topTokenId, _bottomTokenId, _shoesTokenId);
-        setBodyIndex(_peterTokenId, _bodyIndex);
-        setBackgroundColor(_peterTokenId, _backgroundColor);
+    ) public onlyChonkOwner(_chonkTokenId) {
+        equipAll(_chonkTokenId, _headTokenId, _hairTokenId, _faceTokenId, _accessoryTokenId, _topTokenId, _bottomTokenId, _shoesTokenId);
+        setBodyIndex(_chonkTokenId, _bodyIndex);
+        setBackgroundColor(_chonkTokenId, _backgroundColor);
     }
 
     /// Validations
 
-    function _validateTBAOwnership(uint256 _peterId, uint256 _traitTokenId) internal view onlyPeterOwner(_peterId) {
-        address tbaOfPeter = tokenIdToTBAAccountAddress[_peterId];
+    function _validateTBAOwnership(uint256 _chonkId, uint256 _traitTokenId) internal view onlyChonkOwner(_chonkId) {
+        address tbaOfChonk = tokenIdToTBAAccountAddress[_chonkId];
         address ownerOfTrait = traitsContract.ownerOf(_traitTokenId);
-        if (ownerOfTrait != tbaOfPeter) revert IncorrectTBAOwner();
+        if (ownerOfTrait != tbaOfChonk) revert IncorrectTBAOwner();
     }
 
     function _validateTraitType(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
@@ -367,8 +368,8 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             revert IncorrectTraitType();
     }
 
-    function _equipValidation(uint256 _peterTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
-        _validateTBAOwnership(_peterTokenId, _traitTokenId);
+    function _equipValidation(uint256 _chonkTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
+        _validateTBAOwnership(_chonkTokenId, _traitTokenId);
         traitType = traitsContract.getTraitType(_traitTokenId);
         _validateTraitType(_traitTokenId, traitType);
     }
@@ -376,7 +377,7 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     /// tokenURI/Rendering
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
-        if (!_exists(_tokenId)) revert PeterDoesntExist();
+        if (!_exists(_tokenId)) revert ChonkDoesntExist();
 
         return renderAsDataUri(_tokenId);
     }
@@ -392,18 +393,18 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return mainRenderer2D.getBodyImageSvg(colorMap);
     }
 
-    function getBodySVGZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory, bytes memory , string memory ) {
+    function getBodySVGZmapsAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory, bytes memory , string memory ) {
         return (
-            getBodyImageSvg(storedPeter.bodyIndex),
-            bodyIndexToMetadata[storedPeter.bodyIndex].zMap,
-            mainRenderer2D.stringTrait('Body Type', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
+            getBodyImageSvg(storedChonk.bodyIndex),
+            bodyIndexToMetadata[storedChonk.bodyIndex].zMap,
+            mainRenderer2D.stringTrait('Body Type', bodyIndexToMetadata[storedChonk.bodyIndex].bodyName)
         );
     }
 
-    function getBodySvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory, string memory) {
+    function getBodySvgAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory, string memory) {
         return (
-            getBodyImageSvg(storedPeter.bodyIndex),
-            mainRenderer2D.stringTrait('Body Type', bodyIndexToMetadata[storedPeter.bodyIndex].bodyName)
+            getBodyImageSvg(storedChonk.bodyIndex),
+            mainRenderer2D.stringTrait('Body Type', bodyIndexToMetadata[storedChonk.bodyIndex].bodyName)
         );
     }
 
@@ -457,16 +458,16 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         string memory backpackSVGs;
         // string memory backgroundColorStyles;
 
-        StoredPeter memory storedPeter = getPeter(_tokenId);
-        (bodySvg, bodyAttributes) = getBodySvgAndMetadata(storedPeter);
-        (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedPeter);
+        StoredChonk memory storedChonk = getChonk(_tokenId);
+        (bodySvg, bodyAttributes) = getBodySvgAndMetadata(storedChonk);
+        (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedChonk);
         backpackSVGs = getBackpackSVGs(_tokenId);
 
         Chonkdata memory chonkdata;
 
-        chonkdata.backgroundColor = storedPeter.backgroundColor;
+        chonkdata.backgroundColor = storedChonk.backgroundColor;
         chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
-        chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
+        chonkdata.bodyName =  bodyIndexToMetadata[storedChonk.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 
         return mainRenderer2D.renderAsDataUri(
@@ -491,10 +492,10 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         string memory fullAttributes;
         Chonkdata memory chonkdata;
 
-        StoredPeter memory storedPeter = getPeter(_tokenId);
+        StoredChonk memory storedChonk = getChonk(_tokenId);
 
-        (bodySvg, bodyZmap, bodyAttributes) = getBodySVGZmapsAndMetadata(storedPeter);
-        (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedPeter);
+        (bodySvg, bodyZmap, bodyAttributes) = getBodySVGZmapsAndMetadata(storedChonk);
+        (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
         fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
 
         fullZmap = bytes.concat(
@@ -502,9 +503,9 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitZmaps
         );
 
-        chonkdata.backgroundColor = storedPeter.backgroundColor;
+        chonkdata.backgroundColor = storedChonk.backgroundColor;
         chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
-        chonkdata.bodyName =  bodyIndexToMetadata[storedPeter.bodyIndex].bodyName;
+        chonkdata.bodyName =  bodyIndexToMetadata[storedChonk.bodyIndex].bodyName;
         chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
 
         return mainRenderer3D.renderAsDataUri(
@@ -519,23 +520,23 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
-        StoredPeter memory storedPeter = getPeter(_tokenId);
+        StoredChonk memory storedChonk = getChonk(_tokenId);
 
-        return (storedPeter.render3D) ? renderAsDataUri3D(_tokenId) : renderAsDataUri2D(_tokenId);
+        return (storedChonk.render3D) ? renderAsDataUri3D(_tokenId) : renderAsDataUri2D(_tokenId);
     }
 
     /// Getters
 
-    // gets complete zMap for a Peter, body and traits
-    // TODO: proably should add getPeterColorMap
-    function getPeterZMap(uint256 _tokenId) public view returns (string memory) {
+    // Gets complete zMap for a Chonk, body and traits
+    // TODO: proably should add getChonkColorMap
+    function getChonkZMap(uint256 _tokenId) public view returns (string memory) {
         bytes memory bodyZmap;
         bytes memory traitZmaps;
 
-        StoredPeter memory storedPeter = getPeter(_tokenId);
+        StoredChonk memory storedChonk = getChonk(_tokenId);
 
-        (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedPeter);
-        (, traitZmaps, ) = traitsContract.getSvgZmapsAndMetadata(storedPeter);
+        (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedChonk);
+        (, traitZmaps, ) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
 
         return string.concat(
             string(bodyZmap),
@@ -548,31 +549,31 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function getBodyZMap(uint256 _tokenId) public view returns (string memory) {
         bytes memory bodyZmap;
 
-        StoredPeter memory storedPeter = getPeter(_tokenId);
+        StoredChonk memory storedChonk = getChonk(_tokenId);
 
-        (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedPeter);
+        (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedChonk);
 
         return string(bodyZmap);
     }
 
-    function getPeter(uint256 _tokenId) public view returns (IPeterStorage.StoredPeter memory) {
-        IPeterStorage.StoredPeter memory storedPeter = peterTokens.all[_tokenId];
-        return storedPeter;
+    function getChonk(uint256 _tokenId) public view returns (IChonkStorage.StoredChonk memory) {
+        IChonkStorage.StoredChonk memory storedChonk = chonkTokens.all[_tokenId];
+        return storedChonk;
     }
 
-    function getTokenRenderZ(uint256 _peterTokenId) public view returns (bool) {
-        return peterTokens.all[_peterTokenId].render3D;
+    function getTokenRenderZ(uint256 _chonkTokenId) public view returns (bool) {
+        return chonkTokens.all[_chonkTokenId].render3D;
     }
 
     function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
-        IPeterStorage.StoredPeter memory storedPeter = getPeter(_chonkId);
-        return storedPeter.headId == _traitId ||
-            storedPeter.hairId == _traitId ||
-            storedPeter.faceId == _traitId ||
-            storedPeter.accessoryId == _traitId ||
-            storedPeter.topId == _traitId ||
-            storedPeter.bottomId == _traitId ||
-            storedPeter.shoesId == _traitId;
+        IChonkStorage.StoredChonk memory storedChonk = getChonk(_chonkId);
+        return storedChonk.headId == _traitId ||
+            storedChonk.hairId == _traitId ||
+            storedChonk.faceId == _traitId ||
+            storedChonk.accessoryId == _traitId ||
+            storedChonk.topId == _traitId ||
+            storedChonk.bottomId == _traitId ||
+            storedChonk.shoesId == _traitId;
     }
 
     /// @dev Returns the token ids the end user's wallet owns
@@ -639,7 +640,7 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Public Setters
 
-    function setBackgroundColor(uint256 _peterTokenId, string memory _color) public onlyPeterOwner(_peterTokenId) {
+    function setBackgroundColor(uint256 _chonkTokenId, string memory _color) public onlyChonkOwner(_chonkTokenId) {
         bytes memory colorBytes = bytes(_color);
         if (colorBytes.length != 6) revert InvalidColor();
 
@@ -655,21 +656,21 @@ contract ChonksMain is IPeterStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 revert InvalidColor(); // Invalid character found
             }
         }
-        peterTokens.all[_peterTokenId].backgroundColor = _color;
+        chonkTokens.all[_chonkTokenId].backgroundColor = _color;
 
-        emit BackgroundColor(ownerOf(_peterTokenId), _peterTokenId, _color );
+        emit BackgroundColor(ownerOf(_chonkTokenId), _chonkTokenId, _color );
     }
 
-    function setBodyIndex(uint256 _peterTokenId, uint8 _bodyIndex) public onlyPeterOwner(_peterTokenId) {
+    function setBodyIndex(uint256 _chonkTokenId, uint8 _bodyIndex) public onlyChonkOwner(_chonkTokenId) {
         if (_bodyIndex > 4) revert InvalidBodyIndex();
 
-        peterTokens.all[_peterTokenId].bodyIndex = _bodyIndex;
-        emit BodyIndex(ownerOf(_peterTokenId), _peterTokenId, _bodyIndex );
+        chonkTokens.all[_chonkTokenId].bodyIndex = _bodyIndex;
+        emit BodyIndex(ownerOf(_chonkTokenId), _chonkTokenId, _bodyIndex );
     }
 
-    function setTokenRender3D(uint256 _peterTokenId, bool _render3D) public onlyPeterOwner(_peterTokenId) {
-        peterTokens.all[_peterTokenId].render3D = _render3D;
-        emit Render3D(ownerOf(_peterTokenId), _peterTokenId, _render3D);
+    function setTokenRender3D(uint256 _chonkTokenId, bool _render3D) public onlyChonkOwner(_chonkTokenId) {
+        chonkTokens.all[_chonkTokenId].render3D = _render3D;
+        emit Render3D(ownerOf(_chonkTokenId), _chonkTokenId, _render3D);
     }
 
     // Boilerplate

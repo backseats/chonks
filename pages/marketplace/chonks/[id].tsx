@@ -15,7 +15,7 @@ import {
     traitsABI,
     chainId,
 } from "@/contract_data";
-import { StoredPeter } from "@/types/StoredPeter";
+import { StoredChonk } from "@/types/StoredChonk";
 import { Category } from "@/types/Category";
 import OwnershipSection from "@/components/marketplace/chonks/OwnershipSection";
 import TraitsSection from '@/components/marketplace/TraitsSection';
@@ -156,77 +156,77 @@ export default function ChonkDetail({ id }: { id: string }) {
     }, [tokenURIData]);
 
     // Get the trait ids that are equipped to the body
-    const { data: storedPeter } = useReadContract({
+    const { data: storedChonk } = useReadContract({
         address: mainContract,
         abi: mainABI,
-        functionName: "getPeter",
+        functionName: "getChonk",
         args: [BigInt(id)],
         chainId,
-    }) as { data: StoredPeter };
+    }) as { data: StoredChonk };
 
     useEffect(() => {
-        if (!storedPeter) return;
+        if (!storedChonk) return;
 
-        console.log("storedPeter", storedPeter);
+        console.log("storedChonk", storedChonk);
 
         setCurrentChonk({
             tokenId: parseInt(id),
             head: {
                 tokenId:
-                    storedPeter.headId === 0n ? 0 : parseInt(storedPeter.headId.toString()),
+                    storedChonk.headId === 0n ? 0 : parseInt(storedChonk.headId.toString()),
                 category: Category.Head,
-                isEquipped: storedPeter.headId !== 0n,
+                isEquipped: storedChonk.headId !== 0n,
             },
             hair: {
                 tokenId:
-                    storedPeter.hairId === 0n
+                    storedChonk.hairId === 0n
                         ? 0
-                        : parseInt(storedPeter.hairId.toString()),
+                        : parseInt(storedChonk.hairId.toString()),
                 category: Category.Top,
-                isEquipped: storedPeter.hairId !== 0n,
+                isEquipped: storedChonk.hairId !== 0n,
             },
             face: {
                 tokenId:
-                    storedPeter.faceId === 0n
+                    storedChonk.faceId === 0n
                         ? 0
-                        : parseInt(storedPeter.faceId.toString()),
+                        : parseInt(storedChonk.faceId.toString()),
                 category: Category.Face,
-                isEquipped: storedPeter.faceId !== 0n,
+                isEquipped: storedChonk.faceId !== 0n,
             },
             accessory: {
                 tokenId:
-                    storedPeter.accessoryId === 0n
+                    storedChonk.accessoryId === 0n
                         ? 0
-                        : parseInt(storedPeter.accessoryId.toString()),
+                        : parseInt(storedChonk.accessoryId.toString()),
                 category: Category.Accessory,
-                isEquipped: storedPeter.accessoryId !== 0n,
+                isEquipped: storedChonk.accessoryId !== 0n,
             },
             top: {
                 tokenId:
-                    storedPeter.topId === 0n
+                    storedChonk.topId === 0n
                         ? 0
-                        : parseInt(storedPeter.topId.toString()),
+                        : parseInt(storedChonk.topId.toString()),
                 category: Category.Top,
-                isEquipped: storedPeter.topId !== 0n,
+                isEquipped: storedChonk.topId !== 0n,
             },
             bottom: {
                 tokenId:
-                    storedPeter.bottomId === 0n
+                    storedChonk.bottomId === 0n
                         ? 0
-                        : parseInt(storedPeter.bottomId.toString()),
+                        : parseInt(storedChonk.bottomId.toString()),
                 category: Category.Bottom,
-                isEquipped: storedPeter.bottomId !== 0n,
+                isEquipped: storedChonk.bottomId !== 0n,
             },
             shoes: {
                 tokenId:
-                    storedPeter.shoesId === 0n
+                    storedChonk.shoesId === 0n
                         ? 0
-                        : parseInt(storedPeter.shoesId.toString()),
+                        : parseInt(storedChonk.shoesId.toString()),
                 category: Category.Shoes,
-                isEquipped: storedPeter.shoesId !== 0n,
+                isEquipped: storedChonk.shoesId !== 0n,
             },
         });
-    }, [storedPeter]);
+    }, [storedChonk]);
 
     useEffect(() => {
         console.log("currentChonk", currentChonk);
@@ -255,64 +255,64 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     // This gets the ids that are equipped to the chonk
     useEffect(() => {
-        if (!storedPeter) return;
+        if (!storedChonk) return;
 
-        console.log("storedPeter", storedPeter);
+        console.log("storedChonk", storedChonk);
 
         const hatIdIndex =
             // @ts-ignore
-            storedPeter.headId === 0n
+            storedChonk.headId === 0n
                 ? null
                 : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.headId
+                    (tokenId) => tokenId === storedChonk.headId
                 );
 
         const hairIdIndex =
             // @ts-ignore
-            storedPeter.hairId === 0n
+            storedChonk.hairId === 0n
                 ? null
                 : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.hairId
+                    (tokenId) => tokenId === storedChonk.hairId
                 );
 
         const glassesIdIndex =
             // @ts-ignore
-            storedPeter.accessoryId === 0n
+            storedChonk.accessoryId === 0n
                 ? null
                 : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.accessoryId
+                    (tokenId) => tokenId === storedChonk.accessoryId
                 );
 
         const handheldIdIndex =
             // @ts-ignore
-            storedPeter.accessoryId === 0n
+            storedChonk.accessoryId === 0n
                 ? null
                 : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.accessoryId
+                    (tokenId) => tokenId === storedChonk.accessoryId
                 );
 
         const shirtIdIndex =
             // @ts-ignore
-            storedPeter.topId === 0n
+            storedChonk.topId === 0n
                 ? null
                 : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.topId
+                    (tokenId) => tokenId === storedChonk.topId
                 );
 
         const pantsIdIndex =
             // @ts-ignore
-            storedPeter.bottomId === 0n
+            storedChonk.bottomId === 0n
                 ? null
                 : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.bottomId
+                    (tokenId) => tokenId === storedChonk.bottomId
                 );
 
         const shoesIdIndex =
             // @ts-ignore
-            storedPeter.shoesId === 0n
+            storedChonk.shoesId === 0n
                 ? null
                 : allTraitTokenIds.findIndex(
-                    (tokenId) => tokenId === storedPeter.shoesId
+                    (tokenId) => tokenId === storedChonk.shoesId
                 );
 
         const filteredTraitTokenIds = allTraitTokenIds.filter((tokenId, index) => {
@@ -331,7 +331,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         console.log("filteredTraitTokenIds", filteredTraitTokenIds);
 
         setFilteredTraitTokenIds(filteredTraitTokenIds);
-    }, [allTraitTokenIds, storedPeter]);
+    }, [allTraitTokenIds, storedChonk]);
 
     // // Add these console logs
     // useEffect(() => {
@@ -378,9 +378,9 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     // const [isListingSuccess, setIsListingSuccess] = useState(false);
 
-   
 
-    
+
+
 
     return (
         <>
@@ -451,7 +451,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                                                 // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
                                                 // isOfferSpecific={isOfferSpecific}
                                                 // canAcceptOffer={canAcceptOffer}
-                                               
+
                                                 // hasActiveOffer={hasActiveOffer}
                                                 // hasActiveBid={hasActiveBid}
                                                 // chonkBid={chonkBid}

@@ -4,7 +4,7 @@ pragma solidity ^0.8.22;
 import { ChonksMain } from '../src/ChonksMain.sol';
 import { PeterTraits } from "../src/PeterTraits.sol";
 import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
-import { IPeterStorage } from '../src/interfaces/IPeterStorage.sol';
+import { IChonkStorage } from '../src/interfaces/IChonkStorage.sol';
 import { MainRenderer2D } from '../src/renderers/MainRenderer2D.sol';
 import { MainRenderer3D } from '../src/renderers/MainRenderer3D.sol';
 import { ITraitStorage } from '../src/interfaces/ITraitStorage.sol';
@@ -38,8 +38,8 @@ contract ChonksMainTest is ChonksBaseTest {
 
         // Check initial state
         assertEq(newMain.owner(), address(this));
-        assertEq(newMain.name(), "Peter Test");
-        assertEq(newMain.symbol(), "PETER");
+        assertEq(newMain.name(), "Chonks");
+        assertEq(newMain.symbol(), "CHONKS");
         assertEq(newMain._nextTokenId(), 0);
         assertEq(newMain.maxTraitsToOutput(), 99);
         assertEq(newMain.price(), 0);
@@ -61,8 +61,8 @@ contract ChonksMainTest is ChonksBaseTest {
 
         // Check initial state
         assertEq(newMain.owner(), deployer);
-        assertEq(newMain.name(), "Peter Test");
-        assertEq(newMain.symbol(), "PETER");
+        assertEq(newMain.name(), "Chonks");
+        assertEq(newMain.symbol(), "CHONKS");
         assertEq(newMain._nextTokenId(), 0);
 
         // Setup required contracts for debug mint
@@ -96,13 +96,13 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(newMain.balanceOf(user2), 1);
 
         // // Verify token data
-        IPeterStorage.StoredPeter memory peter = newMain.getPeter(1);
-        assertGt(peter.shoesId, 0); // Should have shoes equipped
-        assertGt(peter.bottomId, 0); // Should have bottom equipped
-        assertGt(peter.topId, 0); // Should have top equipped
-        assertGt(peter.hairId, 0); // Should have hair equipped
-        assertLt(peter.bodyIndex, 5); // Should have valid body index
-        assertEq(peter.backgroundColor, "0D6E9D"); // Should have default background color
+        IChonkStorage.StoredChonk memory chonk = newMain.getChonk(1);
+        assertGt(chonk.shoesId, 0); // Should have shoes equipped
+        assertGt(chonk.bottomId, 0); // Should have bottom equipped
+        assertGt(chonk.topId, 0); // Should have top equipped
+        assertGt(chonk.hairId, 0); // Should have hair equipped
+        assertLt(chonk.bodyIndex, 5); // Should have valid body index
+        assertEq(chonk.backgroundColor, "0D6E9D"); // Should have default background color
         vm.stopPrank();
     }
 
@@ -324,11 +324,11 @@ contract ChonksMainTest is ChonksBaseTest {
     function test_equipTraitAlreadyEquipped() public {}
 
     // Peter Makeover Tests
-    function test_peterMakeoverComplete() public {}
-    function test_peterMakeoverPartial() public {}
-    function test_peterMakeoverWithInvalidBody() public {}
-    function test_peterMakeoverWithInvalidColor() public {}
-    function test_peterMakeoverMultipleTimes() public {}
+    function test_chonkMakeoverComplete() public {}
+    function test_chonkMakeoverPartial() public {}
+    function test_chonkMakeoverWithInvalidBody() public {}
+    function test_chonkMakeoverWithInvalidColor() public {}
+    function test_chonkMakeoverMultipleTimes() public {}
 
     // Background Color Tests
     function test_setValidBackgroundColor() public {}
@@ -355,12 +355,12 @@ contract ChonksMainTest is ChonksBaseTest {
     function test_TBAApprovalsClearOnTransfer() public {}
 
     // Getter Function Tests
-    function test_getPeterData() public {}
+    function test_getChonkData() public {}
     function test_getTraitTokens() public {}
     function test_getBodyImageSvg() public {}
     function test_getFullPictureForTrait() public {}
     function test_getBackpackSVGs() public {}
-    function test_getPeterZMap() public {}
+    function test_getChonkZMap() public {}
     function test_getBodyZMap() public {}
     function test_checkIfTraitIsEquipped() public {}
     function test_walletOfOwner() public {}

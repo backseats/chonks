@@ -3,7 +3,7 @@ pragma solidity ^0.8.22;
 
 import { EncodeURI } from "../EncodeURI.sol";
 
-import { IPeterStorage } from "../interfaces/IPeterStorage.sol";
+import { IChonkStorage } from "../interfaces/IChonkStorage.sol";
 import { Utils } from "../common/Utils.sol";
 // import { Base64 } from "solady/utils/Base64.sol";
 
@@ -29,7 +29,7 @@ contract MainRenderer3D {
 
     string private constant SVG_START_STYLE = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
 
-    function generateFullSvg( string memory _bodySvg, string memory _traitsSvg, IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory image) {
+    function generateFullSvg( string memory _bodySvg, string memory _traitsSvg, IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory image) {
         string memory fullSvg = string.concat(
             SVG_START_STYLE,
             generateBackgroundColorStyles(_chonkdata),
@@ -48,7 +48,7 @@ contract MainRenderer3D {
         );
     }
 
-    function generateBackgroundColorStyles( IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
+    function generateBackgroundColorStyles( IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
         backgroundColorStyles = string.concat(
             '<style>',
             'body, svg{ background: #', _chonkdata.backgroundColor, '; }',
@@ -57,7 +57,7 @@ contract MainRenderer3D {
         );
     }
 
-    function generateChonkdata( IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
+    function generateChonkdata( IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
         chonkDataJson = string.concat(
             '"chonkdata":[',
                 '{ "background_color" : "#', _chonkdata.backgroundColor, '" },',
@@ -68,7 +68,7 @@ contract MainRenderer3D {
         );
     }
 
-    function generateAttributes(string memory _traitsAttributes, string memory _bodyAttributes, IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory fullAttributes) {
+    function generateAttributes(string memory _traitsAttributes, string memory _bodyAttributes, IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory fullAttributes) {
         //todo: do we need this bodyAttributes check in here?
         if (bytes(_traitsAttributes).length > 0) {
             // fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
@@ -95,7 +95,7 @@ contract MainRenderer3D {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         bytes memory _fullZmap,
-        IPeterStorage.Chonkdata memory _chonkdata
+        IChonkStorage.Chonkdata memory _chonkdata
     ) public view returns (string memory) {
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _chonkdata);
 
@@ -219,10 +219,9 @@ contract MainRenderer3D {
             );
     }
 
-
     function base64AndEncodeJson(uint256 tokenId, string memory fullAttributes, string memory image, bytes memory base64EncodedHTMLDataURI) pure internal returns (string memory) {
         bytes memory metadata = abi.encodePacked(
-            '{"name":"Peters","animation_url":"',
+            '{"name":"Chonks","animation_url":"',
             base64EncodedHTMLDataURI,
             '"}'
         );

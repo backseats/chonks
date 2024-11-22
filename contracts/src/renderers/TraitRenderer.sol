@@ -3,7 +3,7 @@ pragma solidity ^0.8.22;
 
 import { TraitCategory } from "../TraitCategory.sol";
 import { ITraitStorage } from "../interfaces/ITraitStorage.sol";
-import { IPeterStorage } from "../interfaces/IPeterStorage.sol";
+import { IChonkStorage } from "../interfaces/IChonkStorage.sol";
 import { Utils } from "../common/Utils.sol";
 
 contract TraitRenderer {
@@ -156,7 +156,7 @@ contract TraitRenderer {
     //     bytes memory svgParts = createSvgFromPixels(pixels);
     //     return string(abi.encodePacked('<g id="Trait">', svgParts, '</g>'));
     // }
-    
+
     function getTraitImageSvg(bytes memory colorMap) public pure returns (string memory svg) {
         bytes memory pixels = getTraitImage(colorMap);
         bytes memory svgParts = createSvgFromPixels(pixels);
@@ -257,55 +257,55 @@ contract TraitRenderer {
     }
 
     function getSvgAndMetadata(
-        IPeterStorage.StoredPeter memory storedPeter,
+        IChonkStorage.StoredChonk memory storedChonk,
         function(uint256, string memory, string memory) external view returns (string memory, string memory) callGetSvgAndMetadataTraitFn
     ) public view returns (string memory traitsSvg, string memory traitsAttributes) {
-        if (storedPeter.shoesId > 0)
-            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.shoesId, traitsSvg, traitsAttributes);
+        if (storedChonk.shoesId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.shoesId, traitsSvg, traitsAttributes);
 
-        if (storedPeter.bottomId > 0)
-            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.bottomId, traitsSvg, traitsAttributes);
+        if (storedChonk.bottomId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.bottomId, traitsSvg, traitsAttributes);
 
-        if (storedPeter.topId > 0)
-            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.topId, traitsSvg, traitsAttributes);
+        if (storedChonk.topId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.topId, traitsSvg, traitsAttributes);
 
-        if (storedPeter.faceId > 0)
-            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.faceId, traitsSvg, traitsAttributes);
+        if (storedChonk.faceId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.faceId, traitsSvg, traitsAttributes);
 
-        if (storedPeter.hairId > 0)
-            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.hairId, traitsSvg, traitsAttributes);
+        if (storedChonk.hairId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.hairId, traitsSvg, traitsAttributes);
 
-        if (storedPeter.headId > 0)
-            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.headId, traitsSvg, traitsAttributes);
+        if (storedChonk.headId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.headId, traitsSvg, traitsAttributes);
 
-        if (storedPeter.accessoryId > 0)
-            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedPeter.accessoryId, traitsSvg, traitsAttributes);
+        if (storedChonk.accessoryId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.accessoryId, traitsSvg, traitsAttributes);
     }
 
     function getSvgZmapsAndMetadata(
-        IPeterStorage.StoredPeter memory storedPeter,
+        IChonkStorage.StoredChonk memory storedChonk,
         function(uint256, string memory, string memory, bytes memory) external view returns (string memory, string memory, bytes memory) callGetSVGZmapAndMetadataTraitFn
     ) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
-        if (storedPeter.shoesId > 0)
-            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.shoesId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedChonk.shoesId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.shoesId, traitsSvg, traitsAttributes, traitZMaps);
 
-        if (storedPeter.bottomId > 0)
-            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.bottomId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedChonk.bottomId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.bottomId, traitsSvg, traitsAttributes, traitZMaps);
 
-        if (storedPeter.topId > 0)
-            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.topId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedChonk.topId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.topId, traitsSvg, traitsAttributes, traitZMaps);
 
-        if (storedPeter.faceId > 0)
-            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.faceId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedChonk.faceId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.faceId, traitsSvg, traitsAttributes, traitZMaps);
 
-        if (storedPeter.hairId > 0)
-            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.hairId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedChonk.hairId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.hairId, traitsSvg, traitsAttributes, traitZMaps);
 
-        if (storedPeter.headId > 0)
-            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.headId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedChonk.headId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.headId, traitsSvg, traitsAttributes, traitZMaps);
 
-        if (storedPeter.accessoryId > 0)
-            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedPeter.accessoryId, traitsSvg, traitsAttributes, traitZMaps);
+        if (storedChonk.accessoryId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.accessoryId, traitsSvg, traitsAttributes, traitZMaps);
     }
 
     function stringTrait(string memory traitName, string memory traitValue) internal pure returns (string memory) {

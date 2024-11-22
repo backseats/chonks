@@ -3,7 +3,7 @@ pragma solidity ^0.8.22;
 
 import { EncodeURI } from "../EncodeURI.sol";
 
-import { IPeterStorage } from "../interfaces/IPeterStorage.sol";
+import { IChonkStorage } from "../interfaces/IChonkStorage.sol";
 import { Utils } from "../common/Utils.sol";
 
 // I don't think this should know about any kind of contracts. It should just get data and render it.
@@ -16,7 +16,7 @@ contract MainRenderer2D {
     string private constant SVG_TOGGLE_SCRIPT = '<script><![CDATA[  const maxTraitsPerScreen = 20; const mainGroup = document.getElementById("main"); const backpackGroup = document.getElementById("backpack"); const backpackTraits = document.getElementById("backpackTraits"); const backpackTraitsSvgs = Array.from(backpackTraits.getElementsByTagName("svg"));  const ghostGroup = document.getElementById("ghost"); const leftBtn = document.getElementById("leftBtn"); const rightBtn = document.getElementById("rightBtn"); let curScreen = 0; const numScreens = Math.ceil(backpackTraitsSvgs.length / maxTraitsPerScreen); while (backpackTraits.firstChild) { backpackTraits.removeChild(backpackTraits.firstChild);} const ghostClone = ghostGroup.outerHTML; for (let i = 0; i < backpackTraitsSvgs.length; i += maxTraitsPerScreen) {  const gElement = document.createElementNS("http://www.w3.org/2000/svg", "g"); gElement.setAttribute("transform", `translate(${(i / maxTraitsPerScreen) * 30} 0)`); for (let j = 0; j < maxTraitsPerScreen && i + j < backpackTraitsSvgs.length; ++j) { const svg = backpackTraitsSvgs[i + j]; const x = -(j % 5) * 30; const y = -(Math.floor(j / 5) * 30) - 10; svg.setAttribute("viewBox", `${x} ${y} 150 150`); svg.innerHTML = ghostClone + svg.innerHTML; gElement.appendChild(svg);} backpackTraits.appendChild(gElement); } ghostGroup.remove(); if (backpackTraitsSvgs.length <= maxTraitsPerScreen) { leftBtn.style.display = "none"; rightBtn.style.display = "none";} else {leftBtn.style.opacity = 0.1;} leftBtn.onclick = () => { if (curScreen === 0) return; curScreen--; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`; rightBtn.style.opacity = 1; if (curScreen === 0) { leftBtn.style.opacity = 0.1;} }; rightBtn.onclick = () => { if (curScreen >= numScreens - 1) return; curScreen++; backpackTraits.style.transform = `translate(-${curScreen * 100}%, 0)`;leftBtn.style.opacity = 1;if (curScreen >= numScreens - 1) { rightBtn.style.opacity = 0.1; }}; document.getElementById("toggleMain").onclick = () => { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); if (backpackGroup.classList.contains("open")) { backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed");}}; document.getElementById("toggleBackpack").onclick = () => {  console.log("toggleBackpack"); backpackGroup.classList.toggle("open"); backpackGroup.classList.toggle("closed"); if (mainGroup.classList.contains("on")) { mainGroup.classList.toggle("on"); mainGroup.classList.toggle("off"); } };  ]]></script>';
     string private constant SVG_END = '</svg> ';
 
-    function generateBackgroundColorStyles(IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
+    function generateBackgroundColorStyles(IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
         backgroundColorStyles = string.concat(
             '<style>',
             'body, svg{ background: #', _chonkdata.backgroundColor, '; }',
@@ -25,7 +25,7 @@ contract MainRenderer2D {
         );
     }
 
-    function generateChonkdata(IPeterStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
+    function generateChonkdata(IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
         chonkDataJson = string.concat(
             '"chonkdata":[',
                 '{ "background_color" : "#', _chonkdata.backgroundColor, '" },',
@@ -43,7 +43,7 @@ contract MainRenderer2D {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         string memory _backpackSVGs,
-        IPeterStorage.Chonkdata memory _chonkdata
+        IChonkStorage.Chonkdata memory _chonkdata
         // string memory _backgroundColorStyles
     ) public pure returns (string memory) {
 
@@ -174,7 +174,7 @@ contract MainRenderer2D {
         string memory bodyGhostSvg,
         string[] memory traitSvgs,
         uint256 traitCount,
-        uint256 maxTraitsToOutput 
+        uint256 maxTraitsToOutput
     ) public pure returns (string memory backpackSVGs) {
         string memory baseSvgPart = '<svg viewBox="0 0 150 150">';
         string memory closeSvgTag = '</svg>';

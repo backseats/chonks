@@ -1,4 +1,4 @@
-export type StoredPeter = {
+export type StoredChonk = {
   headId: BigInt;
   hairId: BigInt;
   faceId: BigInt;

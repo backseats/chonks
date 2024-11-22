@@ -182,14 +182,14 @@ export default function ChonkDetail({ id }: { id: string }) {
 
 
     // function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
-    //     IPeterStorage.StoredPeter memory storedPeter = getPeter(_chonkId);
-    //     return storedPeter.headId == _traitId ||
-    //         storedPeter.hairId == _traitId ||
-    //         storedPeter.faceId == _traitId ||
-    //         storedPeter.accessoryId == _traitId ||
-    //         storedPeter.topId == _traitId ||
-    //         storedPeter.bottomId == _traitId ||
-    //         storedPeter.shoesId == _traitId;
+    //     IChonkStorage.StoredChonk memory storedChonk = getChonk(_chonkId);
+    //     return storedChonk.headId == _traitId ||
+    //         storedChonk.hairId == _traitId ||
+    //         storedChonk.faceId == _traitId ||
+    //         storedChonk.accessoryId == _traitId ||
+    //         storedChonk.topId == _traitId ||
+    //         storedChonk.bottomId == _traitId ||
+    //         storedChonk.shoesId == _traitId;
     // }
 
     // const { data: isEquipped } = useReadContract({

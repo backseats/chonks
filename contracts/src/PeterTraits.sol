@@ -13,7 +13,7 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 // Associated Interfaces and Libraries
 import { CommitReveal } from "./common/CommitReveal.sol";
 import { IERC4906 } from "./interfaces/IERC4906.sol";
-import { IPeterStorage } from "./interfaces/IPeterStorage.sol";
+import { IChonkStorage } from "./interfaces/IChonkStorage.sol";
 import { IRenderMinterV1 } from "./interfaces/IRenderMinterV1.sol";
 import { ITraitStorage } from "./interfaces/ITraitStorage.sol";
 import { TraitCategory } from "./TraitCategory.sol";
@@ -285,14 +285,14 @@ contract PeterTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         );
     }
 
-    // called from PeterMain renderAsDataUriSVG()
-    function getSvgAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, string memory traitsAttributes)
+    // called from ChonksMain renderAsDataUriSVG()
+    function getSvgAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory traitsSvg, string memory traitsAttributes)
     {
-        return traitRenderer.getSvgAndMetadata(storedPeter, this.callGetSvgAndMetadataTrait);
+        return traitRenderer.getSvgAndMetadata(storedChonk, this.callGetSvgAndMetadataTrait);
     }
 
-    function getSvgZmapsAndMetadata(IPeterStorage.StoredPeter memory storedPeter) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
-        return traitRenderer.getSvgZmapsAndMetadata(storedPeter, this.callGetSVGZmapAndMetadataTrait);
+    function getSvgZmapsAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
+        return traitRenderer.getSvgZmapsAndMetadata(storedChonk, this.callGetSVGZmapAndMetadataTrait);
     }
 
     function callGetSvgAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes ) public view returns (string memory traitsSvg, string memory traitsAttributes) {

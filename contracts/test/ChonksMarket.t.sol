@@ -698,7 +698,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(offerSeller, address(0));
     }
 
-    // TODO: move to PeterMain.t.sol
+    // TODO: move to ChonksMain.t.sol
     function test_mintStartsAtTokenId1() public {
         vm.prank(address(1));
         main.mint(1);
