@@ -75,11 +75,6 @@ interface ITraitStorage {
         string season;
     }
 
-    event Mint(
-        address indexed owner,
-        uint256 indexed tokenId
-    );
-
     // Event for when all approvals are invalidated
     event AllOperatorApprovalsInvalidated(uint256 indexed tokenId);
 

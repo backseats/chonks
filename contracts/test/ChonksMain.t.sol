@@ -76,7 +76,7 @@ contract ChonksMainTest is ChonksBaseTest {
 
         // // Add body traits for minting
         bytes memory emptyBytes;
-        for(uint8 i = 0; i < 5; i++) {
+        for (uint8 i = 0; i < 5; i++) {
             newMain.addNewBody(
                 i,
                 string.concat("Skin Tone ", vm.toString(i + 1)),

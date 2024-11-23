@@ -548,7 +548,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         (bodySvg, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedChonk);
         (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
-       
+
         fullZmap = bytes.concat(
             bodyZmap,
             traitZmaps
@@ -631,7 +631,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 tokenCount = balanceOf(_owner);
 
         uint256[] memory tokensId = new uint256[](tokenCount);
-        for(uint256 i; i < tokenCount; ++i){
+        for (uint256 i; i < tokenCount; ++i){
             tokensId[i] = tokenOfOwnerByIndex(_owner, i);
         }
 

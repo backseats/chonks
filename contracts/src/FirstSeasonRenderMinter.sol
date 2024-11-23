@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
+import { ChonkTraits } from './ChonkTraits.sol';
 import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { ITraitStorage } from './interfaces/ITraitStorage.sol';
 import { Ownable } from 'solady/auth/Ownable.sol';
-import { ChonkTraits } from './ChonkTraits.sol';
 import { TraitCategory } from './TraitCategory.sol';
 import { Utils } from './common/Utils.sol';
 
@@ -14,9 +14,9 @@ import "forge-std/console.sol";
 // contract FirstSeasonRenderMinter is IRenderMinterV1 { // TODO: ownable, ITraitStorage
 contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
     uint256[] public accessory =                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    uint[] internal accessory_probability =     [12, 24, 32, 44, 54, 64, 72, 80, 84, 92, 96, 98, 100];
+    uint256[] internal accessory_probability =  [12, 24, 32, 44, 54, 64, 72, 80, 84, 92, 96, 98, 100];
     uint256[] public head =                     [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015];
-    uint[] internal head_probability =          [10, 18, 26, 34, 42, 50, 58, 66, 74, 82, 86, 90, 94, 96, 98, 100];
+    uint256[] internal head_probability =       [10, 18, 26, 34, 42, 50, 58, 66, 74, 82, 86, 90, 94, 96, 98, 100];
     uint256[] public hair =                     [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015];
     uint256[] public face =                     [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009, 3010, 3011, 3012];
     uint256[] public top =                      [4000, 4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010, 4011, 4012, 4013, 4014, 4015, 4016, 4017, 4018, 4019, 4020, 4021, 4022, 4023, 4024, 4025, 4026, 4027, 4028, 4029, 4030, 4031, 4032, 4033, 4034, 4035, 4036, 4037, 4038, 4039, 4040, 4041, 4042, 4043, 4044, 4045, 4046, 4047, 4048, 4049, 4050, 4051, 4052, 4053, 4054];
@@ -26,12 +26,10 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
     bool _localDeploy; // DEPLOY: remove
 
     // The Main contract address
-    address public ChonksMain;
+    address public chonksMain;
 
     // The Trait contract address
     ChonkTraits public chonkTraits;
-
-    uint8 private constant INITIAL_TRAIT_NUMBER = 4; // NOTE, if 4 or less, "panic: array out-of-bounds access" error
 
     /// Errors
 
@@ -40,10 +38,10 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
 
     /// Constructor
 
-    constructor(address _ChonksMain, address _chonkTraits, bool localDeploy_) {
+    constructor(address _chonksMain, address _chonkTraits, bool localDeploy_) {
         _initializeOwner(msg.sender);
 
-        ChonksMain = _ChonksMain;
+        chonksMain = _chonksMain;
         chonkTraits = ChonkTraits(_chonkTraits);
 
         _localDeploy = localDeploy_;
@@ -214,32 +212,13 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
         }
     }
 
-    // // DEPLOY: Remove
-    // function _debugPostConstructorMint() public {
-    //     if (_localDeploy) {
-    //         // for (uint i; i < 5; ++i) { // DEPLOY: remove
-    //         //     safeMint(_traits); // Mints 3 sets of traits
-    //         // }
-
-    //         safeMintMany(msg.sender, 3);
-    //     }
-    // }
-
-    // DEPLOY: remove, just for testing to change the address
-    function setChonksMain(address _ChonksMain) public onlyOwner {
-        ChonksMain = _ChonksMain;
-    }
-
-    // TODO: Do we want a team mint here?
-
-    // This just creates a blank trait with a type
     function safeMintMany(address _toTBA, uint8 _traitCount) public returns (uint256[] memory) {
-        if (msg.sender != ChonksMain) revert OnlyChonksMain();
+        if (msg.sender != chonksMain) revert OnlyChonksMain();
 
         uint256[] memory mintedIds = new uint256[](_traitCount);
-        for(uint i; i < _traitCount; ++i) {
+        for (uint256 i; i < _traitCount; ++i) {
             // Creates a blank Trait token
-            uint tokenId = chonkTraits.safeMint(_toTBA);
+            uint256 tokenId = chonkTraits.safeMint(_toTBA);
             mintedIds[i] = tokenId;
 
             // Initialize our Trait
@@ -268,15 +247,11 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
             } else if (i == 6) {
                 trait.traitType = TraitCategory.Name.Accessory;
             } else {
-                // this should never happen as amount should never be more than 7
-                // but for testing purposes, assign a random accessory
+                // This should never happen
                 trait.traitType = TraitCategory.Name.Accessory;
             }
 
             chonkTraits.setTraitForTokenId(tokenId, trait);
-
-            // DEPLOY: I dont think we need this because it emits a Transfer function
-            emit ITraitStorage.Mint(_toTBA, tokenId);
         }
 
         return mintedIds;
@@ -291,7 +266,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
         bytes memory _zMap,
         address _creatorAddress,
         string memory _creatorName
-    ) public { // onlyOwner() { TODO
+    ) public onlyOwner {
         // maybe check if a trait already exists for _traitIndex so we don't override
         // alternatively there should be a time period beyond which we can't "edit" existing traits. it would act as a temporary safeguard
 
@@ -322,14 +297,14 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
         chonkTraits.setTraitIndexToMetadata(_traitIndex, metadata);
     }
 
-    // shoutout to apex777.eth and Based OnChain Dinos:
+    // Shoutout to apex777.eth and Based OnChain Dinos:
     // "The reason I went with 'cumulative' weighting is because it requires less loops in Solidity, so less gas."
-    function _pickTraitByProbability(uint seed, uint256[] memory traitArray, uint[] memory traitProbability) internal pure returns (uint) {
+    function _pickTraitByProbability(uint256 seed, uint256[] memory traitArray, uint256[] memory traitProbability) internal pure returns (uint256) {
         require(traitArray.length > 0, "Elements array is empty");
         require(traitArray.length == traitProbability.length, "Elements and weights length mismatch");
 
-        for(uint i; i < traitProbability.length; i++) {
-            if(seed < traitProbability[i]) {
+        for (uint256 i; i < traitProbability.length; i++) {
+            if (seed < traitProbability[i]) {
                 return i;
             }
         }
@@ -343,7 +318,6 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
         ITraitStorage.StoredTrait memory storedTrait,
         uint128 randomness
     ) view public returns (ITraitStorage.StoredTrait memory) {
-
         uint256 n; // number for randomness
 
         storedTrait.seed = uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % type(uint256).max;
@@ -416,6 +390,11 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
         }
 
         return storedTrait;
+    }
+
+    // DEPLOY: remove, just for testing to change the address
+    function setChonksMain(address _chonksMain) public onlyOwner {
+        chonksMain = _chonksMain;
     }
 
 }

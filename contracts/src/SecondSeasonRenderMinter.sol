@@ -52,7 +52,7 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
 
         uint256[] memory mintedIds = new uint256[](_amount);
 
-        for(uint i; i < _amount; ++i) {
+        for (uint i; i < _amount; ++i) {
             // Creates a token without any kind of info
             uint tokenId = chonkTraits.safeMint(tba);
             mintedIds[i] = tokenId;
@@ -66,8 +66,6 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
             trait.traitType = TraitCategory.Name.Accessory;
 
             chonkTraits.setTraitForTokenId(tokenId, trait);
-
-            emit ITraitStorage.Mint(tba, tokenId);
         }
     }
 

@@ -361,7 +361,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         uint256 tokenCount = balanceOf(_owner);
 
         uint256[] memory tokensId = new uint256[](tokenCount);
-        for(uint256 i; i < tokenCount; ++i){
+        for (uint256 i; i < tokenCount; ++i){
             console.log("tokenOfOwnerByIndex(_owner, i)", tokenOfOwnerByIndex(_owner, i));
             tokensId[i] = tokenOfOwnerByIndex(_owner, i);
         }

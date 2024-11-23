@@ -143,7 +143,7 @@ export function useMarketplaceActions(traitId: number) {
 //     uint256 tokenCount = balanceOf(_owner);
 
 //     uint256[] memory tokensId = new uint256[](tokenCount);
-//     for(uint256 i; i < tokenCount; ++i){
+//     for (uint256 i; i < tokenCount; ++i){
 //         tokensId[i] = tokenOfOwnerByIndex(_owner, i);
 //     }
 

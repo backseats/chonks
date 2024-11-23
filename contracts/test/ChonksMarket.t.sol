@@ -750,7 +750,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
         uint256[] memory traitsForChonk1 = main.getTraitTokens(tbaForChonk1);
         vm.startPrank(tbaForChonk1);
-            for(uint256 i; i < traitsForChonk1.length; i++) {
+            for (uint256 i; i < traitsForChonk1.length; i++) {
                 uint256 traitId = traitsForChonk1[i];
                 traits.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
             }
@@ -976,7 +976,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(traitIds.length, 4);
 
         // Each trait should have 4 approvals
-        for(uint i; i < traitIds.length; i++) {
+        for (uint i; i < traitIds.length; i++) {
             uint256 traitId = traitIds[i];
             address[] memory traitApprovals = traits.getApprovedOperators(traitId);
             assertEq(traitApprovals.length, 4);
@@ -994,7 +994,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(traitIds.length, 4);
 
         // Each trait should have 4 approvals
-        for(uint i; i < traitIds.length; i++) {
+        for (uint i; i < traitIds.length; i++) {
             uint256 traitId = traitIds[i];
             address[] memory traitApprovals = traits.getApprovedOperators(traitId);
             assertEq(traitApprovals.length, 0);
@@ -1070,7 +1070,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         traits.addMinter(address(minter));
 
         uint256[] memory wallet = traits.walletOfOwner(tba);
-        for(uint i; i < wallet.length; i++) {
+        for (uint i; i < wallet.length; i++) {
             console.log(wallet[i]);
         }
 
@@ -1081,7 +1081,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(traits.balanceOf(tba), 6);
         wallet = traits.walletOfOwner(tba);
 
-        for(uint i; i < wallet.length; i++) {
+        for (uint i; i < wallet.length; i++) {
             // console.log(wallet[i]);
             ITraitStorage.StoredTrait memory trait = traits.getTrait(wallet[i]);
             // console.log('renderMinterContract', trait.renderMinterContract);
