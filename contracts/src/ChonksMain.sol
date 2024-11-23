@@ -785,11 +785,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Approvals
 
-    // - tokenIdToTBAAccountAddress
-    // - tbaAddressToTokenId
-
-    // for chonk action, get tba, use that address
-
     function getChonkIdToApprovedOperators(uint256 _chonkId) public view returns (address[] memory) {
         return chonkIdToApprovedOperators[_chonkId];
     }
