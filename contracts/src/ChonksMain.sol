@@ -121,9 +121,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Chonk ID to approved addresses
     mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators;
 
-    bytes32 public friendsListMerkleRoot;
+    /// Merkle Roots
 
     bytes32 public specialCollectionMerkleRoot;
+    bytes32 public friendsListMerkleRoot;
+    bytes32 public chonksCreatorListMerkleRoot;
 
     /// Errors
 
@@ -215,6 +217,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (MerkleProof.verify(_merkleProof, specialCollectionMerkleRoot, leaf)) {
             traitCount = 5;
         } else if (MerkleProof.verify(_merkleProof, friendsListMerkleRoot, leaf)) {
+            traitCount = 6;
+        } else if (MerkleProof.verify(_merkleProof, chonksCreatorListMerkleRoot, leaf)) {
             traitCount = 7;
         }
 
@@ -732,6 +736,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function setSpecialCollectionMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
         specialCollectionMerkleRoot = _merkleRoot;
+    }
+
+    function setChonksCreatorListMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
+        chonksCreatorListMerkleRoot = _merkleRoot;
     }
 
     // Boilerplate
