@@ -1636,10 +1636,60 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         main.approve(address(market), 1);
     }
 
+    function test_deployingANewMarketplace() public {
+        // I need to replace the marketplace on ChonksMain
+        address user = address(1);
+        vm.startPrank(user);
+            bytes32[] memory empty;
+            main.mint(1, empty);
+        vm.stopPrank();
+
+        address bidder = address(2);
+        vm.deal(bidder, 1 ether);
+        vm.startPrank(bidder);
+            market.bidOnChonk{value: 1 ether}(1);
+        vm.stopPrank();
+
+        (address bidderAddr, uint256 amountInWei,,) = market.getChonkBid(1);
+        assertEq(bidderAddr, bidder);
+        assertEq(amountInWei, 1 ether);
+
+        // Oops there was a problem with the marketplace. Deploying a new one
+
+        ChonksMarket newMarketplace = new ChonksMarket(address(main), address(traits), 250, TREASURY);
+        vm.startPrank(deployer);
+            market.pause(true);
+            main.setMarketplace(address(newMarketplace));
+        vm.stopPrank();
+
+        // The bid should still be there
+        (bidderAddr, amountInWei,,) = market.getChonkBid(1);
+        assertEq(bidderAddr, bidder);
+        assertEq(amountInWei, 1 ether);
+
+        // remove your bid
+        vm.startPrank(bidder);
+            uint256 startingBal = bidder.balance;
+            assertEq(address(market).balance, 1 ether);
+            market.withdrawBidOnChonk(1);
+            assertEq(address(market).balance, 0);
+            assertGt(bidder.balance, startingBal);
+        vm.stopPrank();
+
+        vm.startPrank(user);
+            main.setApprovalForAll(address(newMarketplace), true);
+            newMarketplace.offerChonk(1, 1 ether);
+        vm.stopPrank();
+
+        vm.prank(bidder);
+        newMarketplace.buyChonk{value: 1 ether}(1);
+
+        assertEq(main.ownerOf(1), bidder);
+    }
+
     /*
     Test:
     test the stuff in beforeTokenTransfer of ChonksMain related to the marketplace
-    test the approval attack
     test all the types of offers and bids
     */
 

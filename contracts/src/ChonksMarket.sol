@@ -236,7 +236,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     /// Constructor
 
     constructor(
-        address _ChonksMain,
+        address _chonksMain,
         address _chonkTraits,
         uint8 _royaltyPercentage,
         address _teamWallet
@@ -244,7 +244,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         console.log("ChonksMarket constructor called, msg.sender:", msg.sender);
         _initializeOwner(msg.sender);
 
-        CHONKS_MAIN = ChonksMain(_ChonksMain);
+        CHONKS_MAIN = ChonksMain(_chonksMain);
         CHONK_TRAITS = ChonkTraits(_chonkTraits);
         royaltyPercentage = _royaltyPercentage;
         teamWallet = _teamWallet;
