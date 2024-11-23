@@ -777,11 +777,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
 
         super._beforeTokenTransfer(from, to, tokenId);
-
-        // Additional considerations:
-        // Consider if the marketplace contract needs its own reentrancy protection
-        // Verify that the traitsContract and marketplace addresses cannot be changed during execution
-        // Consider adding emergency pause functionality for critical issues
     }
 
     function _afterTokenTransfer(address _from, address, uint256 _tokenId) internal virtual override {

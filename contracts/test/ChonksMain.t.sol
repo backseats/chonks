@@ -287,6 +287,25 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(main.balanceOf(user), 1);
     }
 
+    function test_beforeTokenTransferCantTransferChonkToTBA() public {
+        vm.startPrank(deployer);
+            main.setFirstSeasonRenderMinter(address(dataContract));
+            traits.addMinter(address(dataContract));
+            traits.setChonksMain(address(main));
+            traits.setMarketplace(address(market));
+        vm.stopPrank();
+
+        address user = address(1);
+        vm.startPrank(user);
+            bytes32[] memory empty;
+            main.mint(2, empty);
+
+            address tba = main.tokenIdToTBAAccountAddress(2);
+            vm.expectRevert(ChonksMain.CantTransferToTBAs.selector);
+            main.transferFrom(user, tba, 2);
+        vm.stopPrank();
+    }
+
     function test_mintMultiple() public {
         vm.startPrank(deployer);
         main.setFirstSeasonRenderMinter(address(dataContract));

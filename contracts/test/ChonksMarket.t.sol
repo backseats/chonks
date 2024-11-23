@@ -1687,6 +1687,172 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         assertEq(main.ownerOf(1), bidder);
     }
 
+    function test_cleanUpMarketplaceOffersAndBids() public {
+        address user = address(1);
+        address bidder = address(2);
+        address buyer = address(3);
+
+        vm.startPrank(user);
+            bytes32[] memory empty;
+            main.mint(1, empty);
+            main.setApprovalForAll(address(market), true);
+            market.offerChonk(1, 1 ether);
+        vm.stopPrank();
+
+        // bid
+        vm.deal(bidder, 1 ether);
+        vm.prank(bidder);
+        market.bidOnChonk{value: 0.5 ether}(1);
+
+        // another bid
+
+        uint256 startingBal = bidder.balance;
+
+        // buy it
+        vm.deal(buyer, 2 ether);
+        vm.startPrank(buyer);
+            // first bid
+            market.bidOnChonk{value: 0.6 ether}(1);
+            // ehh they'll buy it
+            market.buyChonk{value: 1 ether}(1);
+        vm.stopPrank();
+
+        assertEq(main.ownerOf(1), buyer);
+        assertGt(bidder.balance, startingBal); // check they got their money back
+
+        // Check offer is gone
+        (uint256 price, address seller,,,,) = market.getChonkOffer(1);
+        assertEq(price, 0);
+        assertEq(seller, address(0));
+
+        // Check bids are gone
+        (address bidderAddr, uint256 amountInWei,,) = market.getChonkBid(1);
+        assertEq(bidderAddr, address(0));
+        assertEq(amountInWei, 0);
+    }
+
+    function test_cleanUpMarketplaceTraitOffersAndBids() public {
+        address user = address(1);
+        address bidder = address(2);
+        address buyer = address(3);
+
+        vm.startPrank(user);
+            bytes32[] memory empty;
+            main.mint(1, empty);
+            main.setApprovalForAll(address(market), true);
+        vm.stopPrank();
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        vm.startPrank(tba);
+            traits.setApprovalForAll(address(market), true); // do i need? i think so
+            vm.expectRevert(NotYourTrait.selector);
+            market.offerTrait(1, 1, 1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(user);
+            vm.expectRevert(TraitEquipped.selector);
+            market.offerTrait(1, 1, 1 ether);
+
+            main.unequip(1, TraitCategory.Name.Shoes);
+            main.unequip(1, TraitCategory.Name.Bottom);
+            market.offerTrait(1, 1, 1 ether); // shoes
+            market.offerTrait(2, 1, 1 ether); // bottom
+        vm.stopPrank();
+
+        vm.deal(bidder, 1 ether);
+        vm.startPrank(bidder);
+            main.mint(1, empty);
+            uint256 startingBal = bidder.balance;
+            market.bidOnTrait{value: 0.5 ether}(1, 2); // his chonk is 2
+            assertLt(bidder.balance, startingBal);
+        vm.stopPrank();
+
+        vm.deal(buyer, 2 ether);
+        vm.startPrank(buyer);
+            main.mint(1, empty); // his chonk is 3
+            market.bidOnTrait{value: 0.6 ether}(1, 3);
+            market.buyTrait{value: 1 ether}(1, 3);
+            assertEq(bidder.balance, startingBal); // got your money back
+        vm.stopPrank();
+
+        assertEq(traits.ownerOf(1), main.tokenIdToTBAAccountAddress(3));
+
+        // verify the offer is gone
+        (uint256 price, address seller,,) = market.getTraitOffer(1);
+        assertEq(price, 0);
+        assertEq(seller, address(0));
+
+        // verify the bids are gone
+        (address bidderAddr, address bidderTBA, uint256 amountInWei) = market.getTraitBid(1);
+        assertEq(bidderAddr, address(0));
+        assertEq(bidderTBA, address(0));
+        assertEq(amountInWei, 0);
+    }
+
+    function test_cleanUpTraitBidsAndOffersOnChonkSale() public {
+        address user = address(1);
+        address bidder = address(2);
+        address buyer = address(3);
+
+        vm.startPrank(user);
+            bytes32[] memory empty;
+            main.mint(1, empty);
+            main.setApprovalForAll(address(market), true);
+        vm.stopPrank();
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        vm.startPrank(tba);
+            traits.setApprovalForAll(address(market), true); // do i need? i think so
+            vm.expectRevert(NotYourTrait.selector);
+            market.offerTrait(1, 1, 1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(user);
+            vm.expectRevert(TraitEquipped.selector);
+            market.offerTrait(1, 1, 1 ether);
+
+            main.unequip(1, TraitCategory.Name.Shoes);
+            main.unequip(1, TraitCategory.Name.Bottom);
+            market.offerChonk(1, 1 ether);
+            market.offerTrait(1, 1, 1 ether); // shoes
+            market.offerTrait(2, 1, 1 ether); // bottom
+        vm.stopPrank();
+
+        vm.deal(bidder, 2 ether);
+        vm.startPrank(bidder);
+            main.mint(1, empty);
+            uint256 startingBal = bidder.balance;
+            market.bidOnChonk{value: 0.75 ether}(1);
+            market.bidOnTrait{value: 0.5 ether}(1, 2); // his chonk is 2
+            assertLt(bidder.balance, startingBal);
+        vm.stopPrank();
+
+        vm.deal(buyer, 2 ether);
+        vm.startPrank(buyer);
+            main.mint(1, empty); // his chonk is 3
+            market.bidOnTrait{value: 0.6 ether}(1, 3);
+            market.buyChonk{value: 1 ether}(1);
+
+            assertLt(bidder.balance, startingBal);
+        vm.stopPrank();
+
+        assertEq(main.ownerOf(1), buyer);
+
+        // verify the offer is gone
+        (uint256 price, address seller,,) = market.getTraitOffer(1);
+        assertEq(price, 0);
+        assertEq(seller, address(0));
+
+        // verify the bids are gone
+        (address bidderAddr, address bidderTBA, uint256 amountInWei) = market.getTraitBid(1);
+        assertEq(bidderAddr, address(0));
+        assertEq(bidderTBA, address(0));
+        assertEq(amountInWei, 0);
+
+        // TODO: verify the trait approvals are gone
+    }
+
+
     /*
     Test:
     test the stuff in beforeTokenTransfer of ChonksMain related to the marketplace

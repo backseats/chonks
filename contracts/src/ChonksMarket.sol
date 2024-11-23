@@ -500,6 +500,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit TraitOfferCanceled(_traitId, msg.sender);
     }
 
+    /// Note: Needs to be called by the EOA that owns the Chonk
     function offerTrait(
         uint256 _traitId,
         uint256 _chonkId,
@@ -659,7 +660,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 _traitId,
         uint256 _yourChonkId
     ) public payable ensurePriceIsNotZero(msg.value) notPaused nonReentrant {
-
         (address chonkOwner, address tbaAddressOfBiddersChonk) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_yourChonkId);
         // Ensure msg.sender owns the Chonk trait will go to
         if (chonkOwner != msg.sender) revert NotYourChonk();
