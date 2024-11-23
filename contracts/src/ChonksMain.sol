@@ -193,7 +193,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // TODO: do we let this go longer than the main mint?
     function teamMint(address _to, uint256 _amount) public onlyOwner {
         if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
-        if (block.timestamp > mintStartTime + 1 weeks) revert MintEnded();
+        if (block.timestamp > mintStartTime + 26 hours) revert MintEnded();
 
         _mintInternal(_to, _amount, 4);
     }
