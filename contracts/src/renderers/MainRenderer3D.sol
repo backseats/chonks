@@ -2,18 +2,15 @@
 pragma solidity ^0.8.22;
 
 import { EncodeURI } from "../EncodeURI.sol";
-
 import { IChonkStorage } from "../interfaces/IChonkStorage.sol";
 import { Utils } from "../common/Utils.sol";
-// import { Base64 } from "solady/utils/Base64.sol";
 
 // Scripty for 3D rendering
 import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../../lib/scripty/interfaces/IScriptyBuilderV2.sol";
 
-// import { console2 } from 'forge-std/console2.sol';
-import "forge-std/console.sol"; // DEPLOY: remove
+// DEPLOY: remove
+import "forge-std/console.sol";
 
-// I don't think this should know about any kind of contracts. It should just get data and render it.
 contract MainRenderer3D {
 
     // Scripty & EthFS for 3D rendering
@@ -29,7 +26,11 @@ contract MainRenderer3D {
 
     string private constant SVG_START_STYLE = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
 
-    function generateFullSvg( string memory _bodySvg, string memory _traitsSvg, IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory image) {
+    function generateFullSvg(
+        string memory _bodySvg,
+        string memory _traitsSvg,
+        IChonkStorage.Chonkdata memory _chonkdata
+    ) internal pure returns (string memory image) {
         string memory fullSvg = string.concat(
             SVG_START_STYLE,
             generateBackgroundColorStyles(_chonkdata),
@@ -48,7 +49,7 @@ contract MainRenderer3D {
         );
     }
 
-    function generateBackgroundColorStyles( IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
+    function generateBackgroundColorStyles(IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
         backgroundColorStyles = string.concat(
             '<style>',
             'body, svg{ background: #', _chonkdata.backgroundColor, '; }',
@@ -57,7 +58,7 @@ contract MainRenderer3D {
         );
     }
 
-    function generateChonkdata( IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
+    function generateChonkdata(IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
         chonkDataJson = string.concat(
             '"chonkdata":[',
                 '{ "background_color" : "#', _chonkdata.backgroundColor, '" },',
@@ -78,7 +79,7 @@ contract MainRenderer3D {
                 '],',
                 generateChonkdata(_chonkdata)
             );
-        } 
+        }
         else {
             fullAttributes = string.concat(
                 '"attributes":[],',
@@ -237,6 +238,7 @@ contract MainRenderer3D {
         encodeURIContract = EncodeURI(_encodeURIAddress);
     }
 
+    // TODO: onlyOwner?
     function setScriptContent(bytes calldata _base64EncodedString) public {
         base64ScriptContent = _base64EncodedString;
     }

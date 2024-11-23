@@ -546,13 +546,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         StoredChonk memory storedChonk = getChonk(_tokenId);
 
-        (bodySvg, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedChonk);
+        (bodySvg, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
         (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
 
-        fullZmap = bytes.concat(
-            bodyZmap,
-            traitZmaps
-        );
+        fullZmap = bytes.concat(bodyZmap, traitZmaps);
 
         chonkdata.backgroundColor = storedChonk.backgroundColor;
         chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
@@ -585,8 +582,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         StoredChonk memory storedChonk = getChonk(_tokenId);
 
-        (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedChonk);
-        (, traitZmaps, ) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
+        (, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
+        (, traitZmaps,) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
 
         return string.concat(
             string(bodyZmap),
