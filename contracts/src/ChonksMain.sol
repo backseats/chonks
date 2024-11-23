@@ -128,24 +128,25 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     /// Errors
 
     error BodyAlreadyExists();
+    error CantBeZero();
     error CantTransfer();
     error CantTransferToTBAs();
+    error ChonkDoesntExist();
     error FirstSeasonRenderMinterNotSet();
     error IncorrectChonkOwner();
     error IncorrectTBAOwner();
     error IncorrectTraitType();
+    error InsufficientFunds();
     error InvalidBodyIndex();
     error InvalidColor();
     error InvalidLevelAmount();
     error InvalidSignature();
     error markaSaysNo();
-    error NonceAlreadyUsed();
-    error ChonkDoesntExist();
-    error UseUnequip();
     error MintEnded();
     error MintNotStarted();
-    error InsufficientFunds();
-    error CantBeZero();
+    error NonceAlreadyUsed();
+    error ThirtyIsMaxMint();
+    error UseUnequip();
     error WithdrawFailed();
 
     /// Modifier
@@ -198,10 +199,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _mintInternal(_to, _amount, 4);
     }
 
-    // TODO: Do we want to limit the _amount here to 30?
     function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
         if (_amount == 0) revert CantBeZero();
+        if (_amount > 30) revert ThirtyIsMaxMint();
 
         // TODO: bring these back in, tested them
         // if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
