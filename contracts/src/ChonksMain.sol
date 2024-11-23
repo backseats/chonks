@@ -176,8 +176,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 // setTokenRenderZ(i, true);
                 // setTokenRender3D(i, true);
             }
-            setBackgroundColor(1, "ffffff");
-            setTokenRender3D(1, true);
+            // setBackgroundColor(1, "ffffff");
+            // setTokenRender3D(1, true);
 
         }
     }
@@ -509,14 +509,12 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
         string memory bodySvg;
-        string memory bodyAttributes;
         string memory traitsSvg;
         string memory traitsAttributes;
         string memory backpackSVGs;
-        // string memory backgroundColorStyles;
 
         StoredChonk memory storedChonk = getChonk(_tokenId);
-        (bodySvg, bodyAttributes) = getBodySvgAndMetadata(storedChonk);
+        (bodySvg, ) = getBodySvgAndMetadata(storedChonk);
         (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedChonk);
         backpackSVGs = getBackpackSVGs(_tokenId);
 
@@ -530,7 +528,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return mainRenderer2D.renderAsDataUri(
             _tokenId,
             bodySvg,
-            bodyAttributes,
             traitsSvg,
             traitsAttributes,
             backpackSVGs,
@@ -545,16 +542,13 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         bytes  memory traitZmaps;
         bytes  memory fullZmap;
         string memory traitsAttributes;
-        string memory bodyAttributes;
-        string memory fullAttributes;
         Chonkdata memory chonkdata;
 
         StoredChonk memory storedChonk = getChonk(_tokenId);
 
-        (bodySvg, bodyZmap, bodyAttributes) = getBodySVGZmapsAndMetadata(storedChonk);
+        (bodySvg, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedChonk);
         (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
-        fullAttributes = string.concat('"attributes":[', bodyAttributes, ',', traitsAttributes, ']');
-
+       
         fullZmap = bytes.concat(
             bodyZmap,
             traitZmaps
@@ -568,7 +562,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return mainRenderer3D.renderAsDataUri(
             _tokenId,
             bodySvg,
-            bodyAttributes,
             traitsSvg,
             traitsAttributes,
             fullZmap,

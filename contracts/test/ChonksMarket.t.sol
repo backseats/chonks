@@ -817,13 +817,13 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.deal(buyer, 10 ether);
         vm.startPrank(buyer);
             uint startingBal = buyer.balance;
-            console.log("startingBal", startingBal);
+            // console.log("startingBal", startingBal);
 
             (address bidder, uint256 amountInWei,,) = market.getChonkBid(chonkId);
             assertEq(bidder, address(0));
             market.bidOnChonk{value: 0.5 ether}(chonkId);
             uint endingBal = buyer.balance;
-            console.log("endingBal", endingBal);
+            // console.log("endingBal", endingBal);
             assertLt(endingBal, startingBal);
 
             (bidder, amountInWei,,) = market.getChonkBid(chonkId);
@@ -835,7 +835,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.stopPrank();
 
         // expect balance to be > what it was before
-        console.log("buyer.balance", buyer.balance);
+        // console.log("buyer.balance", buyer.balance);
         // start: 10
         // bid .5 (new bal 9.5)
         // buy (new bal 8.5)
@@ -1082,9 +1082,9 @@ contract ChonksMarketTest is ChonksBaseTest {
         wallet = traits.walletOfOwner(tba);
 
         for(uint i; i < wallet.length; i++) {
-            console.log(wallet[i]);
+            // console.log(wallet[i]);
             ITraitStorage.StoredTrait memory trait = traits.getTrait(wallet[i]);
-            console.log('renderMinterContract', trait.renderMinterContract);
+            // console.log('renderMinterContract', trait.renderMinterContract);
         }
     }
 
@@ -1343,7 +1343,7 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
         uint256[] memory sellerTraits = main.getTraitTokens(sellerTBA);
         uint256 traitId = sellerTraits[0];
-        console.log("traitId", traitId);
+        // console.log("traitId", traitId);
 
         // Setup bidder with a Chonk
         vm.prank(bidder);

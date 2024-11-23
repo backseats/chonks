@@ -68,7 +68,7 @@ contract MainRenderer3D {
         );
     }
 
-    function generateAttributes(string memory _traitsAttributes, string memory _bodyAttributes, IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory fullAttributes) {
+    function generateAttributes(string memory _traitsAttributes, IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory fullAttributes) {
         //todo: do we need this bodyAttributes check in here?
         if (bytes(_traitsAttributes).length > 0) {
             // fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
@@ -78,11 +78,10 @@ contract MainRenderer3D {
                 '],',
                 generateChonkdata(_chonkdata)
             );
-        } else {
+        } 
+        else {
             fullAttributes = string.concat(
-                '"attributes":[',
-                _bodyAttributes,
-                '],',
+                '"attributes":[],',
                 generateChonkdata(_chonkdata)
             );
         }
@@ -91,15 +90,13 @@ contract MainRenderer3D {
     function renderAsDataUri(
         uint256 _tokenId,
         string memory _bodySvg,
-        string memory _bodyAttributes,
         string memory _traitsSvg,
         string memory _traitsAttributes,
         bytes memory _fullZmap,
         IChonkStorage.Chonkdata memory _chonkdata
     ) public view returns (string memory) {
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _chonkdata);
-
-        string memory fullAttributes = generateAttributes(_traitsAttributes, _bodyAttributes, _chonkdata);
+        string memory fullAttributes = generateAttributes(_traitsAttributes, _chonkdata);
 
         // html style
         HTMLTag[] memory headTags = new HTMLTag[](1);

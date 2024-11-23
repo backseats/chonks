@@ -39,12 +39,10 @@ contract MainRenderer2D {
     function renderAsDataUri(
         uint256 _tokenId,
         string memory _bodySvg,
-        string memory _bodyAttributes,
         string memory _traitsSvg,
         string memory _traitsAttributes,
         string memory _backpackSVGs,
         IChonkStorage.Chonkdata memory _chonkdata
-        // string memory _backgroundColorStyles
     ) public pure returns (string memory) {
 
         string memory fullSvg;
@@ -53,7 +51,6 @@ contract MainRenderer2D {
         fullSvg = string.concat(
             SVG_START,
             SVG_STYLE,
-            // _backgroundColorStyles,
             generateBackgroundColorStyles(_chonkdata),
             SVG_BG_MAIN_START,
             _bodySvg,
@@ -69,8 +66,9 @@ contract MainRenderer2D {
 
         if (bytes(_traitsAttributes).length > 0) {
             fullAttributes = string.concat('"attributes":[', _traitsAttributes, ']');
-        } else {
-            fullAttributes = string.concat('"attributes":[', _bodyAttributes, ']');
+        } 
+        else {
+            fullAttributes = string.concat('"attributes":[]');
         }
 
         string memory combinedHTML = string.concat(

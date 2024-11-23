@@ -241,7 +241,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint8 _royaltyPercentage,
         address _teamWallet
     ) {
-        console.log("ChonksMarket constructor called, msg.sender:", msg.sender);
+        // console.log("ChonksMarket constructor called, msg.sender:", msg.sender);
         _initializeOwner(msg.sender);
 
         CHONKS_MAIN = ChonksMain(_chonksMain);
@@ -594,10 +594,10 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     ) public payable notPaused nonReentrant {
         // Ensure msg.sender owns the Chonk token of the TBA
         address owner = CHONKS_MAIN.ownerOf(_forChonkId);
-        console.log("buyTrait: _traitId", _traitId);
-        console.log("buyTrait: _forChonkId", _forChonkId);
-        console.log("buyTrait: owner of Chonk", owner);
-        console.log("buyTrait: msg.sender", msg.sender);
+        // console.log("buyTrait: _traitId", _traitId);
+        // console.log("buyTrait: _forChonkId", _forChonkId);
+        // console.log("buyTrait: owner of Chonk", owner);
+        // console.log("buyTrait: msg.sender", msg.sender);
         if (owner != msg.sender) revert NotYourChonk();
 
         // Ensure you don't own the Trait
@@ -755,19 +755,19 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     }
 
     function deleteTraitOffersBeforeTokenTransfer(uint256 _traitId) public {
-        console.log(
-            "ChonksMarket deleteTraitOffersBeforeTokenTransfer called for trait ID:",
-            _traitId
-        );
-        console.log("- message sender:", msg.sender);
-        console.log("- address(CHONKS_MAIN)", address(CHONKS_MAIN));
-        console.log("- address(CHONK_TRAITS)", address(CHONK_TRAITS));
+        // console.log(
+        //     "ChonksMarket deleteTraitOffersBeforeTokenTransfer called for trait ID:",
+        //     _traitId
+        // );
+        // console.log("- message sender:", msg.sender);
+        // console.log("- address(CHONKS_MAIN)", address(CHONKS_MAIN));
+        // console.log("- address(CHONK_TRAITS)", address(CHONK_TRAITS));
 
         if (
             msg.sender != address(CHONKS_MAIN) &&
             msg.sender != address(CHONK_TRAITS)
         ) {
-            console.log("CMUnauthorized");
+            // console.log("CMUnauthorized");
             revert CMUnauthorized();
         }
 
@@ -775,7 +775,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (traitOffers[_traitId].seller != address(0))
             delete traitOffers[_traitId];
 
-        console.log("ChonksMarket deleteTraitOffersBeforeTokenTransfer end");
+        // console.log("ChonksMarket deleteTraitOffersBeforeTokenTransfer end");
     }
 
     /// @dev Loops through all of the TBAs associated with the _toEOA address to see if they bid on the Trait. If so, delete and refund the bidder
@@ -819,10 +819,10 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     function removeChonkOfferOnTraitTransfer(
         uint256 _chonkId
     ) public onlyTraitContract {
-        console.log(
-            "ChonksMarket removeChonkOfferOnTraitTransfer called for chonk ID:",
-            _chonkId
-        );
+        // console.log(
+        //     "ChonksMarket removeChonkOfferOnTraitTransfer called for chonk ID:",
+        //     _chonkId
+        // );
         delete chonkOffers[_chonkId];
     }
 
