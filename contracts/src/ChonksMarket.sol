@@ -730,7 +730,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 _chonkId
     ) public view returns (uint256[] memory traitIds, bytes memory encodedTraitIds) {
         (, address tbaAddress) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
-        traitIds = CHONKS_MAIN.getTraitTokens(tbaAddress);
+        traitIds = CHONK_TRAITS.walletOfOwner(tbaAddress);
         encodedTraitIds = abi.encode(traitIds);
     }
 

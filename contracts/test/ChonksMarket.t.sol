@@ -705,7 +705,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         // move traits from chonk 2 to chonk 1
         address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
         address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
-        uint256[] memory traitsForChonk1 = main.getTraitTokens(tbaForChonk1);
+        uint256[] memory traitsForChonk1 = traits.walletOfOwner(tbaForChonk1);
         uint256 traitId = traitsForChonk1[0];
 
         // be the tba of chonk 1, move trait 1
@@ -748,7 +748,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         // drain (addr1)
         address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
         address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
-        uint256[] memory traitsForChonk1 = main.getTraitTokens(tbaForChonk1);
+        uint256[] memory traitsForChonk1 = traits.walletOfOwner(tbaForChonk1);
         vm.startPrank(tbaForChonk1);
             for (uint256 i; i < traitsForChonk1.length; i++) {
                 uint256 traitId = traitsForChonk1[i];
@@ -782,15 +782,15 @@ contract ChonksMarketTest is ChonksBaseTest {
         // move traits from chonk 2 to chonk 1
         address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
         address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
-        uint256[] memory traitsForChonk2 = main.getTraitTokens(tbaForChonk2);
+        uint256[] memory traitsForChonk2 = traits.walletOfOwner(tbaForChonk2);
         uint256 traitId = traitsForChonk2[0];
 
         // be the tba of chonk 2
         vm.prank(tbaForChonk2);
         traits.transferFrom(tbaForChonk2, tbaForChonk1, traitId);
 
-        assertEq(main.getTraitTokens(tbaForChonk1).length, 5);
-        assertEq(main.getTraitTokens(tbaForChonk2).length, 3);
+        assertEq(traits.walletOfOwner(tbaForChonk1).length, 5);
+        assertEq(traits.walletOfOwner(tbaForChonk2).length, 3);
 
         // see marketplace.removeChonkOfferOnTraitTransfer(chonkId); on traits.afterTraitTransfer
         vm.deal(buyer, 1 ether);
@@ -1185,7 +1185,7 @@ main.mint(1, empty);
 
         // Get one of the initial traits that came with the Chonk
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
-        uint256[] memory sellerTraits = main.getTraitTokens(sellerTBA);
+        uint256[] memory sellerTraits = traits.walletOfOwner(sellerTBA);
         uint256 traitId = sellerTraits[0]; // Use the first trait
 
         // First verify that offering an equipped trait reverts
@@ -1239,7 +1239,7 @@ main.mint(1, empty);
 
         // Get one of the initial traits
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
-        uint256[] memory sellerTraits = main.getTraitTokens(sellerTBA);
+        uint256[] memory sellerTraits = traits.walletOfOwner(sellerTBA);
         uint256 traitId = sellerTraits[0];
 
         // First verify that offering an equipped trait reverts
@@ -1341,7 +1341,7 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
 
         // Get one of the initial traits
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
-        uint256[] memory sellerTraits = main.getTraitTokens(sellerTBA);
+        uint256[] memory sellerTraits = traits.walletOfOwner(sellerTBA);
         uint256 traitId = sellerTraits[0];
         // console.log("traitId", traitId);
 
@@ -1425,7 +1425,7 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
 
         // Get one of the initial traits
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
-        uint256[] memory sellerTraits = main.getTraitTokens(sellerTBA);
+        uint256[] memory sellerTraits = traits.walletOfOwner(sellerTBA);
         uint256 traitId = sellerTraits[0]; // Use the first trait
 
         // Setup bidder with Chonk

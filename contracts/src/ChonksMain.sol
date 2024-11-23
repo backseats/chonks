@@ -107,6 +107,9 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     uint256 public mintStartTime;
 
+    // The date when contract was deployed, a year after which, certain functions can't be called by the owner
+    uint256 public immutable deploymentTime;
+
     // ERC-6551 Boilerplate addresses
     IRegistry constant REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
     address constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
@@ -148,6 +151,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error MintNotStarted();
     error NonceAlreadyUsed();
     error ThirtyIsMaxMint();
+    error Timelocked();
     error UseUnequip();
     error WithdrawFailed();
 
@@ -163,6 +167,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // DEPLOY: remove localDeploy_
     constructor(bool localDeploy_) ERC721("Chonks", "CHONKS") {
         _initializeOwner(msg.sender);
+        deploymentTime = block.timestamp;
         _localDeploy = localDeploy_;
     }
 
@@ -193,7 +198,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     //     usedNonces[nonce] = true;
     // }
 
-    // TODO: do we let this go longer than the main mint?
     function teamMint(address _to, uint256 _amount) public onlyOwner {
         if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
         if (block.timestamp > mintStartTime + 26 hours) revert MintEnded();
@@ -245,7 +249,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // Initialize the TBA
             IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
-            // TODO: think we need to call this currentSeasonRenderMinter
             uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
 
             // Initialize the Chonk
@@ -435,14 +438,12 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
         if (!_exists(_tokenId)) revert ChonkDoesntExist();
-
         return renderAsDataUri(_tokenId);
     }
 
-    function getTraitTokens(address _tbaAddress) public view returns (uint256[] memory) {
-        uint256[] memory traitTokens = traitsContract.walletOfOwner(_tbaAddress);
-        return traitTokens;
-    }
+    // function getTraitTokens(address _tbaAddress) public view returns (uint256[] memory) {
+    //     return traitsContract.walletOfOwner(_tbaAddress);
+    // }
 
     // outputs svg for a provided body index
     function getBodyImageSvg(uint256 _index) public view returns (string memory svg) {
@@ -490,7 +491,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function getTraitsForChonkId(uint256 _chonkId) public view returns (uint256[] memory traitTokens) {
         address tbaAddress = getTBAAddressForChonkId(_chonkId);
-        traitTokens = getTraitTokens(tbaAddress);
+        traitTokens = traitsContract.walletOfOwner(tbaAddress);
     }
 
     function getBackpackSVGs(uint256 _tokenId) public view returns (string memory) {
@@ -568,7 +569,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
         StoredChonk memory storedChonk = getChonk(_tokenId);
-
         return (storedChonk.render3D) ? renderAsDataUri3D(_tokenId) : renderAsDataUri2D(_tokenId);
     }
 
@@ -598,14 +598,13 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         StoredChonk memory storedChonk = getChonk(_tokenId);
 
-        (, bodyZmap, ) = getBodySVGZmapsAndMetadata(storedChonk);
+        (, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
 
         return string(bodyZmap);
     }
 
     function getChonk(uint256 _tokenId) public view returns (IChonkStorage.StoredChonk memory) {
-        IChonkStorage.StoredChonk memory storedChonk = chonkTokens.all[_tokenId];
-        return storedChonk;
+        return chonkTokens.all[_tokenId];
     }
 
     function getTokenRenderZ(uint256 _chonkTokenId) public view returns (bool) {
@@ -635,12 +634,22 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return tokensId;
     }
 
+    /// @notice Returns the timestamp one year after contract deployment
+    function oneYearFromDeployment() public view returns (uint256) {
+        return deploymentTime + 365 days;
+    }
+
+    function isTimelocked() public view returns (bool) {
+        return block.timestamp > oneYearFromDeployment();
+    }
+
     /// Ownable Functions
 
-    // TODO: Timelock
     function addNewBody(uint256 _bodyIndex, string memory _bodyName, bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
+        if (isTimelocked()) revert Timelocked();
         BodyMetadata storage metadata = bodyIndexToMetadata[_bodyIndex];
 
+        // TODO: do we want?
         // if (metadata.bodyIndex != 0) revert BodyAlreadyExists();
 
         metadata.bodyIndex = _bodyIndex;
@@ -649,28 +658,33 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         metadata.zMap = _zMap;
     }
 
-    function setMaxTraitsToOutput(uint256 _maxTraitsToOutput) public onlyOwner {
-        maxTraitsToOutput = _maxTraitsToOutput;
-    }
-
     function setTraitsContract(ChonkTraits _address) public onlyOwner {
+        if (isTimelocked()) revert Timelocked();
         traitsContract = _address;
     }
 
     function setFirstSeasonRenderMinter(address _dataContract) public onlyOwner {
+        if (isTimelocked()) revert Timelocked();
         firstSeasonRenderMinter = FirstSeasonRenderMinter(_dataContract);
     }
 
     function setMainRenderer2D(address _mainRenderer2D) public onlyOwner {
+        if (isTimelocked()) revert Timelocked();
         mainRenderer2D = MainRenderer2D(_mainRenderer2D);
     }
 
     function setMainRenderer3D(address _mainRenderer3D) public onlyOwner {
+        if (isTimelocked()) revert Timelocked();
         mainRenderer3D = MainRenderer3D(_mainRenderer3D);
     }
 
     function setMarketplace(address _marketplace) public onlyOwner {
+        if (isTimelocked()) revert Timelocked();
         marketplace = ChonksMarket(_marketplace);
+    }
+
+    function setMaxTraitsToOutput(uint256 _maxTraitsToOutput) public onlyOwner {
+        maxTraitsToOutput = _maxTraitsToOutput;
     }
 
     function setMintStartTime(uint256 _mintStartTime) public onlyOwner {
@@ -683,6 +697,18 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function setPrice(uint256 _priceInWei) public onlyOwner {
         price = _priceInWei;
+    }
+
+    function setFriendsListMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
+        friendsListMerkleRoot = _merkleRoot;
+    }
+
+    function setSpecialCollectionMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
+        specialCollectionMerkleRoot = _merkleRoot;
+    }
+
+    function setChonksCreatorListMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
+        chonksCreatorListMerkleRoot = _merkleRoot;
     }
 
     /// Public Setters
@@ -703,6 +729,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 revert InvalidColor(); // Invalid character found
             }
         }
+
         chonkTokens.all[_chonkTokenId].backgroundColor = _color;
 
         emit BackgroundColor(ownerOf(_chonkTokenId), _chonkTokenId, _color );
@@ -718,18 +745,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setTokenRender3D(uint256 _chonkTokenId, bool _render3D) public onlyChonkOwner(_chonkTokenId) {
         chonkTokens.all[_chonkTokenId].render3D = _render3D;
         emit Render3D(ownerOf(_chonkTokenId), _chonkTokenId, _render3D);
-    }
-
-    function setFriendsListMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
-        friendsListMerkleRoot = _merkleRoot;
-    }
-
-    function setSpecialCollectionMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
-        specialCollectionMerkleRoot = _merkleRoot;
-    }
-
-    function setChonksCreatorListMerkleRoot(bytes32 _merkleRoot) public onlyOwner {
-        chonksCreatorListMerkleRoot = _merkleRoot;
     }
 
     // Boilerplate
