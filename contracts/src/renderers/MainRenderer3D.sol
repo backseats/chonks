@@ -219,12 +219,10 @@ contract MainRenderer3D is Ownable {
             );
     }
 
-    // TODO: put in onlyOwner here? or call this from ChonksMain?
     function setEncodeURI(address _encodeURIAddress) public onlyOwner {
         encodeURIContract = EncodeURI(_encodeURIAddress);
     }
 
-    // TODO: onlyOwner?
     function setScriptContent(bytes calldata _base64EncodedString) public onlyOwner {
         base64ScriptContent = _base64EncodedString;
     }

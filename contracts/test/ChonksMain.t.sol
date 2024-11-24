@@ -480,6 +480,7 @@ contract ChonksMainTest is ChonksBaseTest {
 
         vm.stopPrank();
     }
+
     function test_toggleBetween2DAnd3D() public {
         // Setup contracts and mint a token
         vm.startPrank(deployer);
@@ -520,6 +521,33 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.prank(nonOwner);
         vm.expectRevert(); // Reverts because non-owner cannot toggle
         main.setTokenRender3D(1, true);
+    }
+
+    function test_3DSetters() public {
+         // Setup contracts and mint a token
+        vm.startPrank(deployer);
+        main.setFirstSeasonRenderMinter(address(dataContract));
+        main.setMainRenderer2D(address(mainRenderer2D));
+        main.setMainRenderer3D(address(mainRenderer3D));
+        traits.setChonksMain(address(main));
+        traits.addMinter(address(dataContract));
+        traits.setMarketplace(address(market));
+        vm.stopPrank();
+
+        address user = address(1);
+        vm.startPrank(user);
+        vm.expectRevert(); // onlyOwner
+        mainRenderer3D.setEncodeURI(address(encodeURIContract));
+        vm.expectRevert(); // onlyOwner
+        mainRenderer3D.setScriptContent(bytes(""));
+        vm.stopPrank();
+
+        vm.startPrank(deployer);
+        mainRenderer3D.setEncodeURI(address(encodeURIContract));
+        mainRenderer3D.setScriptContent(bytes("0x1234"));
+        assertEq(address(mainRenderer3D.encodeURIContract()), address(encodeURIContract));
+        assertEq(mainRenderer3D.base64ScriptContent(), bytes("0x1234"));
+        vm.stopPrank();
     }
 
     function test_renderWithNoTraits() public {}
