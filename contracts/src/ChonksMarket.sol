@@ -527,7 +527,11 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit TraitOffered(_traitId, _priceInWei, tokenOwner, tbaTraitOwner);
     }
 
-    // Remove?
+    /// @notice This should be called by the EOA that owns the Chonk, not the TBA
+    /// @param _traitId The ID of the Trait you're selling
+    /// @param _chonkId The ID of the Chonk you're selling the Trait for. This Chonk ID must own the `_traitId`
+    /// @param _priceInWei The price of the Trait you're selling, in Wei
+    /// @param _onlySellTo should be the EOA that will be buying the Trait for their Chonk
     function offerTraitToAddress(
         uint256 _traitId,
         uint256 _chonkId,
@@ -555,39 +559,9 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit TraitOfferedToAddress(_traitId, _priceInWei, tokenOwner, tbaTraitOwner, _onlySellTo);
     }
 
-    // Use instead? Easier to offer to a specific Chonk ID than their TBA
-    function offerTraitToChonkId(
-        uint256 _traitId,
-        uint256 _chonkId,
-        uint256 _priceInWei,
-        uint256 _onlySellToChonkId
-    ) public notPaused ensurePriceIsNotZero(_priceInWei) {
-        if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
-
-        // TODO: ensure onlySellToChonkId is not yours
-
-        // Please unequip the trait if you want to sell it
-        if (CHONKS_MAIN.checkIfTraitIsEquipped(_chonkId, _traitId))
-            revert TraitEquipped();
-
-        address tbaTraitOwner = CHONK_TRAITS.ownerOf(_traitId);
-        (address tokenOwner, ) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(
-            _chonkId
-        );
-
-        (, address chonkTBA) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_onlySellToChonkId);
-
-        traitOffers[_traitId] = TraitOffer(
-            _priceInWei,
-            tokenOwner,
-            tbaTraitOwner,
-            chonkTBA
-        );
-
-        emit TraitOffered(_traitId, _priceInWei, tokenOwner, tbaTraitOwner);
-    }
-
-    // forChonkId should be your Chonk you're buying the Trait for
+    /// @notice This should be called by the EOA that owns the Chonk
+    /// @param _traitId The ID of the Trait you're buying
+    /// @param _forChonkId should be your Chonk you're buying the Trait for
     function buyTrait(
         uint256 _traitId,
         uint256 _forChonkId
@@ -599,6 +573,8 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         // console.log("buyTrait: owner of Chonk", owner);
         // console.log("buyTrait: msg.sender", msg.sender);
         if (owner != msg.sender) revert NotYourChonk();
+
+        // TODO write a test where a trait is offered to a TBA and an EOA, and handle it
 
         // Ensure you don't own the Trait
         address tba = CHONKS_MAIN.tokenIdToTBAAccountAddress(_forChonkId);
