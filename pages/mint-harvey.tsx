@@ -1,14 +1,19 @@
 import Head from 'next/head'
 import MenuBar from '@/components/mint/MenuBar';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAccount } from "wagmi";
 import { useMintFunction } from "../hooks/marketplaceAndMintHooks";
-import React from 'react';
 import Footer from '@/components/layout/Footer';
 import LFC from '@/components/layout/LFC';
 import { FaEthereum } from "react-icons/fa6";
 import { ConnectKitButton } from "connectkit";
 import Link from 'next/link'
+import { MerkleTree } from 'merkletreejs';
+import { keccak256, getAddress } from "viem";
+
+import { addresses as friendsListAddresses } from './friendsListAddresses.json';
+import { addresses as creatorListAddresses } from './creatorListAddresses.json';
+import { addresses as specialCollectionsAddresses } from './specialCollectionsAddresses.json';
 
 
 // Update the modal content to show different states
@@ -88,7 +93,7 @@ import Link from 'next/link'
 // };
 
 export default function Mint() {
-    const MAX_MINT_AMOUNT = 100;
+    const MAX_MINT_AMOUNT = 30;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedChonk, setSelectedChonk] = useState<number | null>(null);
     const [mintAmount, setMintAmount] = useState(1);
@@ -100,9 +105,71 @@ export default function Mint() {
     const { mint, isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected, hashMinting, mainContractTokens, traitTokens } = useMintFunction();
     const [mounted, setMounted] = React.useState(false);
 
-    React.useEffect(() => {
-        setMounted(true);
+    const [friendsListMerkleRoot, setFriendsListMerkleRoot] = useState<string | null>(null);
+    const [specialCollectionsMerkleRoot, setSpecialCollectionsMerkleRoot] = useState<string | null>(null);
+    const [creatorListMerkleRoot, setCreatorListMerkleRoot] = useState<string | null>(null);
+
+    useEffect(() => setMounted(true), []);
+
+    useEffect(() => {
+        const generateMerkleRoot = (addressList: string[]) => {
+            const checksummedAddresses = addressList.map(addr => getAddress(addr));
+            const leaves = checksummedAddresses.map(addr => keccak256(addr));
+            const merkleTree = new MerkleTree(leaves, keccak256, {
+                sortPairs: true
+            });
+
+            return merkleTree.getHexRoot();
+        };
+
+        // Process friends list
+        const friendsRoot = generateMerkleRoot(friendsListAddresses);
+        console.log('Friends List Merkle Root:', friendsRoot);
+        setFriendsListMerkleRoot(friendsRoot);
+
+        // Process special collections list
+        const specialRoot = generateMerkleRoot(specialCollectionsAddresses);
+        console.log('Special Collections Merkle Root:', specialRoot);
+        setSpecialCollectionsMerkleRoot(specialRoot);
+
+        const creatorRoot = generateMerkleRoot(creatorListAddresses);
+        console.log('Creator List Merkle Root:', creatorRoot);
+        setCreatorListMerkleRoot(creatorRoot);
     }, []);
+
+    useEffect(() => {
+        if (!address) return;
+
+        const verifyAddress = (addressList: string[], listName: string) => {
+            const checksummedAddresses = addressList.map(addr => getAddress(addr));
+            const leaves = checksummedAddresses.map(addr => keccak256(addr));
+            const merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true });
+            const leaf = keccak256(address);
+            const proof = merkleTree.getHexProof(leaf); // MARKA: use the proof when calling `mint`: `function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {`
+
+            // in your useWriteContract, `proof` is the second argument after how many they're minting
+            const root = merkleTree.getHexRoot();
+            const isValid = merkleTree.verify(proof, leaf, root);
+
+            console.log(`${listName} Verification for ${address}:`);
+            console.log('Proof:', proof);
+            console.log('Is Valid:', isValid);
+
+            return isValid;
+        };
+
+        const isFriend = verifyAddress(friendsListAddresses, 'Friends List');
+        const isSpecial = verifyAddress(specialCollectionsAddresses, 'Special Collections');
+        const isCreator = verifyAddress(creatorListAddresses, 'Creator List');
+
+        console.log('Address Verification Summary:', {
+            address,
+            isFriend,
+            isSpecial,
+            isCreator
+        });
+
+    }, [address]);
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
