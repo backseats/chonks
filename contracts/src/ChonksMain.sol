@@ -453,7 +453,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return mainRenderer2D.getBodyImageSvg(colorMap);
     }
 
-    function getBodySVGZmapsAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory, bytes memory , string memory ) {
+    function getBodySVGZmapsAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory, bytes memory , string memory) {
         return (
             getBodyImageSvg(storedChonk.bodyIndex),
             bodyIndexToMetadata[storedChonk.bodyIndex].zMap,
@@ -481,12 +481,12 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         isEquipped = checkIfTraitIsEquipped(chonkTokenId, _chonkTraitTokenId);
     }
 
-    // Returns the TBA address for a Chonk
+    /// @notice Returns the TBA address for a Chonk
     function getTBAAddressForChonkId(uint256 _chonkId) public view returns (address) {
         return tokenIdToTBAAccountAddress[_chonkId];
     }
 
-    // Returns the ChonkId for a TBA
+    /// @notice Returns the ChonkId for a TBA
     function getChonkIdForTBAAddress(address _tbaAddress) public view returns (uint256) {
         return tbaAddressToTokenId[_tbaAddress];
     }
