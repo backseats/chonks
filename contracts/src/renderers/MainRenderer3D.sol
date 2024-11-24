@@ -11,7 +11,9 @@ import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../../lib/
 // DEPLOY: remove
 import "forge-std/console.sol";
 
-contract MainRenderer3D {
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+
+contract MainRenderer3D is Ownable {
 
     // Scripty & EthFS for 3D rendering
     address immutable scriptyBuilderAddress = 0xD7587F110E08F4D120A231bA97d3B577A81Df022;
@@ -217,29 +219,13 @@ contract MainRenderer3D {
             );
     }
 
-    function base64AndEncodeJson(uint256 tokenId, string memory fullAttributes, string memory image, bytes memory base64EncodedHTMLDataURI) pure internal returns (string memory) {
-        bytes memory metadata = abi.encodePacked(
-            '{"name":"Chonks","animation_url":"',
-            base64EncodedHTMLDataURI,
-            '"}'
-        );
-
-        return
-            string(
-                abi.encodePacked(
-                    "data:application/json;base64,",
-                    Utils.encode(metadata)
-                )
-            );
-    }
-
     // TODO: put in onlyOwner here? or call this from ChonksMain?
-    function setEncodeURI(address _encodeURIAddress) public  {
+    function setEncodeURI(address _encodeURIAddress) public onlyOwner {
         encodeURIContract = EncodeURI(_encodeURIAddress);
     }
 
     // TODO: onlyOwner?
-    function setScriptContent(bytes calldata _base64EncodedString) public {
+    function setScriptContent(bytes calldata _base64EncodedString) public onlyOwner {
         base64ScriptContent = _base64EncodedString;
     }
 

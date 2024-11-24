@@ -227,44 +227,30 @@ library Utils {
         result = encode(data, fileSafe, false);
     }
 
+    function contains(string memory _str, string memory _searchStr) internal pure returns (bool) {
+        bytes memory str = bytes(_str);
+        bytes memory searchStr = bytes(_searchStr);
+        
+        for (uint i = 0; i <= str.length - searchStr.length; i++) {
+            bool found = true;
+            for (uint j = 0; j < searchStr.length; j++) {
+                if (str[i + j] != searchStr[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) return true;
+        }
+        return false;
+    }
 
-
-
-    // /// @dev Returns a concatenated string of `a` and `b`.
-    // /// Cheaper than `string.concat()` and does not de-align the free memory pointer.
-    // function concat(string memory a, string memory b)
-    //     internal
-    //     pure
-    //     returns (string memory result)
-    // {
-    //     /// @solidity memory-safe-assembly
-    //     assembly {
-    //         let w := not(0x1f)
-    //         result := mload(0x40)
-    //         let aLength := mload(a)
-    //         // Copy `a` one word at a time, backwards.
-    //         for { let o := and(add(aLength, 0x20), w) } 1 {} {
-    //             mstore(add(result, o), mload(add(a, o)))
-    //             o := add(o, w) // `sub(o, 0x20)`.
-    //             if iszero(o) { break }
-    //         }
-    //         let bLength := mload(b)
-    //         let output := add(result, aLength)
-    //         // Copy `b` one word at a time, backwards.
-    //         for { let o := and(add(bLength, 0x20), w) } 1 {} {
-    //             mstore(add(output, o), mload(add(b, o)))
-    //             o := add(o, w) // `sub(o, 0x20)`.
-    //             if iszero(o) { break }
-    //         }
-    //         let totalLength := add(aLength, bLength)
-    //         let last := add(add(result, 0x20), totalLength)
-    //         // Zeroize the slot after the string.
-    //         mstore(last, 0)
-    //         // Stores the length.
-    //         mstore(result, totalLength)
-    //         // Allocate memory for the length and the bytes,
-    //         // rounded up to a multiple of 32.
-    //         mstore(0x40, and(add(last, 0x1f), w))
-    //     }
-    // }
+    function startsWith(string memory _str, string memory _prefix) internal pure returns (bool) {
+        bytes memory str = bytes(_str);
+        bytes memory prefix = bytes(_prefix);
+        if (str.length < prefix.length) return false;
+        for (uint i = 0; i < prefix.length; i++) {
+            if (str[i] != prefix[i]) return false;
+        }
+        return true;
+    }
 }
