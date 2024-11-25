@@ -246,11 +246,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         return traitTokens.all[_tokenId];
     }
 
-    // TODO: move this down
-    function setTraitForTokenId(uint256 _tokenId, ITraitStorage.StoredTrait memory _trait) public { // TODO: lock this down
-        traitTokens.all[_tokenId] = _trait;
-    }
-
     function getCurrentEpoch() public view returns (uint256) {
         return traitTokens.epoch;
     }
@@ -307,7 +302,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // returns traitSvg and traitAttributes
     function getSvgAndMetadataTrait(StoredTrait memory trait, uint256 traitId) public view returns(string memory traitSvg, string memory traitAttributes ) {
-
         return traitRenderer.getSvgAndMetadataTrait(
             trait,
             traitId,
@@ -387,6 +381,10 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         isMinter[_minter] = false;
     }
 
+    function setTraitForTokenId(uint256 _tokenId, ITraitStorage.StoredTrait memory _trait) public onlyMinter(msg.sender) {
+        traitTokens.all[_tokenId] = _trait;
+    }
+
     function setTraitRenderer(address _traitRenderer) public onlyOwner {
         traitRenderer = TraitRenderer(_traitRenderer);
     }
@@ -416,7 +414,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     /// Boilerplate
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, IERC165, ERC721) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(IERC165, ERC721Enumerable, ERC721) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 

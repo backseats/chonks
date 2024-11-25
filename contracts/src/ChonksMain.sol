@@ -32,7 +32,7 @@ import { TraitCategory } from "./TraitCategory.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
-// import "forge-std/console.sol"; // DEPLOY: remove
+import "forge-std/console.sol"; // DEPLOY: remove
 
 /*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -336,10 +336,12 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _shoesTokenId
     ) public onlyChonkOwner(_chonkTokenId) {
         // TODO: Might be able to cut this down gas-wise since it's validating Chonk ownership each time
+        StoredChonk storage chonk = chonkTokens.all[_chonkTokenId];
+
         if (_headTokenId != 0) {
             _validateTBAOwnership(_chonkTokenId, _headTokenId);
             _validateTraitType(_headTokenId, TraitCategory.Name.Head);
-            chonkTokens.all[_chonkTokenId].headId = _headTokenId;
+            chonk.headId = _headTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _headTokenId, uint8(TraitCategory.Name.Head));
         }
@@ -347,7 +349,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_hairTokenId != 0) {
             _validateTBAOwnership(_chonkTokenId, _hairTokenId);
             _validateTraitType(_hairTokenId, TraitCategory.Name.Hair);
-            chonkTokens.all[_chonkTokenId].hairId = _hairTokenId;
+            chonk.hairId = _hairTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _hairTokenId, uint8(TraitCategory.Name.Hair));
         }
@@ -355,7 +357,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_faceTokenId != 0) {
             _validateTBAOwnership(_chonkTokenId, _faceTokenId);
             _validateTraitType(_faceTokenId, TraitCategory.Name.Face);
-            chonkTokens.all[_chonkTokenId].faceId = _faceTokenId;
+            chonk.faceId = _faceTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _faceTokenId, uint8(TraitCategory.Name.Face));
         }
@@ -363,7 +365,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_accessoryTokenId != 0) {
             _validateTBAOwnership(_chonkTokenId, _accessoryTokenId);
             _validateTraitType(_accessoryTokenId, TraitCategory.Name.Accessory);
-            chonkTokens.all[_chonkTokenId].accessoryId = _accessoryTokenId;
+            chonk.accessoryId = _accessoryTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _accessoryTokenId, uint8(TraitCategory.Name.Accessory));
         }
@@ -371,7 +373,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_topTokenId != 0) {
             _validateTBAOwnership(_chonkTokenId, _topTokenId);
             _validateTraitType(_topTokenId, TraitCategory.Name.Top);
-            chonkTokens.all[_chonkTokenId].topId = _topTokenId;
+            chonk.topId = _topTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _topTokenId, uint8(TraitCategory.Name.Top));
         }
@@ -379,7 +381,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_bottomTokenId != 0) {
             _validateTBAOwnership(_chonkTokenId, _bottomTokenId);
             _validateTraitType(_bottomTokenId, TraitCategory.Name.Bottom);
-            chonkTokens.all[_chonkTokenId].bottomId = _bottomTokenId;
+            chonk.bottomId = _bottomTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _bottomTokenId, uint8(TraitCategory.Name.Bottom));
         }
@@ -387,7 +389,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_shoesTokenId != 0) {
             _validateTBAOwnership(_chonkTokenId, _shoesTokenId);
             _validateTraitType(_shoesTokenId, TraitCategory.Name.Shoes);
-            chonkTokens.all[_chonkTokenId].shoesId = _shoesTokenId;
+            chonk.shoesId = _shoesTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _shoesTokenId, uint8(TraitCategory.Name.Shoes));
         }
@@ -441,11 +443,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return renderAsDataUri(_tokenId);
     }
 
-    // function getTraitTokens(address _tbaAddress) public view returns (uint256[] memory) {
-    //     return traitsContract.walletOfOwner(_tbaAddress);
-    // }
-
-    // outputs svg for a provided body index
+    /// @param _index The index of the body to get the SVG for
+    /// @return svg The SVG for the body
     function getBodyImageSvg(uint256 _index) public view returns (string memory svg) {
         bytes memory colorMap = mainRenderer2D.getBodyImage(bodyIndexToMetadata[_index].colorMap);
         return mainRenderer2D.getBodyImageSvg(colorMap);
@@ -748,7 +747,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // Boilerplate
 
-    function supportsInterface(bytes4 interfaceId) public view override(ERC721Enumerable, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId) public view override(IERC165, ERC721Enumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }
 
@@ -758,8 +757,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             super._beforeTokenTransfer(from, to, tokenId);
             return;
         }
-
-        // CHECKS
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
          if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();
@@ -773,8 +770,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         for (uint256 j; j < chonkIds.length; ++j) {
             tbas[j] = tokenIdToTBAAccountAddress[chonkIds[j]];
         }
-
-        // EFFECTS (if any state changes were needed)
 
         marketplace.deleteChonkOfferBeforeTokenTransfer(tokenId);
         marketplace.deleteChonkBidsBeforeTokenTransfer(tokenId, to);
