@@ -88,8 +88,13 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     bool _localDeploy; // DEPLOY: remove
 
+    uint256 public nextTokenId;
+
+    uint256 internal _transientChonkId;
+
     /// Errors
 
+    error AddressCantBurn();
     error CantTransfer();
     error NotATBA();
     error NotAValidMinterContract();
@@ -133,18 +138,22 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     function safeMint(address _to) public onlyMinter(msg.sender) returns (uint256) {
         resolveEpochIfNecessary();
 
-        uint tokenId = totalSupply() + 1;
+        uint tokenId = ++nextTokenId;
         _safeMint(_to, tokenId);
         emit BatchMetadataUpdate(0, type(uint256).max);
 
         return tokenId;
     }
 
-    function burn(uint256 tokenId) public override {
-        _burn(tokenId);
+    function burn(uint256 _tokenId) public override {
+        if (!isMinter[msg.sender]) revert AddressCantBurn();
+
+        _burn(_tokenId);
     }
 
     function burnBatch(uint256[] memory tokenIds) public {
+        if (!isMinter[msg.sender]) revert AddressCantBurn();
+
         for (uint256 i; i < tokenIds.length; ++i) {
             _burn(tokenIds[i]);
         }
@@ -422,6 +431,10 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         if (to == address(0)) {
             _cleanUpMarketplaceOffersAndBids(tokenId, to);
 
+            // If burning, store the owning Chonk ID for Marketplace cleanup later
+            address tba = ownerOf(tokenId);
+            _transientChonkId = chonksMain.tbaAddressToTokenId(tba);
+
             super._beforeTokenTransfer(from, to, tokenId);
             return;
         }
@@ -435,11 +448,21 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     // Remove an active ChonkOffer because owned Traits changed
-    function _afterTokenTransfer(address from , address, uint256 _traitTokenId) internal override(ERC721) {
+    function _afterTokenTransfer(address _from , address _to, uint256 _traitTokenId) internal override(ERC721) {
         if (address(chonksMain)  == address(0)) revert SetChonksMainAddress();
         if (address(marketplace) == address(0)) revert SetMarketplaceAddress();
 
-        if (from == address(0)) return;
+        // Ignore if minting
+        if (_from == address(0)) return;
+
+        // If burning
+        if (_to == address(0)) {
+            uint256 id = _transientChonkId;
+            _transientChonkId = 0;
+            marketplace.removeChonkOfferOnTraitTransfer(id);
+
+            return;
+        }
 
         // Delete the Offer on Chonk ID after the transfer
         address tba = ownerOf(_traitTokenId);

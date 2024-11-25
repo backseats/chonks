@@ -9,6 +9,7 @@ import { ChonksMarket } from "../src/ChonksMarket.sol";
 import { TraitCategory } from "../src/TraitCategory.sol";
 import { SecondSeasonRenderMinter } from "../src/SecondSeasonRenderMinter.sol";
 import { ITraitStorage } from "../src/interfaces/ITraitStorage.sol";
+import { BurningDataMinter } from "../src/BurningDataMinter.sol";
 
 struct ChonkOffer {
     // How much for the Chonk
@@ -1088,18 +1089,182 @@ contract ChonksMarketTest is ChonksBaseTest {
         }
     }
 
+    function test_burnAndMint() public {
+        address seller = address(1);
+
+        BurningDataMinter minter = new BurningDataMinter(address(main), address(traits), true);
+        vm.prank(deployer);
+        traits.addMinter(address(minter));
+
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            bytes32[] memory empty;
+            main.mint(1, empty);
+            main.setApprovalForAll(address(market), true);
+            main.setApprovalForAll(address(minter), true);
+
+            address tba = main.tokenIdToTBAAccountAddress(1);
+            assertEq(traits.ownerOf(1), tba);
+
+            minter.burnAndMint(1, 1);
+        vm.stopPrank();
+
+        vm.expectRevert("ERC721: invalid token ID");
+        assertEq(traits.ownerOf(1), address(0));
+
+        assertEq(traits.ownerOf(5), tba);
+    }
+
+    function test_burnAndMintNoApproval() public {
+        address seller = address(1);
+
+        BurningDataMinter minter = new BurningDataMinter(address(main), address(traits), true);
+        vm.prank(deployer);
+        traits.addMinter(address(minter));
+
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            bytes32[] memory empty;
+            main.mint(1, empty);
+            // main.setApprovalForAll(address(market), true);
+            // main.setApprovalForAll(address(minter), true);
+
+            address tba = main.tokenIdToTBAAccountAddress(1);
+            assertEq(traits.ownerOf(1), tba);
+
+            minter.burnAndMint(1, 1);
+        vm.stopPrank();
+
+        vm.expectRevert("ERC721: invalid token ID");
+        assertEq(traits.ownerOf(1), address(0));
+
+        assertEq(traits.ownerOf(5), tba);
+    }
+
+    function test_burnBatchAndMint() public {
+        address seller = address(1);
+
+        BurningDataMinter minter = new BurningDataMinter(address(main), address(traits), true);
+        vm.prank(deployer);
+        traits.addMinter(address(minter));
+
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            bytes32[] memory empty;
+            main.mint(1, empty);
+            // main.setApprovalForAll(address(market), true);
+            // main.setApprovalForAll(address(minter), true);
+
+            address tba = main.tokenIdToTBAAccountAddress(1);
+            assertEq(traits.ownerOf(1), tba);
+
+            uint256[] memory traitIds = new uint256[](3);
+            traitIds[0] = 1;
+            traitIds[1] = 2;
+            traitIds[2] = 3;
+            minter.burnBatchAndMint(1, traitIds);
+        vm.stopPrank();
+
+        // OwnerOf doesnt work because they're burned and token no longer exists so we check for revert
+        vm.expectRevert("ERC721: invalid token ID");
+        assertEq(traits.ownerOf(1), address(0));
+        vm.expectRevert("ERC721: invalid token ID");
+        assertEq(traits.ownerOf(2), address(0));
+        vm.expectRevert("ERC721: invalid token ID");
+        assertEq(traits.ownerOf(3), address(0));
+
+        assertEq(traits.ownerOf(5), tba);
+    }
+
+    function test_burnTraitInvalidBadOwner() public {
+        address seller = address(1);
+        address minter = address(2);
+
+        BurningDataMinter burnMinter = new BurningDataMinter(address(main), address(traits), true);
+        vm.prank(deployer);
+        traits.addMinter(address(burnMinter));
+
+        bytes32[] memory empty;
+        vm.deal(seller, 1 ether);
+        vm.prank(seller);
+        main.mint(1, empty);
+
+        vm.deal(minter, 1 ether);
+        vm.prank(minter);
+        main.mint(1, empty);
+
+        vm.prank(minter);
+        vm.expectRevert(NotYourChonk.selector);
+        burnMinter.burnAndMint(1, 5);
+    }
+
+    function test_burnTraitInvalid() public {
+        address seller = address(1);
+        address minter = address(2);
+
+        BurningDataMinter burnMinter = new BurningDataMinter(address(main), address(traits), true);
+        vm.prank(deployer);
+        traits.addMinter(address(burnMinter));
+
+        bytes32[] memory empty;
+        vm.deal(seller, 1 ether);
+        vm.prank(seller);
+        main.mint(1, empty);
+
+        vm.deal(minter, 1 ether);
+        vm.prank(minter);
+        main.mint(1, empty);
+
+        vm.prank(minter);
+        vm.expectRevert(NotYourTrait.selector);
+        burnMinter.burnAndMint(2, 4); // your chonk, not your trait
+    }
+
+    error AddressCantBurn();
+
+    function test_AddressCantBurn() public {
+        address seller = address(1);
+
+        bytes32[] memory empty;
+        vm.deal(seller, 1 ether);
+        vm.prank(seller);
+        main.mint(1, empty);
+
+        vm.prank(seller);
+        vm.expectRevert(AddressCantBurn.selector);
+        traits.burn(1);
+    }
+
+    function test_AddressCantBurnBatch() public {
+        address seller = address(1);
+
+        bytes32[] memory empty;
+        vm.deal(seller, 1 ether);
+        vm.prank(seller);
+        main.mint(1, empty);
+
+        uint256[] memory traitIds = new uint256[](3);
+        traitIds[0] = 1;
+        traitIds[1] = 2;
+        traitIds[2] = 3;
+
+        vm.prank(seller);
+        vm.expectRevert(AddressCantBurn.selector);
+        traits.burnBatch(traitIds);
+    }
+
     function test_teamMintNotStarted() public {
-        
+
         vm.startPrank(deployer);
-        
+
             // neeed reset it as it's set in constructor
-            main.setMintStartTime(block.timestamp); 
+            main.setMintStartTime(block.timestamp);
             vm.warp(block.timestamp - 10 minutes);
 
             vm.expectRevert(MintNotStarted.selector);
             main.teamMint(address(2), 1, 4);
 
-            main.setMintStartTime(0); 
+            main.setMintStartTime(0);
             vm.warp(block.timestamp - 10 minutes);
 
             vm.expectRevert(MintNotStarted.selector);

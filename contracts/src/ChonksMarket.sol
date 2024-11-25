@@ -792,13 +792,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         }
     }
 
-    function removeChonkOfferOnTraitTransfer(
-        uint256 _chonkId
-    ) public onlyTraitContract {
-        // console.log(
-        //     "ChonksMarket removeChonkOfferOnTraitTransfer called for chonk ID:",
-        //     _chonkId
-        // );
+    function removeChonkOfferOnTraitTransfer(uint256 _chonkId) public onlyTraitContract {
         delete chonkOffers[_chonkId];
     }
 
