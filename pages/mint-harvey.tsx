@@ -336,11 +336,11 @@ export default function Mint() {
                                 { (isFriend || isSpecial || isCreator) && (
                                     <div className="text-lg mt-2 text-green-500 text-center">
                                         {isCreator ? 
-                                            <div>Congrats, you're on the Creator List! <br /> For every Chonk you mint, you'll get 7 traits.</div>
+                                            <div>Congrats, you&apos;re on the Creator List! <br /> For every Chonk you mint, you&apos;ll get 7 traits.</div>
                                         : isFriend ? 
-                                            <div>Congrats, you're on the Friends List! <br />For every Chonk you mint, you'll get 6 traits.</div>
+                                            <div>Congrats, you&apos;re on the Friends List! <br />For every Chonk you mint, you&apos;ll get 6 traits.</div>
                                         : isSpecial ? 
-                                            <div>Congrats, you're on the Special Collections List! <br />For every Chonk you mint, you'll get 5 traits.</div>
+                                            <div>Congrats, you&apos;re on the Special Collections List! <br />For every Chonk you mint, you&apos;ll get 5 traits.</div>
                                         : ''}
                                     </div>
                                 )}
