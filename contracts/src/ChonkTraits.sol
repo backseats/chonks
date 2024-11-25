@@ -65,13 +65,6 @@ import "forge-std/console.sol"; // DEPLOY: remove
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 */
 
-// TODO?
-// modifier onlyAuthorizedMinter() {
-//     require(authorizedMinters[msg.sender], "Caller is not an authorized minter");
-//     require(IERC165(msg.sender).supportsInterface(type(IRenderMinterV1).interfaceId), "Caller does not implement IRenderMinterV1");
-//     _;
-// }
-
 contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage, Ownable, IERC4906, ReentrancyGuard {
 
     /// @dev We use this database for persistent storage
@@ -133,8 +126,13 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         return traitIndexToMetadata[_traitIndex];
     }
 
-    // TODO should only be callable by a msg sender that conforms to IRenderMinterV1 (maybe that's tx.origin?)
-    function setTraitIndexToMetadata(uint256 _traitIndex, TraitMetadata memory _metadata) public {
+    // Called by DataMinter contracts to set the trait for a tokenId
+    function setTraitForTokenId(uint256 _tokenId, ITraitStorage.StoredTrait memory _trait) public onlyMinter(msg.sender) {
+        traitTokens.all[_tokenId] = _trait;
+    }
+
+    /// @dev Called in DataMinter contracts to add Traits
+    function setTraitIndexToMetadata(uint256 _traitIndex, TraitMetadata memory _metadata) public { // onlyMinter(msg.sender) { // DEPLOY: bring back in
         traitIndexToMetadata[_traitIndex] = _metadata;
     }
 
@@ -379,10 +377,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     function removeMinter(address _minter) public onlyOwner {
         isMinter[_minter] = false;
-    }
-
-    function setTraitForTokenId(uint256 _tokenId, ITraitStorage.StoredTrait memory _trait) public onlyMinter(msg.sender) {
-        traitTokens.all[_tokenId] = _trait;
     }
 
     function setTraitRenderer(address _traitRenderer) public onlyOwner {

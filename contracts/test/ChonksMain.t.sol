@@ -37,7 +37,6 @@ contract ChonksMainTest is ChonksBaseTest {
 
     // Basic Contract Setup Tests
     function test_constructor() public {
-
         console.log('test_constructor called');
         // Create new instance without local deploy
         ChonksMain newMain = new ChonksMain(false);
@@ -80,7 +79,7 @@ contract ChonksMainTest is ChonksBaseTest {
             traits.setMarketplace(address(market));
             dataContract.setChonksMain(address(newMain));
 
-            newMain.setMintStartTime(block.timestamp); 
+            newMain.setMintStartTime(block.timestamp);
             // advance time 1 minute
             vm.warp(block.timestamp + 1 minutes);
 
@@ -350,7 +349,7 @@ contract ChonksMainTest is ChonksBaseTest {
         main.mint(10, empty);
         assertEq(main.balanceOf(user), 10);
     }
-    
+
     function test_mintWithInsufficientFunds() public {}
     function test_mintBeforeStartTime() public {}
     function test_mintAfterEndTime() public {}
@@ -413,7 +412,7 @@ contract ChonksMainTest is ChonksBaseTest {
         traits.addMinter(address(dataContract));
         main.setFirstSeasonRenderMinter(address(dataContract));
 
-        main.setMintStartTime(block.timestamp); 
+        main.setMintStartTime(block.timestamp);
         // advance time 1 minute
         vm.warp(block.timestamp + 1 minutes);
 
@@ -474,7 +473,7 @@ contract ChonksMainTest is ChonksBaseTest {
         traits.addMinter(address(dataContract));
         main.setFirstSeasonRenderMinter(address(dataContract));
 
-        main.setMintStartTime(block.timestamp); 
+        main.setMintStartTime(block.timestamp);
         // advance time 1 minute
         vm.warp(block.timestamp + 1 minutes);
 

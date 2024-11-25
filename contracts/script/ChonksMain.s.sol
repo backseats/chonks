@@ -62,6 +62,8 @@ contract ChonksMainScript is Script {
         // Attach the data contract to ChonkTraits
         firstSeasonRenderMinter = new FirstSeasonRenderMinter(address(main), address(traits), localDeploy);
         main.setFirstSeasonRenderMinter(address(firstSeasonRenderMinter));
+        // Allows traits to be added
+        traits.addMinter(address(firstSeasonRenderMinter));
 
         console.log('setup done. minting...');
 

@@ -42,7 +42,7 @@ contract ChonksBaseTest is Test {
 
         traits = new ChonkTraits(true);
         main.setMintStartTime(block.timestamp); // advance time 1 minute
-        
+
         vm.warp(block.timestamp + 1 minutes);
         // console.log('traits address', address(traits));
 
