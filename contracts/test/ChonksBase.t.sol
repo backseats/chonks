@@ -40,6 +40,7 @@ contract ChonksBaseTest is Test {
         main = new ChonksMain(true);
         // console.log('Chonk manager address', address(main));
 
+        // comment out this for testing test_teamMintNotStarted
         traits = new ChonkTraits(true);
         main.setMintStartTime(block.timestamp); // advance time 1 minute
 

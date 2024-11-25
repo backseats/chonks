@@ -150,6 +150,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error InvalidTraitCount();
     error MintEnded();
     error MintNotStarted();
+    error MintStartTimeAlreadySet();
     error NonceAlreadyUsed();
     error TenIsMaxMint();
     error Timelocked();
@@ -681,6 +682,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function setMintStartTime(uint256 _mintStartTime) public onlyOwner {
+        if (mintStartTime != 0) revert MintStartTimeAlreadySet();
         mintStartTime = _mintStartTime;
     }
 

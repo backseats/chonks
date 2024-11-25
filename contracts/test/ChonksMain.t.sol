@@ -182,15 +182,23 @@ contract ChonksMainTest is ChonksBaseTest {
         main.setMarketplace(address(market));
     }
 
-    function test_setMintStartTime() public {
-        vm.prank(deployer);
-        main.setMintStartTime(block.timestamp);
-    }
+    // DEPLOY: Commented out as it's set in constructor
+    // function test_setMintStartTime() public {
+    //     vm.prank(deployer);
+    //     main.setMintStartTime(block.timestamp);
+    // }
 
     function test_setPrice() public {
         vm.prank(deployer);
         main.setPrice(1000);
         assertEq(main.price(), 1000);
+    }
+
+    function test_setPriceAfterMintStarted() public {
+        test_mintMultiple();
+         vm.prank(deployer);
+        main.setPrice(2000);
+        assertEq(main.price(), 2000);
     }
 
     function test_setPriceRevert() public {
