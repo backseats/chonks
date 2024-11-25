@@ -150,7 +150,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error MintEnded();
     error MintNotStarted();
     error NonceAlreadyUsed();
-    error ThirtyIsMaxMint();
+    error TenIsMaxMint();
     error Timelocked();
     error UseUnequip();
     error WithdrawFailed();
@@ -208,7 +208,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {
         if (address(firstSeasonRenderMinter) == address(0)) revert FirstSeasonRenderMinterNotSet();
         if (_amount == 0) revert CantBeZero();
-        if (_amount > 30) revert ThirtyIsMaxMint();
+        if (_amount > 10) revert TenIsMaxMint();
 
         // TODO: bring these back in, tested them
         // if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();

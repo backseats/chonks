@@ -93,7 +93,7 @@ import { addresses as specialCollectionsAddresses } from './specialCollectionsAd
 // };
 
 export default function Mint() {
-    const MAX_MINT_AMOUNT = 30;
+    const MAX_MINT_AMOUNT = 10;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedChonk, setSelectedChonk] = useState<number | null>(null);
     const [mintAmount, setMintAmount] = useState(1);

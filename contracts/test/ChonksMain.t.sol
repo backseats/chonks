@@ -324,11 +324,30 @@ contract ChonksMainTest is ChonksBaseTest {
         main.mint(5, empty);
         assertEq(main.balanceOf(user), 5);
     }
+
+    function test_mintMaximumAllowed() public {
+        vm.startPrank(deployer);
+        main.setFirstSeasonRenderMinter(address(dataContract));
+        traits.setChonksMain(address(main));
+        traits.addMinter(address(dataContract));
+        traits.setMarketplace(address(market));
+        vm.stopPrank();
+
+        address user = address(1);
+        vm.prank(user);
+        bytes32[] memory empty;
+        vm.expectRevert(ChonksMain.TenIsMaxMint.selector);
+        main.mint(11, empty);
+        
+        vm.prank(user);
+        main.mint(10, empty);
+        assertEq(main.balanceOf(user), 10);
+    }
+
     function test_mintWithInsufficientFunds() public {}
     function test_mintBeforeStartTime() public {}
     function test_mintAfterEndTime() public {}
     function test_mintWithZeroAmount() public {}
-    function test_mintMaximumAllowed() public {}
     function test_mintAndWithdraw() public {}
 
     // Transfer Tests
