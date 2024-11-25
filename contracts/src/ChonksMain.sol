@@ -189,7 +189,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function teamReserve() public onlyOwner {
-        if( totalSupply() > 2) revert CanOnlyReserveFirstTwo();
+        if (totalSupply() > 2) revert CanOnlyReserveFirstTwo();
         _mintInternal(msg.sender, 2, 7);
     }
 

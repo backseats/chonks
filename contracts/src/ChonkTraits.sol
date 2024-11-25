@@ -439,7 +439,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         if (address(chonksMain)  == address(0)) revert SetChonksMainAddress();
         if (address(marketplace) == address(0)) revert SetMarketplaceAddress();
 
-        if(from == address(0)) return;
+        if (from == address(0)) return;
 
         // Delete the Offer on Chonk ID after the transfer
         address tba = ownerOf(_traitTokenId);
@@ -449,7 +449,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // Approvals
 
-    // add nonReentrant?
+    // TODO: add nonReentrant?
     /// @notice Override approve to track individual token approvals
     function approve(address _operator, uint256 _tokenId) public override(ERC721, IERC721) {
         // CHECKS //

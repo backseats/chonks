@@ -198,7 +198,7 @@ contract MainRenderer2D {
             );
         }
 
-        if(traitCount > maxTraitsToOutput) {
+        if (traitCount > maxTraitsToOutput) {
             buffer = abi.encodePacked(
                 buffer,
                 baseSvgPart,

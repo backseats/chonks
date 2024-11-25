@@ -331,7 +331,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
 
             // Example of rarity based on 2 tranches, a 90% chance of a "common", a 10% chance of a "rare":
             // n = Utils.random(storedTrait.seed, 'accessory', 100);
-            // if(n < 90) {
+            // if (n < 90) {
             //     storedTrait.traitIndex = 0 + Utils.random(storedTrait.seed, 'accessory-common', 8);
             // } else {
             //     storedTrait.traitIndex = 8 + Utils.random(storedTrait.seed, 'accessory-rare', 5);
@@ -359,7 +359,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
             // storedTrait.traitIndex = uint256(3000 + (storedTrait.seed % accessory.length));
             n = Utils.random(storedTrait.seed, 'face', 100);
 
-            if(n < 95) {
+            if (n < 95) {
                 storedTrait.traitIndex = 3000 + Utils.random(storedTrait.seed, 'face-common', face.length - 3 );
             } else {
                 storedTrait.traitIndex = 3000 + (face.length - 3) + Utils.random(storedTrait.seed, 'face-rare', 3 );
@@ -372,7 +372,7 @@ contract FirstSeasonRenderMinter is Ownable { // TODO: ITraitStorage
             // storedTrait.traitIndex = 4000 + Utils.random(storedTrait.seed, 'top', top.length);
             n = Utils.random(storedTrait.seed, 'top', 100);
 
-            if(n < 95) {
+            if (n < 95) {
                 storedTrait.traitIndex = 4000 + Utils.random(storedTrait.seed, 'top-common', top.length - 5 );
             } else {
                 storedTrait.traitIndex = 4000 + (top.length - 5) + Utils.random(storedTrait.seed, 'top-rare', 5 );

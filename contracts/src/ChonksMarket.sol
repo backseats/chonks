@@ -597,7 +597,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (offer.priceInWei != msg.value) revert WrongAmount();
 
         (,,, bool isEquipped) = CHONKS_MAIN.getFullPictureForTrait(_traitId);
-        if(isEquipped) revert TraitEquipped();
+        if (isEquipped) revert TraitEquipped();
 
         // Delete the Offer
         delete traitOffers[_traitId];
@@ -642,7 +642,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
         // Ensure  msg.sender does own Chonk or Trait
         (address traitOwnerTBA, , address traitChonkOwner, ) = CHONKS_MAIN.getFullPictureForTrait(_traitId);
-        if(traitChonkOwner == msg.sender || traitOwnerTBA == msg.sender) revert CantBidOnYourOwnTrait();
+        if (traitChonkOwner == msg.sender || traitOwnerTBA == msg.sender) revert CantBidOnYourOwnTrait();
 
         TraitBid memory existingBid = traitBids[_traitId];
         if (msg.value <= existingBid.amountInWei) revert BidIsTooLow();
