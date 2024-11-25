@@ -1089,9 +1089,23 @@ contract ChonksMarketTest is ChonksBaseTest {
     }
 
     function test_teamMintNotStarted() public {
-        vm.prank(deployer);
-        vm.expectRevert(MintNotStarted.selector);
-        main.teamMint(address(2), 1, 4);
+        
+        vm.startPrank(deployer);
+        
+            // neeed reset it as it's set in constructor
+            main.setMintStartTime(block.timestamp); 
+            vm.warp(block.timestamp - 10 minutes);
+
+            vm.expectRevert(MintNotStarted.selector);
+            main.teamMint(address(2), 1, 4);
+
+            main.setMintStartTime(0); 
+            vm.warp(block.timestamp - 10 minutes);
+
+            vm.expectRevert(MintNotStarted.selector);
+            main.teamMint(address(2), 1, 4);
+
+        vm.stopPrank();
     }
 
     function test_teamMint() public {
@@ -1143,6 +1157,33 @@ contract ChonksMarketTest is ChonksBaseTest {
             vm.warp(block.timestamp + 1 weeks);
             vm.expectRevert(MintEnded.selector);
             main.teamMint(address(3), 1, 4);
+        vm.stopPrank();
+    }
+
+    function test_teamReserve() public {
+        vm.startPrank(deployer);
+            main.setMintStartTime(block.timestamp);
+            // advance time 1 minute
+            vm.warp(block.timestamp + 1 minutes);
+
+            // mint 1 token to address 2
+            main.teamReserve();
+        vm.stopPrank();
+
+        assertEq(main.ownerOf(1), deployer);
+        assertEq(main.ownerOf(2), deployer);
+    }
+
+    function test_teamReserveRevert() public {
+        vm.startPrank(deployer);
+            main.setMintStartTime(block.timestamp);
+            // advance time 1 minute
+            vm.warp(block.timestamp + 1 minutes);
+
+            main.teamMint(address(2), 3, 4);
+
+            vm.expectRevert(ChonksMain.CanOnlyReserveFirstTwo.selector);
+            main.teamReserve();
         vm.stopPrank();
     }
 

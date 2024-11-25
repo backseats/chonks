@@ -63,33 +63,37 @@ contract ChonksMainTest is ChonksBaseTest {
         address deployer = vm.addr(69);
         vm.startPrank(deployer);
 
-        ChonksMain newMain = new ChonksMain(true);
+            ChonksMain newMain = new ChonksMain(true);
 
-        // Check initial state
-        assertEq(newMain.owner(), deployer);
-        assertEq(newMain.name(), "Chonks");
-        assertEq(newMain.symbol(), "CHONKS");
-        assertEq(newMain._nextTokenId(), 0);
+            // Check initial state
+            assertEq(newMain.owner(), deployer);
+            assertEq(newMain.name(), "Chonks");
+            assertEq(newMain.symbol(), "CHONKS");
+            assertEq(newMain._nextTokenId(), 0);
 
-        // Setup required contracts for debug mint
-        newMain.setTraitsContract(traits);
-        newMain.setFirstSeasonRenderMinter(address(dataContract));
-        newMain.setMarketplace(address(market));
-        traits.setChonksMain(address(newMain));
-        traits.addMinter(address(dataContract));
-        traits.setMarketplace(address(market));
-        dataContract.setChonksMain(address(newMain));
+            // Setup required contracts for debug mint
+            newMain.setTraitsContract(traits);
+            newMain.setFirstSeasonRenderMinter(address(dataContract));
+            newMain.setMarketplace(address(market));
+            traits.setChonksMain(address(newMain));
+            traits.addMinter(address(dataContract));
+            traits.setMarketplace(address(market));
+            dataContract.setChonksMain(address(newMain));
 
-        // // Add body traits for minting
-        bytes memory emptyBytes;
-        for (uint8 i = 0; i < 5; i++) {
-            newMain.addNewBody(
-                i,
-                string.concat("Skin Tone ", vm.toString(i + 1)),
-                emptyBytes,
-                emptyBytes
-            );
-        }
+            newMain.setMintStartTime(block.timestamp); 
+            // advance time 1 minute
+            vm.warp(block.timestamp + 1 minutes);
+
+            // // Add body traits for minting
+            bytes memory emptyBytes;
+            for (uint8 i = 0; i < 5; i++) {
+                newMain.addNewBody(
+                    i,
+                    string.concat("Skin Tone ", vm.toString(i + 1)),
+                    emptyBytes,
+                    emptyBytes
+                );
+            }
         vm.stopPrank();
 
         // Test debug mint functionality
@@ -408,6 +412,11 @@ contract ChonksMainTest is ChonksBaseTest {
         traits.setChonksMain(address(main));
         traits.addMinter(address(dataContract));
         main.setFirstSeasonRenderMinter(address(dataContract));
+
+        main.setMintStartTime(block.timestamp); 
+        // advance time 1 minute
+        vm.warp(block.timestamp + 1 minutes);
+
         vm.stopPrank();
 
 
@@ -464,6 +473,12 @@ contract ChonksMainTest is ChonksBaseTest {
         traits.setChonksMain(address(main));
         traits.addMinter(address(dataContract));
         main.setFirstSeasonRenderMinter(address(dataContract));
+
+        main.setMintStartTime(block.timestamp); 
+        // advance time 1 minute
+        vm.warp(block.timestamp + 1 minutes);
+
+
         vm.stopPrank();
 
 

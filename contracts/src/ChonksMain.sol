@@ -134,6 +134,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     error BodyAlreadyExists();
     error CantBeZero();
+    error CanOnlyReserveFirstTwo();
     error CantTransfer();
     error CantTransferToTBAs();
     error ChonkDoesntExist();
@@ -187,20 +188,13 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
     }
 
-    // just popping this in here for now, we can decide full spec later
-    // function mintByLevel(uint8 amount, string calldata nonce, bytes calldata signature ) public payable {
-    //     if (amount < 4 || amount > 7) revert InvalidLevelAmount();
-    //     if (!isValidSignature(keccak256(abi.encodePacked(msg.sender, nonce)), signature)) revert InvalidSignature();
-    //     if (usedNonces[nonce]) revert NonceAlreadyUsed();
-
-    //     _mintAmount(amount);
-
-    //     usedNonces[nonce] = true;
-    // }
+    function teamReserve() public onlyOwner {
+        if( totalSupply() > 2) revert CanOnlyReserveFirstTwo();
+        _mintInternal(msg.sender, 2, 7);
+    }
 
     function teamMint(address _to, uint256 _amount, uint8 _traitCount) public onlyOwner {
         if (_traitCount < 4 || _traitCount > 7) revert InvalidTraitCount();
-
         if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
         if (block.timestamp > mintStartTime + 26 hours) revert MintEnded();
 
@@ -212,9 +206,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (_amount == 0) revert CantBeZero();
         if (_amount > 10) revert TenIsMaxMint();
 
-        // TODO: bring these back in, tested them
-        // if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
-        // if (block.timestamp > mintStartTime + 24 hours) revert MintEnded();
+        if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
+        if (block.timestamp > mintStartTime + 24 hours) revert MintEnded();
 
         if (msg.value != price * _amount) revert InsufficientFunds();
 

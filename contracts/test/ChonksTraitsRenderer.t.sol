@@ -38,6 +38,9 @@ contract ChonksTraitsRendererTest is AbstractTest {
         dataContract = new FirstSeasonRenderMinter(address(main), address(traits), localDeploy); // if true, addNewTrait called for all traits
         console.log('FirstSeasonRenderMinter address', address(dataContract));
 
+        main.setMintStartTime(block.timestamp); 
+        // advance time 1 minute
+        vm.warp(block.timestamp + 1 minutes);
 
         market = new ChonksMarket(
             address(main),

@@ -79,6 +79,10 @@ contract ChonksMainRendererTest is AbstractTest {
 
         main.setFirstSeasonRenderMinter(address(dataContract));
 
+        main.setMintStartTime(block.timestamp); 
+        // advance time 1 minute
+        vm.warp(block.timestamp + 1 minutes);
+
         main._debugPostConstructorMint();
 
         vm.stopPrank();

@@ -41,6 +41,9 @@ contract ChonksBaseTest is Test {
         // console.log('Chonk manager address', address(main));
 
         traits = new ChonkTraits(true);
+        main.setMintStartTime(block.timestamp); // advance time 1 minute
+        
+        vm.warp(block.timestamp + 1 minutes);
         // console.log('traits address', address(traits));
 
         dataContract = new FirstSeasonRenderMinter(address(main), address(traits), localDeploy);

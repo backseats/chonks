@@ -389,7 +389,10 @@ export default function Mint() {
                                         </div>
                                         <div>
                                             <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">Will the team be minting?</h3>
-                                            <p className="text-[1.25vw]">We will be minting some Chonks for giveaways and collabs. And potentially to round off the number of Chonks &amp; Trait NFTs (we have plans). We will do this within 2 hours of the mint ending and it will be no more than 1% of the total supply.</p>
+                                            <p className="text-[1.25vw]">
+                                                We will be minting some Chonks for giveaways and collabs. 
+                                                And potentially to round off the number of Chonk &amp; Trait NFTs (we have plans). 
+                                                We will do this within 2 hours of the mint ending and it will be no more than 1% of the total supply.</p>
                                         </div>
                                     </div>
                                 </div>
