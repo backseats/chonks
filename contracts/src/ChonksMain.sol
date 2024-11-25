@@ -146,7 +146,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error InvalidColor();
     error InvalidLevelAmount();
     error InvalidSignature();
-    error markaSaysNo();
+    error InvalidTraitCount();
     error MintEnded();
     error MintNotStarted();
     error NonceAlreadyUsed();
@@ -198,11 +198,13 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     //     usedNonces[nonce] = true;
     // }
 
-    function teamMint(address _to, uint256 _amount) public onlyOwner {
+    function teamMint(address _to, uint256 _amount, uint8 _traitCount) public onlyOwner {
+        if (_traitCount < 4 || _traitCount > 7) revert InvalidTraitCount();
+
         if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
         if (block.timestamp > mintStartTime + 26 hours) revert MintEnded();
 
-        _mintInternal(_to, _amount, 4);
+        _mintInternal(_to, _amount, _traitCount);
     }
 
     function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {
@@ -714,8 +716,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setBackgroundColor(uint256 _chonkTokenId, string memory _color) public onlyChonkOwner(_chonkTokenId) {
         bytes memory colorBytes = bytes(_color);
         if (colorBytes.length != 6) revert InvalidColor();
-
-        if(keccak256(colorBytes) == keccak256(bytes("069420"))) revert markaSaysNo(); // TODO: either take this out or make it so only marka can do this
 
         // Ensure all characters are valid hex characters (0-9, a-f, A-F)
         for (uint i; i < 6; i++) {

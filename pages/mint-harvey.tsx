@@ -102,7 +102,7 @@ export default function Mint() {
     const [transactionhashMinting, setTransactionhashMinting] = useState<string | null>(null);
 
     const { address } = useAccount();
-    const { mint, isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected, hashMinting, mainContractTokens, traitTokens } = useMintFunction();
+    const { mint, isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected, hashMinting, mainContractTokens, traitTokens, totalSupply } = useMintFunction();
     const [mounted, setMounted] = React.useState(false);
 
     const [friendsListMerkleRoot, setFriendsListMerkleRoot] = useState<string | null>(null);
@@ -279,13 +279,14 @@ export default function Mint() {
                     <div className="mx-[20px] sm:mx-[3.45vw] "> {/* EDGES */}
 
                         <section className={`border-l border-r flex flex-col items-center justify-center bg-white py-[3.45vw]`}>
-                            <h1 className="text-4xl mb-8">Mint a Chonk</h1>
+                            <h1 className="text-[3.45vw] mb-8">Mint a Chonk</h1>
                             <div className="flex flex-col items-center gap-4">
+                                
                                 <div className="text-lg">Desired Quantity</div>
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={decrementMintAmount}
-                                        className="px-3 py-1 border rounded hover:bg-chonk-orange"
+                                        className="px-3 py-1 border  hover:bg-chonk-orange"
                                     >
                                         -
                                     </button>
@@ -293,13 +294,13 @@ export default function Mint() {
                                         type="number"
                                         value={mintAmount}
                                         onChange={(e) => setMintAmount(Math.max(1, Math.min(MAX_MINT_AMOUNT, parseInt(e.target.value) || 1)))}
-                                        className="w-[6.9vw] min-w-[100px] text-center border rounded px-2 py-1"
+                                        className="w-[6.9vw] min-w-[100px] text-center border  px-2 py-1"
                                         min="1"
                                         max={MAX_MINT_AMOUNT.toString()}
                                     />
                                     <button
                                         onClick={incrementMintAmount}
-                                        className="px-3 py-1 border rounded hover:bg-chonk-orange"
+                                        className="px-3 py-1 border  hover:bg-chonk-orange"
                                     >
                                         +
                                     </button>
@@ -327,7 +328,7 @@ export default function Mint() {
                                     <button
                                         onClick={handleMint}
                                         disabled={isPending || isConfirming}
-                                        className="bg-chonk-blue border border-chonk-blue hover:border-black hover:text-gray-200 text-white source-sans-pro py-2 px-4 rounded disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                                        className="bg-chonk-blue border border-chonk-blue hover:border-black hover:text-gray-200 text-white source-sans-pro py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
                                     >
                                         {getMintButtonText()}
                                     </button>
@@ -344,7 +345,54 @@ export default function Mint() {
                                         : ''}
                                     </div>
                                 )}
-                                <div className="text-lg mt-6">10,690 minted (not really)</div>
+                                <div className="text-[1vw] mt-6 text-center">
+                                    <p>
+                                        {totalSupply !== undefined ? `${totalSupply} Chonks minted` : 'Loading...'}   {/* TODO: Update if someone mints */}
+                                        <br />[Insert countdown timer here]    
+                                    </p>
+                                   
+                                </div>
+                                <div className="text-[1vw] w-full max-w-2xl text-gray-500">
+                                    <p>
+                                       Note: Chonks (and Traits) will not be tradable during the 24 hour mint period. Once the mint is over, you will be able to trade them on our Marketplace and others.
+                                    </p>
+            
+                                </div>
+
+                                <div className="mt-[1.725vw] w-full max-w-2xl border-t border-gray-300 pt-[3.45vw]">
+                                    <h2 className="text-[3.45vw] mb-[3.45vw]">FAQ</h2>
+                                    <div className="space-y-[0vw]">
+                                        <div>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">How much is a Chonk?</h3>
+                                            <p className="text-[1.25vw]"> Each Chonk costs 0.01 ETH to mint, approximatley $33 USD.</p>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">How many Chonks can I mint?</h3>
+                                            <p className="text-[1.25vw]">You can mint up to 10 Chonks per transaction. If you are one of the Chonklists, you can only use your Chonklist allocation once.</p>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">Is there a collection limit?</h3>
+                                            <p className="text-[1.25vw]">No. This is a Timed Edition mint - there is no limit to the number of Chonks that can minted in the 24 hours.</p>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">Is there an Allowlist?</h3>
+                                            <p className="text-[1.25vw]">No, anyone can mint but...</p>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">What are the Chonklists?</h3>
+                                            <p className="text-[1.25vw] pb-[1.25vw]">Each Chonk comes with 4 traits. The number of traits you receive depends on your Chonklist status:</p>
+                                            <ul className="list-disc ml-6 text-[1.25vw] pb-[3.45vw]">
+                                                <li>Special Collections List: 5 traits per Chonk</li>
+                                                <li>Friends List: 6 traits per Chonk</li>
+                                                <li>Creator List: 7 traits per Chonk</li>
+                                            </ul>
+                                        </div>
+                                        <div>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">Will the team be minting?</h3>
+                                            <p className="text-[1.25vw]">We will be minting some Chonks for giveaways and collabs. And potentially to round off the number of Chonks &amp; Trait NFTs (we have plans). We will do this within 2 hours of the mint ending and it will be no more than 1% of the total supply.</p>
+                                        </div>
+                                    </div>
+                                </div>
 
                             </div>
                         </section>

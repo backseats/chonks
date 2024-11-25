@@ -1091,7 +1091,7 @@ contract ChonksMarketTest is ChonksBaseTest {
     function test_teamMintNotStarted() public {
         vm.prank(deployer);
         vm.expectRevert(MintNotStarted.selector);
-        main.teamMint(address(2), 1);
+        main.teamMint(address(2), 1, 4);
     }
 
     function test_teamMint() public {
@@ -1101,7 +1101,29 @@ contract ChonksMarketTest is ChonksBaseTest {
             vm.warp(block.timestamp + 1 minutes);
 
             // mint 1 token to address 2
-            main.teamMint(address(2), 1);
+            main.teamMint(address(2), 1, 4);
+        vm.stopPrank();
+
+        assertEq(main.ownerOf(1), address(2));
+    }
+
+    function test_teamMintReverts() public {
+        vm.startPrank(deployer);
+            main.setMintStartTime(block.timestamp);
+            // advance time 1 minute
+            vm.warp(block.timestamp + 1 minutes);
+
+            vm.expectRevert(ChonksMain.InvalidTraitCount.selector);
+            main.teamMint(address(2), 1, 0);
+
+            vm.expectRevert(ChonksMain.InvalidTraitCount.selector);
+            main.teamMint(address(2), 1, 3);
+
+            vm.expectRevert(ChonksMain.InvalidTraitCount.selector);
+            main.teamMint(address(2), 1, 8);
+
+            main.teamMint(address(2), 1, 4);
+
         vm.stopPrank();
 
         assertEq(main.ownerOf(1), address(2));
@@ -1113,14 +1135,14 @@ contract ChonksMarketTest is ChonksBaseTest {
             main.setMintStartTime(block.timestamp);
             // advance time 1 minute
             vm.warp(block.timestamp + 1 minutes);
-            main.teamMint(address(2), 1);
+            main.teamMint(address(2), 1, 4);
 
             assertEq(main.ownerOf(1), address(2));
 
             // Move past end date
             vm.warp(block.timestamp + 1 weeks);
             vm.expectRevert(MintEnded.selector);
-            main.teamMint(address(3), 1);
+            main.teamMint(address(3), 1, 4);
         vm.stopPrank();
     }
 
@@ -1133,7 +1155,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         vm.prank(address(1));
         bytes32[] memory empty;
-main.mint(1, empty);
+        main.mint(1, empty);
 
         assertEq(main.ownerOf(1), address(1));
     }

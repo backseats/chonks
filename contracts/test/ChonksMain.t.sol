@@ -346,7 +346,7 @@ contract ChonksMainTest is ChonksBaseTest {
         main.mint(10, empty);
         assertEq(main.balanceOf(user), 10);
     }
-
+    
     function test_mintWithInsufficientFunds() public {}
     function test_mintBeforeStartTime() public {}
     function test_mintAfterEndTime() public {}
@@ -638,13 +638,8 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(chonk.bottomId, 0);
         assertEq(chonk.shoesId, 0);
 
-        for (uint i = 1; i < 5; i++) {
-            ITraitStorage.StoredTrait memory trait = traits.getTrait(i);
-            console.log("trait id", i);
-            console.log("trait type", TraitCategory.toString(trait.traitType));
-        }
         vm.prank(user);
-        main.equip(1,2);
+        main.equip(1,2); // this will equip trait token #2 which will be a bottom as defined in the minting process:  chonk.bottomId = traitsIds[1];
 
         IChonkStorage.StoredChonk memory updatedChonk = main.getChonk(1);
 
@@ -653,8 +648,8 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(updatedChonk.faceId, 0);
         assertEq(updatedChonk.accessoryId, 0);
         assertEq(updatedChonk.topId, 0);
-        assertEq(updatedChonk.bottomId, 0);
-        assertEq(updatedChonk.shoesId, 1);
+        assertEq(updatedChonk.bottomId, 2);
+        assertEq(updatedChonk.shoesId, 0);
     }
 
     function test_equipMultipleTraits() public {

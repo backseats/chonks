@@ -51,6 +51,12 @@ export function useMintFunction() {
   const [mainContractTokens, setMainContractTokens] = useState<number[]>();
   const [traitTokens, setTraitTokens] = useState<number[]>();
 
+  const { data: totalSupply } = useReadContract({
+    address: mainContract,
+    abi: mainABI,
+    functionName: 'totalSupply',
+  });
+
   const mint = async (amount: number = 1, proof: string[] | null = null) => {
     if (amount < 1) throw new Error("Amount must be greater than 0");
     if (proof === null) proof = [];
@@ -140,7 +146,8 @@ export function useMintFunction() {
     hashMinting,
     receipt,
     mainContractTokens,
-    traitTokens
+    traitTokens,
+    totalSupply: totalSupply ? Number(totalSupply) : undefined
   };
 }
 
