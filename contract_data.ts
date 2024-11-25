@@ -3,9 +3,9 @@ import traitsAbiImport from './contracts/out/ChonkTraits.sol/ChonkTraits.json'
 import marketplaceAbiImport from './contracts/out/ChonksMarket.sol/ChonksMarket.json'
 import { baseSepolia, base } from "viem/chains";
 
-export const mainContract = "0x863B88b08B3b2AbF6169813C21F3DEBe634D3a21";
-export const traitsContract = "0x58C23901E83eE90e1aa4CddeFebd4D2BE7384782";
-export const marketplaceContract = "0x9e6be8D05131bDA3255Db2E3c49992B6b99520A4";
+export const mainContract = "0x705D20B055287403567B74100b1A8122304f77A2";
+export const traitsContract = "0xF05C08f7aF7a63e52b35A81fFdBE6F9B366b4d5B";
+export const marketplaceContract = "0x75094264b32f60e60958D123b184b7e9E226c477";
 
 export const mainABI = mainAbiImport.abi;
 export const traitsABI = traitsAbiImport.abi;

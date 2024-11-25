@@ -39,13 +39,14 @@ export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
     // // Parse as JSON and stringify with proper formatting
     // const jsonData = JSON.parse(base64String);
 
-    // console.log(jsonData);
+    
 
     const base64String = data.split(",")[1];
     const jsonString = atob(base64String);
+    // console.log(jsonData);
     const jsonData = JSON.parse(jsonString) as Chonk;
 
-    // console.log(jsonData);
+    console.log(jsonData);
 
     setData(jsonData);
 }
@@ -420,11 +421,18 @@ export default function ChonkDetail({ id }: { id: string }) {
                             <section className="flex flex-row gap-[3.45vw] py-[1.725vw] px-[3.45vw]">
                                 <div className="w-2/5">
 
-                                    <img
+                                    {/* <img
                                         src={tokenData.image}
                                         alt={`Chonk ${id}`}
                                         className="w-full h-auto"
-                                    />
+                                    /> */}
+
+                                    <div className="relative w-full pt-[100%]">
+                                        <iframe 
+                                            className="absolute top-0 left-0 w-full h-full" 
+                                            src={tokenData.animation_url}
+                                        ></iframe>
+                                    </div>
 
                                     <TraitsSection
                                         id={id}

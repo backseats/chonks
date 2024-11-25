@@ -32,7 +32,7 @@ import { TraitCategory } from "./TraitCategory.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
-import "forge-std/console.sol"; // DEPLOY: remove
+// import "forge-std/console.sol"; // DEPLOY: remove
 
 /*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -447,9 +447,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // outputs svg for a provided body index
     function getBodyImageSvg(uint256 _index) public view returns (string memory svg) {
-        console.log("getBodyImageSvg for _index", _index);
         bytes memory colorMap = mainRenderer2D.getBodyImage(bodyIndexToMetadata[_index].colorMap);
-        console.log("getBodyImageSvg got colorMap for _index", _index);
         return mainRenderer2D.getBodyImageSvg(colorMap);
     }
 

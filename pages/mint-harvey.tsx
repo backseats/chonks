@@ -109,6 +109,16 @@ export default function Mint() {
     const [specialCollectionsMerkleRoot, setSpecialCollectionsMerkleRoot] = useState<string | null>(null);
     const [creatorListMerkleRoot, setCreatorListMerkleRoot] = useState<string | null>(null);
 
+    // const [isValidFriendsList, setIsValidFriendsList] = useState(false);
+    // const [isValidSpecialCollections, setIsValidSpecialCollections] = useState(false);
+    // const [isValidCreatorList, setIsValidCreatorList] = useState(false);
+
+    const [isFriend, setIsFriend] = useState(false);
+    const [isSpecial, setIsSpecial] = useState(false);
+    const [isCreator, setIsCreator] = useState(false);
+
+    const [proofToUse, setProofToUse] = useState<string[] | null>(null);
+
     useEffect(() => setMounted(true), []);
 
     useEffect(() => {
@@ -146,28 +156,34 @@ export default function Mint() {
             const merkleTree = new MerkleTree(leaves, keccak256, { sortPairs: true });
             const leaf = keccak256(address);
             const proof = merkleTree.getHexProof(leaf); // MARKA: use the proof when calling `mint`: `function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {`
-
+            console.log('Proof:', proof);
             // in your useWriteContract, `proof` is the second argument after how many they're minting
             const root = merkleTree.getHexRoot();
             const isValid = merkleTree.verify(proof, leaf, root);
 
-            console.log(`${listName} Verification for ${address}:`);
-            console.log('Proof:', proof);
-            console.log('Is Valid:', isValid);
-
+            console.log(`${listName} Direct Verification Result:`, isValid);
+            if(isValid) {
+                console.log('Setting proof to use:', proof);
+                setProofToUse(proof);
+            }
             return isValid;
         };
 
-        const isFriend = verifyAddress(friendsListAddresses, 'Friends List');
-        const isSpecial = verifyAddress(specialCollectionsAddresses, 'Special Collections');
-        const isCreator = verifyAddress(creatorListAddresses, 'Creator List');
+        const friendResult = verifyAddress(friendsListAddresses, 'Friends List');
+        const specialResult = verifyAddress(specialCollectionsAddresses, 'Special Collections');
+        const creatorResult = verifyAddress(creatorListAddresses, 'Creator List');
 
-        console.log('Address Verification Summary:', {
+        setIsFriend(friendResult);
+        setIsSpecial(specialResult);
+        setIsCreator(creatorResult);
+       
+        console.log('Address Verification Summary (after state updates):', {
             address,
-            isFriend,
-            isSpecial,
-            isCreator
+            isFriend: friendResult,
+            isSpecial: specialResult,
+            isCreator: creatorResult
         });
+       
 
     }, [address]);
 
@@ -207,7 +223,7 @@ export default function Mint() {
     const handleMint = async () => {
         try {
             setIsModalOpen(true);
-            await mint(mintAmount);
+            await mint(mintAmount, proofToUse);
         } catch (error: any) {
             console.error("Error minting:", error);
             if (error.message === 'USER_REJECTED_TRANSACTION') {
@@ -317,8 +333,17 @@ export default function Mint() {
                                     </button>
                                 )}
 
-
-
+                                { (isFriend || isSpecial || isCreator) && (
+                                    <div className="text-lg mt-2 text-green-500 text-center">
+                                        {isCreator ? 
+                                            <div>Congrats, you're on the Creator List! <br /> For every Chonk you mint, you'll get 7 traits.</div>
+                                        : isFriend ? 
+                                            <div>Congrats, you're on the Friends List! <br />For every Chonk you mint, you'll get 6 traits.</div>
+                                        : isSpecial ? 
+                                            <div>Congrats, you're on the Special Collections List! <br />For every Chonk you mint, you'll get 5 traits.</div>
+                                        : ''}
+                                    </div>
+                                )}
                                 <div className="text-lg mt-6">10,690 minted (not really)</div>
 
                             </div>

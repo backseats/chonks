@@ -51,8 +51,9 @@ export function useMintFunction() {
   const [mainContractTokens, setMainContractTokens] = useState<number[]>();
   const [traitTokens, setTraitTokens] = useState<number[]>();
 
-  const mint = async (amount: number = 1) => {
+  const mint = async (amount: number = 1, proof: string[] | null = null) => {
     if (amount < 1) throw new Error("Amount must be greater than 0");
+    if (proof === null) proof = [];
     setIsMintRejected(false);
     
     try {
@@ -60,7 +61,7 @@ export function useMintFunction() {
         address: mainContract,
         abi: mainABI,
         functionName: 'mint',
-        args: [amount],
+        args: [amount, proof],
         chainId,
       }, {
         onError: (error) => {
@@ -331,6 +332,7 @@ const hasActiveOffer = useMemo(() => {
   });
 
   const displayPrice = useMemo(() => {
+    console.log('isListChonkSuccess:', isListChonkSuccess);
     if (isListChonkSuccess && pendingListPrice) {
       return parseFloat(pendingListPrice);
     }
@@ -547,6 +549,7 @@ const hasActiveOffer = useMemo(() => {
     isOfferSpecific,
     canAcceptOffer,
     chonkBid,
+    isListChonkLoading,
     isListingRejected,
     hashListChonk,
     isListChonkError,

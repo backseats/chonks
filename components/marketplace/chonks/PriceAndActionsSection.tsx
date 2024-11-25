@@ -51,6 +51,7 @@ export default function PriceAndActionsSection({
         isOfferSpecific,
         canAcceptOffer,
         isListChonkError,
+        isListChonkLoading,
         isListChonkSuccess,
         price,
         handleApproveMarketplace, 
@@ -68,12 +69,19 @@ export default function PriceAndActionsSection({
     const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
     const [offerAmount, setOfferAmount] = useState('');
     const [localListingRejected, setLocalListingRejected] = useState(false);
+    const [localListingPending, setLocalListingPending] = useState(false);
 
     useEffect(() => {
         if (isListingRejected) {
             setLocalListingRejected(true); // neeeded because we want to clear the rejection here 
         }
     }, [isListingRejected]);
+
+    useEffect(() => {
+        if (isListChonkLoading) {
+            setLocalListingPending(true); // neeeded because we want to clear the rejection here 
+        }
+    }, [isListChonkLoading]);
 
     // useEffect(() => {
     //     if (isListChonkSuccess) {
@@ -124,6 +132,9 @@ export default function PriceAndActionsSection({
 
     // Add this constant near the top of the component
     const MIN_LISTING_PRICE = 0.000001; // 1 millionth of an ETH
+
+    console.log('hasActiveOffer:', hasActiveOffer);
+    console.log('isListChonkSuccess:', isListChonkSuccess);
 
     return (
         <>
@@ -225,19 +236,21 @@ export default function PriceAndActionsSection({
             {/* Listing Modal */}
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-[5px]">
-                    <div className="bg-white p-8  max-w-md w-full mx-4">
+                    <div className="bg-white p-8 max-w-md w-full mx-4 min-w-[25vw]">
                         
                         { localListingRejected ? (
                             <div>
                                 <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Transaction Rejected</div>
-                                <div className="text-[vw] mb-6">I feel rejected :(</div>
+                                <div className="text-[1vw] mb-6">I feel rejected :(</div>
                                 <button
                                     onClick={() => {
                                         setIsModalOpen(false);
                                         setListingPrice('');
                                         setRecipientAddress('');
+                                        setPriceError('');
                                         setAddressError('');
                                         setLocalListingRejected(false);
+                                        setLocalListingPending(false);
                                     }}
                                     className="mb-2 bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
                                 >
@@ -270,7 +283,7 @@ export default function PriceAndActionsSection({
                                 ) : (
                                     <>
                                         <div className="font-bold text-black text-[1.725vw] mb-2">Transaction Submitted</div>
-                                        <div className="text-[vw]">Checking mint status{dots}</div>
+                                        <div className="text-[1vw]">Checking mint status{dots}</div>
                                     </>
                                 )}
                             
@@ -283,6 +296,11 @@ export default function PriceAndActionsSection({
                                     </button>
                                 </div>
                             </>
+                        ) : localListingPending ? (
+                            <div>
+                                <div className="text-black text-[1.725vw] mb-2">Confirm in Wallet</div>
+                                <div className="text-[1vw]">Requesting signature{dots}</div>
+                            </div>
                         ) : (
                             // LIST FORM
                             <div>
@@ -340,14 +358,10 @@ export default function PriceAndActionsSection({
                                 </div>
 
                                 {priceError && listingPrice === '' && (
-                                    <div className="mb-2">
-                                        <p className="text-red-500 text-sm mt-1">{priceError}</p>
+                                    <div className="mb-4 text-red-500 text-sm mt-1">
+                                        {priceError}
                                     </div>
                                 )}
-
-                                
-
-
 
                                 <div className="flex justify-end space-x-4">
                                     <button
@@ -381,6 +395,8 @@ export default function PriceAndActionsSection({
                                             } else {
                                                 handleListChonk(listingPrice);
                                             }
+
+                                            setLocalListingPending(true);
                                         }}
                                     >
                                         {isPrivateListingExpanded && resolvedAddress ? 'Private List Chonk' : 'List Chonk'}
