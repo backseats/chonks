@@ -72,9 +72,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     TraitRenderer public traitRenderer;
 
-    // An address that will be used to sign newly incoming traits
-    address public signer;
-
     mapping(uint256 => TraitMetadata) public traitIndexToMetadata;
 
     mapping(uint256 traitId => address[] operators) public traitIdToApprovedOperators;
@@ -83,12 +80,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     ChonksMarket public marketplace;
 
-    // Commit Reveal
-    // mapping(uint256 => CommitReveal.Epoch) epochs; // All epochs
-    // uint256 epoch;  // The current epoch index
-    // BS: maybe we can use these instead of the ones inside of ITraitStorage
-
-    // NOTE: This maybe too simplistic but it's okay to start with
+    // Contract addresses that are approved to create Traits
     mapping (address => bool) public isMinter;
 
     // These are Chonks-related contracts that are approved to invalidate operator approvals
@@ -110,6 +102,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     /// Modifiers
 
     modifier onlyMinter(address _address) {
+        // Add DataMinter contract first via `AddMinter`.
         if (!isMinter[_address]) revert NotAValidMinterContract();
         _;
     }
@@ -349,7 +342,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     function walletOfOwner(address _owner) public view returns(uint256[] memory) {
-        console.log("balanceOf(_owner)", balanceOf(_owner));
         uint256 tokenCount = balanceOf(_owner);
 
         uint256[] memory tokensId = new uint256[](tokenCount);
@@ -396,15 +388,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     function removeApprovedInvalidator(address _invalidator) public onlyOwner {
         approvedInvalidators[_invalidator] = false;
     }
-
-    // TODO: PUT BACK IN
-    /*
-
-    // TODO: look at other contracts for signing logic, import ECDSA, etc.
-    function setSigner(address _signer) public onlyOwner {
-        signer = _signer;
-    }
-    */
 
     /// Boilerplate
 

@@ -757,7 +757,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // Cache TBA address and trait tokens to minimize external calls
         address tbaAddress = tokenIdToTBAAccountAddress[tokenId];
 
-        uint256[] memory traitTokenIds = traitsContract.walletOfOwner(tbaAddress);
         uint256[] memory chonkIds = walletOfOwner(to);
         address[] memory tbas = new address[](chonkIds.length);
         for (uint256 j; j < chonkIds.length; ++j) {
@@ -767,6 +766,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         marketplace.deleteChonkOfferBeforeTokenTransfer(tokenId);
         marketplace.deleteChonkBidsBeforeTokenTransfer(tokenId, to);
 
+        uint256[] memory traitTokenIds = traitsContract.walletOfOwner(tbaAddress);
         for (uint256 i; i < traitTokenIds.length; ++i) {
             uint256 traitTokenId = traitTokenIds[i];
 
@@ -774,6 +774,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             marketplace.deleteTraitOffersBeforeTokenTransfer(traitTokenId);
             marketplace.deleteTraitBidsBeforeTokenTransfer(traitTokenId, tbas);
 
+            // Clean up past approvals for new TBA owner
             traitsContract.invalidateAllOperatorApprovals(traitTokenId);
         }
 
