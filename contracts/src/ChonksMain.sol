@@ -328,11 +328,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _bottomTokenId,
         uint256 _shoesTokenId
     ) public onlyChonkOwner(_chonkTokenId) {
-        // TODO: Might be able to cut this down gas-wise since it's validating Chonk ownership each time
         StoredChonk storage chonk = chonkTokens.all[_chonkTokenId];
+        address tbaForChonk = tokenIdToTBAAccountAddress[_chonkTokenId];
 
         if (_headTokenId != 0) {
-            _validateTBAOwnership(_chonkTokenId, _headTokenId);
+            _validateTBAOwnership(tbaForChonk, _headTokenId);
             _validateTraitType(_headTokenId, TraitCategory.Name.Head);
             chonk.headId = _headTokenId;
 
@@ -340,7 +340,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
 
         if (_hairTokenId != 0) {
-            _validateTBAOwnership(_chonkTokenId, _hairTokenId);
+            _validateTBAOwnership(tbaForChonk, _hairTokenId);
             _validateTraitType(_hairTokenId, TraitCategory.Name.Hair);
             chonk.hairId = _hairTokenId;
 
@@ -348,7 +348,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
 
         if (_faceTokenId != 0) {
-            _validateTBAOwnership(_chonkTokenId, _faceTokenId);
+            _validateTBAOwnership(tbaForChonk, _faceTokenId);
             _validateTraitType(_faceTokenId, TraitCategory.Name.Face);
             chonk.faceId = _faceTokenId;
 
@@ -356,7 +356,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
 
         if (_accessoryTokenId != 0) {
-            _validateTBAOwnership(_chonkTokenId, _accessoryTokenId);
+            _validateTBAOwnership(tbaForChonk, _accessoryTokenId);
             _validateTraitType(_accessoryTokenId, TraitCategory.Name.Accessory);
             chonk.accessoryId = _accessoryTokenId;
 
@@ -364,7 +364,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
 
         if (_topTokenId != 0) {
-            _validateTBAOwnership(_chonkTokenId, _topTokenId);
+            _validateTBAOwnership(tbaForChonk, _topTokenId);
             _validateTraitType(_topTokenId, TraitCategory.Name.Top);
             chonk.topId = _topTokenId;
 
@@ -372,7 +372,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
 
         if (_bottomTokenId != 0) {
-            _validateTBAOwnership(_chonkTokenId, _bottomTokenId);
+            _validateTBAOwnership(tbaForChonk, _bottomTokenId);
             _validateTraitType(_bottomTokenId, TraitCategory.Name.Bottom);
             chonk.bottomId = _bottomTokenId;
 
@@ -380,7 +380,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         }
 
         if (_shoesTokenId != 0) {
-            _validateTBAOwnership(_chonkTokenId, _shoesTokenId);
+            _validateTBAOwnership(tbaForChonk, _shoesTokenId);
             _validateTraitType(_shoesTokenId, TraitCategory.Name.Shoes);
             chonk.shoesId = _shoesTokenId;
 
@@ -409,22 +409,19 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Validations
 
-    function _validateTBAOwnership(uint256 _chonkId, uint256 _traitTokenId) internal view onlyChonkOwner(_chonkId) {
-        address tbaOfChonk = tokenIdToTBAAccountAddress[_chonkId];
+    function _validateTBAOwnership(address _tbaForChonk, uint256 _traitTokenId) internal view {
         address ownerOfTrait = traitsContract.ownerOf(_traitTokenId);
-        if (ownerOfTrait != tbaOfChonk) revert IncorrectTBAOwner();
+        if (ownerOfTrait != _tbaForChonk) revert IncorrectTBAOwner();
     }
 
     function _validateTraitType(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
-        TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId); // Head, bottom, etc.
-
-        // Checks the fetched TraitCategory.Name against the one we send in
+        TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId);
         if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))
             revert IncorrectTraitType();
     }
 
     function _equipValidation(uint256 _chonkTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
-        _validateTBAOwnership(_chonkTokenId, _traitTokenId);
+        _validateTBAOwnership(tokenIdToTBAAccountAddress[_chonkTokenId], _traitTokenId);
         traitType = traitsContract.getTraitType(_traitTokenId);
         _validateTraitType(_traitTokenId, traitType);
     }
