@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
-// import { CommitReveal } from '../common/CommitReveal.sol';
 
 /// A shared interface for data storage of the Chonks
 interface IChonkStorage {
@@ -37,18 +36,10 @@ interface IChonkStorage {
         // randomly set in ChonksMain.mint() but can be updated by holder
         uint8 bodyIndex;
 
-        // TODO: Do we need these?
-
-        // Set in getChonk if epoch is revealed
-        // bool isRevealed;
-
-         // This is the seed that's calculuated in getChonk based on randomness + stored.seed
-        // uint256 seed;
-
         // RRGGBB colour of the background, default blue #0D6E9D set in ChonksMain.sol mint(), and setBackgroundColor()
         string backgroundColor;
 
-        // bool to determine whether to render 3D or not
+        // bool to determine whether to render in 3D or not
         bool render3D;
     }
 
@@ -56,12 +47,6 @@ interface IChonkStorage {
     struct Chonks {
         // Token ID => Chonk
         mapping(uint256 => StoredChonk) all;
-
-        // All of the epochs
-        // mapping(uint256 => CommitReveal.Epoch) epochs;
-
-        // // The current epoch index
-        // uint256 epoch;
     }
 
     struct BodyMetadata {
@@ -85,7 +70,6 @@ interface IChonkStorage {
         string bodyName;
         string rendererSet;
         uint256 numOfItemsInBackpack;
-        // string backgroundStyles;
     }
 
     /// Events
@@ -98,4 +82,5 @@ interface IChonkStorage {
     event BackgroundColor(address indexed owner, uint256 indexed tokenId, string color);
     event BodyIndex(address indexed owner, uint256 indexed tokenId, uint8 _bodyIndex);
     event Render3D(address indexed owner, uint256 indexed tokenId, bool renderZ);
+
 }
