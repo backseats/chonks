@@ -134,7 +134,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error BodyAlreadyExists();
     error CantBeZero();
     error CanOnlyReserveFirstTwo();
-    // error CantTransfer();
+    error CantTransferDuringMint();
     error CantTransferToTBAs();
     error ChonkDoesntExist();
     error FirstSeasonRenderMinterNotSet();
@@ -213,7 +213,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             address tokenBoundAccountAddress = REGISTRY.createAccount(
                 ACCOUNT_PROXY, // implementation address
                 0, // salt
-                84532, // chainId // DEPLOY
+                84532, // chainId // DEPLOY: 8453
                 address(this), // tokenContract
                 tokenId // tokenId
             );
@@ -235,8 +235,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // level 0: let's give everyone shoes, bottom, top & hair : 4 traits
             // level 1: shoes, bottom, top, hair AND face: 5 traits
             // level 3: shoes, bottom, top AND hair AND face AND head AND accessory : 7 traits
-
-            // Here we've gotten a bunch of trait tokens back with their types, then we set them on the Chonk. No reason this cant happen in the render minter
 
             chonk.shoesId = traitsIds[0];
             chonk.bottomId = traitsIds[1];
@@ -732,6 +730,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             super._beforeTokenTransfer(from, to, tokenId);
             return;
         }
+
+        if (block.timestamp < mintStartTime + 24 hours) revert CantTransferDuringMint();
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
          if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();
