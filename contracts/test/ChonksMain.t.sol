@@ -116,14 +116,6 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.stopPrank();
     }
 
-    function test_constructorRevert() public {
-        // Test that debug mint fails without proper setup
-        ChonksMain newMain = new ChonksMain(true);
-
-        vm.expectRevert(ChonksMain.FirstSeasonRenderMinterNotSet.selector);
-        newMain._debugPostConstructorMint();
-    }
-
     // Admin/Owner Functions
     function test_setTraitsContract() public {
         assertEq(address(main.traitsContract()), address(0));

@@ -31,7 +31,7 @@ contract MainRenderer3D is Ownable {
     function generateFullSvg(
         string memory _bodySvg,
         string memory _traitsSvg,
-        IChonkStorage.Chonkdata memory _chonkdata
+        IChonkStorage.ChonkData memory _chonkdata
     ) internal pure returns (string memory image) {
         string memory fullSvg = string.concat(
             SVG_START_STYLE,
@@ -51,7 +51,7 @@ contract MainRenderer3D is Ownable {
         );
     }
 
-    function generateBackgroundColorStyles(IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
+    function generateBackgroundColorStyles(IChonkStorage.ChonkData memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
         backgroundColorStyles = string.concat(
             '<style>',
             'body, svg{ background: #', _chonkdata.backgroundColor, '; }',
@@ -60,7 +60,7 @@ contract MainRenderer3D is Ownable {
         );
     }
 
-    function generateChonkdata(IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
+    function generateChonkData(IChonkStorage.ChonkData memory _chonkdata) internal pure returns (string memory chonkDataJson) {
         chonkDataJson = string.concat(
             '"chonkdata":[',
                 '{ "background_color" : "#', _chonkdata.backgroundColor, '" },',
@@ -71,7 +71,7 @@ contract MainRenderer3D is Ownable {
         );
     }
 
-    function generateAttributes(string memory _traitsAttributes, IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory fullAttributes) {
+    function generateAttributes(string memory _traitsAttributes, IChonkStorage.ChonkData memory _chonkdata) internal pure returns (string memory fullAttributes) {
         //todo: do we need this bodyAttributes check in here?
         if (bytes(_traitsAttributes).length > 0) {
             // fullAttributes = string.concat('"attributes":[', _bodyAttributes, ',', _traitsAttributes, ']');
@@ -79,13 +79,13 @@ contract MainRenderer3D is Ownable {
                 '"attributes":[',
                 _traitsAttributes,
                 '],',
-                generateChonkdata(_chonkdata)
+                generateChonkData(_chonkdata)
             );
         }
         else {
             fullAttributes = string.concat(
                 '"attributes":[],',
-                generateChonkdata(_chonkdata)
+                generateChonkData(_chonkdata)
             );
         }
     }
@@ -96,7 +96,7 @@ contract MainRenderer3D is Ownable {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         bytes memory _fullZmap,
-        IChonkStorage.Chonkdata memory _chonkdata
+        IChonkStorage.ChonkData memory _chonkdata
     ) public view returns (string memory) {
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _chonkdata);
         string memory fullAttributes = generateAttributes(_traitsAttributes, _chonkdata);

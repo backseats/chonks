@@ -18,7 +18,7 @@ contract MainRenderer2D {
 
     error InvalidBodyBytes();
 
-    function generateBackgroundColorStyles(IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
+    function generateBackgroundColorStyles(IChonkStorage.ChonkData memory _chonkdata) internal pure returns (string memory backgroundColorStyles) {
         backgroundColorStyles = string.concat(
             '<style>',
             'body, svg{ background: #', _chonkdata.backgroundColor, '; }',
@@ -27,7 +27,7 @@ contract MainRenderer2D {
         );
     }
 
-    function generateChonkdata(IChonkStorage.Chonkdata memory _chonkdata) internal pure returns (string memory chonkDataJson) {
+    function generateChonkData(IChonkStorage.ChonkData memory _chonkdata) internal pure returns (string memory chonkDataJson) {
         chonkDataJson = string.concat(
             '"chonkdata":[',
                 '{ "background_color" : "#', _chonkdata.backgroundColor, '" },',
@@ -44,7 +44,7 @@ contract MainRenderer2D {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         string memory _backpackSVGs,
-        IChonkStorage.Chonkdata memory _chonkdata
+        IChonkStorage.ChonkData memory _chonkdata
     ) public pure returns (string memory) {
 
         string memory fullSvg;
@@ -100,7 +100,7 @@ contract MainRenderer2D {
                 Utils.toString(_tokenId),
                 '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
                 fullAttributes,
-                ',', generateChonkdata(_chonkdata),
+                ',', generateChonkData(_chonkdata),
                 ',', image,
                 ',', animationURL, // comment out for qa collection
             '}'

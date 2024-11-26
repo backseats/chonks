@@ -43,12 +43,6 @@ interface IChonkStorage {
         bool render3D;
     }
 
-    // TODO: Do we even need this struct any longer?
-    struct Chonks {
-        // Token ID => Chonk
-        mapping(uint256 => StoredChonk) all;
-    }
-
     struct BodyMetadata {
         // Not token id, it refers to the number used in ChonksMain.addNewBody
         uint256 bodyIndex;
@@ -63,9 +57,7 @@ interface IChonkStorage {
         bytes zMap;
     }
 
-    // old struct, let's move this into Chonkdata
-
-    struct Chonkdata {
+    struct ChonkData {
         string backgroundColor;
         string bodyName;
         string rendererSet;

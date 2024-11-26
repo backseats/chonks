@@ -76,9 +76,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // bool _localDeploy; // DEPLOY: remove
 
-    /// @dev We use this database for persistent storage.
-    Chonks chonkTokens;
-
     // Storage for Body metadata
     mapping(uint256 => IChonkStorage.BodyMetadata) public bodyIndexToMetadata;
 
@@ -114,6 +111,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     IRegistry constant REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
     address constant ACCOUNT_PROXY = 0x55266d75D1a14E4572138116aF39863Ed6596E7F;
     address constant ACCOUNT_IMPLEMENTATION = 0x41C8f39463A868d3A88af00cd0fe7102F30E44eC;
+
+    mapping(uint256 tokenID => StoredChonk chonk) public chonkTokens;
 
     // Mapping of tokenID to the TBA account address
     mapping(uint256 => address) public tokenIdToTBAAccountAddress;
@@ -168,22 +167,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _initializeOwner(msg.sender);
         deploymentTime = block.timestamp;
         // _localDeploy = localDeploy_;
-    }
-
-    // DEPLOY: Remove
-    function _debugPostConstructorMint() public {
-        // if (_localDeploy) {
-        //     for (uint i; i < 10; ++i) {
-        //         bytes32[] memory empty;
-        //         mint(4, empty); // Mints N bodies/tokens
-        //         // setBackgroundColor(i, "28b143");
-        //         // setTokenRenderZ(i, true);
-        //         // setTokenRender3D(i, true);
-        //     }
-        //     // setBackgroundColor(1, "ffffff");
-        //     // setTokenRender3D(1, true);
-
-        // }
     }
 
     function teamReserve() public onlyOwner {
@@ -245,7 +228,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             uint256[] memory traitsIds = firstSeasonRenderMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
 
             // Initialize the Chonk
-            StoredChonk storage chonk = chonkTokens.all[tokenId];
+            StoredChonk storage chonk = chonkTokens[tokenId];
 
             chonk.tokenId = tokenId;
 
@@ -280,31 +263,31 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         TraitCategory.Name traitType = _equipValidation(_chonkTokenId, _traitTokenId);
 
-        if (traitType == TraitCategory.Name.Head)      chonkTokens.all[_chonkTokenId].headId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Hair)      chonkTokens.all[_chonkTokenId].hairId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Face)      chonkTokens.all[_chonkTokenId].faceId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Accessory) chonkTokens.all[_chonkTokenId].accessoryId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Top)       chonkTokens.all[_chonkTokenId].topId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Bottom)    chonkTokens.all[_chonkTokenId].bottomId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Shoes)     chonkTokens.all[_chonkTokenId].shoesId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Head)      chonkTokens[_chonkTokenId].headId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Hair)      chonkTokens[_chonkTokenId].hairId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Face)      chonkTokens[_chonkTokenId].faceId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Accessory) chonkTokens[_chonkTokenId].accessoryId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Top)       chonkTokens[_chonkTokenId].topId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Bottom)    chonkTokens[_chonkTokenId].bottomId = _traitTokenId;
+        if (traitType == TraitCategory.Name.Shoes)     chonkTokens[_chonkTokenId].shoesId = _traitTokenId;
 
         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _traitTokenId, uint8(traitType));
     }
 
     function unequip(uint256 _chonkTokenId, TraitCategory.Name traitType) public onlyChonkOwner(_chonkTokenId) {
-        if (traitType == TraitCategory.Name.Head)      chonkTokens.all[_chonkTokenId].headId = 0;
-        if (traitType == TraitCategory.Name.Hair)      chonkTokens.all[_chonkTokenId].hairId = 0;
-        if (traitType == TraitCategory.Name.Face)      chonkTokens.all[_chonkTokenId].faceId = 0;
-        if (traitType == TraitCategory.Name.Accessory) chonkTokens.all[_chonkTokenId].accessoryId = 0;
-        if (traitType == TraitCategory.Name.Top)       chonkTokens.all[_chonkTokenId].topId = 0;
-        if (traitType == TraitCategory.Name.Bottom)    chonkTokens.all[_chonkTokenId].bottomId = 0;
-        if (traitType == TraitCategory.Name.Shoes)     chonkTokens.all[_chonkTokenId].shoesId = 0;
+        if (traitType == TraitCategory.Name.Head)      chonkTokens[_chonkTokenId].headId = 0;
+        if (traitType == TraitCategory.Name.Hair)      chonkTokens[_chonkTokenId].hairId = 0;
+        if (traitType == TraitCategory.Name.Face)      chonkTokens[_chonkTokenId].faceId = 0;
+        if (traitType == TraitCategory.Name.Accessory) chonkTokens[_chonkTokenId].accessoryId = 0;
+        if (traitType == TraitCategory.Name.Top)       chonkTokens[_chonkTokenId].topId = 0;
+        if (traitType == TraitCategory.Name.Bottom)    chonkTokens[_chonkTokenId].bottomId = 0;
+        if (traitType == TraitCategory.Name.Shoes)     chonkTokens[_chonkTokenId].shoesId = 0;
 
         emit Unequip(ownerOf(_chonkTokenId), _chonkTokenId, uint8(traitType));
     }
 
     function unequipAll(uint256 _chonkTokenId) public onlyChonkOwner(_chonkTokenId) {
-        StoredChonk storage chonk = chonkTokens.all[_chonkTokenId];
+        StoredChonk storage chonk = chonkTokens[_chonkTokenId];
 
         chonk.headId = 0;
         chonk.hairId = 0;
@@ -328,7 +311,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint256 _bottomTokenId,
         uint256 _shoesTokenId
     ) public onlyChonkOwner(_chonkTokenId) {
-        StoredChonk storage chonk = chonkTokens.all[_chonkTokenId];
+        StoredChonk storage chonk = chonkTokens[_chonkTokenId];
         address tbaForChonk = tokenIdToTBAAccountAddress[_chonkTokenId];
 
         if (_headTokenId != 0) {
@@ -507,7 +490,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         (bodySvg, ) = getBodySvgAndMetadata(storedChonk);
         (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedChonk);
         backpackSVGs = getBackpackSVGs(_tokenId);
-        Chonkdata memory chonkdata;
+        ChonkData memory chonkdata;
 
         chonkdata.backgroundColor = storedChonk.backgroundColor;
         chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
@@ -531,7 +514,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         bytes  memory traitZmaps;
         bytes  memory fullZmap;
         string memory traitsAttributes;
-        Chonkdata memory chonkdata;
+        ChonkData memory chonkdata;
 
         StoredChonk memory storedChonk = getChonk(_tokenId);
 
@@ -595,11 +578,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function getChonk(uint256 _tokenId) public view returns (IChonkStorage.StoredChonk memory) {
-        return chonkTokens.all[_tokenId];
+        return chonkTokens[_tokenId];
     }
 
     function getTokenRenderZ(uint256 _chonkTokenId) public view returns (bool) {
-        return chonkTokens.all[_chonkTokenId].render3D;
+        return chonkTokens[_chonkTokenId].render3D;
     }
 
     function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
@@ -720,7 +703,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             }
         }
 
-        chonkTokens.all[_chonkTokenId].backgroundColor = _color;
+        chonkTokens[_chonkTokenId].backgroundColor = _color;
 
         emit BackgroundColor(ownerOf(_chonkTokenId), _chonkTokenId, _color );
     }
@@ -728,12 +711,12 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function setBodyIndex(uint256 _chonkTokenId, uint8 _bodyIndex) public onlyChonkOwner(_chonkTokenId) {
         if (_bodyIndex > 4) revert InvalidBodyIndex();
 
-        chonkTokens.all[_chonkTokenId].bodyIndex = _bodyIndex;
+        chonkTokens[_chonkTokenId].bodyIndex = _bodyIndex;
         emit BodyIndex(ownerOf(_chonkTokenId), _chonkTokenId, _bodyIndex );
     }
 
     function setTokenRender3D(uint256 _chonkTokenId, bool _render3D) public onlyChonkOwner(_chonkTokenId) {
-        chonkTokens.all[_chonkTokenId].render3D = _render3D;
+        chonkTokens[_chonkTokenId].render3D = _render3D;
         emit Render3D(ownerOf(_chonkTokenId), _chonkTokenId, _render3D);
     }
 
