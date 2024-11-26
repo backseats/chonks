@@ -8,8 +8,8 @@ import { ChonkTraits } from "./ChonkTraits.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 // DEPLOY: remove
-import "forge-std/console.sol";
-import "forge-std/console2.sol";
+// import "forge-std/console.sol";
+// import "forge-std/console2.sol";
 
 contract ChonksMarket is Ownable, ReentrancyGuard {
     // Structs

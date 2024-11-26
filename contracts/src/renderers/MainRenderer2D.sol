@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import { EncodeURI } from "../EncodeURI.sol";
+// import { EncodeURI } from "../EncodeURI.sol";
 import { IChonkStorage } from "../interfaces/IChonkStorage.sol";
 import { Utils } from "../common/Utils.sol";
-import "forge-std/console.sol";
+// import "forge-std/console.sol";
 
 contract MainRenderer2D {
 
@@ -89,7 +89,6 @@ contract MainRenderer2D {
             '</body></html>'
         );
 
-        // NOTE: Unused variable
         string memory animationURL = string.concat(
             '"animation_url":"data:text/html;base64,',
             Utils.encode(bytes(combinedHTML)),
@@ -99,7 +98,7 @@ contract MainRenderer2D {
         string memory json = string.concat(
             '{"name":"Chonk #',
                 Utils.toString(_tokenId),
-             '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
+                '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
                 fullAttributes,
                 ',', generateChonkdata(_chonkdata),
                 ',', image,

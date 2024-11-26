@@ -227,22 +227,22 @@ library Utils {
         result = encode(data, fileSafe, false);
     }
 
-    function contains(string memory _str, string memory _searchStr) internal pure returns (bool) {
-        bytes memory str = bytes(_str);
-        bytes memory searchStr = bytes(_searchStr);
+    // function contains(string memory _str, string memory _searchStr) internal pure returns (bool) {
+    //     bytes memory str = bytes(_str);
+    //     bytes memory searchStr = bytes(_searchStr);
         
-        for (uint i = 0; i <= str.length - searchStr.length; i++) {
-            bool found = true;
-            for (uint j = 0; j < searchStr.length; j++) {
-                if (str[i + j] != searchStr[j]) {
-                    found = false;
-                    break;
-                }
-            }
-            if (found) return true;
-        }
-        return false;
-    }
+    //     for (uint i = 0; i <= str.length - searchStr.length; i++) {
+    //         bool found = true;
+    //         for (uint j = 0; j < searchStr.length; j++) {
+    //             if (str[i + j] != searchStr[j]) {
+    //                 found = false;
+    //                 break;
+    //             }
+    //         }
+    //         if (found) return true;
+    //     }
+    //     return false;
+    // }
 
     function startsWith(string memory _str, string memory _prefix) internal pure returns (bool) {
         bytes memory str = bytes(_str);

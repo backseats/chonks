@@ -25,7 +25,7 @@ import { TraitRenderer } from "./renderers/TraitRenderer.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 import { ChonksMain } from "./ChonksMain.sol";
 
-import "forge-std/console.sol"; // DEPLOY: remove
+// import "forge-std/console.sol"; // DEPLOY: remove
 
 /*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -355,7 +355,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         uint256[] memory tokensId = new uint256[](tokenCount);
         for (uint256 i; i < tokenCount; ++i){
-            console.log("tokenOfOwnerByIndex(_owner, i)", tokenOfOwnerByIndex(_owner, i));
+            // console.log("tokenOfOwnerByIndex(_owner, i)", tokenOfOwnerByIndex(_owner, i));
             tokensId[i] = tokenOfOwnerByIndex(_owner, i);
         }
 

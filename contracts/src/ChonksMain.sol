@@ -32,7 +32,7 @@ import { TraitCategory } from "./TraitCategory.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
-import "forge-std/console.sol"; // DEPLOY: remove
+// import "forge-std/console.sol"; // DEPLOY: remove
 
 /*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -74,7 +74,7 @@ import "forge-std/console.sol"; // DEPLOY: remove
 
 contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
 
-    bool _localDeploy; // DEPLOY: remove
+    // bool _localDeploy; // DEPLOY: remove
 
     /// @dev We use this database for persistent storage.
     Chonks chonkTokens;
@@ -135,7 +135,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error BodyAlreadyExists();
     error CantBeZero();
     error CanOnlyReserveFirstTwo();
-    error CantTransfer();
+    // error CantTransfer();
     error CantTransferToTBAs();
     error ChonkDoesntExist();
     error FirstSeasonRenderMinterNotSet();
@@ -145,13 +145,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error InsufficientFunds();
     error InvalidBodyIndex();
     error InvalidColor();
-    error InvalidLevelAmount();
-    error InvalidSignature();
     error InvalidTraitCount();
     error MintEnded();
     error MintNotStarted();
     error MintStartTimeAlreadySet();
-    error NonceAlreadyUsed();
     error TenIsMaxMint();
     error Timelocked();
     error UseUnequip();
@@ -170,23 +167,23 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     constructor(bool localDeploy_) ERC721("Chonks", "CHONKS") {
         _initializeOwner(msg.sender);
         deploymentTime = block.timestamp;
-        _localDeploy = localDeploy_;
+        // _localDeploy = localDeploy_;
     }
 
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
-        if (_localDeploy) {
-            for (uint i; i < 10; ++i) {
-                bytes32[] memory empty;
-                mint(4, empty); // Mints N bodies/tokens
-                // setBackgroundColor(i, "28b143");
-                // setTokenRenderZ(i, true);
-                // setTokenRender3D(i, true);
-            }
-            // setBackgroundColor(1, "ffffff");
-            // setTokenRender3D(1, true);
+        // if (_localDeploy) {
+        //     for (uint i; i < 10; ++i) {
+        //         bytes32[] memory empty;
+        //         mint(4, empty); // Mints N bodies/tokens
+        //         // setBackgroundColor(i, "28b143");
+        //         // setTokenRenderZ(i, true);
+        //         // setTokenRender3D(i, true);
+        //     }
+        //     // setBackgroundColor(1, "ffffff");
+        //     // setTokenRender3D(1, true);
 
-        }
+        // }
     }
 
     function teamReserve() public onlyOwner {
@@ -571,16 +568,19 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Gets complete zMap for a Chonk, body and traits
     // TODO: proably should add getChonkColorMap
     function getChonkZMap(uint256 _tokenId) public view returns (string memory) {
-        bytes memory bodyZmap;
+        // bytes memory bodyZmap;
         bytes memory traitZmaps;
 
-        StoredChonk memory storedChonk = getChonk(_tokenId);
+        // StoredChonk memory storedChonk = getChonk(_tokenId);
 
-        (, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
-        (, traitZmaps,) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
+        // (, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
+        // (, traitZmaps,) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
+
+        (, traitZmaps,) = traitsContract.getSvgZmapsAndMetadata(getChonk(_tokenId));
 
         return string.concat(
-            string(bodyZmap),
+            // string(bodyZmap),
+            getBodyZMap(_tokenId),
             string(traitZmaps)
         );
     }
@@ -590,9 +590,9 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function getBodyZMap(uint256 _tokenId) public view returns (string memory) {
         bytes memory bodyZmap;
 
-        StoredChonk memory storedChonk = getChonk(_tokenId);
-
-        (, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
+        // StoredChonk memory storedChonk = getChonk(_tokenId);
+        // (, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
+        (, bodyZmap,) = getBodySVGZmapsAndMetadata(getChonk(_tokenId));
 
         return string(bodyZmap);
     }

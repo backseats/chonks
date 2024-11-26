@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
-import { CommitReveal } from '../common/CommitReveal.sol';
+// import { CommitReveal } from '../common/CommitReveal.sol';
 
 /// A shared interface for data storage of the Chonks
 interface IChonkStorage {
@@ -52,15 +52,16 @@ interface IChonkStorage {
         bool render3D;
     }
 
+    // TODO: Do we even need this struct any longer?
     struct Chonks {
         // Token ID => Chonk
         mapping(uint256 => StoredChonk) all;
 
         // All of the epochs
-        mapping(uint256 => CommitReveal.Epoch) epochs;
+        // mapping(uint256 => CommitReveal.Epoch) epochs;
 
-        // The current epoch index
-        uint256 epoch;
+        // // The current epoch index
+        // uint256 epoch;
     }
 
     struct BodyMetadata {
