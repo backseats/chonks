@@ -10,11 +10,44 @@ import { ConnectKitButton } from "connectkit";
 import Link from 'next/link'
 import { MerkleTree } from 'merkletreejs';
 import { keccak256, getAddress } from "viem";
-
+import { MINT_PRICE} from "@/contract_data";
+import { mainContract, tokenURIABI } from "@/contract_data";
+import { useReadContract } from "wagmi";
 import { addresses as friendsListAddresses } from './friendsListAddresses.json';
 import { addresses as creatorListAddresses } from './creatorListAddresses.json';
 import { addresses as specialCollectionsAddresses } from './specialCollectionsAddresses.json';
 
+const TokenImage = ({ tokenId }: { tokenId: number }) => {
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+    const { data: tokenURIData } = useReadContract({
+        address: mainContract,
+        abi: tokenURIABI,
+        functionName: 'tokenURI',
+        args: [BigInt(tokenId)],
+    });
+
+    useEffect(() => {
+        if (tokenURIData && typeof tokenURIData === 'string') {
+            const base64String = tokenURIData.split(",")[1];
+            const jsonString = atob(base64String);
+            const jsonData = JSON.parse(jsonString);
+            setImageUrl(jsonData.image);
+        }
+    }, [tokenURIData]);
+
+    if (!imageUrl) {
+        return <div className="w-[100px] h-[100px] bg-gray-200 animate-pulse" />;
+    }
+
+    return (
+        <img 
+            src={imageUrl} 
+            alt={`Chonk ${tokenId}`} 
+            className="w-[100px] h-[100px] object-cover"
+        />
+    );
+};
 
 // Update the modal content to show different states
 // const ModalContent = ({
@@ -94,6 +127,9 @@ import { addresses as specialCollectionsAddresses } from './specialCollectionsAd
 
 export default function Mint() {
     const MAX_MINT_AMOUNT = 10;
+    
+    const [isMintOpen, setIsMintOpen] = useState(true);
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedChonk, setSelectedChonk] = useState<number | null>(null);
     const [mintAmount, setMintAmount] = useState(1);
@@ -102,16 +138,12 @@ export default function Mint() {
     const [transactionhashMinting, setTransactionhashMinting] = useState<string | null>(null);
 
     const { address } = useAccount();
-    const { mint, isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected, hashMinting, mainContractTokens, traitTokens, totalSupply } = useMintFunction();
+    const { mint, isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected, hashMinting, mainContractTokens, traitTokens, totalSupply, mintStatus } = useMintFunction();
     const [mounted, setMounted] = React.useState(false);
 
     const [friendsListMerkleRoot, setFriendsListMerkleRoot] = useState<string | null>(null);
     const [specialCollectionsMerkleRoot, setSpecialCollectionsMerkleRoot] = useState<string | null>(null);
     const [creatorListMerkleRoot, setCreatorListMerkleRoot] = useState<string | null>(null);
-
-    // const [isValidFriendsList, setIsValidFriendsList] = useState(false);
-    // const [isValidSpecialCollections, setIsValidSpecialCollections] = useState(false);
-    // const [isValidCreatorList, setIsValidCreatorList] = useState(false);
 
     const [isFriend, setIsFriend] = useState(false);
     const [isSpecial, setIsSpecial] = useState(false);
@@ -119,7 +151,58 @@ export default function Mint() {
 
     const [proofToUse, setProofToUse] = useState<string[] | null>(null);
 
-    useEffect(() => setMounted(true), []);
+    const [timeRemaining, setTimeRemaining] = useState<number>(0);
+    const [countdownDisplay, setCountdownDisplay] = useState('');
+    
+    const [revealStatus, setRevealStatus] = useState<{ isRevealed: boolean | null, epoch: number | null }>({
+        isRevealed: null,
+        epoch: null
+    });
+
+    // const { isRevealed, epoch } = useTraitRevealStatus();
+
+    // Set initial time remaining when mintStatus changes
+    useEffect(() => {
+        if (mintStatus?.timeRemaining) {
+            setTimeRemaining(mintStatus.timeRemaining);
+        }
+    }, [mintStatus?.timeRemaining]);
+
+    // Countdown timer effect
+    useEffect(() => {
+        if (!timeRemaining) return;
+
+        const updateCountdown = () => {
+            const hours = Math.floor(timeRemaining / 3600);
+            const minutes = Math.floor((timeRemaining % 3600) / 60);
+            const seconds = timeRemaining % 60;
+            
+            setCountdownDisplay(
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+            );
+        };
+
+        updateCountdown();
+
+        const interval = setInterval(() => {
+            setTimeRemaining(prev => {
+                const newTime = Math.max(0, prev - 1);
+                return newTime;
+            });
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, [timeRemaining]);
+
+    // Update isMintOpen based on timeRemaining
+    useEffect(() => {
+        setIsMintOpen(timeRemaining > 0);
+    }, [timeRemaining]);
+
+    useEffect(() => {
+        setMounted(true);
+        setIsMintOpen(mintStatus?.isOpen ?? false);
+    }, [mintStatus?.isOpen]);
 
     useEffect(() => {
         const generateMerkleRoot = (addressList: string[]) => {
@@ -246,10 +329,39 @@ export default function Mint() {
         if (isConfirming) return "Minting...";
         return (
             <span className="flex items-center gap-1">
-                Mint for {(0.021 * mintAmount).toFixed(3)} <FaEthereum />
+                Mint for {(MINT_PRICE * mintAmount).toFixed(2)} <FaEthereum />
             </span>
         );
     };
+
+    // Add new state for trait reveal countdown
+    const [traitRevealCountdown, setTraitRevealCountdown] = useState<number | null>(null);
+
+    // Update the useEffect that handles the countdown
+    useEffect(() => {
+        if (traitTokens && traitTokens.length > 0 && traitRevealCountdown === null) {
+            setTraitRevealCountdown(100);
+        }
+
+        if (traitRevealCountdown !== null && traitRevealCountdown > 0) {
+            const timer = setInterval(() => {
+                setTraitRevealCountdown(prev => {
+                    // if (prev === 1) {
+                    //     console.log('Setting reveal status...');
+                    //     console.log('isRevealed:', isRevealed);
+                    //     console.log('epoch:', epoch);
+                    //     setRevealStatus({ 
+                    //         isRevealed, 
+                    //         epoch: epoch ? Number(epoch) : null 
+                    //     });
+                    // }
+                    return prev !== null ? prev - 1 : null;
+                });
+            }, 1000);
+
+            return () => clearInterval(timer);
+        }
+    }, [traitTokens, traitRevealCountdown]);
 
     if (!mounted) return null;
 
@@ -279,32 +391,39 @@ export default function Mint() {
                     <div className="mx-[20px] sm:mx-[3.45vw] "> {/* EDGES */}
 
                         <section className={`border-l border-r flex flex-col items-center justify-center bg-white py-[3.45vw]`}>
-                            <h1 className="text-[3.45vw] mb-8">Mint a Chonk</h1>
-                            <div className="flex flex-col items-center gap-4">
+                            <h1 className="text-[3.45vw] mb-8">Mint a Chonk{isMintOpen ? '' : '... Soon!'}</h1>
+                            <div className="flex flex-col items-center gap-[1.725vw]">
                                 
-                                <div className="text-lg">Desired Quantity</div>
-                                <div className="flex items-center gap-2">
-                                    <button
-                                        onClick={decrementMintAmount}
-                                        className="px-3 py-1 border  hover:bg-chonk-orange"
-                                    >
-                                        -
-                                    </button>
-                                    <input
-                                        type="number"
-                                        value={mintAmount}
-                                        onChange={(e) => setMintAmount(Math.max(1, Math.min(MAX_MINT_AMOUNT, parseInt(e.target.value) || 1)))}
-                                        className="w-[6.9vw] min-w-[100px] text-center border  px-2 py-1"
-                                        min="1"
-                                        max={MAX_MINT_AMOUNT.toString()}
-                                    />
-                                    <button
-                                        onClick={incrementMintAmount}
-                                        className="px-3 py-1 border  hover:bg-chonk-orange"
-                                    >
-                                        +
-                                    </button>
-                                </div>
+                                { isMintOpen ? (
+                                    <>
+                                        <div className="text-[1.25vw]">Desired Quantity</div>
+                                        <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={decrementMintAmount}
+                                            className="px-3 py-1 border  hover:bg-chonk-orange"
+                                        >
+                                            -
+                                        </button>
+                                        <input
+                                            type="number"
+                                            value={mintAmount}
+                                            onChange={(e) => setMintAmount(Math.max(1, Math.min(MAX_MINT_AMOUNT, parseInt(e.target.value) || 1)))}
+                                            className="w-[6.9vw] min-w-[100px] text-center border  px-2 py-1"
+                                            min="1"
+                                            max={MAX_MINT_AMOUNT.toString()}
+                                        />
+                                        <button
+                                            onClick={incrementMintAmount}
+                                            className="px-3 py-1 border  hover:bg-chonk-orange"
+                                        >
+                                            +
+                                            </button>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="text-[1.25vw]">Connect your wallet to check if you are on a Chonklist</div>
+                                )}
+
                                 {!address ? (
                                     <ConnectKitButton
                                         // theme="web"
@@ -321,10 +440,10 @@ export default function Mint() {
                                             "--ck-connectbutton-border-radius": "0px",
                                             "--ck-connectbutton-color": "#FFFFFF",
                                             "--ck-connectbutton-font-weight": "600",
-                                            "--ck-connectbutton-font-size": "20px",
+                                            "--ck-connectbutton-font-size": "21px",
                                         }}
                                     />
-                                ) : (
+                                ) : isMintOpen ? (
                                     <button
                                         onClick={handleMint}
                                         disabled={isPending || isConfirming}
@@ -332,26 +451,36 @@ export default function Mint() {
                                     >
                                         {getMintButtonText()}
                                     </button>
+                                ) : (
+                                    <div></div>
                                 )}
 
-                                { (isFriend || isSpecial || isCreator) && (
-                                    <div className="text-lg mt-2 text-green-500 text-center">
-                                        {isCreator ? 
-                                            <div>Congrats, you&apos;re on the Creator List! <br /> For every Chonk you mint, you&apos;ll get 7 traits.</div>
+                                { address && (
+                                    <div className="text-lg mt-2 text-center">
+                                        {
+                                        isCreator ? 
+                                            <div className="text-green-500">Congrats, you&apos;re on the Creator List! <br /> For every Chonk you mint, you&apos;ll get 7 traits.<br />But only in your first transaction!</div>
                                         : isFriend ? 
-                                            <div>Congrats, you&apos;re on the Friends List! <br />For every Chonk you mint, you&apos;ll get 6 traits.</div>
+                                            <div className="text-green-500">Congrats, you&apos;re on the Friends List! <br />For every Chonk you mint, you&apos;ll get 6 traits.<br />But only in your first transaction!</div>
                                         : isSpecial ? 
-                                            <div>Congrats, you&apos;re on the Special Collections List! <br />For every Chonk you mint, you&apos;ll get 5 traits.</div>
-                                        : ''}
+                                            <div className="text-green-500">Congrats, you&apos;re on the Special Collections List! <br />For every Chonk you mint, you&apos;ll get 5 traits.<br />But only in your first transaction!</div>
+                                        : <div className="text-red-500">Your wallet is not on a Chonklist :(</div>
+                                        }
                                     </div>
                                 )}
-                                <div className="text-[1vw] mt-6 text-center">
-                                    <p>
-                                        {totalSupply !== undefined ? `${totalSupply} Chonks minted` : 'Loading...'}   {/* TODO: Update if someone mints */}
-                                        <br />[Insert countdown timer here]    
-                                    </p>
-                                   
-                                </div>
+
+                                { isMintOpen ? (
+                                    <div className="text-[1vw] mt-6 text-center">
+                                        <p>
+                                            {totalSupply !== undefined ? `${totalSupply} Chonks minted` : 'Loading...'}
+                                            <br />
+                                            24hr mint closes in: {countdownDisplay}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div>
+                                    </div>
+                                )}
                                 <div className="text-[1vw] w-full max-w-2xl text-gray-500">
                                     <p>
                                        Note: Chonks (and Traits) will not be tradable during the 24 hour mint period. Once the mint is over, you will be able to trade them on our Marketplace and others.
@@ -363,23 +492,23 @@ export default function Mint() {
                                     <h2 className="text-[3.45vw] mb-[3.45vw]">FAQ</h2>
                                     <div className="space-y-[0vw]">
                                         <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">How much is a Chonk?</h3>
-                                            <p className="text-[1.25vw]"> Each Chonk costs 0.01 ETH to mint, approximatley $33 USD.</p>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">1. How much is a Chonk?</h3>
+                                            <p className="text-[1.25vw]"> Each Chonk costs {MINT_PRICE} ETH to mint, approximatley $33 USD.</p>
                                         </div>
                                         <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">How many Chonks can I mint?</h3>
-                                            <p className="text-[1.25vw]">You can mint up to 10 Chonks per transaction. If you are one of the Chonklists, you can only use your Chonklist allocation once.</p>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">2. How many Chonks can I mint?</h3>
+                                            <p className="text-[1.25vw]">You can mint up to 10 Chonks per transaction. If you are one of the Chonklists, you can only use your Chonklist allocation in one transaction.</p>
                                         </div>
                                         <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">Is there a collection limit?</h3>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">3. Is there a collection limit?</h3>
                                             <p className="text-[1.25vw]">No. This is a Timed Edition mint - there is no limit to the number of Chonks that can minted in the 24 hours.</p>
                                         </div>
                                         <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">Is there an Allowlist?</h3>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">4. Is there an Allowlist?</h3>
                                             <p className="text-[1.25vw]">No, anyone can mint but...</p>
                                         </div>
                                         <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">What are the Chonklists?</h3>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">5. What are the Chonklists?</h3>
                                             <p className="text-[1.25vw] pb-[1.25vw]">Each Chonk comes with 4 traits. The number of traits you receive depends on your Chonklist status:</p>
                                             <ul className="list-disc ml-6 text-[1.25vw] pb-[3.45vw]">
                                                 <li>Special Collections List: 5 traits per Chonk</li>
@@ -388,11 +517,11 @@ export default function Mint() {
                                             </ul>
                                         </div>
                                         <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">Will the team be minting?</h3>
+                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">6. Will the team be minting?</h3>
                                             <p className="text-[1.25vw]">
                                                 We will be minting some Chonks for giveaways and collabs. 
                                                 And potentially to round off the number of Chonk &amp; Trait NFTs (we have plans). 
-                                                We will do this within 2 hours of the mint ending and it will be no more than 1% of the total supply.</p>
+                                                We will do this within 2 hours of the mint ending and it will be no more than 5% of the total supply.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -430,29 +559,44 @@ export default function Mint() {
                             <div>
                                 <div className="text-green-500 text-[1.725vw] mb-2">Success - LFC!</div>
                                 {mainContractTokens && mainContractTokens.length > 0 && (
-                                    <div className="mt-2 text-[1vw]">
-                                        <div className="font-bold  mb-1"> {mainContractTokens.length > 1 ? 'Chonk IDs:' : 'Chonk ID:'}</div>
-                                        <div className="">
+                                    <div className="mt-2 text-[1.2vw]">
+                                        <div className="font-bold mb-1">{mainContractTokens.length > 1 ? 'Your Chonks' : 'Your Chonk'}</div>
+                                        <div className="flex flex-wrap gap-4">
                                             {mainContractTokens.map((id, index) => (
-                                                <React.Fragment key={id}>
+                                                <div key={id} className="flex flex-col items-center gap-2 text-center">
                                                     <Link
                                                         target="_blank"
                                                         href={`/chonks/${id}`}
-                                                        className="text-chonk-blue hover:underline"
+                                                        className="hover:text-chonk-blue"
                                                     >
+                                                        <TokenImage tokenId={id} />
+                                                    
                                                         {id}
                                                     </Link>
-                                                    {index < mainContractTokens.length - 1 ? ', ' : ''}
-                                                </React.Fragment>
+                                                </div>
                                             ))}
                                         </div>
                                     </div>
                                 )}
                                 {traitTokens && traitTokens.length > 0 && (
-                                    <div className="mt-2 text-[1vw]">
-                                        <div className="font-bold mb-1"> {traitTokens.length > 1 ? 'Trait IDs:' : 'Trait ID:'}</div>
-                                        <div className="">
-                                            {traitTokens.join(', ')}
+                                    <div className="mt-6 text-[1.2vw]">
+                                        <div className="font-bold">
+                                            {traitRevealCountdown === 0 ? (
+                                                <>
+                                                    Your traits are can now be revealed...<br />Click on your chonk(s) to view and equip them
+                                                    {/* {revealStatus.isRevealed !== null && (
+                                                        <div>
+                                                            {revealStatus.isRevealed 
+                                                                ? "Your traits are now revealed - click on your chonk(s) to view and equip them"
+                                                                : "Waiting for traits to be revealed..."
+                                                            }
+                                                        </div>
+                                                    )} */}
+                                                </>
+                                            ) : (
+                                                // : ${String(Math.floor(traitRevealCountdown! / 60)).padStart(2, '0')} :${String(traitRevealCountdown! % 60).padStart(2, '0')}
+                                                `Your traits can be revealed in ${traitRevealCountdown} seconds `
+                                            )}
                                         </div>
                                     </div>
                                 )}

@@ -13,6 +13,7 @@ import {
   traitsABI,
   marketplaceABI,
   chainId,
+  MINT_PRICE,
 } from "@/contract_data";
 import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
@@ -63,11 +64,13 @@ export function useMintFunction() {
     setIsMintRejected(false);
     
     try {
+      const priceInWei = parseEther((MINT_PRICE * amount).toString());
       const tx = await writeContract({
         address: mainContract,
         abi: mainABI,
         functionName: 'mint',
         args: [amount, proof],
+        value: priceInWei,
         chainId,
       }, {
         onError: (error) => {
@@ -136,6 +139,33 @@ export function useMintFunction() {
     }
   }, [isMintingError]);
 
+  // Add new hook to check mint start time
+  const { data: mintStartTime } = useReadContract({
+    address: mainContract,
+    abi: mainABI,
+    functionName: 'mintStartTime',
+  });
+
+  // Calculate if mint is open and time remaining
+  const mintStatus = useMemo(() => {
+    
+    // return { isOpen: false, timeRemaining: 0 }; // for testing
+
+    if (!mintStartTime) return { isOpen: false, timeRemaining: 0 };
+    
+    const startTimeNum = Number(mintStartTime);
+    if (startTimeNum === 0) return { isOpen: false, timeRemaining: 0 };
+    
+    const now = Math.floor(Date.now() / 1000);
+    const endTime = startTimeNum + (24 * 60 * 60); // 24 hours in seconds
+    const timeRemaining = endTime - now;
+    
+    return {
+      isOpen: timeRemaining > 0,
+      timeRemaining: Math.max(0, timeRemaining)
+    };
+  }, [mintStartTime]);
+
   return { 
     mint, 
     isPending,          
@@ -147,7 +177,8 @@ export function useMintFunction() {
     receipt,
     mainContractTokens,
     traitTokens,
-    totalSupply: totalSupply ? Number(totalSupply) : undefined
+    totalSupply: totalSupply ? Number(totalSupply) : undefined,
+    mintStatus,
   };
 }
 

@@ -15,6 +15,8 @@ export const simpleHashKey = "makingmemark_sk_ab7284sr3v5o19g3iaublzep6sffynfu";
 
 export const chainId = baseSepolia.id; // TODO: base.id
 
+export const MINT_PRICE = 0.01;
+
 export const tokenURIABI = [
       {
         inputs: [{ internalType: "uint256", name: "tokenId", type: "uint256" }],

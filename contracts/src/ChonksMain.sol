@@ -74,7 +74,7 @@ import { FirstSeasonRenderMinter } from "./FirstSeasonRenderMinter.sol";
 
 contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
 
-    // bool _localDeploy; // DEPLOY: remove
+    bool _localDeploy; // DEPLOY: remove
 
     // Storage for Body metadata
     mapping(uint256 => IChonkStorage.BodyMetadata) public bodyIndexToMetadata;
@@ -167,6 +167,22 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         _initializeOwner(msg.sender);
         deploymentTime = block.timestamp;
         // _localDeploy = localDeploy_;
+    }
+
+    // DEPLOY: Remove
+    function _debugPostConstructorMint() public {
+        if (_localDeploy) {
+            for (uint i; i < 10; ++i) {
+                bytes32[] memory empty;
+                mint(4, empty); // Mints N bodies/tokens
+                // setBackgroundColor(i, "28b143");
+                // setTokenRenderZ(i, true);
+                // setTokenRender3D(i, true);
+            }
+            // setBackgroundColor(1, "ffffff");
+            // setTokenRender3D(1, true);
+
+        }
     }
 
     function teamReserve() public onlyOwner {

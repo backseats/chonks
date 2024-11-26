@@ -18,6 +18,7 @@ import MenuBar from "@/components/chonk_explorer/MenuBar";
 import MainChonkImage from "@/components/chonk_explorer/MainChonkImage";
 import OwnershipSection from "@/components/chonk_explorer/OwnershipSection";
 import Trait from "@/components/chonk_explorer/Trait";
+import { useTraitRevealStatus } from "@/hooks/useTraitRevealStatus";
 
 type CurrentChonk = {
   tokenId: number;
@@ -92,6 +93,9 @@ export default function ChonkDetail({ id }: { id: string }) {
   );
 
   const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
+
+  // const { isRevealed } = useTraitRevealStatus(BigInt(id));
+  // console.log("isRevealed", isRevealed);
 
   // const { data } = writeContract({
   //   address: mainContract,
@@ -244,6 +248,10 @@ export default function ChonkDetail({ id }: { id: string }) {
     if (!storedChonk) return;
 
     console.log("storedChonk", storedChonk);
+    console.log("allTraitTokenIds", allTraitTokenIds);
+
+    // need to check if the trait is revealed
+    
 
     const hatIdIndex =
       // @ts-ignore
