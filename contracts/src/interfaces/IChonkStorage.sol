@@ -4,7 +4,6 @@ pragma solidity ^0.8.22;
 /// A shared interface for data storage of the Chonks
 interface IChonkStorage {
 
-    // The token id in the traits contract of each corresponding trait to be layered on the Chonk from the ChonksTraits contract
     struct StoredChonk {
         // The token id of the head, if applicable
         uint256 headId;
@@ -47,7 +46,7 @@ interface IChonkStorage {
         // Not token id, it refers to the number used in ChonksMain.addNewBody
         uint256 bodyIndex;
 
-        // e.g. 'Body 001'
+        // e.g. 'Body 001' // DEPLOY: still correct?
         string bodyName;
 
         // bytes memory colorMap = new bytes(2700); 30x30 grid by 3 bytes (rgb, each colour is a byte, or 2 hex digits);
