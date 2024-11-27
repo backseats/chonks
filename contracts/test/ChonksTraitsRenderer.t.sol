@@ -4,7 +4,7 @@ pragma solidity ^0.8.22;
 import { AbstractTest } from "./AbstractTest.t.sol";
 import { ChonksMain } from '../src/ChonksMain.sol';
 import { ChonkTraits } from '../src/ChonkTraits.sol';
-import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
+import { FirstReleaseDataMinter } from '../src/FirstReleaseDataMinter.sol';
 import { TraitCategory } from "../src/TraitCategory.sol";
 import { ChonksMarket } from '../src/ChonksMarket.sol';
 
@@ -14,7 +14,7 @@ contract ChonksTraitsRendererTest is AbstractTest {
 
     ChonksMain public main;
     ChonkTraits public traits;
-    FirstSeasonRenderMinter public dataContract;
+    FirstReleaseDataMinter public dataContract;
     ChonksMarket public market;
 
     bool constant localDeploy = true;
@@ -26,8 +26,12 @@ contract ChonksTraitsRendererTest is AbstractTest {
         address deployer = vm.addr(1);
         vm.startPrank(deployer);
 
-        main = new ChonksMain(localDeploy);
-        traits = new ChonkTraits(localDeploy);
+        // main = new ChonksMain(localDeploy);
+        main = new ChonksMain();
+        traits = new ChonkTraits(
+            localDeploy,
+            ["[View Trait on the Chonks website](https://www.chonks.xyz/traits/", ")"]
+        );
         console.log('Chonk traits address', address(traits));
 
         console.log("Adding Ghost...");
@@ -35,8 +39,8 @@ contract ChonksTraitsRendererTest is AbstractTest {
 
         main.setTraitsContract(traits);
 
-        dataContract = new FirstSeasonRenderMinter(address(main), address(traits), localDeploy); // if true, addNewTrait called for all traits
-        console.log('FirstSeasonRenderMinter address', address(dataContract));
+        dataContract = new FirstReleaseDataMinter(address(main), address(traits), localDeploy); // if true, addNewTrait called for all traits
+        console.log('FirstReleaseDataMinter address', address(dataContract));
 
         main.setMintStartTime(block.timestamp);
         // advance time 1 minute
@@ -57,7 +61,9 @@ contract ChonksTraitsRendererTest is AbstractTest {
 
 
         traits.addMinter(address(dataContract));
-        main.setFirstSeasonRenderMinter(address(dataContract));
+        main.setFirstReleaseDataMinter(address(dataContract));
+
+        // main._debugPostConstructorMint();
 
         vm.stopPrank();
     }

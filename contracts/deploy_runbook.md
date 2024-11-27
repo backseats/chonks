@@ -4,11 +4,11 @@ To deploy Chonks to Base Sepolia:
 2. update scripts/ChonksMain.s.sol with the address of the deployed ChonksMain contract - find/replace, x instances
 3. run `./deploy-traits-base-sepolia.sh`
 4. update scripts/ChonksMain.s.sol with the address of the deployed ChonkTraits contract - find/replace, x instances
-5. ensure addNewTraits() in localDeploy of FirstSeasonRenderMinter is commented or we get max initcode exceeded issue
+5. ensure addNewTraits() in localDeploy of FirstReleaseDataMinter is commented or we get max initcode exceeded issue
 
 
 6. run `./deploy-renderers-base-sepolia.sh` (you are here)
-7. update scripts/ChonksMain.s.sol with the address of the deployed FirstSeasonRenderMinter contract - find/replace, 2 instances
+7. update scripts/ChonksMain.s.sol with the address of the deployed FirstReleaseDataMinter contract - find/replace, 2 instances
 
 8. run `./deploy-marketplace-base-sepolia.sh`
 

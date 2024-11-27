@@ -75,7 +75,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Setup contracts for minting (copied from test_mintSingle)
         vm.startPrank(deployer);
-        main.setFirstSeasonRenderMinter(address(dataContract));
+        main.setFirstReleaseDataMinter(address(dataContract));
         traits.setChonksMain(address(main));
         traits.addMinter(address(dataContract));
         traits.setMarketplace(address(market));

@@ -39,5 +39,6 @@ Test Notes:
     forge test --fork-url http://localhost:8545 (seems to stall and failing on some curently)
 2. OR, have this in your tests: vm.createSelectFork("base_sepolia", 17419761);
 3. Make sure you add this to .env or testSvgRenderer will fail: NFT_ID=1
+4. if error, Reason: revert: ERC721: address zero is not a valid owner: ensure _debugPostConstructorMint is being called locally
 
 forge test --match-path test/ChonksMain.t.sol --match-test test_mint

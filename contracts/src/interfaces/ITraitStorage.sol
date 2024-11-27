@@ -71,8 +71,8 @@ interface ITraitStorage {
         // name of creator
         string creatorName;
 
-        // season of trait
-        string season;
+        // release of trait
+        string release;
     }
 
     // Event for when all approvals are invalidated

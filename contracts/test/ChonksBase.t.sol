@@ -4,7 +4,7 @@ pragma solidity ^0.8.22;
 import { AbstractTest } from "./AbstractTest.t.sol";
 import { ChonkTraits } from "../src/ChonkTraits.sol";
 import { ChonksMain } from '../src/ChonksMain.sol';
-import { FirstSeasonRenderMinter } from '../src/FirstSeasonRenderMinter.sol';
+import { FirstReleaseDataMinter } from '../src/FirstReleaseDataMinter.sol';
 import { ChonksMarket } from '../src/ChonksMarket.sol';
 import { EncodeURI } from '../src/EncodeURI.sol';
 import { MainRenderer2D } from '../src/renderers/MainRenderer2D.sol';
@@ -18,7 +18,7 @@ contract ChonksBaseTest is Test {
 
     ChonksMain public main;
     ChonkTraits public traits;
-    FirstSeasonRenderMinter public dataContract;
+    FirstReleaseDataMinter public dataContract;
     MainRenderer2D public mainRenderer2D;
     MainRenderer3D public mainRenderer3D;
     EncodeURI public encodeURIContract;
@@ -37,18 +37,22 @@ contract ChonksBaseTest is Test {
         vm.createSelectFork("base_sepolia", 17419761);
         vm.startPrank(deployer);
 
-        main = new ChonksMain(true);
+        // main = new ChonksMain(localDeploy);
+        main = new ChonksMain();
         // console.log('Chonk manager address', address(main));
 
         // comment out this for testing test_teamMintNotStarted
-        traits = new ChonkTraits(true);
+        traits = new ChonkTraits(
+            true,
+            ["[View Trait on the Chonks website](https://www.chonks.xyz/traits/", ")"]
+        );
         main.setMintStartTime(block.timestamp); // advance time 1 minute
 
         vm.warp(block.timestamp + 1 minutes);
         // console.log('traits address', address(traits));
 
-        dataContract = new FirstSeasonRenderMinter(address(main), address(traits), localDeploy);
-        // console.log('FirstSeasonRenderMinter address', address(dataContract));
+        dataContract = new FirstReleaseDataMinter(address(main), address(traits), localDeploy);
+        // console.log('FirstReleaseDataMinter address', address(dataContract));
 
         market = new ChonksMarket(
             address(main),
@@ -63,7 +67,7 @@ contract ChonksBaseTest is Test {
 
         // console.log('Market address set for main & traits');
 
-        // main.setFirstSeasonRenderMinter(address(dataContract));
+        // main.setFirstReleaseDataMinter(address(dataContract));
 
 
         // mainRenderer = new MainRenderer();
@@ -93,8 +97,8 @@ contract ChonksBaseTest is Test {
         // main.setTraitsContract(traits);
 
 
-        // dataContract = new FirstSeasonRenderMinter(traits, localDeploy);
-        // console.log('FirstSeasonRenderMinter address', address(dataContract));
+        // dataContract = new FirstReleaseDataMinter(traits, localDeploy);
+        // console.log('FirstReleaseDataMinter address', address(dataContract));
         // dataContract.setMinterStatus(address(main), true);
 
         // market = new ChonksMarket(
@@ -112,7 +116,7 @@ contract ChonksBaseTest is Test {
 
         // console.log('Market address set for main & traits');
 
-        // main.setFirstSeasonRenderMinter(address(dataContract));
+        // main.setFirstReleaseDataMinter(address(dataContract));
 
         // main._debugPostConstructorMint();
 

@@ -22,7 +22,8 @@ contract TraitRenderer {
         ITraitStorage.StoredTrait memory trait,
         ITraitStorage.TraitMetadata memory metadata,
         string memory ghostSvg,
-        string memory traitSvg
+        string memory traitSvg,
+        string[2] memory descriptionParts
     ) public pure returns (string memory) {
         string memory fullSvg;
         string memory attributes;
@@ -41,8 +42,8 @@ contract TraitRenderer {
                 ),
                 ',',
                 stringTrait(
-                    'Season',
-                    metadata.season
+                    'Release',
+                    metadata.release
                 ),
                 ']'
             );
@@ -62,7 +63,11 @@ contract TraitRenderer {
         string memory json = string.concat(
             '{"name":"Chonk Trait #',
             Utils.toString(_tokenId),
-            '","description":"This is just a test",', //TODO: look at description, we could have a link in here to the site/mp to encourage trading there e.g. chonks.xyz/traits/traitIndex or the likes (maybe make this updateable via contract)
+            '","description":"',
+            descriptionParts[0],
+            Utils.toString(_tokenId),
+            descriptionParts[1],
+            '",',
             attributes,
             ',',
             image,

@@ -103,7 +103,7 @@ contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
         metadata.renderMinterContract = address(this);
         metadata.creatorAddress = _creatorAddress;
         metadata.creatorName = _creatorName;
-        metadata.season = "2"; // TODO: send this in
+        metadata.release = "2"; // TODO: send this in
 
         chonkTraits.setTraitIndexToMetadata(_traitIndex, metadata);
     }

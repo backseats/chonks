@@ -20,7 +20,7 @@ import "forge-std/console.sol";
 
 // TODO: withdraw function
 
-// contract FirstSeasonRenderMinter is IRenderMinterV1 { // TODO: ownable, ITraitStorage
+// contract FirstRelaseDataMinter is IRenderMinterV1 { // TODO: ownable, ITraitStorage
 contract BurningDataMinter { // TODO: ownable, ITraitStorage
     uint256[] public accessory = [0]; // let's just have the torch as a 1/1
 
@@ -127,7 +127,7 @@ contract BurningDataMinter { // TODO: ownable, ITraitStorage
         metadata.renderMinterContract = address(this);
         metadata.creatorAddress = _creatorAddress;
         metadata.creatorName = _creatorName;
-        metadata.season = "3"; // TODO: send this in
+        metadata.release = "3"; // TODO: send this in
 
         chonkTraits.setTraitIndexToMetadata(_traitIndex, metadata);
     }

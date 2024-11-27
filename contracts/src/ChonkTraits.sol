@@ -94,6 +94,8 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     uint256 public mintStartTime;
 
+    string[2] descriptionParts;
+
     /// Errors
 
     error AddressCantBurn();
@@ -116,10 +118,10 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     // DEPLOY: remove localDeploy
-    constructor(bool localDeploy_) ERC721("Chonk Traits", "CHONK TRAITS") {
+    constructor(bool localDeploy_, string[2] memory _descriptionParts) ERC721("Chonk Traits", "CHONK TRAITS") {
         _initializeOwner(msg.sender);
         _localDeploy = localDeploy_;
-
+        descriptionParts = _descriptionParts;
         traitRenderer = new TraitRenderer();
     }
 
@@ -257,12 +259,14 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         StoredTrait memory trait = getTrait(_tokenId);
         string memory traitSvg = trait.isRevealed ? getTraitImageSvg(trait.traitIndex) : '<svg></svg>';
 
+
         return traitRenderer.renderAsDataUri(
             _tokenId,
             trait,
             traitIndexToMetadata[trait.traitIndex],
             getGhostSvg(),
-            traitSvg
+            traitSvg,
+            descriptionParts
         );
     }
 
@@ -403,6 +407,10 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     function setMintStartTime(uint256 _mintStartTime) public onlyOwner {
         mintStartTime = _mintStartTime;
+    }
+
+    function setDescriptionParts(string[2] memory _descriptionParts) public onlyOwner {
+        descriptionParts = _descriptionParts;
     }
 
     /// Boilerplate
