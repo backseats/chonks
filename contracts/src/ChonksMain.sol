@@ -224,7 +224,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function _mintInternal(address _to, uint256 _amount, uint8 _traitCount) internal {
-        unchecked {
+        unchecked { // TODO: ensure this is ok but it should be because we check _amount < MAX_MINT_AMOUNT
             for (uint i; i < _amount; ++i) {
                 uint256 tokenId = ++_nextTokenId;
                 _mint(_to, tokenId);
@@ -391,6 +391,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         emit EquipAll(ownerOf(_chonkTokenId), _chonkTokenId);
     }
 
+    // Commented out due to bytecode size limit - if we can get it below 24576 bytes, we can add it back
     // function chonkMakeover(
     //     uint256 _chonkTokenId,
     //     uint256 _headTokenId,
