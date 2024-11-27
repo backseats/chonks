@@ -92,10 +92,13 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     uint256 internal _transientChonkId;
 
+    uint256 public mintStartTime;
+
     /// Errors
 
     error AddressCantBurn();
     error CantTransfer();
+    error CantTransferDuringMint();
     error NotATBA();
     error NotAValidMinterContract();
     error NotYourTrait();
@@ -398,6 +401,10 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         approvedInvalidators[_invalidator] = false;
     }
 
+    function setMintStartTime(uint256 _mintStartTime) public onlyOwner {
+        mintStartTime = _mintStartTime;
+    }
+
     /// Boilerplate
 
     function supportsInterface(bytes4 interfaceId) public view override(IERC165, ERC721Enumerable, ERC721) returns (bool) {
@@ -417,6 +424,8 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     // Override functions for marketplace compatibility
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
         // TODO: ensure not equipped
+
+        if (block.timestamp < mintStartTime + 24 hours) revert CantTransferDuringMint();
 
         if (from == address(0)) {
             super._beforeTokenTransfer(from, to, tokenId);

@@ -22,6 +22,8 @@ To deploy Chonks to Base Sepolia:
 
 14. run `main.teamReserve()`
 
+15. run `main.setMintStartTime()` and `traits.setMintStartTime()` with the same timestamp
+
 
 NOTE: if (code: -32603, message: replacement transaction underpriced, data: None) error: send a tx in mm, i just transfer another account .0001 eth
 
