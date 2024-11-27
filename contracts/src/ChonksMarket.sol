@@ -453,10 +453,10 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 _chonkId,
         address _bidder
     ) public notPaused nonReentrant {
+        address owner = CHONKS_MAIN.ownerOf(_chonkId);
         if (!CHONKS_MAIN.isApprovedForAll(owner, address(this)) && CHONKS_MAIN.getApproved(_chonkId) != address(this))
             revert ApproveTheMarketplace();
 
-        address owner = CHONKS_MAIN.ownerOf(_chonkId);
         if (owner != msg.sender) revert NotYourChonk();
 
         ChonkBid memory bid = chonkBids[_chonkId];
