@@ -27,7 +27,7 @@ contract ChonksTraitsRendererTest is AbstractTest {
         vm.startPrank(deployer);
 
         // main = new ChonksMain(localDeploy);
-        main = new ChonksMain();
+        main = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
         traits = new ChonkTraits(
             localDeploy,
             ["[View Trait on the Chonks website](https://www.chonks.xyz/traits/", ")"]

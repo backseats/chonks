@@ -40,7 +40,7 @@ contract ChonksMainTest is ChonksBaseTest {
         console.log('test_constructor called');
         // Create new instance without local deploy
         // ChonksMain newMain = new ChonksMain(true);
-        ChonksMain newMain = new ChonksMain();
+        ChonksMain newMain = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
 
         // Check initial state
         assertEq(newMain.owner(), address(this));
@@ -64,7 +64,7 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.startPrank(deployer);
 
             // ChonksMain newMain = new ChonksMain(true);
-            ChonksMain newMain = new ChonksMain();
+            ChonksMain newMain = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
 
             // Check initial state
             assertEq(newMain.owner(), deployer);
@@ -387,7 +387,7 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.startPrank(deployer);
 
         // main = new ChonksMain(true);
-        main = new ChonksMain();
+        main = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
         mainRenderer2D = new MainRenderer2D();
         main.setMainRenderer2D(address(mainRenderer2D));
         mainRenderer3D = new MainRenderer3D();
@@ -452,7 +452,7 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.startPrank(deployer);
 
         // main = new ChonksMain(true);
-        main = new ChonksMain();
+        main = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
         mainRenderer2D = new MainRenderer2D();
         main.setMainRenderer2D(address(mainRenderer2D));
         mainRenderer3D = new MainRenderer3D();

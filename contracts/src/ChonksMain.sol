@@ -112,6 +112,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     uint256 public mintStartTime;
 
+    string[2] descriptionParts;
+
     // The date when contract was deployed, a year after which, certain functions can't be called by the owner
     uint256 public immutable deploymentTime;
 
@@ -166,9 +168,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // DEPLOY: remove localDeploy_
     // constructor(bool localDeploy_) ERC721("Chonks", "CHONKS") {
-    constructor() ERC721("Chonks", "CHONKS") {
+    constructor(string[2] memory _descriptionParts) ERC721("Chonks", "CHONKS") {
         _initializeOwner(msg.sender);
-        deploymentTime = block.timestamp;
+        deploymentTime = block.timestamp;   
+        descriptionParts = _descriptionParts;
         // _localDeploy = localDeploy_;
     }
 
@@ -522,7 +525,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitsSvg,
             traitsAttributes,
             backpackSVGs,
-            chonkdata
+            chonkdata,
+            descriptionParts
         );
     }
 
@@ -552,7 +556,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitsSvg,
             traitsAttributes,
             fullZmap,
-            chonkdata
+            chonkdata,
+            descriptionParts
         );
     }
 
@@ -703,6 +708,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function setCreatorsMerkle(bytes32 _merkleRoot) public onlyOwner {
         creatorsMerkle = _merkleRoot;
+    }
+
+    function setDescriptionParts(string[2] memory _descriptionParts) public onlyOwner {
+        descriptionParts = _descriptionParts;
     }
 
     /// Public Setters

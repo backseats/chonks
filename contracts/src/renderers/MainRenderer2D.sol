@@ -44,7 +44,8 @@ contract MainRenderer2D {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         string memory _backpackSVGs,
-        IChonkStorage.ChonkData memory _chonkdata
+        IChonkStorage.ChonkData memory _chonkdata,
+        string[2] memory _descriptionParts
     ) public pure returns (string memory) {
 
         string memory fullSvg;
@@ -98,7 +99,11 @@ contract MainRenderer2D {
         string memory json = string.concat(
             '{"name":"Chonk #',
                 Utils.toString(_tokenId),
-                '","description": "Click/tap top left to open your backpack, top right for PFP mode ",',
+                '","description":"',
+                _descriptionParts[0],
+                Utils.toString(_tokenId),
+                _descriptionParts[1],
+                '",',
                 fullAttributes,
                 ',', generateChonkData(_chonkdata),
                 ',', image,

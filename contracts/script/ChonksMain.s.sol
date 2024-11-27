@@ -39,7 +39,7 @@ contract ChonksMainScript is Script {
         vm.startBroadcast();
 
         // main = new ChonksMain(localDeploy);
-        main = new ChonksMain();
+        main = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
         console.log("ChonksMain Address:", address(main));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(main));
 
@@ -99,7 +99,7 @@ contract ChonksMainBodyAndRenderderScript is Script {
         vm.startBroadcast();
 
         // main = new ChonksMain(localDeploy);
-        main = new ChonksMain();
+        main = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
         console.log("ChonksMain Address:", address(main));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(main));
 

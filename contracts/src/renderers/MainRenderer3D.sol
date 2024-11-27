@@ -96,7 +96,8 @@ contract MainRenderer3D is Ownable {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         bytes memory _fullZmap,
-        IChonkStorage.ChonkData memory _chonkdata
+        IChonkStorage.ChonkData memory _chonkdata,
+        string[2] memory _descriptionParts
     ) public view returns (string memory) {
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _chonkdata);
         string memory fullAttributes = generateAttributes(_traitsAttributes, _chonkdata);
@@ -201,6 +202,14 @@ contract MainRenderer3D is Ownable {
             scriptyBuilderAddress
         ).getHTMLURLSafe(htmlRequest);
 
+        // '{"name":"Chonk Trait #',
+        //     Utils.toString(_tokenId),
+        //     '","description":"',
+        //     descriptionParts[0],
+        //     Utils.toString(_tokenId),
+        //     descriptionParts[1],
+        // '",',
+
         return
             string(
                 abi.encodePacked(
@@ -208,7 +217,12 @@ contract MainRenderer3D is Ownable {
                     encodeURIContract.encodeURI('{"name":"Chonk #'),
                     Utils.toString(_tokenId),
                     // encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
-                    encodeURIContract.encodeURI('", "description":"Left click and drag to rotate, right click to move, mouse wheel to zoom ",'),
+                    // encodeURIContract.encodeURI('", "description":"Left click and drag to rotate, right click to move, mouse wheel to zoom ",'),
+                    encodeURIContract.encodeURI('", "description":"'),
+                    encodeURIContract.encodeURI(_descriptionParts[0]),
+                    Utils.toString(_tokenId),
+                    encodeURIContract.encodeURI(_descriptionParts[1]),
+                    encodeURIContract.encodeURI('",'),
                     encodeURIContract.encodeURI(fullAttributes),
                     encodeURIContract.encodeURI(','),
                     encodeURIContract.encodeURI(image),

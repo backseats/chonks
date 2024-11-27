@@ -30,7 +30,7 @@ contract ChonksMainRendererTest is AbstractTest {
         vm.startPrank(deployer);
 
         // main = new ChonksMain(localDeploy);
-        main = new ChonksMain();
+        main = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
         console.log('Chonk manager address', address(main));
 
         mainRenderer2D = new MainRenderer2D();
