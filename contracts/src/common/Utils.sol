@@ -80,7 +80,6 @@ library Utils {
         return string(toByteArray(_bytes32));
     }
 
-    // todo: check this
     function toStringBytes3(bytes3 _bytes) public pure returns (string memory) {
         bytes memory hexChars = "0123456789abcdef";
         bytes memory hexString = new bytes(6); // Since bytes3 contains 3 bytes, resulting in 6 hex characters
@@ -230,7 +229,7 @@ library Utils {
     // function contains(string memory _str, string memory _searchStr) internal pure returns (bool) {
     //     bytes memory str = bytes(_str);
     //     bytes memory searchStr = bytes(_searchStr);
-        
+
     //     for (uint i = 0; i <= str.length - searchStr.length; i++) {
     //         bool found = true;
     //         for (uint j = 0; j < searchStr.length; j++) {

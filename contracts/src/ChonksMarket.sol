@@ -453,6 +453,9 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 _chonkId,
         address _bidder
     ) public notPaused nonReentrant {
+        if (!CHONKS_MAIN.isApprovedForAll(owner, address(this)) && CHONKS_MAIN.getApproved(_chonkId) != address(this))
+            revert ApproveTheMarketplace();
+
         address owner = CHONKS_MAIN.ownerOf(_chonkId);
         if (owner != msg.sender) revert NotYourChonk();
 
@@ -463,14 +466,10 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (bidder != _bidder) revert BidderChanged();
 
         // Since they bid, your Chonk-owned traits changed. They need to re-bid.
-        (, bytes memory encodedTraitIds) = getTraitIdsAndEncodingForChonk(
-            _chonkId
-        );
-        // if (encodedTraitIds != bid.encodedTraitIds) revert TraitIdsChangedSinceBid();
+        (, bytes memory encodedTraitIds) = getTraitIdsAndEncodingForChonk(_chonkId);
+
         if (keccak256(encodedTraitIds) != keccak256(bid.encodedTraitIds))
             revert TraitIdsChangedSinceListingRelist();
-
-        // todo check approval
 
         delete chonkBids[_chonkId];
 

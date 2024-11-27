@@ -84,7 +84,6 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
 
         /*
         // commenting out for now
-        // todo: add checks of some kind
         // Check if we already have itw
         if (keccak256(bytes(metadata.traitName)) != keccak256(bytes(''))) {
             revert('Trait already exists');
