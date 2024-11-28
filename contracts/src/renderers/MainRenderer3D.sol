@@ -65,7 +65,7 @@ contract MainRenderer3D is Ownable {
             '"chonkdata":[',
                 '{ "background_color" : "#', _chonkdata.backgroundColor, '" },',
                 '{ "num_items_in_backpack" : "', Utils.toString(_chonkdata.numOfItemsInBackpack), '" },',
-                '{ "renderer" : "', _chonkdata.rendererSet, '" },',
+                '{ "renderer" : "3D" },',
                 '{ "body_type" : "', _chonkdata.bodyName, '" }'
            ']'
         );
@@ -96,8 +96,7 @@ contract MainRenderer3D is Ownable {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         bytes memory _fullZmap,
-        IChonkStorage.ChonkData memory _chonkdata,
-        string[2] memory _descriptionParts
+        IChonkStorage.ChonkData memory _chonkdata
     ) public view returns (string memory) {
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _chonkdata);
         string memory fullAttributes = generateAttributes(_traitsAttributes, _chonkdata);
@@ -202,35 +201,74 @@ contract MainRenderer3D is Ownable {
             scriptyBuilderAddress
         ).getHTMLURLSafe(htmlRequest);
 
-        // '{"name":"Chonk Trait #',
-        //     Utils.toString(_tokenId),
-        //     '","description":"',
-        //     descriptionParts[0],
-        //     Utils.toString(_tokenId),
-        //     descriptionParts[1],
-        // '",',
 
-        return
+        return generateJSON(_tokenId, fullAttributes, _chonkdata, image, doubleURLEncodedHTMLDataURI);
+
+            // string(
+            //     abi.encodePacked(
+            //         "data:application/json,",
+            //         encodeURIContract.encodeURI('{"name":"Chonk #'),
+            //         Utils.toString(_tokenId),
+            //         // encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
+            //         // encodeURIContract.encodeURI('", "description":"Left click and drag to rotate, right click to move, mouse wheel to zoom ",'),
+                    
+            //         // encodeURIContract.encodeURI('", "description":"'),
+            //         // encodeURIContract.encodeURI(_chonkdata.descriptionParts[0]),
+            //         // Utils.toString(_tokenId),
+            //         // encodeURIContract.encodeURI(_chonkdata.descriptionParts[1]),
+            //         // encodeURIContract.encodeURI('",'),
+
+            //         // generateDescription(_chonkdata, _tokenId),
+                    
+            //         encodeURIContract.encodeURI(fullAttributes),
+            //         encodeURIContract.encodeURI(','),
+            //         encodeURIContract.encodeURI(image),
+            //         encodeURIContract.encodeURI(',"animation_url":"'),
+            //         doubleURLEncodedHTMLDataURI,
+            //         encodeURIContract.encodeURI('"}')
+            //     )
+            // );
+    }
+
+    function generateJSON(uint256 _tokenId, string memory _attributes, IChonkStorage.ChonkData memory _chonkdata, string memory _image, bytes memory _doubleURLEncodedHTMLDataURI) internal view returns (string memory json) {
+        return 
             string(
                 abi.encodePacked(
                     "data:application/json,",
                     encodeURIContract.encodeURI('{"name":"Chonk #'),
                     Utils.toString(_tokenId),
+                    // old way
                     // encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
                     // encodeURIContract.encodeURI('", "description":"Left click and drag to rotate, right click to move, mouse wheel to zoom ",'),
-                    encodeURIContract.encodeURI('", "description":"'),
-                    encodeURIContract.encodeURI(_descriptionParts[0]),
-                    Utils.toString(_tokenId),
-                    encodeURIContract.encodeURI(_descriptionParts[1]),
-                    encodeURIContract.encodeURI('",'),
-                    encodeURIContract.encodeURI(fullAttributes),
+                    
+                    // mid way
+                    // encodeURIContract.encodeURI('", "description":"'),
+                    // encodeURIContract.encodeURI(_chonkdata.descriptionParts[0]),
+                    // Utils.toString(_tokenId),
+                    // encodeURIContract.encodeURI(_chonkdata.descriptionParts[1]),
+                    // encodeURIContract.encodeURI('",'),
+
+                    // new way due to stack too deep
+                    generateDescription(_chonkdata, _tokenId),
+                    
+                    encodeURIContract.encodeURI(_attributes),
                     encodeURIContract.encodeURI(','),
-                    encodeURIContract.encodeURI(image),
+                    encodeURIContract.encodeURI(_image),
                     encodeURIContract.encodeURI(',"animation_url":"'),
-                    doubleURLEncodedHTMLDataURI,
+                    _doubleURLEncodedHTMLDataURI,
                     encodeURIContract.encodeURI('"}')
                 )
             );
+    }
+
+    function generateDescription(IChonkStorage.ChonkData memory _chonkdata, uint256 _tokenId) internal view returns (string memory description) {
+        description = string.concat(
+            encodeURIContract.encodeURI('", "description":"'),
+            encodeURIContract.encodeURI(_chonkdata.descriptionParts[0]),
+            Utils.toString(_tokenId),
+            encodeURIContract.encodeURI(_chonkdata.descriptionParts[1]),
+            encodeURIContract.encodeURI('",')
+        );
     }
 
     function setEncodeURI(address _encodeURIAddress) public onlyOwner {

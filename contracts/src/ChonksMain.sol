@@ -133,8 +133,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     bytes32 public friendsMerkle;
     bytes32 public creatorsMerkle;
 
-    /// Errors
-    error BodyAlreadyExists();
+    /// Errors - NOTE: these do not affect the bytecode size
+    // error BodyAlreadyExists();
     // error CantBeZero(); // replaced with InvalidMintAmount();
     error CanOnlyReserveFirstTwo();
     error CantTransferDuringMint();
@@ -168,28 +168,29 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // DEPLOY: remove localDeploy_
     // constructor(bool localDeploy_) ERC721("Chonks", "CHONKS") {
-    constructor(string[2] memory _descriptionParts) ERC721("Chonks", "CHONKS") {
+    // constructor(string[2] memory _descriptionParts) ERC721("Chonks", "CHONKS") {
+    constructor() ERC721("Chonks", "CHONKS") {
         _initializeOwner(msg.sender);
         deploymentTime = block.timestamp;   
-        descriptionParts = _descriptionParts;
+        // descriptionParts = _descriptionParts; // can set this later
         // _localDeploy = localDeploy_;
     }
 
     // DEPLOY: Remove
-    // function _debugPostConstructorMint() public {
-    //     // if (_localDeploy) {
-    //     //     for (uint i; i < 10; ++i) {
-    //     //         bytes32[] memory empty;
-    //     //         mint(4, empty); // Mints N bodies/tokens
-    //     //         // setBackgroundColor(i, "28b143");
-    //     //         // setTokenRenderZ(i, true);
-    //     //         // setTokenRender3D(i, true);
-    //     //     }
-    //     //     // setBackgroundColor(1, "ffffff");
-    //     //     // setTokenRender3D(1, true);
+    function _debugPostConstructorMint() public {
+        // if (_localDeploy) {
+            for (uint i; i < 10; ++i) {
+                bytes32[] memory empty;
+                mint(4, empty); // Mints N bodies/tokens
+                // setBackgroundColor(i, "28b143");
+                // setTokenRenderZ(i, true);
+                // setTokenRender3D(i, true);
+            }
+            // setBackgroundColor(1, "ffffff");
+            // setTokenRender3D(1, true);
 
-    //     // }
-    // }
+        // }
+    }
 
     function teamReserve() public onlyOwner {
         if (totalSupply() > 2) revert CanOnlyReserveFirstTwo();
@@ -279,32 +280,57 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Equip/Unequip Traits
 
+    // function equip(uint256 _chonkTokenId, uint256 _traitTokenId) public onlyChonkOwner(_chonkTokenId) {
+    //     if (_traitTokenId == 0) revert UseUnequip();
+
+    //     TraitCategory.Name traitType = _equipValidation(_chonkTokenId, _traitTokenId);
+
+    //     if (traitType == TraitCategory.Name.Head)      chonkTokens[_chonkTokenId].headId = _traitTokenId;
+    //     if (traitType == TraitCategory.Name.Hair)      chonkTokens[_chonkTokenId].hairId = _traitTokenId;
+    //     if (traitType == TraitCategory.Name.Face)      chonkTokens[_chonkTokenId].faceId = _traitTokenId;
+    //     if (traitType == TraitCategory.Name.Accessory) chonkTokens[_chonkTokenId].accessoryId = _traitTokenId;
+    //     if (traitType == TraitCategory.Name.Top)       chonkTokens[_chonkTokenId].topId = _traitTokenId;
+    //     if (traitType == TraitCategory.Name.Bottom)    chonkTokens[_chonkTokenId].bottomId = _traitTokenId;
+    //     if (traitType == TraitCategory.Name.Shoes)     chonkTokens[_chonkTokenId].shoesId = _traitTokenId;
+
+    //     emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _traitTokenId, uint8(traitType));
+    // }
+
+    // function unequip(uint256 _chonkTokenId, TraitCategory.Name traitType) public onlyChonkOwner(_chonkTokenId) {
+    //     if (traitType == TraitCategory.Name.Head)      chonkTokens[_chonkTokenId].headId = 0;
+    //     if (traitType == TraitCategory.Name.Hair)      chonkTokens[_chonkTokenId].hairId = 0;
+    //     if (traitType == TraitCategory.Name.Face)      chonkTokens[_chonkTokenId].faceId = 0;
+    //     if (traitType == TraitCategory.Name.Accessory) chonkTokens[_chonkTokenId].accessoryId = 0;
+    //     if (traitType == TraitCategory.Name.Top)       chonkTokens[_chonkTokenId].topId = 0;
+    //     if (traitType == TraitCategory.Name.Bottom)    chonkTokens[_chonkTokenId].bottomId = 0;
+    //     if (traitType == TraitCategory.Name.Shoes)     chonkTokens[_chonkTokenId].shoesId = 0;
+
+    //     emit Unequip(ownerOf(_chonkTokenId), _chonkTokenId, uint8(traitType));
+    // }
+
     function equip(uint256 _chonkTokenId, uint256 _traitTokenId) public onlyChonkOwner(_chonkTokenId) {
         if (_traitTokenId == 0) revert UseUnequip();
 
         TraitCategory.Name traitType = _equipValidation(_chonkTokenId, _traitTokenId);
-
-        if (traitType == TraitCategory.Name.Head)      chonkTokens[_chonkTokenId].headId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Hair)      chonkTokens[_chonkTokenId].hairId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Face)      chonkTokens[_chonkTokenId].faceId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Accessory) chonkTokens[_chonkTokenId].accessoryId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Top)       chonkTokens[_chonkTokenId].topId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Bottom)    chonkTokens[_chonkTokenId].bottomId = _traitTokenId;
-        if (traitType == TraitCategory.Name.Shoes)     chonkTokens[_chonkTokenId].shoesId = _traitTokenId;
+        _setTrait(_chonkTokenId, traitType, _traitTokenId);
 
         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _traitTokenId, uint8(traitType));
     }
 
     function unequip(uint256 _chonkTokenId, TraitCategory.Name traitType) public onlyChonkOwner(_chonkTokenId) {
-        if (traitType == TraitCategory.Name.Head)      chonkTokens[_chonkTokenId].headId = 0;
-        if (traitType == TraitCategory.Name.Hair)      chonkTokens[_chonkTokenId].hairId = 0;
-        if (traitType == TraitCategory.Name.Face)      chonkTokens[_chonkTokenId].faceId = 0;
-        if (traitType == TraitCategory.Name.Accessory) chonkTokens[_chonkTokenId].accessoryId = 0;
-        if (traitType == TraitCategory.Name.Top)       chonkTokens[_chonkTokenId].topId = 0;
-        if (traitType == TraitCategory.Name.Bottom)    chonkTokens[_chonkTokenId].bottomId = 0;
-        if (traitType == TraitCategory.Name.Shoes)     chonkTokens[_chonkTokenId].shoesId = 0;
+        _setTrait(_chonkTokenId, traitType, 0);
 
         emit Unequip(ownerOf(_chonkTokenId), _chonkTokenId, uint8(traitType));
+    }
+
+    function _setTrait(uint256 _chonkTokenId, TraitCategory.Name traitType, uint256 _traitTokenId) internal {
+        if (traitType == TraitCategory.Name.Head)           chonkTokens[_chonkTokenId].headId = _traitTokenId;
+        else if (traitType == TraitCategory.Name.Hair)      chonkTokens[_chonkTokenId].hairId = _traitTokenId;
+        else if (traitType == TraitCategory.Name.Face)      chonkTokens[_chonkTokenId].faceId = _traitTokenId;
+        else if (traitType == TraitCategory.Name.Accessory) chonkTokens[_chonkTokenId].accessoryId = _traitTokenId;
+        else if (traitType == TraitCategory.Name.Top)       chonkTokens[_chonkTokenId].topId = _traitTokenId;
+        else if (traitType == TraitCategory.Name.Bottom)    chonkTokens[_chonkTokenId].bottomId = _traitTokenId;
+        else if (traitType == TraitCategory.Name.Shoes)     chonkTokens[_chonkTokenId].shoesId = _traitTokenId;
     }
 
     function unequipAll(uint256 _chonkTokenId) public onlyChonkOwner(_chonkTokenId) {
@@ -517,7 +543,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         chonkdata.backgroundColor = storedChonk.backgroundColor;
         chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
         chonkdata.bodyName =  bodyIndexToMetadata[storedChonk.bodyIndex].bodyName;
-        chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
+        // chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D"; we're in renderAsDataUri2D so don't need to send this
+        chonkdata.descriptionParts = descriptionParts; // stuffing descriptionParts in here to avoid stack too deep
 
         return mainRenderer2D.renderAsDataUri(
             _tokenId,
@@ -525,8 +552,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitsSvg,
             traitsAttributes,
             backpackSVGs,
-            chonkdata,
-            descriptionParts
+            chonkdata
         );
     }
 
@@ -548,7 +574,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         chonkdata.backgroundColor = storedChonk.backgroundColor;
         chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
         chonkdata.bodyName =  bodyIndexToMetadata[storedChonk.bodyIndex].bodyName;
-        chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D";
+        // chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D"; we're in renderAsDataUri3D so don't need to send this
+        chonkdata.descriptionParts = descriptionParts;
 
         return mainRenderer3D.renderAsDataUri(
             _tokenId,
@@ -556,8 +583,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             traitsSvg,
             traitsAttributes,
             fullZmap,
-            chonkdata,
-            descriptionParts
+            chonkdata
         );
     }
 
@@ -605,9 +631,9 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         return chonkTokens[_tokenId];
     }
 
-    function getTokenRenderZ(uint256 _chonkTokenId) public view returns (bool) {
-        return chonkTokens[_chonkTokenId].render3D;
-    }
+    // function getTokenRenderZ(uint256 _chonkTokenId) public view returns (bool) {
+    //     return chonkTokens[_chonkTokenId].render3D;
+    // }
 
     function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
         IChonkStorage.StoredChonk memory storedChonk = getChonk(_chonkId);
@@ -716,11 +742,46 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Public Setters
 
-    function setBackgroundColor(uint256 _chonkTokenId, string memory _color) public onlyChonkOwner(_chonkTokenId) {
+    // function setBackgroundColor(uint256 _chonkTokenId, string memory _color) public onlyChonkOwner(_chonkTokenId) {
+    //     bytes memory colorBytes = bytes(_color);
+    //     if (colorBytes.length != 6) revert InvalidColor();
+
+    //     // Ensure all characters are valid hex characters (0-9, a-f, A-F)
+    //     for (uint i; i < 6; i++) {
+    //         if (
+    //             !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
+    //             !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
+    //             !(colorBytes[i] >= 0x61 && colorBytes[i] <= 0x66)    // a-f
+    //         ) {
+    //             revert InvalidColor(); // Invalid character found
+    //         }
+    //     }
+
+    //     chonkTokens[_chonkTokenId].backgroundColor = _color;
+
+    //     emit BackgroundColor(ownerOf(_chonkTokenId), _chonkTokenId, _color );
+    // }
+
+    // function setBodyIndex(uint256 _chonkTokenId, uint8 _bodyIndex) public onlyChonkOwner(_chonkTokenId) {
+    //     if (_bodyIndex > 4) revert InvalidBodyIndex();
+
+    //     chonkTokens[_chonkTokenId].bodyIndex = _bodyIndex;
+    //     emit BodyIndex(ownerOf(_chonkTokenId), _chonkTokenId, _bodyIndex );
+    // }
+
+    // function setTokenRender3D(uint256 _tokenId, bool _render3D) public onlyChonkOwner(_tokenId) {
+    //     chonkTokens[_tokenId].render3D = _render3D;
+    //     emit Render3D(ownerOf(_tokenId), _tokenId, _render3D);
+    // }
+
+    // TODO: removed for bytecode size, can we get back in?
+    function setChonkAttributes(uint256 _tokenId, string memory _color, uint8 _bodyIndex, bool _render3D) public onlyChonkOwner(_tokenId) {
+        // Validate color
         bytes memory colorBytes = bytes(_color);
         if (colorBytes.length != 6) revert InvalidColor();
+        // Validate body index
+        if (_bodyIndex > 4) revert InvalidBodyIndex();
 
-        // Ensure all characters are valid hex characters (0-9, a-f, A-F)
         for (uint i; i < 6; i++) {
             if (
                 !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
@@ -731,22 +792,18 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             }
         }
 
-        chonkTokens[_chonkTokenId].backgroundColor = _color;
+        // Set attributes
+        chonkTokens[_tokenId].backgroundColor = _color;
+        chonkTokens[_tokenId].bodyIndex = _bodyIndex;
+        chonkTokens[_tokenId].render3D = _render3D;
 
-        emit BackgroundColor(ownerOf(_chonkTokenId), _chonkTokenId, _color );
+        // Emit events : TODO - removed for bytecode size, can we get back in?
+        // emit BackgroundColor(ownerOf(_tokenId), _tokenId, _color);
+        // emit BodyIndex(ownerOf(_tokenId), _tokenId, _bodyIndex);
+        // emit Render3D(ownerOf(_tokenId), _tokenId, _render3D);
     }
 
-    function setBodyIndex(uint256 _chonkTokenId, uint8 _bodyIndex) public onlyChonkOwner(_chonkTokenId) {
-        if (_bodyIndex > 4) revert InvalidBodyIndex();
-
-        chonkTokens[_chonkTokenId].bodyIndex = _bodyIndex;
-        emit BodyIndex(ownerOf(_chonkTokenId), _chonkTokenId, _bodyIndex );
-    }
-
-    function setTokenRender3D(uint256 _chonkTokenId, bool _render3D) public onlyChonkOwner(_chonkTokenId) {
-        chonkTokens[_chonkTokenId].render3D = _render3D;
-        emit Render3D(ownerOf(_chonkTokenId), _chonkTokenId, _render3D);
-    }
+    
 
     // Boilerplate
 

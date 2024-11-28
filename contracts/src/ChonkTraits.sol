@@ -118,10 +118,10 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     // DEPLOY: remove localDeploy
-    constructor(bool localDeploy_, string[2] memory _descriptionParts) ERC721("Chonk Traits", "CHONK TRAITS") {
+    constructor(bool localDeploy_) ERC721("Chonk Traits", "CHONK TRAITS") {
         _initializeOwner(msg.sender);
         _localDeploy = localDeploy_;
-        descriptionParts = _descriptionParts;
+        // descriptionParts = _descriptionParts;
         traitRenderer = new TraitRenderer();
     }
 

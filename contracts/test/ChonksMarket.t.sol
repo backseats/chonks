@@ -466,13 +466,14 @@ contract ChonksMarketTest is ChonksBaseTest {
             bytes32[] memory empty;
             main.mint(1, empty);
 
-        // Approve marketplace
-        main.setApprovalForAll(address(market), true);
+            vm.warp(block.timestamp + 48 hours);
+            // Approve marketplace
+            main.setApprovalForAll(address(market), true);
 
-        // Create offer
-        uint256 chonkId = 1;
-        uint256 price = 1 ether;
-        market.offerChonk(chonkId, price); // Allow anyone to buy
+            // Create offer
+            uint256 chonkId = 1;
+            uint256 price = 1 ether;
+            market.offerChonk(chonkId, price); // Allow anyone to buy
         vm.stopPrank();
 
         // Buyer purchases the chonk
@@ -519,6 +520,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(seller);
             bytes32[] memory empty;
             main.mint(1, empty);
+
+        vm.warp(block.timestamp + 48 hours);
 
         // Approve marketplace
         main.setApprovalForAll(address(market), true);
@@ -598,6 +601,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(seller);
             bytes32[] memory empty;
             main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
             main.setApprovalForAll(address(market), true);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
@@ -618,6 +623,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(seller);
             bytes32[] memory empty;
             main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
             main.approve(address(market), 1);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
@@ -638,6 +645,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(seller);
             bytes32[] memory empty;
             main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
             main.approve(address(market), 1);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
@@ -740,6 +749,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             main.mint(2, empty);
             main.setApprovalForAll(address(market), true);
 
+            vm.warp(block.timestamp + 48 hours);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
             market.offerChonk(chonkId, price);
@@ -775,6 +785,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             main.mint(2, empty);
             main.setApprovalForAll(address(market), true);
 
+            vm.warp(block.timestamp + 48 hours);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
             market.offerChonk(chonkId, price);
@@ -807,6 +818,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(seller);
             bytes32[] memory empty;
             main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
             main.approve(address(market), 1);
 
             uint256 chonkId = 1;
@@ -868,6 +881,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             main.mint(1, empty);
             main.approve(address(market), 1);
 
+            vm.warp(block.timestamp + 48 hours);
             uint256 chonkId = 1;
             uint256 price = 1 ether;
             market.offerChonk(chonkId, price);
@@ -902,6 +916,8 @@ contract ChonksMarketTest is ChonksBaseTest {
             main.mint(1, empty);
             main.approve(address(market), 1);
 
+            vm.warp(block.timestamp + 48 hours);
+
             uint256 chonkId = 1;
             uint256 price = 1 ether;
             market.offerChonk(chonkId, price);
@@ -922,6 +938,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(seller);
             bytes32[] memory empty;
             main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
             main.setApprovalForAll(address(market), true);
             main.setApprovalForAll(address(3), true);
             main.setApprovalForAll(address(4), true);
@@ -952,6 +970,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(seller);
             bytes32[] memory empty;
             main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
             main.setApprovalForAll(address(market), true);
             main.setApprovalForAll(address(3), true);
             main.setApprovalForAll(address(4), true);
@@ -1011,6 +1031,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(seller);
             bytes32[] memory empty;
             main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
             main.setApprovalForAll(address(market), true);
             main.setApprovalForAll(address(3), true);
             main.setApprovalForAll(address(4), true);
@@ -1409,18 +1431,26 @@ contract ChonksMarketTest is ChonksBaseTest {
         bytes32[] memory empty;
         main.mint(1, empty);
 
+        // Setup buyer with a Chonk
+        vm.startPrank(buyer);
+        main.mint(2, empty);
+        vm.stopPrank();
+
+        vm.warp(block.timestamp + 48 hours);
+
         // Get one of the initial traits that came with the Chonk
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
         uint256[] memory sellerTraits = traits.walletOfOwner(sellerTBA);
         uint256 traitId = sellerTraits[0]; // Use the first trait
 
+        // marka 28/12/24: All traits are unequipped now by default
         // First verify that offering an equipped trait reverts
-        vm.startPrank(seller);
-        vm.expectRevert(TraitEquipped.selector);
-        market.offerTrait(traitId, 1, 1 ether);
+        // vm.startPrank(seller);
+        // vm.expectRevert(TraitEquipped.selector);
+        // market.offerTrait(traitId, 1, 1 ether);
 
-        // Now unequip the trait (it's a shoes trait since it's index 0)
-        main.unequip(1, TraitCategory.Name.Shoes);
+        // // Now unequip the trait (it's a shoes trait since it's index 0)
+        // main.unequip(1, TraitCategory.Name.Shoes);
 
         // Approve marketplace for trait transfers
         vm.stopPrank();
@@ -1431,10 +1461,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.prank(seller);
         market.offerTrait(traitId, 1, 1 ether);
 
-        // Setup buyer with a Chonk
-        vm.startPrank(buyer);
-        main.mint(2, empty);
-        vm.stopPrank();
+       
 
         // Buyer purchases the trait
         vm.startPrank(buyer);
@@ -1463,21 +1490,32 @@ contract ChonksMarketTest is ChonksBaseTest {
         bytes32[] memory empty;
         main.mint(1, empty);
 
+        // Setup unauthorized buyer with a Chonk
+        vm.prank(unauthorizedBuyer);
+        main.mint(2, empty);
+
+        // Setup intended buyer with a Chonk
+        vm.prank(intendedBuyer);
+        main.mint(2, empty);
+
+        vm.warp(block.timestamp + 48 hours);
+
         // Get one of the initial traits
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
         uint256[] memory sellerTraits = traits.walletOfOwner(sellerTBA);
         uint256 traitId = sellerTraits[0];
 
+        // marka 28/12/24: All traits are unequipped now by default
         // First verify that offering an equipped trait reverts
-        vm.startPrank(seller);
-        vm.expectRevert(TraitEquipped.selector);
-        market.offerTrait(traitId, 1, 1 ether);
+        // vm.startPrank(seller);
+        // vm.expectRevert(TraitEquipped.selector);
+        // market.offerTrait(traitId, 1, 1 ether);
 
-        // Now unequip the trait (it's a shoes trait since it's index 0)
-        main.unequip(1, TraitCategory.Name.Shoes);
+        // // Now unequip the trait (it's a shoes trait since it's index 0)
+        // main.unequip(1, TraitCategory.Name.Shoes);
 
-        // Approve marketplace for trait transfers
-        vm.stopPrank();
+        // // Approve marketplace for trait transfers
+        // vm.stopPrank();
 
         // Approve marketplace
         vm.prank(sellerTBA);
@@ -1487,9 +1525,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.prank(seller);
         market.offerTraitToAddress(traitId, 1, 1 ether, intendedBuyer);
 
-        // Setup unauthorized buyer with a Chonk
-        vm.prank(unauthorizedBuyer);
-        main.mint(2, empty);
+       
 
         // Try to buy with unauthorized buyer (should revert)
         vm.startPrank(unauthorizedBuyer);
@@ -1498,9 +1534,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         market.buyTrait{value: 1 ether}(traitId, 2);
         vm.stopPrank();
 
-        // Setup intended buyer with a Chonk
-        vm.prank(intendedBuyer);
-        main.mint(2, empty);
+       
 
         // Buy with intended buyer
         vm.startPrank(intendedBuyer);
@@ -1530,6 +1564,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Bidder places bid
         vm.startPrank(bidder);
+        vm.warp(block.timestamp + 48 hours);
         vm.deal(bidder, 2 ether);
         market.bidOnChonk{value: 2 ether}(1);
 
@@ -1563,17 +1598,20 @@ contract ChonksMarketTest is ChonksBaseTest {
         // Mint Chonk for seller (which also mints initial traits)
         vm.prank(seller);
         bytes32[] memory empty;
-main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
+        main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
+
+       
+        // Setup bidder with a Chonk
+        vm.prank(bidder);
+        main.mint(2, empty); // // adddress 2 owns chonk 2, and traits 5 - 8
+
+        vm.warp(block.timestamp + 48 hours);
 
         // Get one of the initial traits
         address sellerTBA = main.tokenIdToTBAAccountAddress(1);
         uint256[] memory sellerTraits = traits.walletOfOwner(sellerTBA);
         uint256 traitId = sellerTraits[0];
         // console.log("traitId", traitId);
-
-        // Setup bidder with a Chonk
-        vm.prank(bidder);
-        main.mint(2, empty); // // adddress 2 owns chonk 2, and traits 5 - 8
 
         // Bidder places bid
         vm.startPrank(bidder);
@@ -1592,9 +1630,10 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         traits.setApprovalForAll(address(market), true);
 
         // Check if trait is equipped
-        vm.prank(seller);
-        vm.expectRevert(TraitEquipped.selector);
-        market.acceptBidForTrait(traitId, bidder);
+        // marka 28/11/24: commented out as we aren't auto equipping traits anymore
+        // vm.prank(seller);
+        // vm.expectRevert(TraitEquipped.selector);
+        // market.acceptBidForTrait(traitId, bidder);
 
         // Unequip the trait (it's a shoes trait since it's index 0)
         vm.prank(seller);
@@ -1702,6 +1741,7 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         vm.stopPrank();
 
         vm.prank(user4);
+        vm.warp(block.timestamp + 48 hours);
         market.buyChonk{value: 1 wei}(1);
 
         // approvals should be cleared
@@ -1734,6 +1774,8 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
             // mint and approve a bunch of things
             bytes32[] memory empty;
             main.mint(2, empty);
+
+            vm.warp(block.timestamp + 48 hours);
             main.setApprovalForAll(address(market), true);
             main.setApprovalForAll(user2, true);
             main.setApprovalForAll(user3, true);
@@ -1791,7 +1833,11 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         vm.startPrank(user1);
             // mint and approve a bunch of things
             bytes32[] memory empty;
+            
             main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
+
             main.approve(address(market), 1);
 
             address[] memory operators = main.getChonkIdToApprovedOperators(1);
@@ -1806,6 +1852,7 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         vm.stopPrank();
 
         vm.prank(user4);
+        vm.warp(block.timestamp + 48 hours);
         market.buyChonk{value: 1 wei}(1);
 
         // approvals should be cleared
@@ -1872,6 +1919,7 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
 
         address bidder = address(2);
         vm.deal(bidder, 1 ether);
+        vm.warp(block.timestamp + 48 hours);
         vm.startPrank(bidder);
             market.bidOnChonk{value: 1 ether}(1);
         vm.stopPrank();
@@ -1921,6 +1969,8 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         vm.startPrank(user);
             bytes32[] memory empty;
             main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
             main.setApprovalForAll(address(market), true);
             market.offerChonk(1, 1 ether);
         vm.stopPrank();
@@ -1965,6 +2015,8 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         vm.startPrank(user);
             bytes32[] memory empty;
             main.mint(1, empty);
+            
+            // vm.warp(block.timestamp + 48 hours);
             main.setApprovalForAll(address(market), true);
         vm.stopPrank();
 
@@ -1976,26 +2028,34 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         vm.stopPrank();
 
         vm.startPrank(user);
-            vm.expectRevert(TraitEquipped.selector);
-            market.offerTrait(1, 1, 1 ether);
+            // marka 28/11/24: commented out as we aren't auto equipping traits anymore
+            // vm.expectRevert(TraitEquipped.selector);
+            // market.offerTrait(1, 1, 1 ether);
 
-            main.unequip(1, TraitCategory.Name.Shoes);
-            main.unequip(1, TraitCategory.Name.Bottom);
+            // main.unequip(1, TraitCategory.Name.Shoes);
+            // main.unequip(1, TraitCategory.Name.Bottom);
+
             market.offerTrait(1, 1, 1 ether); // shoes
             market.offerTrait(2, 1, 1 ether); // bottom
         vm.stopPrank();
 
         vm.deal(bidder, 1 ether);
         vm.startPrank(bidder);
+            // vm.warp(contractDeploymentBlock + 10);
             main.mint(1, empty);
             uint256 startingBal = bidder.balance;
+
+            // vm.warp(block.timestamp + 48 hours);
             market.bidOnTrait{value: 0.5 ether}(1, 2); // his chonk is 2
             assertLt(bidder.balance, startingBal);
         vm.stopPrank();
 
         vm.deal(buyer, 2 ether);
         vm.startPrank(buyer);
+            // vm.warp(contractDeploymentBlock);
             main.mint(1, empty); // his chonk is 3
+
+            // vm.warp(block.timestamp + 48 hours);
             market.bidOnTrait{value: 0.6 ether}(1, 3);
             market.buyTrait{value: 1 ether}(1, 3);
             assertEq(bidder.balance, startingBal); // got your money back
@@ -2034,11 +2094,12 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         vm.stopPrank();
 
         vm.startPrank(user);
-            vm.expectRevert(TraitEquipped.selector);
-            market.offerTrait(1, 1, 1 ether);
+            // marka 28/11/24: commented out as we aren't auto equipping traits anymore
+            // vm.expectRevert(TraitEquipped.selector);
+            // market.offerTrait(1, 1, 1 ether);
 
-            main.unequip(1, TraitCategory.Name.Shoes);
-            main.unequip(1, TraitCategory.Name.Bottom);
+            // main.unequip(1, TraitCategory.Name.Shoes);
+            // main.unequip(1, TraitCategory.Name.Bottom);
             market.offerChonk(1, 1 ether);
             market.offerTrait(1, 1, 1 ether); // shoes
             market.offerTrait(2, 1, 1 ether); // bottom
@@ -2056,6 +2117,8 @@ main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
         vm.deal(buyer, 2 ether);
         vm.startPrank(buyer);
             main.mint(1, empty); // his chonk is 3
+
+            vm.warp(block.timestamp + 48 hours);
             market.bidOnTrait{value: 0.6 ether}(1, 3);
             market.buyChonk{value: 1 ether}(1);
 

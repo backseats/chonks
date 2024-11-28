@@ -59,8 +59,9 @@ interface IChonkStorage {
     struct ChonkData {
         string backgroundColor;
         string bodyName;
-        string rendererSet;
+        // string rendererSet;
         uint256 numOfItemsInBackpack;
+        string[2] descriptionParts;
     }
 
     /// Events
@@ -70,8 +71,8 @@ interface IChonkStorage {
     event Unequip(address indexed owner, uint256 indexed tokenId, uint8 traitCategory);
     event EquipAll(address indexed owner, uint256 indexed tokenId);
     event UnequipAll(address indexed owner, uint256 indexed tokenId);
-    event BackgroundColor(address indexed owner, uint256 indexed tokenId, string color);
-    event BodyIndex(address indexed owner, uint256 indexed tokenId, uint8 _bodyIndex);
-    event Render3D(address indexed owner, uint256 indexed tokenId, bool renderZ);
+    // event BackgroundColor(address indexed owner, uint256 indexed tokenId, string color);
+    // event BodyIndex(address indexed owner, uint256 indexed tokenId, uint8 _bodyIndex);
+    // event Render3D(address indexed owner, uint256 indexed tokenId, bool renderZ);
 
 }

@@ -29,23 +29,22 @@ contract ChonksBaseTest is Test {
 
     bool constant localDeploy = true;
 
+    uint256 contractDeploymentBlock = 17419761;
+
     error UnauthorizedCustom(); // renamed as Unauthorized is already used by OpenZeppelin
     error NotATBA();
 
     function setUp() public virtual {
         deployer = vm.addr(69);
-        vm.createSelectFork("base_sepolia", 17419761);
+        vm.createSelectFork("base_sepolia", contractDeploymentBlock);
         vm.startPrank(deployer);
 
         // main = new ChonksMain(localDeploy);
-        main = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
+        main = new ChonksMain();
         // console.log('Chonk manager address', address(main));
 
         // comment out this for testing test_teamMintNotStarted
-        traits = new ChonkTraits(
-            true,
-            ["[View Trait on the Chonks website](https://www.chonks.xyz/traits/", ")"]
-        );
+        traits = new ChonkTraits(localDeploy);
         main.setMintStartTime(block.timestamp); // advance time 1 minute
 
         vm.warp(block.timestamp + 1 minutes);

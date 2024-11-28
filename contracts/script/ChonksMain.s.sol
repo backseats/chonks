@@ -39,7 +39,7 @@ contract ChonksMainScript is Script {
         vm.startBroadcast();
 
         // main = new ChonksMain(localDeploy);
-        main = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
+        main = new ChonksMain();
         console.log("ChonksMain Address:", address(main));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(main));
 
@@ -50,10 +50,7 @@ contract ChonksMainScript is Script {
         main.setMainRenderer3D(address(mainRenderer3D));
 
         // local deploy: false
-        traits = new ChonkTraits(
-            localDeploy,
-            ["[View Trait on the Chonks website](https://www.chonks.xyz/traits/", ")"]
-        );
+        traits = new ChonkTraits(localDeploy);
         console.log("ChonkTraits Address:", address(traits));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(traits));
         main.setTraitsContract(traits);
@@ -99,7 +96,7 @@ contract ChonksMainBodyAndRenderderScript is Script {
         vm.startBroadcast();
 
         // main = new ChonksMain(localDeploy);
-        main = new ChonksMain(["[View Chonk on the Chonks website](https://www.chonks.xyz/chonks/", ")"]);
+        main = new ChonksMain();
         console.log("ChonksMain Address:", address(main));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(main));
 
@@ -148,10 +145,7 @@ contract ChonksTraitsScript is Script {
         ChonksMain main = ChonksMain(0x03Aad3eBBDb638E4754C45f6293172DaC9F499aA); // insert contract address here
 
          // local deploy: false
-        traits = new ChonkTraits(
-            localDeploy, 
-            ["[View Trait on the Chonks website](https://www.chonks.xyz/traits/", ")"]
-        );
+        traits = new ChonkTraits(localDeploy);
 
         console.log("ChonkTraits Address:", address(traits));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(traits));

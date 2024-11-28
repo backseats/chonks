@@ -32,7 +32,7 @@ contract MainRenderer2D {
             '"chonkdata":[',
                 '{ "background_color" : "#', _chonkdata.backgroundColor, '" },',
                 '{ "num_items_in_backpack" : "', Utils.toString(_chonkdata.numOfItemsInBackpack), '" },',
-                '{ "renderer" : "', _chonkdata.rendererSet, '" },',
+                '{ "renderer" : "2D" },',
                 '{ "body_type" : "', _chonkdata.bodyName, '" }'
            ']'
         );
@@ -44,8 +44,7 @@ contract MainRenderer2D {
         string memory _traitsSvg,
         string memory _traitsAttributes,
         string memory _backpackSVGs,
-        IChonkStorage.ChonkData memory _chonkdata,
-        string[2] memory _descriptionParts
+        IChonkStorage.ChonkData memory _chonkdata
     ) public pure returns (string memory) {
 
         string memory fullSvg;
@@ -100,9 +99,9 @@ contract MainRenderer2D {
             '{"name":"Chonk #',
                 Utils.toString(_tokenId),
                 '","description":"',
-                _descriptionParts[0],
+                _chonkdata.descriptionParts[0],
                 Utils.toString(_tokenId),
-                _descriptionParts[1],
+                _chonkdata.descriptionParts[1],
                 '",',
                 fullAttributes,
                 ',', generateChonkData(_chonkdata),
