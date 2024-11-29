@@ -235,12 +235,12 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         return dataContract.explainTrait(_localDeploy, storedTrait, randomness);
     }
 
-    function getTraitType(uint256 _tokenId) public view returns (TraitCategory.Name) {
-        StoredTrait memory trait = getTrait(_tokenId);
-        TraitMetadata memory metadata = traitIndexToMetadata[trait.traitIndex];
+    // function getTraitType(uint256 _tokenId) public view returns (TraitCategory.Name) {
+    //     StoredTrait memory trait = getTrait(_tokenId);
+    //     TraitMetadata memory metadata = traitIndexToMetadata[trait.traitIndex];
 
-        return metadata.traitType;
-    }
+    //     return metadata.traitType;
+    // }
 
     function getTraitMetadata(uint256 _tokenId) public view returns (TraitMetadata memory) {
         StoredTrait memory trait = getTrait(_tokenId);

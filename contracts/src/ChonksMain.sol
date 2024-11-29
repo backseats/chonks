@@ -446,14 +446,16 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function _validateTraitType(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
-        TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId);
+        // TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId);
+        TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitMetadata(_traitTokenId).traitType;
         if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))
             revert IncorrectTraitType();
     }
 
     function _equipValidation(uint256 _chonkTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
         _validateTBAOwnership(tokenIdToTBAAccountAddress[_chonkTokenId], _traitTokenId);
-        traitType = traitsContract.getTraitType(_traitTokenId);
+        // traitType = traitsContract.getTraitType(_traitTokenId);
+        traitType = traitsContract.getTraitMetadata(_traitTokenId).traitType;
         _validateTraitType(_traitTokenId, traitType);
     }
 
