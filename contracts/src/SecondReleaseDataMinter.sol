@@ -20,8 +20,8 @@ import "forge-std/console.sol";
 
 // TODO: withdraw function
 
-// contract FirstSeasonRenderMinter is IRenderMinterV1 { // TODO: ownable, ITraitStorage
-contract SecondSeasonRenderMinter { // TODO: ownable, ITraitStorage
+// contract SecondReleaseDataMinter is IRenderMinterV1 { // TODO: ownable, ITraitStorage
+contract SecondReleaseDataMinter { // TODO: ownable, ITraitStorage
     uint256[] public accessory = [0]; // let's just have the torch as a 1/1
 
     bool _localDeploy; // DEPLOY: remove

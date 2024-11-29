@@ -7,7 +7,7 @@ import { ChonksMain } from "../src/ChonksMain.sol";
 import { ChonkTraits } from "../src/ChonkTraits.sol";
 import { ChonksMarket } from "../src/ChonksMarket.sol";
 import { TraitCategory } from "../src/TraitCategory.sol";
-import { SecondSeasonRenderMinter } from "../src/SecondSeasonRenderMinter.sol";
+import { SecondReleaseDataMinter } from "../src/SecondReleaseDataMinter.sol";
 import { ITraitStorage } from "../src/interfaces/ITraitStorage.sol";
 import { BurningDataMinter } from "../src/BurningDataMinter.sol";
 
@@ -1088,7 +1088,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         address tba = main.tokenIdToTBAAccountAddress(1);
         assertEq(traits.balanceOf(tba), 4);
 
-        SecondSeasonRenderMinter minter = new SecondSeasonRenderMinter(address(main), address(traits), true);
+        SecondReleaseDataMinter minter = new SecondReleaseDataMinter(address(main), address(traits), true);
         vm.prank(deployer);
         traits.addMinter(address(minter));
 

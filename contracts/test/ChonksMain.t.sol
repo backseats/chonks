@@ -4,6 +4,7 @@ pragma solidity ^0.8.22;
 import { ChonksMain } from '../src/ChonksMain.sol';
 import { ChonkTraits } from "../src/ChonkTraits.sol";
 import { FirstReleaseDataMinter } from '../src/FirstReleaseDataMinter.sol';
+import { SecondReleaseDataMinter } from "../src/SecondReleaseDataMinter.sol";
 import { IChonkStorage } from '../src/interfaces/IChonkStorage.sol';
 import { MainRenderer2D } from '../src/renderers/MainRenderer2D.sol';
 import { MainRenderer3D } from '../src/renderers/MainRenderer3D.sol';
@@ -296,6 +297,95 @@ contract ChonksMainTest is ChonksBaseTest {
         main.mint(1, empty);
         vm.stopPrank();
         assertEq(main.balanceOf(user), 1);
+    }
+
+    function test_cantTransferDuringMint() public {
+        vm.startPrank(deployer);
+        main.setFirstReleaseDataMinter(address(dataContract));
+        traits.setChonksMain(address(main));
+        traits.addMinter(address(dataContract));
+        traits.setMarketplace(address(market));
+
+        // chonnks setMintStartTime is set in setUp()
+        traits.setMintStartTime(block.timestamp);
+
+        vm.stopPrank();
+
+        address user = address(1);
+        vm.prank(user);
+        bytes32[] memory empty;
+        main.mint(1, empty);
+
+        address user2 = address(2);
+        vm.prank(user2);
+        main.mint(1, empty);
+
+        //let's try transferring the minted chonk
+        vm.prank(user);
+        vm.expectRevert(ChonksMain.CantTransferDuringMint.selector);
+        main.transferFrom(user, user2, 1);
+
+
+        address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
+        address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
+        uint256[] memory traitsForChonk1 = traits.walletOfOwner(tbaForChonk1);
+        uint256 traitId = traitsForChonk1[0];
+
+        // be the tba of chonk 1, move trait 1
+        vm.startPrank(tbaForChonk1);
+            vm.expectRevert(ChonkTraits.CantTransferDuringMint.selector);
+            traits.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
+
+            vm.warp(block.timestamp + 48 hours);
+
+            traits.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
+            assertEq(traits.balanceOf(tbaForChonk1), 3); // 4 - 1
+            assertEq(traits.balanceOf(tbaForChonk2), 5); // 4 + 1
+
+        vm.stopPrank();
+
+        SecondReleaseDataMinter srdm = new SecondReleaseDataMinter(address(main), address(traits), true);
+        vm.startPrank(deployer);
+            traits.addMinter(address(srdm));
+            traits.setMintStartTime(0); // clear mintStartTime
+        vm.stopPrank();
+
+        vm.startPrank(tbaForChonk2);
+            // this should work now because mintStartTime is 0
+            traits.transferFrom(tbaForChonk2, tbaForChonk1, traitId);
+            assertEq(traits.balanceOf(tbaForChonk1), 4); // 3 + 1
+            assertEq(traits.balanceOf(tbaForChonk2), 4); // 4 - 1
+        vm.stopPrank();
+
+        // we can mint at any time because mintStartTime is 0
+        vm.prank(user);
+        srdm.safeMintMany(1, 2);
+        assertEq(traits.balanceOf(tbaForChonk1), 6); // 4 + 2
+        console.log("traits mintStartTime", traits.mintStartTime());
+
+        vm.prank(deployer);
+        traits.setMintStartTime(block.timestamp); /// set mintStartTime back to now
+        
+        vm.warp(block.timestamp + 1 hours);
+        vm.startPrank(tbaForChonk1);
+            vm.expectRevert(ChonkTraits.CantTransferDuringMint.selector);
+            traits.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
+        vm.stopPrank();
+
+        vm.prank(deployer);
+        traits.setMintStartTime(0); /// clear mintStartTime
+
+        vm.warp(block.timestamp + 1 minutes);
+        vm.startPrank(tbaForChonk1);
+            traits.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
+            assertEq(traits.balanceOf(tbaForChonk1), 5); // 6 - 1
+            assertEq(traits.balanceOf(tbaForChonk2), 5); // 4 + 1
+        vm.stopPrank();
+
+        assertEq(main.balanceOf(user), 1);
+
+        // i think we need more tests here for minting second and third releases 
+        // if we set startTime back to 0, people can then continue to mint srdm... so we would to ensure we traits.removeMinter each time
     }
 
     function test_beforeTokenTransferCantTransferChonkToTBA() public {
