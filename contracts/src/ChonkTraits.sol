@@ -433,12 +433,12 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
         // TODO: ensure not equipped
 
-        if (block.timestamp < mintStartTime + 24 hours) revert CantTransferDuringMint();
-
         if (from == address(0)) {
             super._beforeTokenTransfer(from, to, tokenId);
             return;
         }
+
+        if (block.timestamp < mintStartTime + 24 hours) revert CantTransferDuringMint();
 
         (, address seller,,) = marketplace.traitOffers(tokenId);
         if (seller != address(0)) {
