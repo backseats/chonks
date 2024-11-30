@@ -110,7 +110,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     uint256 public price;
 
-    uint256 public mintStartTime;
+    uint256 public initialMintStartTime;
 
     string[2] descriptionParts;
 
@@ -152,7 +152,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     error MintEnded();
     error MintNotStarted();
     error MintStartTimeAlreadySet();
-    // error TenIsMaxMint(); // replaced with InvalidMintAmount();
     error Timelocked();
     error UseUnequip();
     error WithdrawFailed();
@@ -171,7 +170,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // constructor(string[2] memory _descriptionParts) ERC721("Chonks", "CHONKS") {
     constructor() ERC721("Chonks", "CHONKS") {
         _initializeOwner(msg.sender);
-        deploymentTime = block.timestamp;   
+        deploymentTime = block.timestamp;
         // descriptionParts = _descriptionParts; // can set this later
         // _localDeploy = localDeploy_;
     }
@@ -199,8 +198,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function teamMint(address _to, uint256 _amount, uint8 _traitCount) public onlyOwner {
         if (_traitCount < 4 || _traitCount > 7) revert InvalidTraitCount();
-        if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
-        if (block.timestamp > mintStartTime + 26 hours) revert MintEnded();
+        if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
+        if (block.timestamp > initialMintStartTime + 26 hours) revert MintEnded();
 
         _mintInternal(_to, _amount, _traitCount);
     }
@@ -209,8 +208,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (address(firstReleaseDataMinter) == address(0)) revert FirstReleaseDataMinterNotSet();
         if (_amount == 0 || _amount > MAX_MINT_AMOUNT) revert InvalidMintAmount();
 
-        if (mintStartTime == 0 || block.timestamp < mintStartTime) revert MintNotStarted();
-        if (block.timestamp > mintStartTime + 24 hours) revert MintEnded();
+        if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
+        if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded();
 
         if (msg.value != price * _amount) revert InsufficientFunds();
 
@@ -259,7 +258,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 chonk.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 5); // even chance for 5 different bodies
                 // Set the default background color
                 chonk.backgroundColor = "0D6E9D";
-                
+
                 // level 0: let's give everyone shoes, bottom, top & hair : 4 traits
                 // level 1: shoes, bottom, top, hair AND face: 5 traits
                 // level 3: shoes, bottom, top AND hair AND face AND head AND accessory : 7 traits
@@ -313,7 +312,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         TraitCategory.Name traitType = _equipValidation(_chonkTokenId, _traitTokenId);
         _setTrait(_chonkTokenId, traitType, _traitTokenId);
-
         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _traitTokenId, uint8(traitType));
     }
 
@@ -454,7 +452,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function _equipValidation(uint256 _chonkTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
         _validateTBAOwnership(tokenIdToTBAAccountAddress[_chonkTokenId], _traitTokenId);
-        // traitType = traitsContract.getTraitType(_traitTokenId);
         traitType = traitsContract.getTraitMetadata(_traitTokenId).traitType;
         _validateTraitType(_traitTokenId, traitType);
     }
@@ -541,7 +538,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         (bodySvg, ) = getBodySvgAndMetadata(storedChonk);
         (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedChonk);
         backpackSVGs = getBackpackSVGs(_tokenId);
-        
+
         chonkdata.backgroundColor = storedChonk.backgroundColor;
         chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
         chonkdata.bodyName =  bodyIndexToMetadata[storedChonk.bodyIndex].bodyName;
@@ -713,9 +710,9 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         maxTraitsToOutput = _maxTraitsToOutput;
     }
 
-    function setMintStartTime(uint256 _mintStartTime) public onlyOwner {
-        if (mintStartTime != 0) revert MintStartTimeAlreadySet();
-        mintStartTime = _mintStartTime;
+    function setMintStartTime(uint256 _initialMintStartTime) public onlyOwner {
+        if (initialMintStartTime != 0) revert MintStartTimeAlreadySet();
+        initialMintStartTime = _initialMintStartTime;
     }
 
     function setWithdrawAddress(address _withdrawAddress) public onlyOwner {
@@ -805,7 +802,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // emit Render3D(ownerOf(_tokenId), _tokenId, _render3D);
     }
 
-    
+
 
     // Boilerplate
 
@@ -820,7 +817,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             return;
         }
 
-        if (block.timestamp < mintStartTime + 24 hours) revert CantTransferDuringMint();
+        if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint();
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
          if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();

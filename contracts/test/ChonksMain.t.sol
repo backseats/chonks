@@ -50,7 +50,7 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(newMain._nextTokenId(), 0);
         assertEq(newMain.maxTraitsToOutput(), 99);
         assertEq(newMain.price(), 0);
-        assertEq(newMain.mintStartTime(), 0);
+        assertEq(newMain.initialMintStartTime(), 0);
         assertEq(newMain.withdrawAddress(), address(0));
         assertEq(address(newMain.traitsContract()), address(0));
         assertEq(address(newMain.firstReleaseDataMinter()), address(0));
@@ -306,7 +306,7 @@ contract ChonksMainTest is ChonksBaseTest {
         traits.addMinter(address(dataContract));
         traits.setMarketplace(address(market));
 
-        // chonnks setMintStartTime is set in setUp()
+        // Chonks setMintStartTime is set in setUp()
         traits.setMintStartTime(block.timestamp);
 
         vm.stopPrank();
@@ -324,8 +324,6 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.prank(user);
         vm.expectRevert(ChonksMain.CantTransferDuringMint.selector);
         main.transferFrom(user, user2, 1);
-
-
         address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
         address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
         uint256[] memory traitsForChonk1 = traits.walletOfOwner(tbaForChonk1);
@@ -343,49 +341,6 @@ contract ChonksMainTest is ChonksBaseTest {
             assertEq(traits.balanceOf(tbaForChonk2), 5); // 4 + 1
 
         vm.stopPrank();
-
-        SecondReleaseDataMinter srdm = new SecondReleaseDataMinter(address(main), address(traits), true);
-        vm.startPrank(deployer);
-            traits.addMinter(address(srdm));
-            traits.setMintStartTime(0); // clear mintStartTime
-        vm.stopPrank();
-
-        vm.startPrank(tbaForChonk2);
-            // this should work now because mintStartTime is 0
-            traits.transferFrom(tbaForChonk2, tbaForChonk1, traitId);
-            assertEq(traits.balanceOf(tbaForChonk1), 4); // 3 + 1
-            assertEq(traits.balanceOf(tbaForChonk2), 4); // 4 - 1
-        vm.stopPrank();
-
-        // we can mint at any time because mintStartTime is 0
-        vm.prank(user);
-        srdm.safeMintMany(1, 2);
-        assertEq(traits.balanceOf(tbaForChonk1), 6); // 4 + 2
-        console.log("traits mintStartTime", traits.mintStartTime());
-
-        vm.prank(deployer);
-        traits.setMintStartTime(block.timestamp); /// set mintStartTime back to now
-        
-        vm.warp(block.timestamp + 1 hours);
-        vm.startPrank(tbaForChonk1);
-            vm.expectRevert(ChonkTraits.CantTransferDuringMint.selector);
-            traits.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
-        vm.stopPrank();
-
-        vm.prank(deployer);
-        traits.setMintStartTime(0); /// clear mintStartTime
-
-        vm.warp(block.timestamp + 1 minutes);
-        vm.startPrank(tbaForChonk1);
-            traits.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
-            assertEq(traits.balanceOf(tbaForChonk1), 5); // 6 - 1
-            assertEq(traits.balanceOf(tbaForChonk2), 5); // 4 + 1
-        vm.stopPrank();
-
-        assertEq(main.balanceOf(user), 1);
-
-        // i think we need more tests here for minting second and third releases 
-        // if we set startTime back to 0, people can then continue to mint srdm... so we would to ensure we traits.removeMinter each time
     }
 
     function test_beforeTokenTransferCantTransferChonkToTBA() public {
@@ -763,6 +718,7 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(updatedChonk.shoesId, 0);
     }
 
+    // NOTE: This test will fail when FSDM isLocal stuff is commented out for contract size, but it passes.
     function test_equipMultipleTraits() public {
         deployerSetup();
 
@@ -810,7 +766,7 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(chonk.shoesId, 0);
 
         // still equipped
-        
+
 
         // not equipped
         assertEq(chonk.hairId, 0);

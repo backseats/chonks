@@ -92,7 +92,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     uint256 internal _transientChonkId;
 
-    uint256 public mintStartTime;
+    uint256 public initialMintStartTime;
 
     string[2] descriptionParts;
 
@@ -101,6 +101,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     error AddressCantBurn();
     error CantTransfer();
     error CantTransferDuringMint();
+    error MintStartTimeAlreadySet();
     error NotATBA();
     error NotAValidMinterContract();
     error NotYourTrait();
@@ -235,13 +236,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         return dataContract.explainTrait(_localDeploy, storedTrait, randomness);
     }
 
-    // function getTraitType(uint256 _tokenId) public view returns (TraitCategory.Name) {
-    //     StoredTrait memory trait = getTrait(_tokenId);
-    //     TraitMetadata memory metadata = traitIndexToMetadata[trait.traitIndex];
-
-    //     return metadata.traitType;
-    // }
-
     function getTraitMetadata(uint256 _tokenId) public view returns (TraitMetadata memory) {
         StoredTrait memory trait = getTrait(_tokenId);
         return traitIndexToMetadata[trait.traitIndex];
@@ -362,7 +356,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         uint256[] memory tokensId = new uint256[](tokenCount);
         for (uint256 i; i < tokenCount; ++i){
-            // console.log("tokenOfOwnerByIndex(_owner, i)", tokenOfOwnerByIndex(_owner, i));
             tokensId[i] = tokenOfOwnerByIndex(_owner, i);
         }
 
@@ -405,8 +398,9 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         approvedInvalidators[_invalidator] = false;
     }
 
-    function setMintStartTime(uint256 _mintStartTime) public onlyOwner {
-        mintStartTime = _mintStartTime;
+    function setMintStartTime(uint256 _initialMintStartTime) public onlyOwner {
+        if (initialMintStartTime != 0) revert MintStartTimeAlreadySet();
+        initialMintStartTime = _initialMintStartTime;
     }
 
     function setDescriptionParts(string[2] memory _descriptionParts) public onlyOwner {
@@ -438,7 +432,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             return;
         }
 
-        if (block.timestamp < mintStartTime + 24 hours) revert CantTransferDuringMint();
+        if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint();
 
         (, address seller,,) = marketplace.traitOffers(tokenId);
         if (seller != address(0)) {
