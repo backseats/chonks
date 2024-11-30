@@ -9,6 +9,7 @@ import { ChonksMarket } from '../src/ChonksMarket.sol';
 import { EncodeURI } from '../src/EncodeURI.sol';
 import { MainRenderer2D } from '../src/renderers/MainRenderer2D.sol';
 import { MainRenderer3D } from '../src/renderers/MainRenderer3D.sol';
+import { ChonkEquipHelper } from '../src/ChonkEquipHelper.sol';
 
 import { Test, console } from 'forge-std/Test.sol';
 
@@ -24,7 +25,7 @@ contract ChonksBaseTest is Test {
     EncodeURI public encodeURIContract;
     bytes public base64ScriptContent;
     ChonksMarket public market;
-
+    ChonkEquipHelper public chonkEquipHelper;
     address internal deployer;
 
     bool constant localDeploy = true;
@@ -46,6 +47,9 @@ contract ChonksBaseTest is Test {
         // comment out this for testing test_teamMintNotStarted
         traits = new ChonkTraits(localDeploy);
         main.setMintStartTime(block.timestamp); // advance time 1 minute
+
+        chonkEquipHelper = new ChonkEquipHelper(address(main), address(traits));
+        main.setChonkEquipHelper(address(chonkEquipHelper));
 
         vm.warp(block.timestamp + 1 minutes);
         // console.log('traits address', address(traits));

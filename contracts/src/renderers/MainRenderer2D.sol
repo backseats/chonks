@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-// import { EncodeURI } from "../EncodeURI.sol";
+// import { EncodeURI } from "../EncodeURI.sol"; // DEPLOY: remove
+import { ChonkTraits } from "../ChonkTraits.sol";
 import { IChonkStorage } from "../interfaces/IChonkStorage.sol";
 import { Utils } from "../common/Utils.sol";
+
 // import "forge-std/console.sol";
 
 contract MainRenderer2D {
@@ -146,6 +148,11 @@ contract MainRenderer2D {
         return string(abi.encodePacked('<g id="Body">', svgParts, '</g>'));
     }
 
+    function colorMapToSVG(bytes memory colorMap) public pure returns (string memory) {
+        bytes memory pixels = getBodyImage(colorMap);
+        return getBodyImageSvg(pixels);
+    }
+
     function getBodyImage(bytes memory colorMap) public pure returns (bytes memory) {
         // console.log('2d renderer: getBodyImage');
         uint256 length = colorMap.length;
@@ -175,16 +182,25 @@ contract MainRenderer2D {
     }
 
     function getBackpackSVGs(
-        string memory bodyGhostSvg,
-        string[] memory traitSvgs,
-        uint256 traitCount,
-        uint256 maxTraitsToOutput
-    ) public pure returns (string memory backpackSVGs) {
+        address _traitsContract,
+        address _tbaAddress,
+        uint256 _maxTraitsToOutput
+    ) public view returns (string memory backpackSVGs) {
+        ChonkTraits traitsContract = ChonkTraits(_traitsContract);
+
+        uint256[] memory traitTokens = traitsContract.walletOfOwner(_tbaAddress);
+        string memory bodyGhostSvg = traitsContract.getGhostSvg();
+
+        uint256 numTraits = traitTokens.length < _maxTraitsToOutput ? traitTokens.length : _maxTraitsToOutput;
+
+        string[] memory traitSvgs = new string[](numTraits);
+        for (uint256 i; i < numTraits; ++i) {
+            traitSvgs[i] = traitsContract.getSvgForTokenId(traitTokens[i]);
+        }
+
         string memory baseSvgPart = '<svg viewBox="0 0 150 150">';
         string memory closeSvgTag = '</svg>';
         bytes memory buffer;
-
-        uint256 numTraits = traitCount < maxTraitsToOutput ? traitCount : maxTraitsToOutput;
 
         buffer = abi.encodePacked(
             SVG_BACKPACK,
@@ -201,7 +217,7 @@ contract MainRenderer2D {
             );
         }
 
-        if (traitCount > maxTraitsToOutput) {
+        if (traitSvgs.length > _maxTraitsToOutput) {
             buffer = abi.encodePacked(
                 buffer,
                 baseSvgPart,

@@ -6,7 +6,7 @@ import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { IERC165 } from  "@openzeppelin/contracts/utils/introspection/IERC165.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
-import { MerkleProof } from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import { MerkleProofLib } from "solady/utils/MerkleProofLib.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
@@ -21,6 +21,8 @@ import { MainRenderer3D } from "./renderers/MainRenderer3D.sol";
 
 // The Traits ERC-721 Contract
 import { ChonkTraits } from "./ChonkTraits.sol";
+
+import { ChonkEquipHelper } from "./ChonkEquipHelper.sol";
 
 // Associated Interfaces and Libraries
 import { IERC4906 } from "./interfaces/IERC4906.sol";
@@ -92,6 +94,9 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // The address of the ChonksMarket contract
     ChonksMarket public marketplace;
+
+    // The address of the ChonkEquipHelper helper contract
+    ChonkEquipHelper public chonkEquipHelper;
 
     // The contract that handles rendering and minting the first release of traits
     FirstReleaseDataMinter public firstReleaseDataMinter;
@@ -215,11 +220,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         uint8 traitCount = 4;
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
-        if (MerkleProof.verify(_merkleProof, collectionsMerkle, leaf)) {
+        if (MerkleProofLib.verify(_merkleProof, collectionsMerkle, leaf)) {
             traitCount = 5;
-        } else if (MerkleProof.verify(_merkleProof, friendsMerkle, leaf)) {
+        } else if (MerkleProofLib.verify(_merkleProof, friendsMerkle, leaf)) {
             traitCount = 6;
-        } else if (MerkleProof.verify(_merkleProof, creatorsMerkle, leaf)) {
+        } else if (MerkleProofLib.verify(_merkleProof, creatorsMerkle, leaf)) {
             traitCount = 7;
         }
 
@@ -310,7 +315,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function equip(uint256 _chonkTokenId, uint256 _traitTokenId) public onlyChonkOwner(_chonkTokenId) {
         if (_traitTokenId == 0) revert UseUnequip();
 
-        TraitCategory.Name traitType = _equipValidation(_chonkTokenId, _traitTokenId);
+        TraitCategory.Name traitType = chonkEquipHelper.equipValidation(_chonkTokenId, _traitTokenId);
         _setTrait(_chonkTokenId, traitType, _traitTokenId);
         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _traitTokenId, uint8(traitType));
     }
@@ -360,56 +365,49 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         address tbaForChonk = tokenIdToTBAAccountAddress[_chonkTokenId];
 
         if (_headTokenId != 0) {
-            _validateTBAOwnership(tbaForChonk, _headTokenId);
-            _validateTraitType(_headTokenId, TraitCategory.Name.Head);
+            chonkEquipHelper.performValidations(tbaForChonk, _headTokenId, TraitCategory.Name.Head);
             chonk.headId = _headTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _headTokenId, uint8(TraitCategory.Name.Head));
         }
 
         if (_hairTokenId != 0) {
-            _validateTBAOwnership(tbaForChonk, _hairTokenId);
-            _validateTraitType(_hairTokenId, TraitCategory.Name.Hair);
+            chonkEquipHelper.performValidations(tbaForChonk, _hairTokenId, TraitCategory.Name.Hair);
             chonk.hairId = _hairTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _hairTokenId, uint8(TraitCategory.Name.Hair));
         }
 
         if (_faceTokenId != 0) {
-            _validateTBAOwnership(tbaForChonk, _faceTokenId);
-            _validateTraitType(_faceTokenId, TraitCategory.Name.Face);
+            chonkEquipHelper.performValidations(tbaForChonk, _faceTokenId, TraitCategory.Name.Face);
             chonk.faceId = _faceTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _faceTokenId, uint8(TraitCategory.Name.Face));
         }
 
         if (_accessoryTokenId != 0) {
-            _validateTBAOwnership(tbaForChonk, _accessoryTokenId);
-            _validateTraitType(_accessoryTokenId, TraitCategory.Name.Accessory);
+            chonkEquipHelper.performValidations(tbaForChonk, _accessoryTokenId, TraitCategory.Name.Accessory);
             chonk.accessoryId = _accessoryTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _accessoryTokenId, uint8(TraitCategory.Name.Accessory));
         }
 
         if (_topTokenId != 0) {
-            _validateTBAOwnership(tbaForChonk, _topTokenId);
-            _validateTraitType(_topTokenId, TraitCategory.Name.Top);
+            chonkEquipHelper.performValidations(tbaForChonk, _topTokenId, TraitCategory.Name.Top);
             chonk.topId = _topTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _topTokenId, uint8(TraitCategory.Name.Top));
         }
 
         if (_bottomTokenId != 0) {
-            _validateTBAOwnership(tbaForChonk, _bottomTokenId);
-            _validateTraitType(_bottomTokenId, TraitCategory.Name.Bottom);
+            chonkEquipHelper.performValidations(tbaForChonk, _bottomTokenId, TraitCategory.Name.Bottom);
             chonk.bottomId = _bottomTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _bottomTokenId, uint8(TraitCategory.Name.Bottom));
         }
 
         if (_shoesTokenId != 0) {
-            _validateTBAOwnership(tbaForChonk, _shoesTokenId);
-            _validateTraitType(_shoesTokenId, TraitCategory.Name.Shoes);
+            chonkEquipHelper.performValidations(tbaForChonk, _shoesTokenId, TraitCategory.Name.Shoes);
             chonk.shoesId = _shoesTokenId;
 
             emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _shoesTokenId, uint8(TraitCategory.Name.Shoes));
@@ -438,23 +436,23 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Validations
 
-    function _validateTBAOwnership(address _tbaForChonk, uint256 _traitTokenId) internal view {
-        address ownerOfTrait = traitsContract.ownerOf(_traitTokenId);
-        if (ownerOfTrait != _tbaForChonk) revert IncorrectTBAOwner();
-    }
+    // function _validateTBAOwnership(address _tbaForChonk, uint256 _traitTokenId) internal view {
+    //     address ownerOfTrait = traitsContract.ownerOf(_traitTokenId);
+    //     if (ownerOfTrait != _tbaForChonk) revert IncorrectTBAOwner();
+    // }
 
-    function _validateTraitType(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
-        // TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId);
-        TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitMetadata(_traitTokenId).traitType;
-        if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))
-            revert IncorrectTraitType();
-    }
+    // function _validateTraitType(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
+    //     // TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId);
+    //     TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitMetadata(_traitTokenId).traitType;
+    //     if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))
+    //         revert IncorrectTraitType();
+    // }
 
-    function _equipValidation(uint256 _chonkTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
-        _validateTBAOwnership(tokenIdToTBAAccountAddress[_chonkTokenId], _traitTokenId);
-        traitType = traitsContract.getTraitMetadata(_traitTokenId).traitType;
-        _validateTraitType(_traitTokenId, traitType);
-    }
+    // function _equipValidation(uint256 _chonkTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
+    //     _validateTBAOwnership(tokenIdToTBAAccountAddress[_chonkTokenId], _traitTokenId);
+    //     traitType = traitsContract.getTraitMetadata(_traitTokenId).traitType;
+    //     _validateTraitType(_traitTokenId, traitType);
+    // }
 
     /// tokenURI/Rendering
 
@@ -466,8 +464,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     /// @param _index The index of the body to get the SVG for
     /// @return svg The SVG for the body
     function getBodyImageSvg(uint256 _index) public view returns (string memory svg) {
-        bytes memory colorMap = mainRenderer2D.getBodyImage(bodyIndexToMetadata[_index].colorMap);
-        return mainRenderer2D.getBodyImageSvg(colorMap);
+        return mainRenderer2D.colorMapToSVG(bodyIndexToMetadata[_index].colorMap);
     }
 
     function getBodySVGZmapsAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory, bytes memory , string memory) {
@@ -514,17 +511,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function getBackpackSVGs(uint256 _tokenId) public view returns (string memory) {
-        uint256[] memory traitTokens = getTraitsForChonkId(_tokenId);
-        string memory bodyGhostSvg = traitsContract.getGhostSvg();
-
-        uint256 numTraits = traitTokens.length < maxTraitsToOutput ? traitTokens.length : maxTraitsToOutput;
-
-        string[] memory traitSvgs = new string[](numTraits);
-        for (uint256 i; i < numTraits; ++i) {
-            traitSvgs[i] = traitsContract.getSvgForTokenId(traitTokens[i]);
-        }
-
-        return mainRenderer2D.getBackpackSVGs(bodyGhostSvg, traitSvgs, traitTokens.length, maxTraitsToOutput);
+        return mainRenderer2D.getBackpackSVGs(
+            address(traitsContract),
+            getTBAAddressForChonkId(_tokenId),
+            maxTraitsToOutput
+        );
     }
 
     function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
@@ -706,6 +697,12 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         marketplace = ChonksMarket(_marketplace);
     }
 
+    function setChonkEquipHelper(address _chonkEquipHelper) public onlyOwner {
+        if (isTimelocked()) revert Timelocked();
+        chonkEquipHelper = ChonkEquipHelper(_chonkEquipHelper);
+    }
+
+    // TODO: can likely reduce from a uint256 to a uint8
     function setMaxTraitsToOutput(uint256 _maxTraitsToOutput) public onlyOwner {
         maxTraitsToOutput = _maxTraitsToOutput;
     }

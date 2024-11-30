@@ -1311,7 +1311,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
     function test_teamMintReverts() public {
         vm.startPrank(deployer);
-            
+
             vm.expectRevert(ChonksMain.MintStartTimeAlreadySet.selector);
             main.setMintStartTime(block.timestamp);
 
@@ -1461,7 +1461,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.prank(seller);
         market.offerTrait(traitId, 1, 1 ether);
 
-       
+
 
         // Buyer purchases the trait
         vm.startPrank(buyer);
@@ -1525,7 +1525,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.prank(seller);
         market.offerTraitToAddress(traitId, 1, 1 ether, intendedBuyer);
 
-       
+
 
         // Try to buy with unauthorized buyer (should revert)
         vm.startPrank(unauthorizedBuyer);
@@ -1534,7 +1534,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         market.buyTrait{value: 1 ether}(traitId, 2);
         vm.stopPrank();
 
-       
+
 
         // Buy with intended buyer
         vm.startPrank(intendedBuyer);
@@ -1600,7 +1600,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         bytes32[] memory empty;
         main.mint(1, empty); // adddress 1 owns chonk 1, and traits 1 - 4
 
-       
+
         // Setup bidder with a Chonk
         vm.prank(bidder);
         main.mint(2, empty); // // adddress 2 owns chonk 2, and traits 5 - 8
@@ -1833,7 +1833,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(user1);
             // mint and approve a bunch of things
             bytes32[] memory empty;
-            
+
             main.mint(1, empty);
 
             vm.warp(block.timestamp + 48 hours);
@@ -2015,7 +2015,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.startPrank(user);
             bytes32[] memory empty;
             main.mint(1, empty);
-            
+
             // vm.warp(block.timestamp + 48 hours);
             main.setApprovalForAll(address(market), true);
         vm.stopPrank();
