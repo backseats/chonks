@@ -686,6 +686,7 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(chonk.shoesId, 0);
     }
 
+    // NOTE: This test will fail when FSDM isLocal stuff is commented out for contract size, but it passes.
     function test_equipSingleTrait() public {
         deployerSetup();
 
@@ -811,6 +812,7 @@ contract ChonksMainTest is ChonksBaseTest {
         // assertEq(chonk.shoesId, 1);
     }
 
+    // NOTE: This test will fail when FSDM isLocal stuff is commented out for contract size, but it passes.
     function test_equipTraitToRightCategoryEquipAll() public {
         deployerSetup();
 
@@ -869,6 +871,7 @@ contract ChonksMainTest is ChonksBaseTest {
         main.equip(1, 5);
     }
 
+    // NOTE: This test will fail when FSDM isLocal stuff is commented out for contract size, but it passes.
     function test_equipUnequipSameTrait() public {
         deployerSetup();
 
