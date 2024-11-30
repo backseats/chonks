@@ -292,10 +292,12 @@ export default function Mint() {
             setIsModalOpen(true);
         } else if (isMintingSuccess) {
             console.log("isMintingSuccess");
+            setTransactionhashMinting(null); // Clear transaction hash on success
             // Keep modal open for success message
             // User can close manually
         } else if (isMintingError) {
             console.log("isMintingError");
+            setTransactionhashMinting(null); // Clear transaction hash on success
             // setIsModalOpen(false);
         } else if ( isMintRejected) {
             console.log("isMintRejected");

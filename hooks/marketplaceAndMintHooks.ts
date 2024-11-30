@@ -143,7 +143,7 @@ export function useMintFunction() {
   const { data: mintStartTime } = useReadContract({
     address: mainContract,
     abi: mainABI,
-    functionName: 'mintStartTime',
+    functionName: 'initialMintStartTime',
   });
 
   // Calculate if mint is open and time remaining
@@ -462,6 +462,27 @@ const hasActiveOffer = useMemo(() => {
   };
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////// 
+  /////////////////////////////////////////////  Widthdraw Bid Chonk  /////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // cancel offer chonk
+  // const { writeContract: cancelOfferChonk } = useWriteContract();
+  const { writeContract: withdrawBidOnChonkChonk, isPending: isWithdrawBidOnChonkkPending, data: hashWithdrawBidOnChonk } = useWriteContract();
+  const { isLoading: isWithdrawBidOnChonkLoading, isSuccess: isWithdrawBidOnChonkSuccess, isError : isWithdrawBidOnChonkErrror, data: receiptWithdrawBidOnChonk } = useWaitForTransactionReceipt({
+    hash: hashCancelOfferChonk,
+  });
+
+  const handleWithdrawBidOnChonk = () => {
+    if (!address || !chonkId) return;
+    cancelOfferChonk({
+      address: marketplaceContract,
+      abi: marketplaceABI,
+      functionName: 'withdrawBidOnChonk',
+      args: [BigInt(chonkId)],
+    });
+  };
+
+  /////////////////////////////////////////////////////////////////////////////////////////////////////// 
   /////////////////////////////////////////////  Cancel Offer Trait  /////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -602,5 +623,6 @@ const hasActiveOffer = useMemo(() => {
     handleCancelOfferTrait,
     handleBidOnChonk,
     handleAcceptBidForChonk,
+    handleWithdrawBidOnChonk
   };
 }

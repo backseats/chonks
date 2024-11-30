@@ -60,7 +60,8 @@ export default function PriceAndActionsSection({
         handleBuyChonk,
         handleCancelOfferChonk,
         handleBidOnChonk,
-        handleAcceptBidForChonk
+        handleAcceptBidForChonk,
+        handleWithdrawBidOnChonk
     } = useMarketplaceActions(chonkId);
     const [isPrivateListingExpanded, setIsPrivateListingExpanded] = useState(false);
     const [recipientAddress, setRecipientAddress] = useState('');
@@ -82,6 +83,13 @@ export default function PriceAndActionsSection({
             setLocalListingPending(true); // neeeded because we want to clear the rejection here 
         }
     }, [isListChonkLoading]);
+    
+    // let's initiall set offerAmount to the current bid amount
+    useEffect(() => {
+        if (hasActiveBid && chonkBid) {
+            setOfferAmount(formatEther(chonkBid.amountInWei));
+        }
+    }, [hasActiveBid, chonkBid]);
 
     // useEffect(() => {
     //     if (isListChonkSuccess) {
@@ -152,12 +160,24 @@ export default function PriceAndActionsSection({
                         </div>
 
                         {isOwner ? (
+                            <div className="flex flex-col gap-2">
+                            
                             <button 
                                 className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
                                 onClick={handleCancelOfferChonk}
                             >
                                 Cancel Listing
                             </button>
+
+                                {hasActiveBid && chonkBid && (
+                                <button 
+                                    className="w-full bg-chonk-orange text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
+                                    onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
+                                >
+                                    Accept Bid for {formatEther(chonkBid.amountInWei)} ETH
+                                </button>
+                                )}
+                            </div>
                         ) : (
                             <>
                                 <button 
@@ -193,7 +213,11 @@ export default function PriceAndActionsSection({
                     </>
                 ) : (
                     <>
-                        <div className="text-[1vw] text-gray-500 mb-[1.725vw]">Not Listed</div>
+                        <div className="text-[1vw] text-gray-500 mb-[1.725vw]">Not Listed 
+                            {hasActiveBid && chonkBid && (
+                                <span className="text-gray-500"> | Current Bid: {formatEther(chonkBid.amountInWei)} ETH</span>
+                            )}
+                        </div>
                         <div className="flex flex-col gap-2">
                             {isOwner && (
                                 <>
@@ -212,7 +236,7 @@ export default function PriceAndActionsSection({
                                     
                                     {hasActiveBid && chonkBid && (
                                         <button 
-                                            className="w-full bg-chonk-orange text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
+                                            className="w-full bg-chonk-orange text-white py-2 px-4 hover:bg-chonk-orange hover:text-black transition-colors"
                                             onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
                                         >
                                             Accept Bid for {formatEther(chonkBid.amountInWei)} ETH
@@ -221,12 +245,27 @@ export default function PriceAndActionsSection({
                                 </>
                             )}
                             {!isOwner && (
-                                <button 
-                                    className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
-                                    onClick={() => setIsOfferModalOpen(true)}
-                                >
-                                    Make an Offer
-                                </button>
+
+                                // Need to check if there's an active bid, and who it's by
+                                // If current address is the bidder, show "Cancel Offer" button
+                                // Otherwise, show "Make an Offer" button
+                                <>
+                                    {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
+                                        <button 
+                                            className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
+                                            onClick={() => handleWithdrawBidOnChonk()}
+                                    >
+                                            Cancel Your Offer
+                                        </button>
+                                    ) : (
+                                        <button 
+                                            className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
+                                            onClick={() => setIsOfferModalOpen(true)}
+                                        >
+                                            Make an Offer
+                                        </button>
+                                    )}
+                                </>
                             )}
                         </div>
                     </>
@@ -411,22 +450,35 @@ export default function PriceAndActionsSection({
             {/* Offer Modal */}
             {isOfferModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-[5px]">
-                    <div className="bg-white p-8 rounded-lg max-w-md w-full mx-4">
-                        <h2 className="text-2xl font-bold mb-4">Make an Offer for Chonk #{chonkId}</h2>
+                    <div className="bg-white p-8   max-w-md w-full mx-4">
+                        <h2 className="text-[1.25vw] font-bold mb-4">Make an Offer for Chonk #{chonkId}</h2>
                         
-                        <div className="mb-4">
-                            <label className="block mb-2">Offer Amount (ETH)</label>
-                            <input
-                                type="number"
-                                step="0.000001"
-                                value={offerAmount}
-                                onChange={(e) => setOfferAmount(e.target.value)}
-                                className="w-full p-2 border rounded"
-                                placeholder="0.00"
-                            />
+                        <div className="mb-4 text-[1vw]">
+
+                            {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
+                                // shouldn't hit this as it will show Cancel Your Offer button
+                                <div className="text-red-500 text-[1vw] mb-2">You already have an active bid on this chonk</div>
+                            ) : (
+                                <>
+                                    {hasActiveBid && chonkBid && (
+                                        <div className="text-red-500 text-[1vw] mb-2">
+                                            Current Bid: {formatEther(chonkBid.amountInWei)} ETH
+                                        </div>
+                                    )}
+                                    <label className="block mb-2">Offer Amount (ETH)</label>
+                                    <input
+                                        type="number"
+                                        step="0.000001"
+                                        value={offerAmount}
+                                        onChange={(e) => setOfferAmount(e.target.value)}
+                                        className="w-full p-2 border rounded"
+                                        placeholder="0.00"
+                                    />
+                                </>
+                            )}
                         </div>
 
-                        <div className="flex justify-end space-x-4">
+                        <div className="flex justify-end space-x-4 text-[1vw]">
                             <button
                                 className="px-4 py-2 border border-black hover:bg-gray-100"
                                 onClick={() => {
@@ -439,6 +491,12 @@ export default function PriceAndActionsSection({
                             <button
                                 className="px-4 py-2 bg-black text-white hover:bg-gray-800"
                                 onClick={() => {
+                                    // Check if there's an active bid and if the new offer amount is greater than the current bid
+                                    if (hasActiveBid && chonkBid && Number(offerAmount) <= Number(formatEther(chonkBid.amountInWei))) {
+                                        alert(`Your offer must be greater than the current bid of ${formatEther(chonkBid.amountInWei)} ETH.`);
+                                        return;
+                                    }
+                                    
                                     if (offerAmount) {
                                         handleBidOnChonk(chonkId, offerAmount);
                                     }
