@@ -4,6 +4,7 @@ import { useMarketplaceActions } from '@/hooks/marketplaceAndMintHooks';
 import { useBalance, useAccount, useEnsAddress } from 'wagmi';
 import { parseEther, isAddress, formatEther } from 'viem';
 import { mainnet } from 'wagmi/chains';
+import { ConnectKitButton } from "connectkit";
 
 type PriceAndActionsSectionProps = {
     chonkId: number;
@@ -12,7 +13,7 @@ type PriceAndActionsSectionProps = {
     // priceUSD: number;
     // isOfferSpecific: boolean;
     // canAcceptOffer: boolean;
-   
+
     // hasActiveOffer: boolean;
     // hasActiveBid: boolean;
     // onListingSuccess?: () => void;
@@ -41,7 +42,7 @@ export default function PriceAndActionsSection({
     const { data: balance } = useBalance({ address });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [listingPrice, setListingPrice] = useState('');
-    const { 
+    const {
         finalIsApproved,
         isListingRejected,
         hashListChonk,
@@ -54,7 +55,7 @@ export default function PriceAndActionsSection({
         isListChonkLoading,
         isListChonkSuccess,
         price,
-        handleApproveMarketplace, 
+        handleApproveMarketplace,
         handleListChonk,
         handleListChonkToAddress,
         handleBuyChonk,
@@ -83,7 +84,7 @@ export default function PriceAndActionsSection({
             setLocalListingPending(true); // neeeded because we want to clear the rejection here 
         }
     }, [isListChonkLoading]);
-    
+
     // let's initiall set offerAmount to the current bid amount
     useEffect(() => {
         if (hasActiveBid && chonkBid) {
@@ -135,7 +136,7 @@ export default function PriceAndActionsSection({
 
     // Calculate if balance is sufficient (price + estimated gas)
     const estimatedGasInEth = 0.0002; // Rough estimate // Deploy: check what this could be set to!?
-    const hasInsufficientBalance = price && balance && 
+    const hasInsufficientBalance = price && balance &&
         balance.value < parseEther((price + estimatedGasInEth).toString());
 
     // Add this constant near the top of the component
@@ -159,114 +160,155 @@ export default function PriceAndActionsSection({
                             )}
                         </div>
 
-                        {isOwner ? (
-                            <div className="flex flex-col gap-2">
-                            
-                            <button 
-                                className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
-                                onClick={handleCancelOfferChonk}
-                            >
-                                Cancel Listing
-                            </button>
-
-                                {hasActiveBid && chonkBid && (
-                                <button 
-                                    className="w-full bg-chonk-orange text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
-                                    onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
-                                >
-                                    Accept Bid for {formatEther(chonkBid.amountInWei)} ETH
-                                </button>
-                                )}
-                            </div>
-                        ) : (
-                            <>
-                                <button 
-                                    className={`w-full py-2 px-4 rounded transition-colors ${
-                                        (!isOfferSpecific || canAcceptOffer) && !hasInsufficientBalance
-                                            ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    }`}
-                                    disabled={Boolean((isOfferSpecific && !canAcceptOffer) || hasInsufficientBalance)}
-                                    onClick={() => {
-                                        console.log('Buy Now clicked, price:', price);
-                                        if (price) {
-                                            console.log('Calling handleBuyChonk with price:', price);
-                                            handleBuyChonk(price);
-                                        } else {
-                                            console.log('Price is null or undefined');
-                                        }
+                        {
+                            !address ? (
+                                <ConnectKitButton
+                                    // theme="web"
+                                    customTheme={{
+                                        "--ck-font-family": "'Source Code Pro', monospace",
+                                        "--ck-primary-button-background": "#2F7BA7",
+                                        "--ck-primary-button-hover-background": "#FFFFFF",
+                                        "--ck-primary-button-hover-color": "#2F7BA7",
+                                        "--ck-primary-button-border-radius": "0px",
+                                        "--ck-primary-button-font-weight": "600",
+                                        "--ck-connectbutton-background": "#2F7BA7",
+                                        "--ck-connectbutton-hover-background": "#111111",
+                                        "--ck-connectbutton-hover-color": "#FFFFFF",
+                                        "--ck-connectbutton-border-radius": "0px",
+                                        "--ck-connectbutton-color": "#FFFFFF",
+                                        "--ck-connectbutton-font-weight": "600",
+                                        "--ck-connectbutton-font-size": "21px",
                                     }}
-                                >
-                                    {isOfferSpecific 
-                                        ? canAcceptOffer 
-                                            ? 'Accept Private Offer' 
-                                            : 'Private Offer - Not For You'
-                                        : 'Buy Now'}
-                                </button>
-                                {hasInsufficientBalance && (
-                                    <p className="text-red-500 text-sm mt-2">
-                                        Insufficient balance. You need at least {price && (price + estimatedGasInEth).toFixed(4)} ETH (including gas)
-                                    </p>
-                                )}
-                            </>
-                        )}
-                    </>
-                ) : (
-                    <>
-                        <div className="text-[1vw] text-gray-500 mb-[1.725vw]">Not Listed 
-                            {hasActiveBid && chonkBid && (
-                                <span className="text-gray-500"> | Current Bid: {formatEther(chonkBid.amountInWei)} ETH</span>
-                            )}
-                        </div>
-                        <div className="flex flex-col gap-2">
-                            {isOwner && (
-                                <>
-                                    <button 
-                                        className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
-                                        onClick={() => {
-                                            if (!finalIsApproved) {
-                                                handleApproveMarketplace();
-                                            } else {
-                                                setIsModalOpen(true);
-                                            }
-                                        }}
+                                />
+                            ) : isOwner ? (
+                                <div className="flex flex-col gap-2">
+
+                                    <button
+                                        className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
+                                        onClick={handleCancelOfferChonk}
                                     >
-                                        {finalIsApproved ? 'List Your Chonk' : 'Approve Marketplace to List Chonk'}
+                                        Cancel Listing
                                     </button>
-                                    
+
                                     {hasActiveBid && chonkBid && (
-                                        <button 
-                                            className="w-full bg-chonk-orange text-white py-2 px-4 hover:bg-chonk-orange hover:text-black transition-colors"
+                                        <button
+                                            className="w-full bg-chonk-orange text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
                                             onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
                                         >
                                             Accept Bid for {formatEther(chonkBid.amountInWei)} ETH
                                         </button>
                                     )}
-                                </>
-                            )}
-                            {!isOwner && (
-
-                                // Need to check if there's an active bid, and who it's by
-                                // If current address is the bidder, show "Cancel Offer" button
-                                // Otherwise, show "Make an Offer" button
+                                </div>
+                            ) : (
                                 <>
-                                    {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
-                                        <button 
-                                            className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
-                                            onClick={() => handleWithdrawBidOnChonk()}
+                                    <button
+                                        className={`w-full py-2 px-4 rounded transition-colors ${(!isOfferSpecific || canAcceptOffer) && !hasInsufficientBalance
+                                            ? 'bg-blue-500 text-white hover:bg-blue-600'
+                                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                            }`}
+                                        disabled={Boolean((isOfferSpecific && !canAcceptOffer) || hasInsufficientBalance)}
+                                        onClick={() => {
+                                            console.log('Buy Now clicked, price:', price);
+                                            if (price) {
+                                                console.log('Calling handleBuyChonk with price:', price);
+                                                handleBuyChonk(price);
+                                            } else {
+                                                console.log('Price is null or undefined');
+                                            }
+                                        }}
                                     >
-                                            Cancel Your Offer
-                                        </button>
-                                    ) : (
-                                        <button 
-                                            className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
-                                            onClick={() => setIsOfferModalOpen(true)}
-                                        >
-                                            Make an Offer
-                                        </button>
+                                        {isOfferSpecific
+                                            ? canAcceptOffer
+                                                ? 'Accept Private Offer'
+                                                : 'Private Offer - Not For You'
+                                            : 'Buy Now'}
+                                    </button>
+                                    {hasInsufficientBalance && (
+                                        <p className="text-red-500 text-sm mt-2">
+                                            Insufficient balance. You need at least {price && (price + estimatedGasInEth).toFixed(4)} ETH (including gas)
+                                        </p>
                                     )}
                                 </>
                             )}
+                    </>
+                ) : (
+                    <>
+                        <div className="text-[1vw] text-gray-500 mb-[1.725vw]">Not Listed
+                            {hasActiveBid && chonkBid && (
+                                <span className="text-gray-500"> | Current Bid: {formatEther(chonkBid.amountInWei)} ETH</span>
+                            )}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            {
+                                !address ? (
+                                    <ConnectKitButton
+                                        // theme="web"
+                                        customTheme={{
+                                            "--ck-font-family": "'Source Code Pro', monospace",
+                                            "--ck-primary-button-background": "#2F7BA7",
+                                            "--ck-primary-button-hover-background": "#FFFFFF",
+                                            "--ck-primary-button-hover-color": "#2F7BA7",
+                                            "--ck-primary-button-border-radius": "0px",
+                                            "--ck-primary-button-font-weight": "600",
+                                            "--ck-connectbutton-background": "#2F7BA7",
+                                            "--ck-connectbutton-hover-background": "#111111",
+                                            "--ck-connectbutton-hover-color": "#FFFFFF",
+                                            "--ck-connectbutton-border-radius": "0px",
+                                            "--ck-connectbutton-color": "#FFFFFF",
+                                            "--ck-connectbutton-font-weight": "600",
+                                            "--ck-connectbutton-font-size": "21px",
+                                        }}
+                                    />
+                                ) :
+                                    isOwner ? (
+                                        <>
+                                            <button
+                                                className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
+                                                onClick={() => {
+                                                    if (!finalIsApproved) {
+                                                        handleApproveMarketplace();
+                                                    } else {
+                                                        setIsModalOpen(true);
+                                                    }
+                                                }}
+                                            >
+                                                {finalIsApproved ? 'List Your Chonk' : 'Approve Marketplace to Trade'}
+                                            </button>
+
+                                            {finalIsApproved && hasActiveBid && chonkBid && (
+                                                <button
+                                                    className="w-full bg-chonk-orange text-white py-2 px-4 hover:bg-chonk-orange hover:text-black transition-colors"
+                                                    onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
+                                                >
+                                                    Accept Bid for {formatEther(chonkBid.amountInWei)} ETH
+                                                </button>
+                                            )}
+                                        </>
+                                    ) :
+                                        !isOwner && (
+                                            <>
+                                                {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
+                                                    <button
+                                                        className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
+                                                        onClick={() => handleWithdrawBidOnChonk()}
+                                                    >
+                                                        Cancel Your Offer
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
+                                                        onClick={() => setIsOfferModalOpen(true)}
+                                                    >
+                                                        Make an Offer
+                                                    </button>
+                                                )}
+                                            </>
+                                        )
+                            }
+
+
+
+
                         </div>
                     </>
                 )}
@@ -276,8 +318,8 @@ export default function PriceAndActionsSection({
             {isModalOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-[5px]">
                     <div className="bg-white p-8 max-w-md w-full mx-4 min-w-[25vw]">
-                        
-                        { localListingRejected ? (
+
+                        {localListingRejected ? (
                             <div>
                                 <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Transaction Rejected</div>
                                 <div className="text-[1vw] mb-6">I feel rejected :(</div>
@@ -302,7 +344,7 @@ export default function PriceAndActionsSection({
                                 <button
                                     onClick={() => setIsModalOpen(false)}
                                     className="mb-4bg-white text-black border border-black px-4 py-2 text-[0.69vw] hover:bg-gray-100 transition-colors mt-[1.725vw]"
-                                >   
+                                >
                                     Close
                                 </button>
                             </>
@@ -325,7 +367,7 @@ export default function PriceAndActionsSection({
                                         <div className="text-[1vw]">Checking mint status{dots}</div>
                                     </>
                                 )}
-                            
+
                                 <div className="text-sm mt-4 break-all max-w-[80%]">
                                     <button
                                         onClick={() => window.open(`https://sepolia.basescan.org/tx/${hashListChonk}`, '_blank')}
@@ -344,7 +386,7 @@ export default function PriceAndActionsSection({
                             // LIST FORM
                             <div>
                                 <h2 className="text-2xl font-bold mb-4">List Chonk #{chonkId}</h2>
-                                
+
                                 <div className="mb-4">
                                     <label className="block mb-2">Price (ETH)</label>
                                     <input
@@ -367,7 +409,7 @@ export default function PriceAndActionsSection({
                                         <span>{isPrivateListingExpanded ? '▼' : '▶'}</span>
                                         Private Listing
                                     </button>
-                                    
+
                                     {isPrivateListingExpanded && (
                                         <div className="mt-2">
                                             <label className="block mb-2">Recipient Address</label>
@@ -386,12 +428,12 @@ export default function PriceAndActionsSection({
                                             )}
                                             {recipientAddress.endsWith('.eth') && (
                                                 <p className="text-gray-500 text-sm mt-1">
-                                                    {!ensAddress 
-                                                        ? 'Resolving ENS address...' 
+                                                    {!ensAddress
+                                                        ? 'Resolving ENS address...'
                                                         : `Resolved to: ${ensAddress}`}
                                                 </p>
                                             )}
-                                           
+
                                         </div>
                                     )}
                                 </div>
@@ -428,7 +470,7 @@ export default function PriceAndActionsSection({
                                                 setAddressError('Please enter a valid address or ENS name');
                                                 return;
                                             }
-                                            
+
                                             if (isPrivateListingExpanded && resolvedAddress) {
                                                 handleListChonkToAddress(listingPrice, resolvedAddress);
                                             } else {
@@ -452,7 +494,7 @@ export default function PriceAndActionsSection({
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-[5px]">
                     <div className="bg-white p-8   max-w-md w-full mx-4">
                         <h2 className="text-[1.25vw] font-bold mb-4">Make an Offer for Chonk #{chonkId}</h2>
-                        
+
                         <div className="mb-4 text-[1vw]">
 
                             {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
@@ -496,7 +538,7 @@ export default function PriceAndActionsSection({
                                         alert(`Your offer must be greater than the current bid of ${formatEther(chonkBid.amountInWei)} ETH.`);
                                         return;
                                     }
-                                    
+
                                     if (offerAmount) {
                                         handleBidOnChonk(chonkId, offerAmount);
                                     }

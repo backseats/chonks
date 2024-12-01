@@ -159,10 +159,12 @@ export function useMintFunction() {
     const now = Math.floor(Date.now() / 1000);
     const endTime = startTimeNum + (24 * 60 * 60); // 24 hours in seconds
     const timeRemaining = endTime - now;
+
+    console.log('timeRemaining', timeRemaining);
     
     return {
       isOpen: timeRemaining > 0,
-      timeRemaining: Math.max(0, timeRemaining)
+      timeRemaining: timeRemaining //Math.max(0, timeRemaining)
     };
   }, [mintStartTime]);
 

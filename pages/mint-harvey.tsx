@@ -49,87 +49,11 @@ const TokenImage = ({ tokenId }: { tokenId: number }) => {
     );
 };
 
-// Update the modal content to show different states
-// const ModalContent = ({
-//     isMintingError,
-//     isMintingSuccess,
-//     isConfirming,
-//     dots,
-//     transactionhashMinting,
-//     setIsModalOpen
-// }: {
-//     isMintingError: boolean;
-//     isMintingSuccess: boolean;
-//     isConfirming: boolean;
-//     dots: string;
-//     transactionhashMinting: string | null;
-//     setIsModalOpen: (open: boolean) => void;
-// }) => {
-//     if (isMintingError) {
-//         console.log("isMintingError");
-//         return (
-//             <div className="space-y-4">
-//                 <div className="text-xl text-red-500">Transaction Failed</div>
-//                 <button
-//                     onClick={() => setIsModalOpen(false)}
-//                     className="bg-chonk-blue hover:bg-chonk-blue/80 text-white py-2 px-4 rounded"
-//                 >
-//                     Close
-//                 </button>
-//             </div>
-//         );
-//     }
-
-//     if (isMintingSuccess) {
-//         console.log("isMintingSuccess");
-//         return (
-//             <div className="space-y-4">
-//                 <div className="text-xl text-green-500">Success!</div>
-//                 <div>Your Chonk has been minted</div>
-//                 <button
-//                     onClick={() => setIsModalOpen(false)}
-//                     className="bg-chonk-blue hover:bg-chonk-blue/80 text-white py-2 px-4 rounded"
-//                 >
-//                     Close
-//                 </button>
-//             </div>
-//         );
-//     }
-
-//     if (isConfirming && transactionhashMinting) {
-//         console.log("isConfirming");
-//         return (
-//             <>
-//                 <div className="text-black text-[1.725vw] mb-2">Transaction Submitted</div>
-//                 <div className="text-[1vw]">Waiting for confirmation{dots}</div>
-//                 {transactionhashMinting && (
-//                     <div className="text-sm mt-4 break-all max-w-[80%] text-center">
-//                         {/* <div className="font-bold mb-1">Transaction hashMinting:</div> */}
-//                         <button
-//                             onClick={() => window.open(`https://sepolia.basescan.org/tx/${transactionhashMinting}`, '_blank')}
-//                             className="bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
-//                         >
-//                             View on Basescan
-//                         </button>
-//                     </div>
-//                 )}
-//             </>
-//         );
-//     }
-
-//     return (
-//         <>
-//             <div className="text-black text-[1.725vw] mb-2">Confirm in Wallet</div>
-//             <div className="text-[1vw]">Requesting signature{dots}</div>
-//         </>
-//     );
-// };
-
 export default function Mint() {
     const MAX_MINT_AMOUNT = 10;
     
     const [isMintOpen, setIsMintOpen] = useState(true);
-
+    const [isMintOver, setIsMintOver] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedChonk, setSelectedChonk] = useState<number | null>(null);
     const [mintAmount, setMintAmount] = useState(1);
@@ -163,6 +87,7 @@ export default function Mint() {
 
     // Set initial time remaining when mintStatus changes
     useEffect(() => {
+        console.log('mintStatus', mintStatus);
         if (mintStatus?.timeRemaining) {
             setTimeRemaining(mintStatus.timeRemaining);
         }
@@ -171,6 +96,11 @@ export default function Mint() {
     // Countdown timer effect
     useEffect(() => {
         if (!timeRemaining) return;
+
+        if (timeRemaining <= 0) {
+            setIsMintOver(true);
+            return;
+        }
 
         const updateCountdown = () => {
             const hours = Math.floor(timeRemaining / 3600);
@@ -393,142 +323,150 @@ export default function Mint() {
                     <div className="mx-[20px] sm:mx-[3.45vw] "> {/* EDGES */}
 
                         <section className={`border-l border-r flex flex-col items-center justify-center bg-white py-[3.45vw]`}>
-                            <h1 className="text-[3.45vw] mb-8">Mint a Chonk{isMintOpen ? '' : '... Soon!'}</h1>
-                            <div className="flex flex-col items-center gap-[1.725vw]">
-                                
-                                { isMintOpen ? (
-                                    <>
-                                        <div className="text-[1.25vw]">Desired Quantity</div>
-                                        <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={decrementMintAmount}
-                                            className="px-3 py-1 border  hover:bg-chonk-orange"
-                                        >
-                                            -
-                                        </button>
-                                        <input
-                                            type="number"
-                                            value={mintAmount}
-                                            onChange={(e) => setMintAmount(Math.max(1, Math.min(MAX_MINT_AMOUNT, parseInt(e.target.value) || 1)))}
-                                            className="w-[6.9vw] min-w-[100px] text-center border  px-2 py-1"
-                                            min="1"
-                                            max={MAX_MINT_AMOUNT.toString()}
-                                        />
-                                        <button
-                                            onClick={incrementMintAmount}
-                                            className="px-3 py-1 border  hover:bg-chonk-orange"
-                                        >
-                                            +
+                            <h1 className="text-[3.45vw] mb-8"> 
+                                {isMintOver ? 'Mint Closed' : 'Mint a Chonk' + (isMintOpen ? '' : '... Soon!')}
+                            </h1>
+                            
+                            {isMintOver ? (
+                                <div className="text-[1.25vw]">Mint is now closed</div>
+                            ) : (
+                                <div className="flex flex-col items-center gap-[1.725vw]">
+                                    
+                                    { isMintOpen ? (
+                                        <>
+                                            <div className="text-[1.25vw]">Desired Quantity</div>
+                                            <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={decrementMintAmount}
+                                                className="px-3 py-1 border  hover:bg-chonk-orange"
+                                            >
+                                                -
                                             </button>
+                                            <input
+                                                type="number"
+                                                value={mintAmount}
+                                                onChange={(e) => setMintAmount(Math.max(1, Math.min(MAX_MINT_AMOUNT, parseInt(e.target.value) || 1)))}
+                                                className="w-[6.9vw] min-w-[100px] text-center border  px-2 py-1"
+                                                min="1"
+                                                max={MAX_MINT_AMOUNT.toString()}
+                                            />
+                                            <button
+                                                onClick={incrementMintAmount}
+                                                className="px-3 py-1 border  hover:bg-chonk-orange"
+                                            >
+                                                +
+                                                </button>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="text-[1.25vw]">Connect your wallet to check if you are on a Chonklist</div>
+                                    )}
+
+                                    {!address ? (
+                                        <ConnectKitButton
+                                            // theme="web"
+                                            customTheme={{
+                                                "--ck-font-family": "'Source Code Pro', monospace",
+                                                "--ck-primary-button-background": "#2F7BA7",
+                                                "--ck-primary-button-hover-background": "#FFFFFF",
+                                                "--ck-primary-button-hover-color": "#2F7BA7",
+                                                "--ck-primary-button-border-radius": "0px",
+                                                "--ck-primary-button-font-weight": "600",
+                                                "--ck-connectbutton-background": "#2F7BA7",
+                                                "--ck-connectbutton-hover-background": "#111111",
+                                                "--ck-connectbutton-hover-color": "#FFFFFF",
+                                                "--ck-connectbutton-border-radius": "0px",
+                                                "--ck-connectbutton-color": "#FFFFFF",
+                                                "--ck-connectbutton-font-weight": "600",
+                                                "--ck-connectbutton-font-size": "21px",
+                                            }}
+                                        />
+                                    ) : isMintOpen ? (
+                                        <button
+                                            onClick={handleMint}
+                                            disabled={isPending || isConfirming}
+                                            className="bg-chonk-blue border border-chonk-blue hover:border-black hover:text-gray-200 text-white source-sans-pro py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                                        >
+                                            {getMintButtonText()}
+                                        </button>
+                                    ) : (
+                                        <div></div>
+                                    )}
+
+                                    { address && (
+                                        <div className="text-lg mt-2 text-center">
+                                            {
+                                            isCreator ? 
+                                                <div className="text-green-500">Congrats, you&apos;re on the Creator List! <br /> For every Chonk you mint, you&apos;ll get 7 traits.<br />But only in your first transaction!</div>
+                                            : isFriend ? 
+                                                <div className="text-green-500">Congrats, you&apos;re on the Friends List! <br />For every Chonk you mint, you&apos;ll get 6 traits.<br />But only in your first transaction!</div>
+                                            : isSpecial ? 
+                                                <div className="text-green-500">Congrats, you&apos;re on the Special Collections List! <br />For every Chonk you mint, you&apos;ll get 5 traits.<br />But only in your first transaction!</div>
+                                            : <div className="text-red-500">Your wallet is not on a Chonklist :(</div>
+                                            }
                                         </div>
-                                    </>
-                                ) : (
-                                    <div className="text-[1.25vw]">Connect your wallet to check if you are on a Chonklist</div>
-                                )}
+                                    )}
 
-                                {!address ? (
-                                    <ConnectKitButton
-                                        // theme="web"
-                                        customTheme={{
-                                            "--ck-font-family": "'Source Code Pro', monospace",
-                                            "--ck-primary-button-background": "#2F7BA7",
-                                            "--ck-primary-button-hover-background": "#FFFFFF",
-                                            "--ck-primary-button-hover-color": "#2F7BA7",
-                                            "--ck-primary-button-border-radius": "0px",
-                                            "--ck-primary-button-font-weight": "600",
-                                            "--ck-connectbutton-background": "#2F7BA7",
-                                            "--ck-connectbutton-hover-background": "#111111",
-                                            "--ck-connectbutton-hover-color": "#FFFFFF",
-                                            "--ck-connectbutton-border-radius": "0px",
-                                            "--ck-connectbutton-color": "#FFFFFF",
-                                            "--ck-connectbutton-font-weight": "600",
-                                            "--ck-connectbutton-font-size": "21px",
-                                        }}
-                                    />
-                                ) : isMintOpen ? (
-                                    <button
-                                        onClick={handleMint}
-                                        disabled={isPending || isConfirming}
-                                        className="bg-chonk-blue border border-chonk-blue hover:border-black hover:text-gray-200 text-white source-sans-pro py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
-                                    >
-                                        {getMintButtonText()}
-                                    </button>
-                                ) : (
-                                    <div></div>
-                                )}
-
-                                { address && (
-                                    <div className="text-lg mt-2 text-center">
-                                        {
-                                        isCreator ? 
-                                            <div className="text-green-500">Congrats, you&apos;re on the Creator List! <br /> For every Chonk you mint, you&apos;ll get 7 traits.<br />But only in your first transaction!</div>
-                                        : isFriend ? 
-                                            <div className="text-green-500">Congrats, you&apos;re on the Friends List! <br />For every Chonk you mint, you&apos;ll get 6 traits.<br />But only in your first transaction!</div>
-                                        : isSpecial ? 
-                                            <div className="text-green-500">Congrats, you&apos;re on the Special Collections List! <br />For every Chonk you mint, you&apos;ll get 5 traits.<br />But only in your first transaction!</div>
-                                        : <div className="text-red-500">Your wallet is not on a Chonklist :(</div>
-                                        }
-                                    </div>
-                                )}
-
-                                { isMintOpen ? (
-                                    <div className="text-[1vw] mt-6 text-center">
+                                    { isMintOpen ? (
+                                        <div className="text-[1vw] mt-6 text-center">
+                                            <p>
+                                                {totalSupply !== undefined ? `${totalSupply} Chonks minted` : 'Loading...'}
+                                                <br />
+                                                24hr mint closes in: {countdownDisplay}
+                                            </p>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                        </div>
+                                    )}
+                                    <div className="text-[1vw] w-full max-w-2xl text-gray-500">
                                         <p>
-                                            {totalSupply !== undefined ? `${totalSupply} Chonks minted` : 'Loading...'}
-                                            <br />
-                                            24hr mint closes in: {countdownDisplay}
+                                        Note: Chonks (and Traits) will not be tradable during the 24 hour mint period. Once the mint is over, you will be able to trade them on our Marketplace and others.
                                         </p>
+                
                                     </div>
-                                ) : (
-                                    <div>
-                                    </div>
-                                )}
-                                <div className="text-[1vw] w-full max-w-2xl text-gray-500">
-                                    <p>
-                                       Note: Chonks (and Traits) will not be tradable during the 24 hour mint period. Once the mint is over, you will be able to trade them on our Marketplace and others.
-                                    </p>
-            
-                                </div>
 
-                                <div className="mt-[1.725vw] w-full max-w-2xl border-t border-gray-300 pt-[3.45vw]">
-                                    <h2 className="text-[3.45vw] mb-[3.45vw]">FAQ</h2>
-                                    <div className="space-y-[0vw]">
-                                        <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">1. How much is a Chonk?</h3>
-                                            <p className="text-[1.25vw]"> Each Chonk costs {MINT_PRICE} ETH to mint, approximatley $33 USD.</p>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">2. How many Chonks can I mint?</h3>
-                                            <p className="text-[1.25vw]">You can mint up to 10 Chonks per transaction. If you are one of the Chonklists, you can only use your Chonklist allocation in one transaction.</p>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">3. Is there a collection limit?</h3>
-                                            <p className="text-[1.25vw]">No. This is a Timed Edition mint - there is no limit to the number of Chonks that can minted in the 24 hours.</p>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">4. Is there an Allowlist?</h3>
-                                            <p className="text-[1.25vw]">No, anyone can mint but...</p>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">5. What are the Chonklists?</h3>
-                                            <p className="text-[1.25vw] pb-[1.25vw]">Each Chonk comes with 4 traits. The number of traits you receive depends on your Chonklist status:</p>
-                                            <ul className="list-disc ml-6 text-[1.25vw] pb-[3.45vw]">
-                                                <li>Special Collections List: 5 traits per Chonk</li>
-                                                <li>Friends List: 6 traits per Chonk</li>
-                                                <li>Creator List: 7 traits per Chonk</li>
-                                            </ul>
-                                        </div>
-                                        <div>
-                                            <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">6. Will the team be minting?</h3>
-                                            <p className="text-[1.25vw]">
-                                                We will be minting some Chonks for giveaways and collabs. 
-                                                And potentially to round off the number of Chonk &amp; Trait NFTs (we have plans). 
-                                                We will do this within 2 hours of the mint ending and it will be no more than 5% of the total supply.</p>
+                                    <div className="mt-[1.725vw] w-full max-w-2xl border-t border-gray-300 pt-[3.45vw]">
+                                        <h2 className="text-[3.45vw] mb-[3.45vw]">FAQ</h2>
+                                        <div className="space-y-[0vw]">
+                                            <div>
+                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">1. How much is a Chonk?</h3>
+                                                <p className="text-[1.25vw]"> Each Chonk costs {MINT_PRICE} ETH to mint, approximatley $33 USD.</p>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">2. How many Chonks can I mint?</h3>
+                                                <p className="text-[1.25vw]">You can mint up to 10 Chonks per transaction. If you are one of the Chonklists, you can only use your Chonklist allocation in one transaction.</p>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">3. Is there a collection limit?</h3>
+                                                <p className="text-[1.25vw]">No. This is a Timed Edition mint - there is no limit to the number of Chonks that can minted in the 24 hours.</p>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">4. Is there an Allowlist?</h3>
+                                                <p className="text-[1.25vw]">No, anyone can mint but...</p>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">5. What are the Chonklists?</h3>
+                                                <p className="text-[1.25vw] pb-[1.25vw]">Each Chonk comes with 4 traits. The number of traits you receive depends on your Chonklist status:</p>
+                                                <ul className="list-disc ml-6 text-[1.25vw] pb-[3.45vw]">
+                                                    <li>Special Collections List: 5 traits per Chonk</li>
+                                                    <li>Friends List: 6 traits per Chonk</li>
+                                                    <li>Creator List: 7 traits per Chonk</li>
+                                                </ul>
+                                            </div>
+                                            <div>
+                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">6. Will the team be minting?</h3>
+                                                <p className="text-[1.25vw]">
+                                                    We will be minting some Chonks for giveaways and collabs. 
+                                                    And potentially to round off the number of Chonk &amp; Trait NFTs (we have plans). 
+                                                    We will do this within 2 hours of the mint ending and it will be no more than 5% of the total supply.</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                            </div>
+                                </div>
+                            )}
+
                         </section>
 
                     </div>
