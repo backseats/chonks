@@ -313,7 +313,7 @@ export default function Mint() {
                 <link rel="manifest" href="/site.webmanifest" />
             </Head>
 
-            <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
+            <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] md:text-[1.5vw]">
 
                 <MenuBar />
 
@@ -322,19 +322,21 @@ export default function Mint() {
 
                     <div className="mx-[20px] sm:mx-[3.45vw] "> {/* EDGES */}
 
-                        <section className={`border-l border-r flex flex-col items-center justify-center bg-white py-[3.45vw]`}>
-                            <h1 className="text-[3.45vw] mb-8"> 
+                        <section className={`border-l border-r flex flex-col items-center justify-center bg-white py-[6.9vw] md:py-[3.45vw] px-[2.5vw] md:w-[69vw] md:mx-auto`}>
+                            <h1 className="text-[6.9vw] md:text-[3.45vw] mb-8"> 
                                 {isMintOver ? 'Mint Closed' : 'Mint a Chonk' + (isMintOpen ? '' : '... Soon!')}
                             </h1>
                             
                             {isMintOver ? (
-                                <div className="text-[1.25vw]">Mint is now closed</div>
+                                <div className="text-[3.45vw] md:text-[1.25vw] text-center mb-[3.45vw]">
+                                    Release 1 Mint is now closed <br />Head on over to our <Link href="/marketplace" className="underline text-chonk-blue ">marketplace</Link>!
+                                </div>
                             ) : (
                                 <div className="flex flex-col items-center gap-[1.725vw]">
                                     
                                     { isMintOpen ? (
                                         <>
-                                            <div className="text-[1.25vw]">Desired Quantity</div>
+                                            <div className="md:text-[1.25vw] text-[3.4vw]">Desired Quantity</div>
                                             <div className="flex items-center gap-2">
                                             <button
                                                 onClick={decrementMintAmount}
@@ -359,7 +361,7 @@ export default function Mint() {
                                             </div>
                                         </>
                                     ) : (
-                                        <div className="text-[1.25vw]">Connect your wallet to check if you are on a Chonklist</div>
+                                        <div className="text-[3.4vw] md:text-[1.25vw]">Connect your wallet to check if you are on a Chonklist</div>
                                     )}
 
                                     {!address ? (
@@ -394,21 +396,21 @@ export default function Mint() {
                                     )}
 
                                     { address && (
-                                        <div className="text-lg mt-2 text-center">
+                                        <div className="text-[3.4vw] md:text-[1.25vw] mt-2 text-center">
                                             {
                                             isCreator ? 
-                                                <div className="text-green-500">Congrats, you&apos;re on the Creator List! <br /> For every Chonk you mint, you&apos;ll get 7 traits.<br />But only in your first transaction!</div>
+                                                <div className="text-green-500">Congrats, you&apos;re on the Creator List! For every Chonk you mint, you&apos;ll get 7 traits. But only in your first transaction!</div>
                                             : isFriend ? 
-                                                <div className="text-green-500">Congrats, you&apos;re on the Friends List! <br />For every Chonk you mint, you&apos;ll get 6 traits.<br />But only in your first transaction!</div>
+                                                <div className="text-green-500">Congrats, you&apos;re on the Friends List! For every Chonk you mint, you&apos;ll get 6 traits. But only in your first transaction!</div>
                                             : isSpecial ? 
-                                                <div className="text-green-500">Congrats, you&apos;re on the Special Collections List! <br />For every Chonk you mint, you&apos;ll get 5 traits.<br />But only in your first transaction!</div>
+                                                <div className="text-green-500">Congrats, you&apos;re on the Special Collections List! For every Chonk you mint, you&apos;ll get 5 traits. But only in your first transaction!</div>
                                             : <div className="text-red-500">Your wallet is not on a Chonklist :(</div>
                                             }
                                         </div>
                                     )}
 
                                     { isMintOpen ? (
-                                        <div className="text-[1vw] mt-6 text-center">
+                                        <div className="md:text-[1vw] text-[3.4vw] mt-6 text-center">
                                             <p>
                                                 {totalSupply !== undefined ? `${totalSupply} Chonks minted` : 'Loading...'}
                                                 <br />
@@ -419,7 +421,7 @@ export default function Mint() {
                                         <div>
                                         </div>
                                     )}
-                                    <div className="text-[1vw] w-full max-w-2xl text-gray-500">
+                                    <div className="md:text-[1vw] text-[2.5vw] w-full max-w-2xl text-gray-500">
                                         <p>
                                         Note: Chonks (and Traits) will not be tradable during the 24 hour mint period. Once the mint is over, you will be able to trade them on our Marketplace and others.
                                         </p>
@@ -427,36 +429,36 @@ export default function Mint() {
                                     </div>
 
                                     <div className="mt-[1.725vw] w-full max-w-2xl border-t border-gray-300 pt-[3.45vw]">
-                                        <h2 className="text-[3.45vw] mb-[3.45vw]">FAQ</h2>
-                                        <div className="space-y-[0vw]">
+                                        <h2 className="md:text-[3.45vw] text-[6.9vw] mb-[3.45vw]">FAQ</h2>
+                                        <div className="space-y-[1vw]">
                                             <div>
-                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">1. How much is a Chonk?</h3>
-                                                <p className="text-[1.25vw]"> Each Chonk costs {MINT_PRICE} ETH to mint, approximatley $33 USD.</p>
+                                                <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">1. How much is a Chonk?</h3>
+                                                <p className="md:text-[1.25vw] text-[2.5vw]"> Each Chonk costs {MINT_PRICE} ETH to mint, approximatley $33 USD.</p>
                                             </div>
                                             <div>
-                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">2. How many Chonks can I mint?</h3>
-                                                <p className="text-[1.25vw]">You can mint up to 10 Chonks per transaction. If you are one of the Chonklists, you can only use your Chonklist allocation in one transaction.</p>
+                                                <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">2. How many Chonks can I mint?</h3>
+                                                <p className="md:text-[1.25vw] text-[2.5vw]">You can mint up to 10 Chonks per transaction. If you are one of the Chonklists, you can only use your Chonklist allocation in one transaction.</p>
                                             </div>
                                             <div>
-                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">3. Is there a collection limit?</h3>
-                                                <p className="text-[1.25vw]">No. This is a Timed Edition mint - there is no limit to the number of Chonks that can minted in the 24 hours.</p>
+                                                <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">3. Is there a collection limit?</h3>
+                                                <p className="md:text-[1.25vw] text-[2.5vw]">No. This is a Timed Edition mint - there is no limit to the number of Chonks that can minted in the 24 hours.</p>
                                             </div>
                                             <div>
-                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">4. Is there an Allowlist?</h3>
-                                                <p className="text-[1.25vw]">No, anyone can mint but...</p>
+                                                <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">4. Is there an Allowlist?</h3>
+                                                <p className="md:text-[1.25vw] text-[2.5vw]">No, anyone can mint but...</p>
                                             </div>
                                             <div>
-                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">5. What are the Chonklists?</h3>
-                                                <p className="text-[1.25vw] pb-[1.25vw]">Each Chonk comes with 4 traits. The number of traits you receive depends on your Chonklist status:</p>
-                                                <ul className="list-disc ml-6 text-[1.25vw] pb-[3.45vw]">
+                                                <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">5. What are the Chonklists?</h3>
+                                                <p className="md:text-[1.25vw] text-[2.5vw] pb-[1.25vw]">Each Chonk comes with 4 traits. The number of traits you receive depends on your Chonklist status:</p>
+                                                <ul className="list-disc ml-6 md:text-[1.25vw] text-[2.5vw] pb-[3.45vw]">
                                                     <li>Special Collections List: 5 traits per Chonk</li>
                                                     <li>Friends List: 6 traits per Chonk</li>
                                                     <li>Creator List: 7 traits per Chonk</li>
                                                 </ul>
                                             </div>
                                             <div>
-                                                <h3 className="text-[1.725vw] mb-[0.8625vw] text-chonk-blue">6. Will the team be minting?</h3>
-                                                <p className="text-[1.25vw]">
+                                                <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">6. Will the team be minting?</h3>
+                                                <p className="md:text-[1.25vw] text-[2.5vw]">
                                                     We will be minting some Chonks for giveaways and collabs. 
                                                     And potentially to round off the number of Chonk &amp; Trait NFTs (we have plans). 
                                                     We will do this within 2 hours of the mint ending and it will be no more than 5% of the total supply.</p>
@@ -479,15 +481,14 @@ export default function Mint() {
             </div>
 
             {/* Update Modal */}
-            {isModalOpen && (
+            {isModalOpen  && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 font-weight-60 font-source-code-pro backdrop-blur-[5px]">
                     <div className="bg-white p-8 min-w-[400px] w-auto mx-4 text-left ">
 
-
                         {isMintRejected ? (
                             <div>
-                                <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Transaction Rejected</div>
-                                <div className="text-[vw] mb-6">You rejected the transaction. <br />Please try again if you&apos;d like to mint.</div>
+                                <div className="text-red-500 text-[3.4vw] md:text-[1.725vw] mb-2 font-bold">Transaction Rejected</div>
+                                <div className="text-[2.5vw] md:text-[1.25vw] mb-6">You rejected the transaction. <br />Please try again if you&apos;d like to mint.</div>
                                 <button
                                     onClick={() => setIsModalOpen(false)}
                                     className="mb-2 bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
@@ -497,9 +498,9 @@ export default function Mint() {
                             </div>
                         ) : isMintingSuccess ? (
                             <div>
-                                <div className="text-green-500 text-[1.725vw] mb-2">Success - LFC!</div>
+                                <div className="text-green-500 text-[3.4vw] md:text-[1.725vw] mb-2">Success - LFC!</div>
                                 {mainContractTokens && mainContractTokens.length > 0 && (
-                                    <div className="mt-2 text-[1.2vw]">
+                                    <div className="mt-2 md:text-[1.2vw] text-[2.5vw]">
                                         <div className="font-bold mb-1">{mainContractTokens.length > 1 ? 'Your Chonks' : 'Your Chonk'}</div>
                                         <div className="flex flex-wrap gap-4">
                                             {mainContractTokens.map((id, index) => (
@@ -519,7 +520,7 @@ export default function Mint() {
                                     </div>
                                 )}
                                 {traitTokens && traitTokens.length > 0 && (
-                                    <div className="mt-6 text-[1.2vw]">
+                                    <div className="mt-6 md:text-[1.2vw] text-[2.5vw]">
                                         <div className="font-bold">
                                             {traitRevealCountdown === 0 ? (
                                                 <>
@@ -542,7 +543,7 @@ export default function Mint() {
                                 )}
                                 <button
                                     onClick={() => setIsModalOpen(false)}
-                                    className="mb-4bg-white text-black border border-black px-4 py-2 text-[0.69vw] hover:bg-gray-100 transition-colors mt-[1.725vw]"
+                                    className="mb-4 bg-white text-black border border-black px-4 py-2 md:text-[0.69vw] text-[1.725vw] hover:bg-gray-100 transition-colors mt-[1.725vw]"
                                 >
                                     Close
                                 </button>
@@ -551,8 +552,8 @@ export default function Mint() {
                             <div>
                                 {isMintingError ? (
                                     <>
-                                        <div className="text-red-500 text-[1.725vw] mb-2 font-bold">Error!</div>
-                                        <div className="text-[vw] mb-2">There&apos;s been an error with your transaction. Please try again.</div>
+                                        <div className="text-red-500 text-[3.4vw] md:text-[1.725vw] mb-2 font-bold">Error!</div>
+                                        <div className="md:text-[1.25vw] text-[2.5vw] mb-2">There&apos;s been an error with your transaction. Please try again.</div>
                                         <button
                                             onClick={() => setIsModalOpen(false)}
                                             className="mb-6 bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
@@ -562,16 +563,16 @@ export default function Mint() {
                                     </>
                                 ) : (
                                     <>
-                                        <div className="font-bold text-black text-[1.725vw] mb-2">Transaction Submitted</div>
-                                        <div className="text-[vw]">Checking mint status{dots}</div>
+                                        <div className="font-bold text-black text-[3.4vw] md:text-[1.725vw] mb-2">Transaction Submitted</div>
+                                        <div className="md:text-[1.25vw] text-[2.5vw]">Checking mint status{dots}</div>
                                     </>
                                 )}
 
-                                <div className="text-sm mt-4 break-all max-w-[80%]">
+                                <div className="md:text-[1vw] text-[2.5vw] mt-4 break-all max-w-[80%]">
                                     {/* <div className="font-bold mb-1">Transaction hashMinting:</div> */}
                                     <button
                                         onClick={() => window.open(`https://sepolia.basescan.org/tx/${transactionhashMinting}`, '_blank')}
-                                        className="bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
+                                        className="bg-white text-black border border-black px-4 py-2  hover:bg-gray-100 transition-colors"
                                     >
                                         View on Basescan
                                     </button>
@@ -579,8 +580,8 @@ export default function Mint() {
                             </div>
                         ) : (
                             <div>
-                                <div className="text-black text-[1.725vw] mb-2">Confirm in Wallet</div>
-                                <div className="text-[vw]">Requesting signature{dots}</div>
+                                <div className="text-black text-[3.4vw] md:text-[1.725vw] mb-2">Confirm in Wallet</div>
+                                <div className="md:text-[1.25vw] text-[2.5vw]">Requesting signature{dots}</div>
                             </div>
                         )}
 

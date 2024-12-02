@@ -13,7 +13,7 @@ export default function Footer({ scrollToSection }: FooterProps) {
   };
 
   return (
-    <footer className={`w-full flex flex-col sm:flex-row justify-between px-[3.45vw] py-[3.45vw] border-t text-[2vw] md:text-[1vw] bg-white`}>
+    <footer className={`w-full flex flex-col sm:flex-row justify-between px-[3.45vw] py-[3.45vw] border-t text-[2.5vw] md:text-[1vw] bg-white`}>
       <div className="text-left mb-2 sm:mb-0 flex items-start">
         <Link href="/#home" onClick={handleScrollToTop} className="hover:opacity-70 transition-opacity">
           <Image
