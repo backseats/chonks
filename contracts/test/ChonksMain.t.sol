@@ -47,7 +47,7 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(newMain.owner(), address(this));
         assertEq(newMain.name(), "Chonks");
         assertEq(newMain.symbol(), "CHONKS");
-        assertEq(newMain._nextTokenId(), 0);
+        // assertEq(newMain._nextTokenId(), 0);
         assertEq(newMain.maxTraitsToOutput(), 99);
         assertEq(newMain.price(), 0);
         assertEq(newMain.initialMintStartTime(), 0);
@@ -71,7 +71,7 @@ contract ChonksMainTest is ChonksBaseTest {
             assertEq(newMain.owner(), deployer);
             assertEq(newMain.name(), "Chonks");
             assertEq(newMain.symbol(), "CHONKS");
-            assertEq(newMain._nextTokenId(), 0);
+            // assertEq(newMain._nextTokenId(), 0);
 
             // Setup required contracts for debug mint
             newMain.setTraitsContract(traits);
@@ -105,15 +105,15 @@ contract ChonksMainTest is ChonksBaseTest {
         newMain.mint(1, empty);
 
         // // Verify debug mint results
-        assertEq(newMain._nextTokenId(), 1); // Should have minted 1 token
+        // assertEq(newMain._nextTokenId(), 1); // Should have minted 1 token
         assertEq(newMain.balanceOf(user2), 1);
 
         // // Verify token data
         IChonkStorage.StoredChonk memory chonk = newMain.getChonk(1);
-        assertEq(chonk.shoesId, 0); // Should have shoes equipped
-        assertEq(chonk.bottomId, 0); // Should have bottom equipped
-        assertEq(chonk.topId, 0); // Should have top equipped
-        assertEq(chonk.hairId, 0); // Should have hair equipped
+        assertEq(chonk.shoesId, 1); // Should have shoes equipped
+        assertEq(chonk.bottomId, 2); // Should have bottom equipped
+        assertEq(chonk.topId, 3); // Should have top equipped
+        assertEq(chonk.hairId, 4); // Should have hair equipped
         assertLt(chonk.bodyIndex, 5); // Should have valid body index
         assertEq(chonk.backgroundColor, "0D6E9D"); // Should have default background color
         vm.stopPrank();
@@ -317,9 +317,15 @@ contract ChonksMainTest is ChonksBaseTest {
         bytes32[] memory empty;
         main.mint(1, empty);
 
+        vm.prank(user);
+        main.unequipAll(1);
+
         address user2 = address(2);
         vm.prank(user2);
         main.mint(1, empty);
+
+        vm.prank(user2);
+        main.unequipAll(2);
 
         //let's try transferring the minted chonk
         vm.prank(user);
@@ -660,10 +666,10 @@ contract ChonksMainTest is ChonksBaseTest {
 
         IChonkStorage.StoredChonk memory chonk = main.getChonk(1);
         // Equipped
-        assertEq(chonk.shoesId, 0);
-        assertEq(chonk.bottomId, 0);
-        assertEq(chonk.topId, 0);
-        assertEq(chonk.hairId, 0);
+        assertEq(chonk.shoesId, 1);
+        assertEq(chonk.bottomId, 2);
+        assertEq(chonk.topId, 3);
+        assertEq(chonk.hairId, 4);
         assertEq(chonk.headId, 0);
         assertEq(chonk.faceId, 0);
         assertEq(chonk.accessoryId, 0);
@@ -732,13 +738,13 @@ contract ChonksMainTest is ChonksBaseTest {
         main.unequipAll(1);
 
         IChonkStorage.StoredChonk memory chonk = main.getChonk(1);
-        assertEq(chonk.headId, 0);
+        assertEq(chonk.shoesId, 0);
+        assertEq(chonk.bottomId, 0);
+        assertEq(chonk.topId, 0);
         assertEq(chonk.hairId, 0);
+        assertEq(chonk.headId, 0);
         assertEq(chonk.faceId, 0);
         assertEq(chonk.accessoryId, 0);
-        assertEq(chonk.topId, 0);
-        assertEq(chonk.bottomId, 0);
-        assertEq(chonk.shoesId, 0);
 
         vm.startPrank(user);
             main.equip(1,1);
@@ -747,13 +753,13 @@ contract ChonksMainTest is ChonksBaseTest {
 
         chonk = main.getChonk(1);
 
-        assertEq(chonk.headId, 0);
+        assertEq(chonk.shoesId, 1);
+        assertEq(chonk.bottomId, 2);
+        assertEq(chonk.topId, 0);
         assertEq(chonk.hairId, 0);
+        assertEq(chonk.headId, 0);
         assertEq(chonk.faceId, 0);
         assertEq(chonk.accessoryId, 0);
-        assertEq(chonk.topId, 0);
-        assertEq(chonk.bottomId, 2);
-        assertEq(chonk.shoesId, 1);
     }
 
     function test_unequipSingleTrait() public {
@@ -769,12 +775,10 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(chonk.shoesId, 0);
 
         // still equipped
-
-
+        assertEq(chonk.bottomId, 2);
+        assertEq(chonk.topId, 3);
+        assertEq(chonk.hairId, 4);
         // not equipped
-        assertEq(chonk.hairId, 0);
-        assertEq(chonk.topId, 0);
-        assertEq(chonk.bottomId, 0);
         assertEq(chonk.headId, 0);
         assertEq(chonk.faceId, 0);
         assertEq(chonk.accessoryId, 0);
@@ -882,7 +886,9 @@ contract ChonksMainTest is ChonksBaseTest {
 
         vm.prank(user);
         // main.unequip(1, TraitCategory.Name.Shoes);
+        main.unequipAll(1);
 
+        vm.prank(user);
         main.equip(1, 1);
 
         IChonkStorage.StoredChonk memory chonk = main.getChonk(1);

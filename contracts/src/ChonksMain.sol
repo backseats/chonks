@@ -253,8 +253,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
                 // use this if we want to equip traits initially...
-                // uint256[] memory traitsIds = firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
-                firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
+                uint256[] memory traitsIds = firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
+                // firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
 
                 // Initialize the Chonk
                 StoredChonk storage chonk = chonkTokens[tokenId];
@@ -268,11 +268,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 // level 1: shoes, bottom, top, hair AND face: 5 traits
                 // level 3: shoes, bottom, top AND hair AND face AND head AND accessory : 7 traits
 
-                // naked to begin with....
-                // chonk.shoesId = traitsIds[0];
-                // chonk.bottomId = traitsIds[1];
-                // chonk.topId = traitsIds[2];
-                // chonk.hairId = traitsIds[3];
+                // 4 traits to begin with....
+                chonk.shoesId = traitsIds[0];
+                chonk.bottomId = traitsIds[1];
+                chonk.topId = traitsIds[2];
+                chonk.hairId = traitsIds[3];
             }
          }
     }
