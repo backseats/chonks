@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import { TraitCategory } from "../TraitCategory.sol";
-import { ITraitStorage } from "../interfaces/ITraitStorage.sol";
 import { IChonkStorage } from "../interfaces/IChonkStorage.sol";
+import { ITraitStorage } from "../interfaces/ITraitStorage.sol";
+import { TraitCategory } from "../TraitCategory.sol";
 import { Utils } from "../common/Utils.sol";
 
 contract TraitRenderer {
@@ -155,12 +155,6 @@ contract TraitRenderer {
         ghost.colorMap = _colorMap;
         ghost.zMap = _zMap;
     }
-
-    // function getTraitImageSvg(uint256 index, bytes memory colorMap) public pure returns (string memory svg) {
-    //     bytes memory pixels = getTraitImage(colorMap);
-    //     bytes memory svgParts = createSvgFromPixels(pixels);
-    //     return string(abi.encodePacked('<g id="Trait">', svgParts, '</g>'));
-    // }
 
     function getTraitImageSvg(bytes memory colorMap) public pure returns (string memory svg) {
         bytes memory pixels = getTraitImage(colorMap);

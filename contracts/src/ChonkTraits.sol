@@ -474,14 +474,10 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // Approvals
 
-    // TODO: add nonReentrant?
     /// @notice Override approve to track individual token approvals
     function approve(address _operator, uint256 _tokenId) public override(ERC721, IERC721) {
-        // CHECKS //
         if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
         if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait();
-
-        // EFFECTS //
 
         // if removing approval
         if (_operator == address(0)) {
@@ -510,19 +506,14 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             }
         }
 
-        // INTERACTIONS //
         super.approve(_operator, _tokenId);
     }
 
     // add nonReentrant?
     /// @notice Override setApprovalForAll to track operator approvals
     function setApprovalForAll(address _operator, bool _approved) public override(ERC721, IERC721) {
-        // CHECKS //
-
         // Cannot approve self as operator
         require(_operator != msg.sender, "ERC721: approve to caller");
-
-        // EFFECTS //
 
         // For setApprovalForAll, we need to update approvals for all tokens owned by msg.sender
         uint256 balance = balanceOf(msg.sender);
@@ -556,7 +547,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             }
         }
 
-        // INTERACTIONS //
         super.setApprovalForAll(_operator, _approved);
     }
 
@@ -570,8 +560,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         address[] memory operators = traitIdToApprovedOperators[_tokenId];
         if (operators.length == 0) return;
-
-        // INTERACTIONS
 
         // Remove individual token approval
         _approve(address(0), _tokenId);
