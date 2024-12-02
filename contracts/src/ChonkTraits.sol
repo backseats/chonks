@@ -426,10 +426,12 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         if (isEquipped) revert CantTransferEquipped();
 
         (, address seller,,) = marketplace.traitOffers(tokenId);
+        // If there's an Offer on the Trait, seller is not 0
         if (seller != address(0)) {
             if (msg.sender != address(marketplace)) revert CantTransfer();
         }
 
+        // If burning
         if (to == address(0)) {
             _cleanUpMarketplaceOffersAndBids(tokenId, to);
 
@@ -462,7 +464,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             uint256 id = _transientChonkId;
             _transientChonkId = 0;
             marketplace.removeChonkOfferOnTraitTransfer(id);
-
             return;
         }
 
