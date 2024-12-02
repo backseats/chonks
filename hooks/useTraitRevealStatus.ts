@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 export function useTraitRevealStatus(traitId: bigint) {
     const [isRevealed, setIsRevealed] = useState<boolean | null>(null);
     const [epoch, setEpoch] = useState<bigint | null>(null);
-  
+
     // Define the expected structure of the trait data
     type TraitData = {
       epoch: bigint;
@@ -16,19 +16,20 @@ export function useTraitRevealStatus(traitId: bigint) {
       traitIndex: bigint;
       traitType: number;
     };
-  
+
     const { data: traitData } = useReadContract({
       address: traitsContract,
       abi: traitsABI,
       functionName: 'getTrait',
       args: [traitId],
     }) as { data: TraitData };
-  
+
     useEffect(() => {
       if (traitData) {
         setEpoch(traitData.epoch);
-        setIsRevealed(traitData.isRevealed);
-        
+        // setIsRevealed(traitData.isRevealed);
+        setIsRevealed(false);
+
         console.log('Trait Data:', {
           epoch: traitData.epoch,
           isRevealed: traitData.isRevealed,
@@ -39,7 +40,7 @@ export function useTraitRevealStatus(traitId: bigint) {
         });
       }
     }, [traitData]);
-  
+
     return {
       isRevealed,
       epoch,

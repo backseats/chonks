@@ -251,9 +251,9 @@ export default function ChonkDetail({ id }: { id: string }) {
     console.log("allTraitTokenIds", allTraitTokenIds);
 
     // need to check if the trait is revealed
-    
 
-    const hatIdIndex =
+
+    const headIdIndex =
       // @ts-ignore
       storedChonk.headId === 0n
         ? null
@@ -269,7 +269,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             (tokenId) => tokenId === storedChonk.hairId
           );
 
-    const glassesIdIndex =
+    const faceIdIndex =
       // @ts-ignore
       storedChonk.faceId === 0n
         ? null
@@ -277,7 +277,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             (tokenId) => tokenId === storedChonk.faceId
           );
 
-    const handheldIdIndex =
+    const accessoryIdIndex =
       // @ts-ignore
       storedChonk.accessoryId === 0n
         ? null
@@ -285,7 +285,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             (tokenId) => tokenId === storedChonk.accessoryId
           );
 
-    const shirtIdIndex =
+    const topIdIndex =
       // @ts-ignore
       storedChonk.topId === 0n
         ? null
@@ -293,7 +293,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             (tokenId) => tokenId === storedChonk.topId
           );
 
-    const pantsIdIndex =
+    const bottomIdIndex =
       // @ts-ignore
       storedChonk.bottomId === 0n
         ? null
@@ -311,12 +311,12 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     const filteredTraitTokenIds = allTraitTokenIds.filter((tokenId, index) => {
       return (
-        index !== hatIdIndex &&
+        index !== headIdIndex &&
         index !== hairIdIndex &&
-        index !== glassesIdIndex &&
-        index !== handheldIdIndex &&
-        index !== shirtIdIndex &&
-        index !== pantsIdIndex &&
+        index !== faceIdIndex &&
+        index !== accessoryIdIndex &&
+        index !== topIdIndex &&
+        index !== bottomIdIndex &&
         index !== shoesIdIndex
       );
     });

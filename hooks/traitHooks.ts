@@ -50,6 +50,30 @@ export function useTraitData(traitTokenId: string) {
   return traitData;
 }
 
+export function useGetTrait(traitTokenId: string) {
+  const { data: traitData } = useReadContract({
+    address: traitsContract,
+    abi: traitsABI,
+    functionName: "getTrait",
+    args: [traitTokenId],
+    chainId: baseSepolia.id,
+  }) as { data: any };
+
+  return traitData;
+}
+
+export function useIsRevealed(traitTokenId: string) {
+  const { data: traitData } = useReadContract({
+    address: traitsContract,
+    abi: traitsABI,
+    functionName: "getTrait",
+    args: [traitTokenId],
+    chainId: baseSepolia.id,
+  }) as { data: any };
+
+  return traitData?.isRevealed ?? false;
+}
+
 export function useTraitType(traitTokenId: string) {
   const [traitType, setTraitType] = useState<Category | null>(null);
 
