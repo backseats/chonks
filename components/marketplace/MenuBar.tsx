@@ -13,8 +13,8 @@ export default function MenuBar(props: Props) {
     <nav id="top" className="w-full flex justify-between px-4 py-4 bg-white">
       <div >
 
-        <Link href="/" className="hover:opacity-70 transition-opacity " >
-          <h1 className=" text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
+        <Link href="/" className="hover:opacity-70 transition-opacity">
+          <h1 className="text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
             <Image
               src="/chonks-logo.svg"
               alt="Chonks"
@@ -22,7 +22,6 @@ export default function MenuBar(props: Props) {
               height={48}
               className="h-12 md:h-12 w-auto"
             />
-
           </h1>
         </Link>
       </div>

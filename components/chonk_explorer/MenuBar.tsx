@@ -9,6 +9,8 @@ import {
 import { baseSepolia } from "viem/chains";
 import { useRouter } from "next/navigation";
 import { Address } from "viem";
+import Image from "next/image";
+import Link from 'next/link';
 
 export default function MenuBar() {
   const router = useRouter();
@@ -44,7 +46,17 @@ export default function MenuBar() {
     <div className="w-full border-b border-gray-200 py-4 px-6 mb-8">
       <div className="w-[1280px] mx-auto flex justify-between items-center">
         {/* Left */}
-        <h1 className="text-[48px] font-bold uppercase">Chonks</h1>
+        <Link href="/" className="hover:opacity-70 transition-opacity">
+          <h1 className="text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
+            <Image
+              src="/chonks-logo.svg"
+            alt="Chonks"
+            width={48}
+            height={48}
+            className="h-12 md:h-12 w-auto"
+          />
+          </h1>
+        </Link>
 
         {/* Right */}
         <div className="flex flex-row gap-4">
