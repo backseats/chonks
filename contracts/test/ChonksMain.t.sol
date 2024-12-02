@@ -47,7 +47,7 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(newMain.owner(), address(this));
         assertEq(newMain.name(), "Chonks");
         assertEq(newMain.symbol(), "CHONKS");
-        // assertEq(newMain._nextTokenId(), 0);
+        assertEq(newMain.nextTokenId(), 0);
         assertEq(newMain.maxTraitsToOutput(), 99);
         assertEq(newMain.price(), 0);
         assertEq(newMain.initialMintStartTime(), 0);
@@ -71,7 +71,7 @@ contract ChonksMainTest is ChonksBaseTest {
             assertEq(newMain.owner(), deployer);
             assertEq(newMain.name(), "Chonks");
             assertEq(newMain.symbol(), "CHONKS");
-            // assertEq(newMain._nextTokenId(), 0);
+            assertEq(newMain.nextTokenId(), 0);
 
             // Setup required contracts for debug mint
             newMain.setTraitsContract(traits);
@@ -105,7 +105,7 @@ contract ChonksMainTest is ChonksBaseTest {
         newMain.mint(1, empty);
 
         // // Verify debug mint results
-        // assertEq(newMain._nextTokenId(), 1); // Should have minted 1 token
+        assertEq(newMain.nextTokenId(), 1); // Should have minted 1 token
         assertEq(newMain.balanceOf(user2), 1);
 
         // // Verify token data
