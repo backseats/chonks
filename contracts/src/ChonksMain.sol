@@ -109,7 +109,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     uint256 public maxTraitsToOutput = 99;
 
-    uint256 public _nextTokenId;
+    uint256 public nextTokenId;
 
     address public withdrawAddress;
 
@@ -234,7 +234,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function _mintInternal(address _to, uint256 _amount, uint8 _traitCount) internal {
         unchecked { // TODO: ensure this is ok but it should be because we check _amount < MAX_MINT_AMOUNT
             for (uint i; i < _amount; ++i) {
-                uint256 tokenId = ++_nextTokenId;
+                uint256 tokenId = ++nextTokenId;
                 _mint(_to, tokenId);
 
                 address tokenBoundAccountAddress = REGISTRY.createAccount(
