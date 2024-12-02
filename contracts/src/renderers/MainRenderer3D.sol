@@ -3,15 +3,11 @@ pragma solidity ^0.8.22;
 
 import { EncodeURI } from "../EncodeURI.sol";
 import { IChonkStorage } from "../interfaces/IChonkStorage.sol";
+import { Ownable } from "solady/auth/Ownable.sol";
 import { Utils } from "../common/Utils.sol";
 
 // Scripty for 3D rendering
 import { IScriptyBuilderV2, HTMLRequest, HTMLTagType, HTMLTag } from "../../lib/scripty/interfaces/IScriptyBuilderV2.sol";
-
-// DEPLOY: remove
-import "forge-std/console.sol";
-
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract MainRenderer3D is Ownable {
 
@@ -27,6 +23,10 @@ contract MainRenderer3D is Ownable {
     bytes public base64ScriptContent;
 
     string private constant SVG_START_STYLE = '<svg shape-rendering="crispEdges" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg"><style> body{overflow: hidden; margin: 0;} svg{ max-width: 100vw; max-height: 100vh; width: 100%;} #main rect{width:1px; height: 1px;} .bg{width:30px; height: 30px;} .on { scale: 177%; transform: translate(-6px, -3px); } .off { scale: 100%; transform: translate(0px, 0px); } .button { cursor: pointer; fill: transparent; } .closed{ transform: translate(0px, 30px); } .open{ transform: translate(0px, 0px); } </style>';
+
+    constructor() {
+        _initializeOwner(msg.sender);
+    }
 
     function generateFullSvg(
         string memory _bodySvg,
@@ -211,7 +211,7 @@ contract MainRenderer3D is Ownable {
             //         Utils.toString(_tokenId),
             //         // encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
             //         // encodeURIContract.encodeURI('", "description":"Left click and drag to rotate, right click to move, mouse wheel to zoom ",'),
-                    
+
             //         // encodeURIContract.encodeURI('", "description":"'),
             //         // encodeURIContract.encodeURI(_chonkdata.descriptionParts[0]),
             //         // Utils.toString(_tokenId),
@@ -219,7 +219,7 @@ contract MainRenderer3D is Ownable {
             //         // encodeURIContract.encodeURI('",'),
 
             //         // generateDescription(_chonkdata, _tokenId),
-                    
+
             //         encodeURIContract.encodeURI(fullAttributes),
             //         encodeURIContract.encodeURI(','),
             //         encodeURIContract.encodeURI(image),
@@ -231,7 +231,7 @@ contract MainRenderer3D is Ownable {
     }
 
     function generateJSON(uint256 _tokenId, string memory _attributes, IChonkStorage.ChonkData memory _chonkdata, string memory _image, bytes memory _doubleURLEncodedHTMLDataURI) internal view returns (string memory json) {
-        return 
+        return
             string(
                 abi.encodePacked(
                     "data:application/json,",
@@ -240,7 +240,7 @@ contract MainRenderer3D is Ownable {
                     // old way
                     // encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
                     // encodeURIContract.encodeURI('", "description":"Left click and drag to rotate, right click to move, mouse wheel to zoom ",'),
-                    
+
                     // mid way
                     // encodeURIContract.encodeURI('", "description":"'),
                     // encodeURIContract.encodeURI(_chonkdata.descriptionParts[0]),
@@ -250,7 +250,7 @@ contract MainRenderer3D is Ownable {
 
                     // new way due to stack too deep
                     generateDescription(_chonkdata, _tokenId),
-                    
+
                     encodeURIContract.encodeURI(_attributes),
                     encodeURIContract.encodeURI(','),
                     encodeURIContract.encodeURI(_image),
