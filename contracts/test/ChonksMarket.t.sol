@@ -1094,6 +1094,25 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(traitApprovals.length, 0);
     }
 
+    function test_revokeOwnershipFSRM() public {
+        address seller = address(1);
+
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            bytes32[] memory empty;
+            main.mint(1, empty);
+        vm.stopPrank();
+
+        vm.startPrank(deployer);
+            dataContract.renounceOwnership();
+            vm.expectRevert(Unauthorized.selector);
+            dataContract.transferOwnership(address(0));
+
+            vm.expectRevert(Unauthorized.selector);
+            dataContract.setChonksMain(address(0));
+        vm.stopPrank();
+    }
+
     function test_mintMultipleSeasons() public {
         address seller = address(1);
         vm.deal(seller, 1 ether);
