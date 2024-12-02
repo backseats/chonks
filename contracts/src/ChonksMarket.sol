@@ -802,7 +802,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 balance = withdrawableFunds[msg.sender];
         withdrawableFunds[msg.sender] = 0;
 
-        (bool success, ) = msg.sender.call{value: balance}("");
+        (bool success, ) = msg.sender.call{value: balance, gas: 60_000}("");
         if (!success) revert WithdrawFailed();
     }
 
@@ -820,12 +820,12 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         );
         if (!royaltyPayment) withdrawableFunds[teamWallet] += royalties;
 
-        (success, ) = payable(_to).call{value: amountForSeller}("");
+        (success, ) = payable(_to).call{value: amountForSeller, gas: 60_000}("");
         if (!success) withdrawableFunds[_to] += amountForSeller;
     }
 
     function _refundBid(address _to, uint256 _amount) private {
-        (bool success, ) = payable(_to).call{value: _amount}("");
+        (bool success, ) = payable(_to).call{value: _amount, gas: 60_000}("");
         if (!success) withdrawableFunds[_to] += _amount;
     }
 

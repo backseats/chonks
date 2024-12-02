@@ -916,6 +916,57 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(chonk.faceId, 0);
     }
 
+    error CantTransferEquipped();
+    function test_tryToTransferEquippedTrait() public {
+        deployerSetup();
+
+        address user = address(1);
+        address user2 = address(2);
+        mintAToken(user);
+        mintAToken(user2);
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        address tba2 = main.tokenIdToTBAAccountAddress(2);
+
+        // verify that trait id 1 is equipped on tba
+        assertEq(traits.ownerOf(1), tba);
+        (,,,bool isEquipped) = main.getFullPictureForTrait(1);
+        assertTrue(isEquipped);
+
+        vm.warp(main.initialMintStartTime() + 26 hours);
+
+        vm.prank(tba);
+        vm.expectRevert(CantTransferEquipped.selector);
+        traits.transferFrom(tba, tba2, 1);
+    }
+
+    function test_transferUnequippedTrait() public {
+        deployerSetup();
+
+        address user = address(1);
+        address user2 = address(2);
+        mintAToken(user);
+        mintAToken(user2);
+
+        vm.prank(user);
+        main.unequip(1, TraitCategory.Name.Shoes);
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        address tba2 = main.tokenIdToTBAAccountAddress(2);
+
+        // verify that trait id 1 is equipped on tba
+        assertEq(traits.ownerOf(1), tba);
+        (,,,bool isEquipped) = main.getFullPictureForTrait(1);
+        assertFalse(isEquipped);
+
+        vm.warp(main.initialMintStartTime() + 26 hours);
+
+        vm.prank(tba);
+        traits.transferFrom(tba, tba2, 1);
+
+        assertEq(traits.ownerOf(1), tba2);
+    }
+
     function test_changeSkinTone() public {
         deployerSetup();
 
