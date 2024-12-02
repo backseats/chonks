@@ -55,20 +55,6 @@ export default function MenuBar() {
             Chonks Studio
           </button>
 
-          <button
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-            onClick={mintChonk}
-          >
-            Mint a Chonk
-          </button>
-
-          <button
-            className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-            onClick={mintTrait}
-          >
-            Mint a Trait
-          </button>
-
           <ConnectKitButton />
         </div>
       </div>
