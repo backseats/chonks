@@ -67,18 +67,23 @@ import { ChonksMain } from "./ChonksMain.sol";
 
 contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage, Ownable, IERC4906, ReentrancyGuard {
 
-    /// @dev We use this database for persistent storage
+    // We use this database for persistent storage
     Traits public traitTokens;
 
+    // The renderer contract for the Traits
     TraitRenderer public traitRenderer;
 
-    mapping(uint256 => TraitMetadata) public traitIndexToMetadata;
-
-    mapping(uint256 traitId => address[] operators) public traitIdToApprovedOperators;
-
+    // The ChonksMain contract
     ChonksMain public chonksMain;
 
+    // The ChonksMarket contract
     ChonksMarket public marketplace;
+
+    // Metadata for each Trait by index
+    mapping(uint256 => TraitMetadata) public traitIndexToMetadata;
+
+    // Approved operators for each Trait
+    mapping(uint256 traitId => address[] operators) public traitIdToApprovedOperators;
 
     // Contract addresses that are approved to create Traits
     mapping (address => bool) public isMinter;
@@ -88,12 +93,16 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     bool _localDeploy; // DEPLOY: remove
 
+    // The next token ID to be minted
     uint256 public nextTokenId;
 
+    // The transient Chonk ID, used in _beforeTokenTransfer and _afterTokenTransfer
     uint256 internal _transientChonkId;
 
+    // When the initial mint started
     uint256 public initialMintStartTime;
 
+    // The description parts
     string[2] descriptionParts;
 
     /// Errors
@@ -119,7 +128,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         _;
     }
 
-    // DEPLOY: remove localDeploy
     constructor(bool localDeploy_) ERC721("Chonk Traits", "CHONK TRAITS") {
         _initializeOwner(msg.sender);
         _localDeploy = localDeploy_;
@@ -137,7 +145,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     /// @dev Called in DataMinter contracts to add Traits
-    function setTraitIndexToMetadata(uint256 _traitIndex, TraitMetadata memory _metadata) public { // onlyMinter(msg.sender) { // DEPLOY: bring back in
+    function setTraitIndexToMetadata(uint256 _traitIndex, TraitMetadata memory _metadata) public { // onlyMinter(msg.sender) { // DEPLOY: bring back in, breaks tests with it in
         traitIndexToMetadata[_traitIndex] = _metadata;
     }
 
@@ -510,7 +518,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         super.approve(_operator, _tokenId);
     }
 
-    // add nonReentrant?
     /// @notice Override setApprovalForAll to track operator approvals
     function setApprovalForAll(address _operator, bool _approved) public override(ERC721, IERC721) {
         // Cannot approve self as operator
