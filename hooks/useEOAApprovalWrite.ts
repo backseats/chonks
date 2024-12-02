@@ -1,8 +1,5 @@
 import { useWriteContract } from "wagmi";
-import { mainContract, mainABI, marketplaceContract } from "@/contract_data";
-import { baseSepolia, base } from "viem/chains";
-
-const chainId = baseSepolia.id; // DEPLOY: change to base
+import { mainContract, mainABI, marketplaceContract, chainId } from "@/contract_data";
 
 export function useEOAApprovalWrite() {
   const { writeContract } = useWriteContract();

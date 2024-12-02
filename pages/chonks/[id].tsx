@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { baseSepolia, base } from "viem/chains";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { getAddress } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
@@ -10,6 +9,7 @@ import {
   traitsContract,
   tokenURIABI,
   traitsABI,
+  chainId
 } from "@/contract_data";
 import { StoredChonk } from "@/types/StoredChonk";
 import EquipmentContainer from "@/components/chonk_explorer/EquipmentContainer";
@@ -20,7 +20,6 @@ import OwnershipSection from "@/components/chonk_explorer/OwnershipSection";
 import Trait from "@/components/chonk_explorer/Trait";
 import { useTraitRevealStatus } from "@/hooks/useTraitRevealStatus";
 
-const chainId = baseSepolia.id; // DEPLOY: change to base
 
 type CurrentChonk = {
   tokenId: number;

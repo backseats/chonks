@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useReadContract } from 'wagmi';
-import { mainContract, mainABI, traitsContract, traitsABI, tokenURIABI } from '@/contract_data';
+import { mainContract, mainABI, traitsContract, traitsABI, tokenURIABI, chainId } from '@/contract_data';
 import { baseSepolia } from 'viem/chains';
 import { Chonk } from '@/types/Chonk';
 import { Trait } from '@/types/Trait';
@@ -18,7 +18,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
         address: traitsContract,
         abi: traitsABI,
         functionName: 'totalSupply',
-        chainId: baseSepolia.id, // DEPLOY: change to base
+        chainId,
     }) as { data: bigint };
 
     // Fetch token URIs for all tokens

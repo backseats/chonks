@@ -13,7 +13,7 @@ export const marketplaceABI = marketplaceAbiImport.abi;
 
 export const simpleHashKey = "makingmemark_sk_ab7284sr3v5o19g3iaublzep6sffynfu"; // TODO: env var
 
-export const chainId = baseSepolia.id; // TODO: base.id
+export const chainId = baseSepolia.id; // DEPLOY: switch to base.id
 
 export const MINT_PRICE = 0.01;
 

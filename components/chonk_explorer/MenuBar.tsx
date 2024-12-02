@@ -5,6 +5,7 @@ import {
   mainABI,
   traitsContract,
   traitsABI,
+  chainId
 } from "@/contract_data";
 import { baseSepolia } from "viem/chains";
 import { useRouter } from "next/navigation";
@@ -25,7 +26,7 @@ export default function MenuBar() {
   const opts = {
     functionName: MINT,
     args: [],
-    chainId: baseSepolia.id, // DEPLOY: change to base
+    chainId,
   };
 
   const config = (address: Address, abi: any) => {

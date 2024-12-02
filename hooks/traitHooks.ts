@@ -7,12 +7,10 @@ import {
   traitsContract,
   tokenURIABI,
   traitsABI,
+  chainId
 } from "@/contract_data";
-import { baseSepolia, base } from "viem/chains";
 import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
-
-const chainId = baseSepolia.id; // DEPLOY: change to base
 
 // Temporarily here because /chonks/[id] is hidden in vercelignore
 function decodeAndSetData(data: string, setData: (data: Chonk) => void) {

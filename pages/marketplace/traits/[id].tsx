@@ -20,9 +20,6 @@ import PriceAndActionsSection from '@/components/marketplace/traits/PriceAndActi
 import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
-import { baseSepolia, base } from "viem/chains";
-
-const chainId = baseSepolia.id; // DEPLOY: change to base
 
 type TraitOffer = {
     priceInWei: bigint;
