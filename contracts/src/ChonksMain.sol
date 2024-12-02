@@ -799,8 +799,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // emit Render3D(ownerOf(_tokenId), _tokenId, _render3D);
     }
 
-
-
     // Boilerplate
 
     function supportsInterface(bytes4 interfaceId) public view override(IERC165, ERC721Enumerable) returns (bool) {
@@ -814,6 +812,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             return;
         }
 
+        // TODO:do we want to do this? prevent body transfers? or just traits?
         if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint();
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)

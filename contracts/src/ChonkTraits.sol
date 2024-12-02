@@ -101,6 +101,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     error AddressCantBurn();
     error CantTransfer();
     error CantTransferDuringMint();
+    error CantTransferEquipped();
     error MintStartTimeAlreadySet();
     error NotATBA();
     error NotAValidMinterContract();
@@ -275,20 +276,11 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         }
     }
 
-    // TODO: probably should add getColorMapforTokenId
     function getZMapForTokenId(uint256 _tokenId) public view returns (string memory) {
         StoredTrait memory trait = getTrait(_tokenId);
         return string(traitIndexToMetadata[trait.traitIndex].zMap);
     }
 
-    // effectively the same as getBodyImageSvg so maybe put in a library or contract
-    // receives body colorMap, puts it into a 30x30 grid, with 5 bytes row-major byte array
-    // function getTraitImage(bytes memory colorMap) public view returns (bytes memory) {
-    //     return traitRenderer.getTraitImage(colorMap);
-    // }
-
-    // effectively the same as getBodyImageSvg so maybe put in a library or contract
-    // outputs svg for a provided trait index
     function getTraitImageSvg(uint256 index) public view returns (string memory svg) {
         return traitRenderer.getTraitImageSvg(traitIndexToMetadata[index].colorMap);
     }
@@ -301,8 +293,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         return traitRenderer.createSvgFromPixels(_pixels);
     }
 
-    // returns traitSvg and traitAttributes
-    function getSvgAndMetadataTrait(StoredTrait memory trait, uint256 traitId) public view returns(string memory traitSvg, string memory traitAttributes ) {
+    function getSvgAndMetadataTrait(StoredTrait memory trait, uint256 traitId) public view returns (string memory traitSvg, string memory traitAttributes ) {
         return traitRenderer.getSvgAndMetadataTrait(
             trait,
             traitId,
@@ -318,9 +309,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         );
     }
 
-    // called from ChonksMain renderAsDataUriSVG()
-    function getSvgAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory traitsSvg, string memory traitsAttributes)
-    {
+    function getSvgAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory traitsSvg, string memory traitsAttributes) {
         return traitRenderer.getSvgAndMetadata(storedChonk, this.callGetSvgAndMetadataTrait);
     }
 
@@ -339,7 +328,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         );
     }
 
-    function callGetSVGZmapAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes, bytes memory _traitZMaps ) public view returns (string memory traitsSvg, string memory traitsAttributes, bytes memory traitZMaps) {
+    function callGetSVGZmapAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes, bytes memory _traitZMaps) public view returns (string memory traitsSvg, string memory traitsAttributes, bytes memory traitZMaps) {
         StoredTrait memory storedTrait = getTrait(_traitId);
         return traitRenderer.callGetSVGZmapAndMetadataTrait(
             _traitId,
@@ -425,14 +414,16 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // Override functions for marketplace compatibility
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
-        // TODO: ensure not equipped
-
         if (from == address(0)) {
             super._beforeTokenTransfer(from, to, tokenId);
             return;
         }
 
         if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint();
+
+        // Check if the Trait is equipped on the Chonk, revert if so
+        (,,, bool isEquipped) = chonksMain.getFullPictureForTrait(tokenId);
+        if (isEquipped) revert CantTransferEquipped();
 
         (, address seller,,) = marketplace.traitOffers(tokenId);
         if (seller != address(0)) {

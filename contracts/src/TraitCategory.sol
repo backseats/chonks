@@ -3,7 +3,6 @@ pragma solidity ^0.8.22;
 
 library TraitCategory {
 
-    // TODO: add bg as a trait?
     enum Name {
         None, // 0
         Head, // 1

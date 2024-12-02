@@ -11,8 +11,7 @@ import { Utils } from './common/Utils.sol';
 // DEPLOY: remove
 import "forge-std/console.sol";
 
-// contract FirstReleaseDataMinter is IRenderMinterV1 { // TODO: ownable, ITraitStorage
-contract FirstReleaseDataMinter is Ownable { // TODO: ITraitStorage
+contract FirstReleaseDataMinter is Ownable {
     uint256[] public accessory =                [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     uint256[] internal accessory_probability =  [12, 24, 32, 44, 54, 64, 72, 80, 84, 92, 96, 98, 100];
     uint256[] public head =                     [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009, 1010, 1011, 1012, 1013, 1014, 1015];
@@ -257,7 +256,7 @@ contract FirstReleaseDataMinter is Ownable { // TODO: ITraitStorage
         return mintedIds;
     }
 
-    function addNewTrait( // this should go in interface above
+    function addNewTrait(
         uint256 _traitIndex,
         string memory _traitName,
         TraitCategory.Name _traitType,
@@ -292,7 +291,7 @@ contract FirstReleaseDataMinter is Ownable { // TODO: ITraitStorage
         metadata.renderMinterContract = address(this);
         metadata.creatorAddress = _creatorAddress;
         metadata.creatorName = _creatorName;
-        metadata.release = "1"; // TODO: send this in
+        metadata.release = "1";
 
         chonkTraits.setTraitIndexToMetadata(_traitIndex, metadata);
     }
@@ -312,7 +311,6 @@ contract FirstReleaseDataMinter is Ownable { // TODO: ITraitStorage
         return 0;
     }
 
-    // TODO finish trait rarity
     function explainTrait(
         bool localDeploy,
         ITraitStorage.StoredTrait memory storedTrait,

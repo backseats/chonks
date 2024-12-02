@@ -301,6 +301,7 @@ contract ChonksMainTest is ChonksBaseTest {
 
     function test_cantTransferDuringMint() public {
         vm.startPrank(deployer);
+        main.setTraitsContract(traits);
         main.setFirstReleaseDataMinter(address(dataContract));
         traits.setChonksMain(address(main));
         traits.addMinter(address(dataContract));
@@ -324,6 +325,7 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.prank(user);
         vm.expectRevert(ChonksMain.CantTransferDuringMint.selector);
         main.transferFrom(user, user2, 1);
+
         address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
         address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
         uint256[] memory traitsForChonk1 = traits.walletOfOwner(tbaForChonk1);

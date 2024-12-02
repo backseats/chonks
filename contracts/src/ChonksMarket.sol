@@ -1,17 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import { IChonkStorage } from "./interfaces/IChonkStorage.sol";
-import { Ownable } from "solady/auth/Ownable.sol";
 import { ChonksMain } from "./ChonksMain.sol";
 import { ChonkTraits } from "./ChonkTraits.sol";
+import { IChonkStorage } from "./interfaces/IChonkStorage.sol";
+import { Ownable } from "solady/auth/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-// DEPLOY: remove
+// DEPLOY: remove and all console.logs
 // import "forge-std/console.sol";
 // import "forge-std/console2.sol";
 
 contract ChonksMarket is Ownable, ReentrancyGuard {
+
     // Structs
 
     // If a Chonk offer, sells the Chonk and all of its Traits, else just sells the Trait
