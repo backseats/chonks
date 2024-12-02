@@ -138,6 +138,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     bytes32 public friendsMerkle;
     bytes32 public creatorsMerkle;
 
+    // Mappings for Merkles
+    mapping(address => bool) public collectionsAddressDidUse;
+    mapping(address => bool) public friendsAddressDidUse;
+    mapping(address => bool) public creatorsAddressDidUse;
+
     /// Errors - NOTE: these do not affect the bytecode size
     // error BodyAlreadyExists();
     // error CantBeZero(); // replaced with InvalidMintAmount();
@@ -221,11 +226,20 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         uint8 traitCount = 4;
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
         if (MerkleProofLib.verify(_merkleProof, collectionsMerkle, leaf)) {
-            traitCount = 5;
+            if (!collectionsAddressDidUse[msg.sender]) {
+                traitCount = 5;
+                collectionsAddressDidUse[msg.sender] = true;
+            }
         } else if (MerkleProofLib.verify(_merkleProof, friendsMerkle, leaf)) {
-            traitCount = 6;
+            if (!friendsAddressDidUse[msg.sender]) {
+                traitCount = 6;
+                friendsAddressDidUse[msg.sender] = true;
+            }
         } else if (MerkleProofLib.verify(_merkleProof, creatorsMerkle, leaf)) {
-            traitCount = 7;
+            if (!creatorsAddressDidUse[msg.sender]) {
+                traitCount = 7;
+                creatorsAddressDidUse[msg.sender] = true;
+            }
         }
 
         _mintInternal(msg.sender, _amount, traitCount);
