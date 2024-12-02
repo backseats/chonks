@@ -1140,7 +1140,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             main.mint(1, empty);
 
             main.unequipAll(1); // marka 02/12/24: unequip all before burning
-            
+
             main.setApprovalForAll(address(market), true);
             main.setApprovalForAll(address(minter), true);
 
@@ -1579,6 +1579,52 @@ contract ChonksMarketTest is ChonksBaseTest {
         address buyerTBA = main.tokenIdToTBAAccountAddress(4);
         assertEq(traits.ownerOf(traitId), buyerTBA);
         vm.stopPrank();
+    }
+
+    function test_offerTraitToAddressOnlySellToEOAs() public {
+        address seller = address(1);
+        address bidder = address(2);
+
+        bytes32[] memory empty;
+        vm.deal(bidder, 2 ether);
+        vm.prank(bidder);
+        main.mint(1, empty);
+
+        vm.startPrank(seller);
+            main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
+
+            // offer trait to bidder tba
+            address sellerTBA = main.tokenIdToTBAAccountAddress(1);
+            vm.expectRevert(ChonksMarket.OnlySellToEOAs.selector);
+            market.offerTraitToAddress(5, 2, 1 ether, sellerTBA);
+
+        vm.stopPrank();
+    }
+
+    function test_offerTraitToAddressOnlySellToEOAs2() public {
+        address seller = address(1);
+        address bidder = address(2);
+
+        bytes32[] memory empty;
+        vm.deal(bidder, 2 ether);
+        vm.prank(bidder);
+        main.mint(1, empty);
+
+        vm.startPrank(seller);
+            main.mint(1, empty);
+
+            vm.warp(block.timestamp + 48 hours);
+
+            main.unequipAll(2);
+
+            // offer trait to bidder tba
+            market.offerTraitToAddress(5, 2, 1 ether, bidder);
+        vm.stopPrank();
+
+        (,,,address onlySellTo) = market.getTraitOffer(5);
+        assertEq(onlySellTo, bidder);
     }
 
     /// Bid on Traits

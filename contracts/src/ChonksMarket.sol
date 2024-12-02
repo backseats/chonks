@@ -7,10 +7,6 @@ import { IChonkStorage } from "./interfaces/IChonkStorage.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-// DEPLOY: remove and all console.logs
-// import "forge-std/console.sol";
-// import "forge-std/console2.sol";
-
 contract ChonksMarket is Ownable, ReentrancyGuard {
 
     // Structs
@@ -111,6 +107,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     error NotYourOffer();
     error NotYourTrait();
     error OfferDoesNotExist();
+    error OnlySellToEOAs();
     error OnlyTraitContract();
     error Paused();
     error PausabilityRevoked();
@@ -540,14 +537,14 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     ) public notPaused ensurePriceIsNotZero(_priceInWei) {
         if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
 
+        if (CHONKS_MAIN.tbaAddressToTokenId(_onlySellTo) != 0) revert OnlySellToEOAs();
+
         // Please unequip the trait if you want to sell it
         if (CHONKS_MAIN.checkIfTraitIsEquipped(_chonkId, _traitId))
             revert TraitEquipped();
 
         address tbaTraitOwner = CHONK_TRAITS.ownerOf(_traitId);
-        (address tokenOwner, ) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(
-            _chonkId
-        );
+        (address tokenOwner, ) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
 
         traitOffers[_traitId] = TraitOffer(
             _priceInWei,
@@ -568,13 +565,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     ) public payable notPaused nonReentrant {
         // Ensure msg.sender owns the Chonk token of the TBA
         address owner = CHONKS_MAIN.ownerOf(_forChonkId);
-        // console.log("buyTrait: _traitId", _traitId);
-        // console.log("buyTrait: _forChonkId", _forChonkId);
-        // console.log("buyTrait: owner of Chonk", owner);
-        // console.log("buyTrait: msg.sender", msg.sender);
         if (owner != msg.sender) revert NotYourChonk();
-
-        // TODO write a test where a trait is offered to a TBA and an EOA, and handle it
 
         // Ensure you don't own the Trait
         address tba = CHONKS_MAIN.tokenIdToTBAAccountAddress(_forChonkId);
@@ -657,10 +648,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit TraitBidEntered(_traitId, msg.sender, msg.value);
     }
 
-    function acceptBidForTrait(
-        uint256 _traitId,
-        address _bidder
-    ) public notPaused nonReentrant {
+    function acceptBidForTrait(uint256 _traitId, address _bidder) public notPaused nonReentrant {
         // Ensure Bid
         TraitBid memory bid = traitBids[_traitId];
         address bidder = bid.bidder;
@@ -671,7 +659,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         (address sellerTBA, , address seller, bool isEquipped) = CHONKS_MAIN.getFullPictureForTrait(_traitId);
         if (seller != msg.sender) revert NotYourTrait();
 
-        if (isEquipped) revert TraitEquipped(); // todo: can reenable this when we put isEquipped back in to full picture
+        if (isEquipped) revert TraitEquipped();
 
         // Delete Offer for trait ID if present, delete Bid you're accepting
         delete traitOffers[_traitId];
