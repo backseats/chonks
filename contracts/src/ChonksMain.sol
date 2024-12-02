@@ -216,11 +216,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {
         if (address(firstReleaseDataMinter) == address(0)) revert FirstReleaseDataMinterNotSet();
-        if (_amount == 0 || _amount > MAX_MINT_AMOUNT) revert InvalidMintAmount();
 
+        if (_amount == 0 || _amount > MAX_MINT_AMOUNT) revert InvalidMintAmount();
         if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
         if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded();
-
         if (msg.value != price * _amount) revert InsufficientFunds();
 
         uint8 traitCount = 4;
@@ -246,7 +245,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function _mintInternal(address _to, uint256 _amount, uint8 _traitCount) internal {
-        unchecked { // TODO: ensure this is ok but it should be because we check _amount < MAX_MINT_AMOUNT
+        unchecked {
             for (uint i; i < _amount; ++i) {
                 uint256 tokenId = ++nextTokenId;
                 _mint(_to, tokenId);
@@ -675,11 +674,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function addNewBody(uint256 _bodyIndex, string memory _bodyName, bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
         if (isTimelocked()) revert Timelocked();
+
         BodyMetadata storage metadata = bodyIndexToMetadata[_bodyIndex];
-
-        // TODO: do we want?
-        // if (metadata.bodyIndex != 0) revert BodyAlreadyExists();
-
         metadata.bodyIndex = _bodyIndex;
         metadata.bodyName = _bodyName;
         metadata.colorMap = _colorMap;
@@ -716,7 +712,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         chonkEquipHelper = ChonkEquipHelper(_chonkEquipHelper);
     }
 
-    // TODO: can likely reduce from a uint256 to a uint8
     function setMaxTraitsToOutput(uint256 _maxTraitsToOutput) public onlyOwner {
         maxTraitsToOutput = _maxTraitsToOutput;
     }
@@ -806,11 +801,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         chonkTokens[_tokenId].backgroundColor = _color;
         chonkTokens[_tokenId].bodyIndex = _bodyIndex;
         chonkTokens[_tokenId].render3D = _render3D;
-
-        // Emit events : TODO - removed for bytecode size, can we get back in?
-        // emit BackgroundColor(ownerOf(_tokenId), _tokenId, _color);
-        // emit BodyIndex(ownerOf(_tokenId), _tokenId, _bodyIndex);
-        // emit Render3D(ownerOf(_tokenId), _tokenId, _render3D);
     }
 
     // Boilerplate
@@ -826,7 +816,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             return;
         }
 
-        // TODO:do we want to do this? prevent body transfers? or just traits?
         if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint();
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
