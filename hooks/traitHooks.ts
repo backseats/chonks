@@ -41,9 +41,11 @@ export function useTraitData(traitTokenId: string) {
     chainId: baseSepolia.id,
   }) as { data: string };
 
-  if (traitTokenURIData && !traitData) {
-    decodeAndSetData(traitTokenURIData, setTraitData);
-  }
+  useEffect(() => {
+    if (traitTokenURIData && !traitData) {
+      decodeAndSetData(traitTokenURIData, setTraitData);
+    }
+  }, [traitTokenURIData, traitData]);
 
   return traitData;
 }
@@ -54,14 +56,15 @@ export function useTraitType(traitTokenId: string) {
   const { data: traitTypeData } = useReadContract({
     address: traitsContract,
     abi: traitsABI,
-    functionName: "getTraitType",
+    functionName: "getTraitMetadata",
     args: [traitTokenId],
     chainId: baseSepolia.id,
-  }) as { data: string };
+  }) as { data: { traitType: string } };
 
   useEffect(() => {
     if (traitTypeData) {
-      const traitTypeString = categoryList[parseInt(traitTypeData)];
+      // @ts-ignore
+      const traitTypeString = categoryList[traitTypeData.traitType];
       setTraitType(traitTypeString as Category);
     }
   }, [traitTypeData]);
