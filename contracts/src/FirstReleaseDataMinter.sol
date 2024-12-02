@@ -2,7 +2,6 @@
 pragma solidity ^0.8.22;
 
 import { ChonkTraits } from './ChonkTraits.sol';
-import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { ITraitStorage } from './interfaces/ITraitStorage.sol';
 import { Ownable } from 'solady/auth/Ownable.sol';
 import { TraitCategory } from './TraitCategory.sol';
@@ -32,7 +31,6 @@ contract FirstReleaseDataMinter is Ownable {
 
     /// Errors
 
-    // error CantBeZero(); // not used
     error OnlyChonksMain();
 
     /// Constructor
@@ -256,6 +254,7 @@ contract FirstReleaseDataMinter is Ownable {
         return mintedIds;
     }
 
+    /// @notice Ownership will be revoked after mint period
     function addNewTrait(
         uint256 _traitIndex,
         string memory _traitName,
@@ -266,22 +265,7 @@ contract FirstReleaseDataMinter is Ownable {
         address _creatorAddress,
         string memory _creatorName
     ) public onlyOwner {
-        // maybe check if a trait already exists for _traitIndex so we don't override
-        // alternatively there should be a time period beyond which we can't "edit" existing traits. it would act as a temporary safeguard
-
-        // trait 4 is Blue Top, get existing metadata, should be empty struct, then set below. not associated with any token ids yet
-        // can't use storage across contracts
         ITraitStorage.TraitMetadata memory metadata = chonkTraits.getTraitIndexToMetadata(_traitIndex);
-
-        /*
-        // commenting out for now
-        // todo: add checks of some kind
-        // Check if we already have itw
-        if (keccak256(bytes(metadata.traitName)) != keccak256(bytes(''))) {
-            revert('Trait already exists');
-        }
-        */
-
         metadata.traitIndex = _traitIndex;
         metadata.traitName = _traitName;
         metadata.traitType = _traitType;
@@ -362,7 +346,6 @@ contract FirstReleaseDataMinter is Ownable {
             } else {
                 storedTrait.traitIndex = 3000 + (face.length - 3) + Utils.random(storedTrait.seed, 'face-rare', 3 );
             }
-
         }
 
         // tops: last 5 are rares, 5% chance of this tranche hitting
