@@ -18,7 +18,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
         address: traitsContract,
         abi: traitsABI,
         functionName: 'totalSupply',
-        chainId: baseSepolia.id,
+        chainId: baseSepolia.id, // DEPLOY: change to base
     }) as { data: bigint };
 
     // Fetch token URIs for all tokens
@@ -41,7 +41,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
     useEffect(() => {
         const fetchTokenURIs = async () => {
             const updatedTraits = [...traits];
-            
+
             for (const trait of updatedTraits) {
                 if (trait.data === null) {
                     try {
@@ -75,12 +75,12 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
                     data === null ? (
                         <LoadingCard key={id} />
                     ) : (
-                        <Link 
-                            href={`/marketplace/traits/${id}`} 
+                        <Link
+                            href={`/marketplace/traits/${id}`}
                             key={id}
                             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
                         >
-                            <img 
+                            <img
                                 src={data.image || "/marka/marka-chonk.svg"}
                                 alt={`Trait #${id}`}
                                 className="w-full h-auto"
@@ -88,7 +88,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
                             <div className="mt-4 space-y-2 p-4">
                                 <h3 className="text-[1.2vw] font-bold">Trait #{id}</h3>
                                 <span className="text-[1vw]">[price to go here]</span>
-                                <button 
+                                <button
                                     className="w-full text-[1vw] border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
                                     onClick={(e) => {
                                         e.preventDefault();
@@ -103,4 +103,4 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
             </div>
         </div>
     );
-} 
+}

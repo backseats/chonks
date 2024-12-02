@@ -1,6 +1,9 @@
 import { useWriteContract } from "wagmi";
 import { mainContract, mainABI, marketplaceContract } from "@/contract_data";
-import { baseSepolia } from "viem/chains";
+import { baseSepolia, base } from "viem/chains";
+
+const chainId = baseSepolia.id; // DEPLOY: change to base
+
 export function useEOAApprovalWrite() {
   const { writeContract } = useWriteContract();
 
@@ -10,7 +13,7 @@ export function useEOAApprovalWrite() {
       abi: mainABI,
       functionName: "setApprovalForAll",
       args: [marketplaceContract, true],
-      chainId: baseSepolia.id,
+      chainId
     });
   }
 
@@ -20,7 +23,7 @@ export function useEOAApprovalWrite() {
       abi: mainABI,
       functionName: "setApprovalForAll",
       args: [marketplaceContract, false],
-      chainId: baseSepolia.id,
+      chainId
     });
   }
 

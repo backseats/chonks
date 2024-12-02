@@ -25,7 +25,7 @@ export default function MenuBar() {
   const opts = {
     functionName: MINT,
     args: [],
-    chainId: baseSepolia.id,
+    chainId: baseSepolia.id, // DEPLOY: change to base
   };
 
   const config = (address: Address, abi: any) => {

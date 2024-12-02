@@ -20,6 +20,9 @@ import PriceAndActionsSection from '@/components/marketplace/traits/PriceAndActi
 import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
+import { baseSepolia, base } from "viem/chains";
+
+const chainId = baseSepolia.id; // DEPLOY: change to base
 
 type TraitOffer = {
     priceInWei: bigint;
@@ -124,7 +127,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     //     abi: traitsABI,
     //     functionName: "ownerOf",
     //     args: [BigInt(id)],
-    //     chainId: baseSepolia.id,
+    //     chainId
     // }) as { data: string };
 
     // // Add this new query to get the tokenId from the TBA address
@@ -133,7 +136,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     //     abi: mainABI,
     //     functionName: "tbaAddressToTokenId",
     //     args: [owner],
-    //     chainId: baseSepolia.id,
+    //     chainId,
     // }) as { data: bigint };
 
     // const { data: ownerOfTraitOwner } = useReadContract({
@@ -141,7 +144,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     //     abi: mainABI,
     //     functionName: "ownerOf",
     //     args: [tokenIdOfTBA ? BigInt(tokenIdOfTBA) : undefined],
-    //     chainId: baseSepolia.id,
+    //     chainId,
     // }) as { data: string };
 
     // console.log("owner (TBA address)", owner);
@@ -197,7 +200,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     //     abi: mainABI,
     //     functionName: "checkIfTraitIsEquipped",
     //     args: [tokenIdOfTBA, BigInt(id)],
-    //     chainId: baseSepolia.id,
+    //     chainId,
     // }) as { data: boolean };
 
 
@@ -225,7 +228,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     //     abi: traitsABI,
     //     functionName: "walletOfOwner",
     //     args: [account],
-    //     chainId: baseSepolia.id,
+    //     chainId,
     // }) as { data: BigInt[] };
 
     // console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works

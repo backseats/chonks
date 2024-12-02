@@ -8,9 +8,11 @@ import {
   tokenURIABI,
   traitsABI,
 } from "@/contract_data";
-import { baseSepolia } from "viem/chains";
+import { baseSepolia, base } from "viem/chains";
 import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
+
+const chainId = baseSepolia.id; // DEPLOY: change to base
 
 // Temporarily here because /chonks/[id] is hidden in vercelignore
 function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
@@ -38,7 +40,7 @@ export function useTraitData(traitTokenId: string) {
     abi: tokenURIABI,
     functionName: "tokenURI",
     args: [traitTokenId],
-    chainId: baseSepolia.id,
+    chainId,
   }) as { data: string };
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export function useGetTrait(traitTokenId: string) {
     abi: traitsABI,
     functionName: "getTrait",
     args: [traitTokenId],
-    chainId: baseSepolia.id,
+    chainId,
   }) as { data: any };
 
   return traitData;
@@ -68,7 +70,7 @@ export function useIsRevealed(traitTokenId: string) {
     abi: traitsABI,
     functionName: "getTrait",
     args: [traitTokenId],
-    chainId: baseSepolia.id,
+    chainId,
   }) as { data: any };
 
   return traitData?.isRevealed ?? false;
@@ -82,7 +84,7 @@ export function useTraitType(traitTokenId: string) {
     abi: traitsABI,
     functionName: "getTraitMetadata",
     args: [traitTokenId],
-    chainId: baseSepolia.id,
+    chainId,
   }) as { data: { traitType: string } };
 
   useEffect(() => {
@@ -104,7 +106,7 @@ export function useTraitName(traitTokenId: string) {
     abi: traitsABI,
     functionName: "getTraitMetadata",
     args: [traitTokenId],
-    chainId: baseSepolia.id,
+    chainId,
   }) as { data: { traitName: string } };
 
   useEffect(() => {
@@ -125,7 +127,7 @@ export function useEquipFunction(chonkId: string, traitTokenId: string, traitTyp
       abi: mainABI,
       functionName: "equip",
       args: [parseInt(chonkId), parseInt(traitTokenId)],
-      chainId: baseSepolia.id,
+      chainId,
     });
   }, [writeContract, chonkId, traitTokenId]);
 
@@ -141,7 +143,7 @@ export function useEquipFunction(chonkId: string, traitTokenId: string, traitTyp
       abi: mainABI,
       functionName: "unequip",
       args: [parseInt(chonkId), categoryIndex],
-      chainId: baseSepolia.id,
+      chainId,
     });
   }, [writeContract, chonkId, traitType]);
 
