@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import { CommitReveal } from '../common/CommitReveal.sol';
-import { TraitCategory } from '../TraitCategory.sol';
+import { CommitReveal } from "../common/CommitReveal.sol";
+import { TraitCategory } from "../TraitCategory.sol";
 
 interface ITraitStorage {
 
     struct StoredTrait {
-        // The token ID of the stored Trait
-        // ML 18.10.24: I've commented this out, as it's not used anywhere and is confusing with the seed
-        // uint256 tokenId;
 
         // The epoch when it was minted
         uint256 epoch;

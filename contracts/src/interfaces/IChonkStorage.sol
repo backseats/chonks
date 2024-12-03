@@ -29,7 +29,7 @@ interface IChonkStorage {
         // This is set when minted based on the epoch
         uint32 epoch;
 
-        // was seed // TODO: make this uint256? | TODO
+        // The token id of the Chonk
         uint256 tokenId;
 
         // randomly set in ChonksMain.mint() but can be updated by holder
