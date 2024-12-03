@@ -199,31 +199,6 @@ contract MainRenderer3D is Ownable {
         bytes memory doubleURLEncodedHTMLDataURI = IScriptyBuilderV2(scriptyBuilderAddress).getHTMLURLSafe(htmlRequest);
 
         return generateJSON(_tokenId, fullAttributes, _chonkdata, image, doubleURLEncodedHTMLDataURI);
-
-            // string(
-            //     abi.encodePacked(
-            //         "data:application/json,",
-            //         encodeURIContract.encodeURI('{"name":"Chonk #'),
-            //         Utils.toString(_tokenId),
-            //         // encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
-            //         // encodeURIContract.encodeURI('", "description":"Left click and drag to rotate, right click to move, mouse wheel to zoom ",'),
-
-            //         // encodeURIContract.encodeURI('", "description":"'),
-            //         // encodeURIContract.encodeURI(_chonkdata.descriptionParts[0]),
-            //         // Utils.toString(_tokenId),
-            //         // encodeURIContract.encodeURI(_chonkdata.descriptionParts[1]),
-            //         // encodeURIContract.encodeURI('",'),
-
-            //         // generateDescription(_chonkdata, _tokenId),
-
-            //         encodeURIContract.encodeURI(fullAttributes),
-            //         encodeURIContract.encodeURI(','),
-            //         encodeURIContract.encodeURI(image),
-            //         encodeURIContract.encodeURI(',"animation_url":"'),
-            //         doubleURLEncodedHTMLDataURI,
-            //         encodeURIContract.encodeURI('"}')
-            //     )
-            // );
     }
 
     function generateJSON(uint256 _tokenId, string memory _attributes, IChonkStorage.ChonkData memory _chonkdata, string memory _image, bytes memory _doubleURLEncodedHTMLDataURI) internal view returns (string memory json) {
@@ -233,18 +208,7 @@ contract MainRenderer3D is Ownable {
                     "data:application/json,",
                     encodeURIContract.encodeURI('{"name":"Chonk #'),
                     Utils.toString(_tokenId),
-                    // old way
-                    // encodeURIContract.encodeURI('", "description":"Click/tap top left to open your backpack, top right for PFP mode ",'),
-                    // encodeURIContract.encodeURI('", "description":"Left click and drag to rotate, right click to move, mouse wheel to zoom ",'),
 
-                    // mid way
-                    // encodeURIContract.encodeURI('", "description":"'),
-                    // encodeURIContract.encodeURI(_chonkdata.descriptionParts[0]),
-                    // Utils.toString(_tokenId),
-                    // encodeURIContract.encodeURI(_chonkdata.descriptionParts[1]),
-                    // encodeURIContract.encodeURI('",'),
-
-                    // new way due to stack too deep
                     generateDescription(_chonkdata, _tokenId),
 
                     encodeURIContract.encodeURI(_attributes),

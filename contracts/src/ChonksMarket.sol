@@ -671,8 +671,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     // Ensures that the msg.sender owns the Chonk which owns the TBA that owns the Trait
     function ensureTraitOwner(uint256 _traitId, uint256 _chonkId) public view returns (bool) {
         address traitOwnerTBA = CHONK_TRAITS.ownerOf(_traitId);
-        (address chonkOwner, address tbaForChonkId) = CHONKS_MAIN
-            .getOwnerAndTBAAddressForChonkId(_chonkId);
+        (address chonkOwner, address tbaForChonkId) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
 
         return (traitOwnerTBA == tbaForChonkId) && (chonkOwner == msg.sender);
     }
@@ -681,9 +680,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         return (_amount * royaltyPercentage) / 10_000;
     }
 
-    function getTraitIdsAndEncodingForChonk(
-        uint256 _chonkId
-    ) public view returns (uint256[] memory traitIds, bytes memory encodedTraitIds) {
+    function getTraitIdsAndEncodingForChonk(uint256 _chonkId) public view returns (uint256[] memory traitIds, bytes memory encodedTraitIds) {
         (, address tbaAddress) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
         traitIds = CHONK_TRAITS.walletOfOwner(tbaAddress);
         encodedTraitIds = abi.encode(traitIds);
