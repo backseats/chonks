@@ -110,21 +110,16 @@ contract MainRenderer3D is Ownable {
         // Gunzip unzips all the other scripts into the page
         HTMLTag[] memory bodyTags = new HTMLTag[](12);
         bodyTags[0].name = "gunzipScripts-0.0.1.js";
-        // <script src="data:text/javascript;base64,[script]"></script>
         bodyTags[0].tagType = HTMLTagType.scriptBase64DataURI;
         bodyTags[0].contractAddress = ethfsFileStorageAddress;
 
         // Helps dynamically load ES modules
         bodyTags[1].name = "es-module-shims.js.Base64.gz";
-        // <script type="text/javascript+gzip" src="data:text/javascript;base64,[script]"></script>
         bodyTags[1].tagType = HTMLTagType.scriptGZIPBase64DataURI;
         bodyTags[1].contractAddress = ethfsFileStorageAddress;
 
         // fflate is a zip/gzip library for JavaScript
         bodyTags[2].name = "fflate.module.js.Base64.gz";
-        // double encoded:
-        // - <script>var fflte = "
-        // - "</script>
         bodyTags[2]
             .tagOpen = "%253Cscript%253Evar%2520fflte%2520%253D%2520%2522";
         bodyTags[2].tagClose = "%2522%253C%252Fscript%253E";
@@ -132,18 +127,12 @@ contract MainRenderer3D is Ownable {
 
          // Three.js is a 3D library for JavaScript
         bodyTags[3].name = "three-v0.162.0-module.min.js.Base64.gz";
-        // double encoded:
-        // - <script>var t3 = "
-        // - "</script>
         bodyTags[3].tagOpen = "%253Cscript%253Evar%2520t3%2520%253D%2520%2522";
         bodyTags[3].tagClose = "%2522%253C%252Fscript%253E";
         bodyTags[3].contractAddress = ethfsFileStorageAddress;
 
         // OrbitControls is a camera control library for Three.js
         bodyTags[4].name = "three-v0.162.0-OrbitControls.js.Base64.gz";
-        // double encoded:
-        // - <script>var oc = "
-        // - "</script>
         bodyTags[4].tagOpen = "%253Cscript%253Evar%2520oc%2520%253D%2520%2522";
         bodyTags[4].tagClose = "%2522%253C%252Fscript%253E";
         bodyTags[4].contractAddress = ethfsFileStorageAddress;
@@ -154,7 +143,6 @@ contract MainRenderer3D is Ownable {
         bodyTags[5].contractAddress = ethfsFileStorageAddress;
 
         bodyTags[6].name = "";
-        // <script>[script]</script>
         bodyTags[6].tagType = HTMLTagType.script;
         bodyTags[6]
             .tagContent = 'injectImportMap([ ["fflate",fflte],   ["three",t3], ["OrbitControls",oc] ],gunzipScripts)';
@@ -166,23 +154,23 @@ contract MainRenderer3D is Ownable {
         // get the zMap and provide it to the script: <script>var zMapFull = '[zMap]';  </script>
         bodyTags[8].tagOpen = bytes(
             string.concat(
-                "%253Cscript%253Evar%2520zMapFull%2520%253D%2527", // <script>var zMapFull ='
+                "%253Cscript%253Evar%2520zMapFull%2520%253D%2527",
                   encodeURIContract.encodeURI(
                     encodeURIContract.encodeURI(string(_fullZmap))
                 )
             )
         );
-        bodyTags[8].tagClose = "%2527%253B%253C%252Fscript%253E"; // ';</script>
+        bodyTags[8].tagClose = "%2527%253B%253C%252Fscript%253E"; 
 
         bodyTags[9].tagOpen = bytes(
             string.concat(
-                "%253Cscript%253Evar%2520bgColor%2520%253D%2527", // <script>var bgColor ='
+                "%253Cscript%253Evar%2520bgColor%2520%253D%2527",
                   encodeURIContract.encodeURI(
                     encodeURIContract.encodeURI(string.concat("#", _chonkdata.backgroundColor))
                 )
             )
         );
-        bodyTags[9].tagClose = "%2527%253B%253C%252Fscript%253E"; // ';</script>
+        bodyTags[9].tagClose = "%2527%253B%253C%252Fscript%253E";
 
         // output the three.js script
         bodyTags[10]
@@ -208,9 +196,7 @@ contract MainRenderer3D is Ownable {
                     "data:application/json,",
                     encodeURIContract.encodeURI('{"name":"Chonk #'),
                     Utils.toString(_tokenId),
-
                     generateDescription(_chonkdata, _tokenId),
-
                     encodeURIContract.encodeURI(_attributes),
                     encodeURIContract.encodeURI(','),
                     encodeURIContract.encodeURI(_image),
