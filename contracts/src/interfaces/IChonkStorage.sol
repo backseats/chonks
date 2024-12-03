@@ -5,6 +5,9 @@ pragma solidity ^0.8.22;
 interface IChonkStorage {
 
     struct StoredChonk {
+        // The token id of the Chonk
+        uint256 tokenId;
+
         // The token id of the head, if applicable
         uint256 headId;
 
@@ -25,12 +28,6 @@ interface IChonkStorage {
 
         // The token id of the shoes, if applicable
         uint256 shoesId;
-
-        // This is set when minted based on the epoch
-        uint32 epoch;
-
-        // The token id of the Chonk
-        uint256 tokenId;
 
         // randomly set in ChonksMain.mint() but can be updated by holder
         uint8 bodyIndex;
