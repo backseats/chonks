@@ -181,9 +181,8 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         }
     }
 
-    /// @notice Initializes and closes epochs. Thank you jalil & mouseDev.
-    /// @dev Based on the commit-reveal scheme proposed by MouseDev.
-
+    /// @notice Initializes and closes epochs. Thank you Jalil & MouseDev.
+    /// @dev Based on the commit-reveal scheme proposed by MouseDev in Checks.
     function resolveEpochIfNecessary() public {
         CommitReveal.Epoch storage currentEpoch = traitTokens.epochs[traitTokens.epoch];
 
