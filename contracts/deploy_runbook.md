@@ -31,6 +31,9 @@ To deploy Chonks to Base Sepolia:
     forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/ChonksMain.s.sol:ChonksUpdateDescriptionScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --broadcast -vvvv
 
 
+18. set withdraw address to 0xE5c8893e69907e7d90a0f012C477CA30Ec61c3B9
+
+
 NOTE: if (code: -32603, message: replacement transaction underpriced, data: None) error: send a tx in mm, i just transfer another account .0001 eth
 
 Once deployed:

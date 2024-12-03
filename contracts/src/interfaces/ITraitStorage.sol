@@ -7,7 +7,6 @@ import { TraitCategory } from "../TraitCategory.sol";
 interface ITraitStorage {
 
     struct StoredTrait {
-
         // The epoch when it was minted
         uint256 epoch;
 
@@ -31,15 +30,15 @@ interface ITraitStorage {
         // A mapping of each token ID to what it actually is (the StoredTrait)
         mapping(uint256 => StoredTrait) all;
 
-        // Collection-wide epoch
-        uint256 epoch;  // The current epoch index of the mapping below
+        // Collection-wide epoch; The current epoch index of the mapping below
+        uint256 epoch;
 
         // A mapping of the above epoch (or past epochs) to the commit-reveal scheme. The epoch in StoredTrait is the epoch when that trait was *minted*
         mapping(uint256 => CommitReveal.Epoch) epochs;
     }
 
-    // with Body, we just hardcode 3 bodies in contracts
-    // but with traits, we want to be able to add them, hence this struct
+    // With Bodies, we just hardcode 5 Bodies in contracts
+    // But with Traits, we want to be able to add them, hence this struct
     struct TraitMetadata {
         // Refers to the number used in ChonkTraits.addNewTrait; not a token ID
         uint256 traitIndex;
@@ -47,7 +46,7 @@ interface ITraitStorage {
         // e.g. 'Blue top'
         string traitName;
 
-        // e.g. TraitCategory.Name.top
+        // e.g. TraitCategory.Name.Top
         TraitCategory.Name traitType;
 
         // The row-major byte array of the 2d version of a Trait
