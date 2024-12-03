@@ -1142,7 +1142,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         for (uint i; i < wallet.length; i++) {
             // console.log(wallet[i]);
             ITraitStorage.StoredTrait memory trait = traits.getTrait(wallet[i]);
-            // console.log('renderMinterContract', trait.renderMinterContract);
+            // console.log('dataMinterContract', trait.dataMinterContract);
         }
     }
 

@@ -270,7 +270,7 @@ contract FirstReleaseDataMinter is Ownable {
             addNewTrait(6012, "Grey", TraitCategory.Name.Shoes, "", hex"0b17A8A8A80c17A8A8A81017A8A8A81117A8A8A8", "0b1705A8A8A80c1705A8A8A8101705A8A8A8111705A8A8A8111706A8A8A8101706A8A8A80b1706A8A8A80c1706A8A8A8", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
             addNewTrait(6013, "White", TraitCategory.Name.Shoes, "", hex"0b17FFFFFF0c17FFFFFF1017FFFFFF1117FFFFFF", "0b1705FFFFFF0c1705FFFFFF101705FFFFFF111705FFFFFF111706FFFFFF101706FFFFFF0b1706FFFFFF0c1706FFFFFF", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );
 
-            
+
         }
     }
 
@@ -291,7 +291,7 @@ contract FirstReleaseDataMinter is Ownable {
             // Set the seed to the tokenId
             trait.seed = tokenId;
             // Set the data render contract to this contract
-            trait.renderMinterContract = address(this);
+            trait.dataMinterContract = address(this);
 
             // Assign the Trait Category
             if (i == 0) {
@@ -334,10 +334,9 @@ contract FirstReleaseDataMinter is Ownable {
         metadata.traitIndex = _traitIndex;
         metadata.traitName = _traitName;
         metadata.traitType = _traitType;
-        metadata.animations = _animations;
         metadata.colorMap = _colorMap;
         metadata.zMap = _zMap;
-        metadata.renderMinterContract = address(this);
+        metadata.dataMinterContract = address(this);
         metadata.creatorAddress = _creatorAddress;
         metadata.creatorName = _creatorName;
         metadata.release = "1";

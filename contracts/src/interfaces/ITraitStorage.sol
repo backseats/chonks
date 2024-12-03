@@ -18,12 +18,12 @@ interface ITraitStorage {
         uint256 seed;
 
         // The RenderMinter contract that can `explain` the trait
-        address renderMinterContract;
+        address dataMinterContract;
 
         // A sequential numbering of the traits that exist in the collection
         uint256 traitIndex;
 
-        // e.g. Head, top
+        // e.g. Head, Top, Shoes, etc.
         TraitCategory.Name traitType;
     }
 
@@ -44,14 +44,11 @@ interface ITraitStorage {
         // Refers to the number used in ChonkTraits.addNewTrait; not a token ID
         uint256 traitIndex;
 
-        // e.g. 'Blue top', same as key, redundant for now
+        // e.g. 'Blue top'
         string traitName;
 
         // e.g. TraitCategory.Name.top
         TraitCategory.Name traitType;
-
-        // Any possible animations related to the trait, to be loaded in the <head>
-        string animations;
 
         // The row-major byte array of the 2d version of a Trait
         bytes colorMap;
@@ -59,16 +56,17 @@ interface ITraitStorage {
         // The row-major byte array of the 3d version of a Trait
         bytes zMap;
 
-        // The RenderMinter contract responsible for this trait
-        address renderMinterContract; // cast as not an address
+        // The DataMinter contract responsible for this trait
+        /// @dev Cast as not an address
+        address dataMinterContract;
 
-         // address of creator
+        // Address of creator
         address creatorAddress;
 
-        // name of creator
+        // Name of creator
         string creatorName;
 
-        // release of trait
+        // Which Release the Trait was in
         string release;
     }
 

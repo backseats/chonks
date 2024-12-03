@@ -11,7 +11,7 @@ import { ITraitStorage } from './interfaces/ITraitStorage.sol';
 import { ChonksMain } from './ChonksMain.sol';
 import { ChonkTraits } from './ChonkTraits.sol';
 import { TraitCategory } from './TraitCategory.sol';
-import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
+// import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { Utils } from './common/Utils.sol';
 
 // DEPLOY: remove
@@ -62,7 +62,7 @@ contract SecondReleaseDataMinter { // TODO: ownable, ITraitStorage
 
             trait.epoch = chonkTraits.getCurrentEpoch(); // set the current epoch
             trait.seed = tokenId;
-            trait.renderMinterContract = address(this);
+            trait.dataMinterContract = address(this);
             trait.traitType = TraitCategory.Name.Accessory;
 
             chonkTraits.setTraitForTokenId(tokenId, trait);
@@ -97,10 +97,10 @@ contract SecondReleaseDataMinter { // TODO: ownable, ITraitStorage
         metadata.traitIndex = _traitIndex;
         metadata.traitName = _traitName;
         metadata.traitType = _traitType;
-        metadata.animations = _animations;
+        // metadata.animations = _animations;
         metadata.colorMap = _colorMap;
         metadata.zMap = _zMap;
-        metadata.renderMinterContract = address(this);
+        metadata.dataMinterContract = address(this);
         metadata.creatorAddress = _creatorAddress;
         metadata.creatorName = _creatorName;
         metadata.release = "2"; // TODO: send this in

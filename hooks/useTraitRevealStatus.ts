@@ -12,7 +12,7 @@ export function useTraitRevealStatus(traitId: bigint) {
       epoch: bigint;
       isRevealed: boolean;
       seed: bigint;
-      renderMinterContract: string;
+      dataMinterContract: string;
       traitIndex: bigint;
       traitType: number;
     };
@@ -34,7 +34,7 @@ export function useTraitRevealStatus(traitId: bigint) {
           epoch: traitData.epoch,
           isRevealed: traitData.isRevealed,
           seed: traitData.seed,
-          renderMinterContract: traitData.renderMinterContract,
+          dataMinterContract: traitData.dataMinterContract,
           traitIndex: traitData.traitIndex,
           traitType: traitData.traitType
         });

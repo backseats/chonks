@@ -4,6 +4,7 @@ pragma solidity ^0.8.17;
 import { ITraitStorage } from './ITraitStorage.sol';
 import { TraitCategory } from '../TraitCategory.sol';
 
+// NOTE: Not included in initial release
 interface IRenderMinterV1 {
     // Mints a single trait token to the the `_to` address
     function safeMint(address _to) external payable returns (uint256);

@@ -63,7 +63,7 @@ contract BurningDataMinter { // TODO: ownable, ITraitStorage
         ITraitStorage.StoredTrait memory trait = chonkTraits.getStoredTraitForTokenId(tokenId);
         trait.epoch = chonkTraits.getCurrentEpoch(); // set the current epoch
         trait.seed = tokenId;
-        trait.renderMinterContract = address(this);
+        trait.dataMinterContract = address(this);
         trait.traitType = TraitCategory.Name.Accessory;
 
         chonkTraits.setTraitForTokenId(tokenId, trait);
@@ -87,7 +87,7 @@ contract BurningDataMinter { // TODO: ownable, ITraitStorage
         ITraitStorage.StoredTrait memory trait = chonkTraits.getStoredTraitForTokenId(tokenId);
         trait.epoch = chonkTraits.getCurrentEpoch(); // set the current epoch
         trait.seed = tokenId;
-        trait.renderMinterContract = address(this);
+        trait.dataMinterContract = address(this);
         trait.traitType = TraitCategory.Name.Accessory;
 
         chonkTraits.setTraitForTokenId(tokenId, trait);
@@ -121,10 +121,10 @@ contract BurningDataMinter { // TODO: ownable, ITraitStorage
         metadata.traitIndex = _traitIndex;
         metadata.traitName = _traitName;
         metadata.traitType = _traitType;
-        metadata.animations = _animations;
+        // metadata.animations = _animations;
         metadata.colorMap = _colorMap;
         metadata.zMap = _zMap;
-        metadata.renderMinterContract = address(this);
+        metadata.dataMinterContract = address(this);
         metadata.creatorAddress = _creatorAddress;
         metadata.creatorName = _creatorName;
         metadata.release = "3"; // TODO: send this in

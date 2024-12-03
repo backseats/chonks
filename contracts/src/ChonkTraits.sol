@@ -14,7 +14,6 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 import { CommitReveal } from "./common/CommitReveal.sol";
 import { IERC4906 } from "./interfaces/IERC4906.sol";
 import { IChonkStorage } from "./interfaces/IChonkStorage.sol";
-import { IRenderMinterV1 } from "./interfaces/IRenderMinterV1.sol";
 import { ITraitStorage } from "./interfaces/ITraitStorage.sol";
 import { TraitCategory } from "./TraitCategory.sol";
 
@@ -22,8 +21,16 @@ import { TraitCategory } from "./TraitCategory.sol";
 import { TraitRenderer } from "./renderers/TraitRenderer.sol";
 
 // Other Chonks Associated Contracts
-import { ChonksMarket } from "./ChonksMarket.sol";
 import { ChonksMain } from "./ChonksMain.sol";
+import { ChonksMarket } from "./ChonksMarket.sol";
+
+interface IRenderMinterV1 {
+    function explainTrait(
+        bool localDeploy,
+        ITraitStorage.StoredTrait calldata storedTrait,
+        uint128 randomness
+    ) external view returns (ITraitStorage.StoredTrait memory);
+}
 
 // import "forge-std/console.sol"; // DEPLOY: remove
 
@@ -237,9 +244,9 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     function getTrait(uint256 _tokenId) public view returns (ITraitStorage.StoredTrait memory) {
         ITraitStorage.StoredTrait memory storedTrait = traitTokens.all[_tokenId];
         uint128 randomness = traitTokens.epochs[storedTrait.epoch].randomness;
-        IRenderMinterV1 dataContract = IRenderMinterV1(storedTrait.renderMinterContract);
+        IRenderMinterV1 dataContract = IRenderMinterV1(storedTrait.dataMinterContract);
 
-        if (storedTrait.renderMinterContract == address(0) && storedTrait.seed == 0)
+        if (storedTrait.dataMinterContract == address(0) && storedTrait.seed == 0)
             revert TraitNotFound(_tokenId);
 
         return dataContract.explainTrait(_localDeploy, storedTrait, randomness);

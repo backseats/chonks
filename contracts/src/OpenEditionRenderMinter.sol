@@ -50,7 +50,7 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
         ITraitStorage.StoredTrait memory trait = chonkTraits.getStoredTraitForTokenId(tokenId);
         trait.epoch = chonkTraits.getCurrentEpoch(); // set the current epoch
         trait.seed = tokenId; // seed is the tokenId
-        trait.renderMinterContract = address(this);
+        trait.dataMinterContract = address(this);
         trait.isRevealed = true; // BS: I think we can set this in certain instances and be okay, if there's no reveal
         trait.traitType = TraitCategory.Name.Top; // Hardcoded but could be a storage var with a setter
 
@@ -93,9 +93,9 @@ contract OpenEditionRenderMinter is IRenderMinterV1, Ownable {
         metadata.traitIndex = _traitIndex;
         metadata.traitName  = _traitName;
         // metadata.traitPath  = _traitPath;
-        metadata.animations = _animations;
+        // metadata.animations = _animations;
         metadata.traitType  = _traitType;
-        metadata.renderMinterContract = address(this);
+        metadata.dataMinterContract = address(this);
 
         chonkTraits.setTraitIndexToMetadata(_traitIndex, metadata);
     }
