@@ -328,10 +328,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit ChonkOfferCanceled(_chonkId, msg.sender);
     }
 
-    function offerChonk(
-        uint256 _chonkId,
-        uint256 _priceInWei
-    ) public notPaused ensurePriceIsNotZero(_priceInWei) {
+    function offerChonk(uint256 _chonkId, uint256 _priceInWei) public notPaused ensurePriceIsNotZero(_priceInWei) {
         (address owner, address tbaAddress) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
 
         _offerChonk(_chonkId, _priceInWei, address(0), owner, tbaAddress);
@@ -391,11 +388,15 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         delete chonkOffers[_chonkId];
 
         // Refund and clear existing Bid if from buyer
+        uint256 refundAmount = 0;
         ChonkBid memory existingBid = chonkBids[_chonkId];
         if (existingBid.bidder == msg.sender) {
             delete chonkBids[_chonkId];
-            _refundBid(existingBid.bidder, existingBid.amountInWei);
+            refundAmount = existingBid.amountInWei;
         }
+
+        if (refundAmount > 0)
+            _refundBid(existingBid.bidder, refundAmount);
 
         // Transfer Chonk (Don't need to transfer Traits because they come with the Chonk)
         CHONKS_MAIN.transferFrom(offer.seller, msg.sender, _chonkId);
@@ -422,9 +423,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit ChonkBidWithdrawn(_chonkId, msg.sender, bid.amountInWei);
     }
 
-    function bidOnChonk(
-        uint256 _chonkId
-    ) public payable ensurePriceIsNotZero(msg.value) notPaused nonReentrant {
+    function bidOnChonk(uint256 _chonkId) public payable ensurePriceIsNotZero(msg.value) notPaused nonReentrant {
         address owner = CHONKS_MAIN.ownerOf(_chonkId);
         if (owner == msg.sender) revert CantBidOnYourOwnChonk();
 
@@ -447,10 +446,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit ChonkBidEntered(_chonkId, msg.sender, msg.value);
     }
 
-    function acceptBidForChonk(
-        uint256 _chonkId,
-        address _bidder
-    ) public notPaused nonReentrant {
+    function acceptBidForChonk(uint256 _chonkId, address _bidder) public notPaused nonReentrant {
         address owner = CHONKS_MAIN.ownerOf(_chonkId);
         if (!CHONKS_MAIN.isApprovedForAll(owner, address(this)) && CHONKS_MAIN.getApproved(_chonkId) != address(this))
             revert ApproveTheMarketplace();
@@ -559,10 +555,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     /// @notice This should be called by the EOA that owns the Chonk
     /// @param _traitId The ID of the Trait you're buying
     /// @param _forChonkId should be your Chonk you're buying the Trait for
-    function buyTrait(
-        uint256 _traitId,
-        uint256 _forChonkId
-    ) public payable notPaused nonReentrant {
+    function buyTrait(uint256 _traitId, uint256 _forChonkId) public payable notPaused nonReentrant {
         // Ensure msg.sender owns the Chonk token of the TBA
         address owner = CHONKS_MAIN.ownerOf(_forChonkId);
         if (owner != msg.sender) revert NotYourChonk();
@@ -594,11 +587,15 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         delete traitOffers[_traitId];
 
         // Clear existing Bid if it exists
+        uint256 refundAmount = 0;
         TraitBid memory existingBid = traitBids[_traitId];
         if (existingBid.bidder == msg.sender) {
             delete traitBids[_traitId];
-            _refundBid(existingBid.bidder, existingBid.amountInWei);
+            refundAmount = existingBid.amountInWei;
         }
+
+        if (refundAmount > 0)
+            _refundBid(existingBid.bidder, refundAmount);
 
         CHONK_TRAITS.transferFrom(offer.sellerTBA, tba, _traitId);
 
@@ -623,10 +620,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit TraitBidWithdrawn(_traitId, msg.sender, bid.amountInWei);
     }
 
-    function bidOnTrait(
-        uint256 _traitId,
-        uint256 _yourChonkId
-    ) public payable ensurePriceIsNotZero(msg.value) notPaused nonReentrant {
+    function bidOnTrait(uint256 _traitId, uint256 _yourChonkId) public payable ensurePriceIsNotZero(msg.value) notPaused nonReentrant {
         (address chonkOwner, address tbaAddressOfBiddersChonk) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_yourChonkId);
         // Ensure msg.sender owns the Chonk trait will go to
         if (chonkOwner != msg.sender) revert NotYourChonk();
@@ -675,10 +669,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     /// Helper Functions
 
     // Ensures that the msg.sender owns the Chonk which owns the TBA that owns the Trait
-    function ensureTraitOwner(
-        uint256 _traitId,
-        uint256 _chonkId
-    ) public view returns (bool) {
+    function ensureTraitOwner(uint256 _traitId, uint256 _chonkId) public view returns (bool) {
         address traitOwnerTBA = CHONK_TRAITS.ownerOf(_traitId);
         (address chonkOwner, address tbaForChonkId) = CHONKS_MAIN
             .getOwnerAndTBAAddressForChonkId(_chonkId);
@@ -700,17 +691,12 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     /// Before Token Transfer
 
-    function deleteChonkOfferBeforeTokenTransfer(
-        uint256 _chonkId
-    ) public onlyMainContract {
+    function deleteChonkOfferBeforeTokenTransfer(uint256 _chonkId) public onlyMainContract {
         ChonkOffer memory offer = chonkOffers[_chonkId];
         if (offer.seller != address(0)) delete chonkOffers[_chonkId];
     }
 
-    function deleteChonkBidsBeforeTokenTransfer(
-        uint256 _chonkId,
-        address _toEOA
-    ) public onlyMainContract {
+    function deleteChonkBidsBeforeTokenTransfer(uint256 _chonkId, address _toEOA) public onlyMainContract {
         ChonkBid memory bid = chonkBids[_chonkId];
         if (bid.bidder == _toEOA) {
             delete chonkBids[_chonkId];
@@ -719,34 +705,14 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     }
 
     function deleteTraitOffersBeforeTokenTransfer(uint256 _traitId) public {
-        // console.log(
-        //     "ChonksMarket deleteTraitOffersBeforeTokenTransfer called for trait ID:",
-        //     _traitId
-        // );
-        // console.log("- message sender:", msg.sender);
-        // console.log("- address(CHONKS_MAIN)", address(CHONKS_MAIN));
-        // console.log("- address(CHONK_TRAITS)", address(CHONK_TRAITS));
-
-        if (
-            msg.sender != address(CHONKS_MAIN) &&
-            msg.sender != address(CHONK_TRAITS)
-        ) {
-            // console.log("CMUnauthorized");
-            revert CMUnauthorized();
-        }
+        if (msg.sender != address(CHONKS_MAIN) && msg.sender != address(CHONK_TRAITS)) revert CMUnauthorized();
 
         // Delete the Trait Offer
-        if (traitOffers[_traitId].seller != address(0))
-            delete traitOffers[_traitId];
-
-        // console.log("ChonksMarket deleteTraitOffersBeforeTokenTransfer end");
+        if (traitOffers[_traitId].seller != address(0)) delete traitOffers[_traitId];
     }
 
     /// @dev Loops through all of the TBAs associated with the _toEOA address to see if they bid on the Trait. If so, delete and refund the bidder
-    function deleteTraitBidsBeforeTokenTransfer(
-        uint256 _traitId,
-        address[] memory _toTBAs
-    ) public {
+    function deleteTraitBidsBeforeTokenTransfer(uint256 _traitId, address[] memory _toTBAs) public {
         if (msg.sender != address(CHONKS_MAIN)) revert CMUnauthorized();
 
         // This handles the case where the bid.bidder owns multiple Chonks
@@ -765,10 +731,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         }
     }
 
-    function deleteTraitBidsBeforeTokenTransfer(
-        uint256 _traitId,
-        address _toTBA
-    ) public {
+    function deleteTraitBidsBeforeTokenTransfer(uint256 _traitId, address _toTBA) public {
         if (msg.sender != address(CHONK_TRAITS)) revert CMUnauthorized();
 
         TraitBid memory bid = traitBids[_traitId];
@@ -796,16 +759,11 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     /// Private
 
-    function _calculateRoyaltiesAndTransferFunds(
-        uint256 _amount,
-        address _to
-    ) private returns (bool success) {
+    function _calculateRoyaltiesAndTransferFunds(uint256 _amount, address _to) private returns (bool success) {
         uint256 royalties = calculateRoyalty(_amount);
         uint256 amountForSeller = _amount - royalties;
 
-        (bool royaltyPayment, ) = payable(teamWallet).call{value: royalties}(
-            ""
-        );
+        (bool royaltyPayment, ) = payable(teamWallet).call{value: royalties}("");
         if (!royaltyPayment) withdrawableFunds[teamWallet] += royalties;
 
         (success, ) = payable(_to).call{value: amountForSeller, gas: 60_000}("");

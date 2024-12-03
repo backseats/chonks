@@ -182,9 +182,9 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
         if (
             // If epoch has not been committed,
-            currentEpoch.committed == false ||
+            !currentEpoch.committed ||
             // Or the reveal commitment timed out.
-            (currentEpoch.revealed == false && currentEpoch.revealBlock < block.number - 256)
+            (!currentEpoch.revealed && currentEpoch.revealBlock < block.number - 256)
         ) {
             // This means the epoch has not been committed, OR the epoch was committed but has expired.
             // Set committed to true, and record the reveal block:

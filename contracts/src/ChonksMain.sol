@@ -265,9 +265,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 // Initialize the TBA
                 IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
-                // use this if we want to equip traits initially...
+                // Mint Traits to equip below
                 uint256[] memory traitsIds = firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
-                // firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
 
                 // Initialize the Chonk
                 StoredChonk storage chonk = chonkTokens[tokenId];

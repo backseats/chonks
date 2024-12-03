@@ -13,7 +13,6 @@ contract MainRenderer3D is Ownable {
 
     // Scripty & EthFS for 3D rendering
     address immutable scriptyBuilderAddress = 0xD7587F110E08F4D120A231bA97d3B577A81Df022;
-    address immutable scriptyStorageAddress = 0xbD11994aABB55Da86DC246EBB17C1Be0af5b7699;
     address immutable ethfsFileStorageAddress = 0x8FAA1AAb9DA8c75917C43Fb24fDdb513edDC3245;
 
     // Encodes plain text as a URI-encoded string
@@ -197,10 +196,7 @@ contract MainRenderer3D is Ownable {
         htmlRequest.bodyTags = bodyTags;
 
         // this combines everything into a single output for animation_url
-        bytes memory doubleURLEncodedHTMLDataURI = IScriptyBuilderV2(
-            scriptyBuilderAddress
-        ).getHTMLURLSafe(htmlRequest);
-
+        bytes memory doubleURLEncodedHTMLDataURI = IScriptyBuilderV2(scriptyBuilderAddress).getHTMLURLSafe(htmlRequest);
 
         return generateJSON(_tokenId, fullAttributes, _chonkdata, image, doubleURLEncodedHTMLDataURI);
 
