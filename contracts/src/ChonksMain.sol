@@ -231,49 +231,47 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function _mintInternal(address _to, uint256 _amount, uint8 _traitCount) internal {
-        unchecked { // TODO: is this definitely ok?
-            for (uint i; i < _amount; ++i) {
-                uint256 tokenId = ++nextTokenId;
-                _mint(_to, tokenId);
+        for (uint i; i < _amount; ++i) {
+            uint256 tokenId = ++nextTokenId;
+            _mint(_to, tokenId);
 
-                address tokenBoundAccountAddress = REGISTRY.createAccount(
-                    ACCOUNT_PROXY, // implementation address
-                    0, // salt
-                    84532, // chainId // DEPLOY: 8453
-                    address(this), // tokenContract
-                    tokenId // tokenId
-                );
+            address tokenBoundAccountAddress = REGISTRY.createAccount(
+                ACCOUNT_PROXY, // implementation address
+                0, // salt
+                84532, // chainId // DEPLOY: 8453
+                address(this), // tokenContract
+                tokenId // tokenId
+            );
 
-                // Set the cross-reference between tokenId and TBA account address
-                tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
-                tbaAddressToTokenId[tokenBoundAccountAddress] = tokenId;
+            // Set the cross-reference between tokenId and TBA account address
+            tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
+            tbaAddressToTokenId[tokenBoundAccountAddress] = tokenId;
 
-                // Initialize the TBA
-                IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
+            // Initialize the TBA
+            IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
-                // Mint Traits to equip below
-                uint256[] memory traitsIds = firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
+            // Mint Traits to equip below
+            uint256[] memory traitsIds = firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
 
-                // Initialize the Chonk
-                StoredChonk storage chonk = chonkTokens[tokenId];
-                chonk.tokenId = tokenId;
-                // This randomly picks your Chonk skin color but you can change it any time.
-                chonk.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 5); // even chance for 5 different bodies
-                // Set the default background color
-                chonk.backgroundColor = "0D6E9D";
+            // Initialize the Chonk
+            StoredChonk storage chonk = chonkTokens[tokenId];
+            chonk.tokenId = tokenId;
+            // This randomly picks your Chonk skin color but you can change it any time.
+            chonk.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 5); // even chance for 5 different bodies
+            // Set the default background color
+            chonk.backgroundColor = "0D6E9D";
 
-                // 4 traits to begin with....
-                chonk.shoesId = traitsIds[0];
-                chonk.bottomId = traitsIds[1];
-                chonk.topId = traitsIds[2];
-                chonk.hairId = traitsIds[3];
+            // 4 traits to begin with....
+            chonk.shoesId = traitsIds[0];
+            chonk.bottomId = traitsIds[1];
+            chonk.topId = traitsIds[2];
+            chonk.hairId = traitsIds[3];
 
-                // DEPLOY: REMOVE!
-                // chonk.headId = traitsIds[4];
-                // chonk.faceId = traitsIds[5];
-                // chonk.accessoryId = traitsIds[6];
-            }
-         }
+            // DEPLOY: REMOVE!
+            // chonk.headId = traitsIds[4];
+            // chonk.faceId = traitsIds[5];
+            // chonk.accessoryId = traitsIds[6];
+        }
     }
 
     function getOwnerAndTBAAddressForChonkId(uint256 _chonkId) public view returns (address owner, address tbaAddress) {
@@ -735,7 +733,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
                 !(colorBytes[i] >= 0x61 && colorBytes[i] <= 0x66)    // a-f
             ) {
-                revert InvalidColor(); 
+                revert InvalidColor();
             }
         }
 
