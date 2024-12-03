@@ -29,13 +29,13 @@ interface IChonkStorage {
         // The token id of the shoes, if applicable
         uint256 shoesId;
 
-        // randomly set in ChonksMain.mint() but can be updated by holder
+        // Randomly set in ChonksMain.mint() but can be updated by holder
         uint8 bodyIndex;
 
         // RRGGBB colour of the background, default blue #0D6E9D set in ChonksMain.sol mint(), and setBackgroundColor()
         string backgroundColor;
 
-        // bool to determine whether to render in 3D or not
+        // Bool to determine whether to render in 3D or not
         bool render3D;
     }
 
@@ -43,7 +43,7 @@ interface IChonkStorage {
         // Not token id, it refers to the number used in ChonksMain.addNewBody
         uint256 bodyIndex;
 
-        // e.g. 'Body 001' // DEPLOY: still correct?
+        // e.g. 'Skin Tone 1'
         string bodyName;
 
         // bytes memory colorMap = new bytes(2700); 30x30 grid by 3 bytes (rgb, each colour is a byte, or 2 hex digits);
