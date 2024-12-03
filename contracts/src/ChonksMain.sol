@@ -133,12 +133,15 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     // Chonk ID to approved addresses
     mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators;
 
-    
-
     // Mappings for Merkles
     mapping(address => bool) public collectionsAddressDidUse;
     mapping(address => bool) public friendsAddressDidUse;
     mapping(address => bool) public creatorsAddressDidUse;
+
+    /// Merkle Roots
+    bytes32 public collectionsMerkle;
+    bytes32 public friendsMerkle;
+    bytes32 public creatorsMerkle;
 
     /// Errors
     error CanOnlyReserveFirstTwo();
