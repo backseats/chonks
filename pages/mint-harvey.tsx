@@ -425,6 +425,9 @@ export default function Mint() {
                                         <p>
                                         Note: Chonks (and Traits) will not be tradable during the 24 hour mint period. Once the mint is over, you will be able to trade them on our Marketplace and others.
                                         </p>
+                                        <p>
+                                            Need to Bridge? <Link target='_blank' href="https://relay.link/bridge/base?fromChainId=1&toCurrency=0x0000000000000000000000000000000000000000&fromCurrency=0x0000000000000000000000000000000000000000" className="underline text-chonk-blue ">Use Relay</Link>
+                                        </p>
                 
                                     </div>
 
@@ -433,7 +436,7 @@ export default function Mint() {
                                         <div className="space-y-[1vw]">
                                             <div>
                                                 <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">1. How much is a Chonk?</h3>
-                                                <p className="md:text-[1.25vw] text-[2.5vw]"> Each Chonk costs {MINT_PRICE} ETH to mint, approximatley $33 USD.</p>
+                                                <p className="md:text-[1.25vw] text-[2.5vw]"> Each Chonk costs {MINT_PRICE} ETH on BASE to mint, approximatley $33 USD. You can use <Link target='_blank' href="https://relay.link/bridge/base?fromChainId=1&toCurrency=0x0000000000000000000000000000000000000000&fromCurrency=0x0000000000000000000000000000000000000000" className="underline text-chonk-blue ">Relay</Link> to bridge.</p>
                                             </div>
                                             <div>
                                                 <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">2. How many Chonks can I mint?</h3>

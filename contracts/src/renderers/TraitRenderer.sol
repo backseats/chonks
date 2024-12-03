@@ -78,6 +78,7 @@ contract TraitRenderer {
     }
 
     // Add a getter function since the constant is private
+    // TODO: needed? not used anywhere
     function getSvgStart() public pure returns (string memory) {
         return SVG_START;
     }
@@ -90,8 +91,6 @@ contract TraitRenderer {
     function createSvgFromPixels(bytes memory _pixels) public pure returns (bytes memory svgParts) {
         string[16] memory hexSymbols = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"];
         string[30] memory coords = ["0","1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29"];
-
-        // bytes memory svgParts = "";
 
         for (uint i; i < 4500; i += 5) {
             if (_pixels[i] > 0) {
@@ -119,7 +118,7 @@ contract TraitRenderer {
 
     function getTraitImage(bytes memory colorMap) public pure returns (bytes memory) {
         uint256 length = colorMap.length;
-        // require(length > 0 && length % 5 == 0, "Invalid trait bytes length"); //TODO: put back in
+        // require(length > 0 && length % 5 == 0, "Invalid trait bytes length"); //TODO: put back in... only we can add a colorMap so do we need it?
 
         bytes memory pixels = new bytes(30 * 30 * 5); // 30x30 grid with 5 bytes per pixel
         uint256 pixelCount = length / 5;
@@ -268,11 +267,11 @@ contract TraitRenderer {
         if (storedChonk.topId > 0)
             (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.topId, traitsSvg, traitsAttributes);
 
-        if (storedChonk.faceId > 0)
-            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.faceId, traitsSvg, traitsAttributes);
-
         if (storedChonk.hairId > 0)
             (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.hairId, traitsSvg, traitsAttributes);
+
+        if (storedChonk.faceId > 0)
+            (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.faceId, traitsSvg, traitsAttributes);
 
         if (storedChonk.headId > 0)
             (traitsSvg, traitsAttributes) = callGetSvgAndMetadataTraitFn(storedChonk.headId, traitsSvg, traitsAttributes);
@@ -294,11 +293,11 @@ contract TraitRenderer {
         if (storedChonk.topId > 0)
             (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.topId, traitsSvg, traitsAttributes, traitZMaps);
 
-        if (storedChonk.faceId > 0)
-            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.faceId, traitsSvg, traitsAttributes, traitZMaps);
-
         if (storedChonk.hairId > 0)
             (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.hairId, traitsSvg, traitsAttributes, traitZMaps);
+
+        if (storedChonk.faceId > 0)
+            (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.faceId, traitsSvg, traitsAttributes, traitZMaps);
 
         if (storedChonk.headId > 0)
             (traitsSvg, traitsAttributes, traitZMaps) = callGetSVGZmapAndMetadataTraitFn(storedChonk.headId, traitsSvg, traitsAttributes, traitZMaps);

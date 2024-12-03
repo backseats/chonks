@@ -100,44 +100,37 @@ contract MainRenderer3D is Ownable {
         string memory image = generateFullSvg( _bodySvg, _traitsSvg, _chonkdata);
         string memory fullAttributes = generateAttributes(_traitsAttributes, _chonkdata);
 
-        // html style
         HTMLTag[] memory headTags = new HTMLTag[](1);
         headTags[0].tagOpen = "%253Cstyle%253E";
         headTags[0]
             .tagContent = "html%257Bheight%253A100%2525%257Dbody%257Bmin-height%253A100%2525%253Bmargin%253A0%253Bpadding%253A0%257Dcanvas%257Bpadding%253A0%253Bmargin%253Aauto%253Bdisplay%253Ablock%253Bposition%253Aabsolute%253Btop%253A0%253Bbottom%253A0%253Bleft%253A0%253Bright%253A0%257D";
         headTags[0].tagClose = "%253C%252Fstyle%253E";
 
-        // Gunzip unzips all the other scripts into the page
         HTMLTag[] memory bodyTags = new HTMLTag[](12);
         bodyTags[0].name = "gunzipScripts-0.0.1.js";
         bodyTags[0].tagType = HTMLTagType.scriptBase64DataURI;
         bodyTags[0].contractAddress = ethfsFileStorageAddress;
 
-        // Helps dynamically load ES modules
         bodyTags[1].name = "es-module-shims.js.Base64.gz";
         bodyTags[1].tagType = HTMLTagType.scriptGZIPBase64DataURI;
         bodyTags[1].contractAddress = ethfsFileStorageAddress;
 
-        // fflate is a zip/gzip library for JavaScript
         bodyTags[2].name = "fflate.module.js.Base64.gz";
         bodyTags[2]
             .tagOpen = "%253Cscript%253Evar%2520fflte%2520%253D%2520%2522";
         bodyTags[2].tagClose = "%2522%253C%252Fscript%253E";
         bodyTags[2].contractAddress = ethfsFileStorageAddress;
 
-         // Three.js is a 3D library for JavaScript
         bodyTags[3].name = "three-v0.162.0-module.min.js.Base64.gz";
         bodyTags[3].tagOpen = "%253Cscript%253Evar%2520t3%2520%253D%2520%2522";
         bodyTags[3].tagClose = "%2522%253C%252Fscript%253E";
         bodyTags[3].contractAddress = ethfsFileStorageAddress;
 
-        // OrbitControls is a camera control library for Three.js
         bodyTags[4].name = "three-v0.162.0-OrbitControls.js.Base64.gz";
         bodyTags[4].tagOpen = "%253Cscript%253Evar%2520oc%2520%253D%2520%2522";
         bodyTags[4].tagClose = "%2522%253C%252Fscript%253E";
         bodyTags[4].contractAddress = ethfsFileStorageAddress;
 
-        // Import handler for dynamically loading ES modules
         bodyTags[5].name = "importHandler.js";
         bodyTags[5].tagType = HTMLTagType.scriptBase64DataURI;
         bodyTags[5].contractAddress = ethfsFileStorageAddress;
@@ -151,7 +144,6 @@ contract MainRenderer3D is Ownable {
         bodyTags[7].tagOpen = '%253Ccanvas%2520id%253D%2522theCanvas%2522%2520class%253D%2522webgl%2522%253E';
         bodyTags[7].tagClose = "%253C%252Fcanvas%253E";
 
-        // get the zMap and provide it to the script: <script>var zMapFull = '[zMap]';  </script>
         bodyTags[8].tagOpen = bytes(
             string.concat(
                 "%253Cscript%253Evar%2520zMapFull%2520%253D%2527",
@@ -172,18 +164,15 @@ contract MainRenderer3D is Ownable {
         );
         bodyTags[9].tagClose = "%2527%253B%253C%252Fscript%253E";
 
-        // output the three.js script
         bodyTags[10]
             .tagOpen = "%253Cscript%2520type%253D%2522module%2522%2520src%253D%2522data%253Atext%252Fjavascript%253Bbase64%252C";
         bodyTags[10].tagContent = base64ScriptContent;
         bodyTags[10].tagClose = "%2522%253E%253C%252Fscript%253E";
 
-        // create scripty htmlRequest
         HTMLRequest memory htmlRequest;
         htmlRequest.headTags = headTags;
         htmlRequest.bodyTags = bodyTags;
 
-        // this combines everything into a single output for animation_url
         bytes memory doubleURLEncodedHTMLDataURI = IScriptyBuilderV2(scriptyBuilderAddress).getHTMLURLSafe(htmlRequest);
 
         return generateJSON(_tokenId, fullAttributes, _chonkdata, image, doubleURLEncodedHTMLDataURI);

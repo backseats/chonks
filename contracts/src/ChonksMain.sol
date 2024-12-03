@@ -183,6 +183,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         for (uint i; i < 10; ++i) {
             bytes32[] memory empty;
             mint(4, empty); // Mints N bodies/tokens
+            // setChonkAttributes(i+1,"0D6E9D",0,true); // set them all to 3d for testing
         }
     }
 
@@ -207,7 +208,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded();
         if (msg.value != price * _amount) revert InsufficientFunds();
 
-        uint8 traitCount = 4;
+        uint8 traitCount = 4; // DEPLOY: 4!
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
         if (MerkleProofLib.verify(_merkleProof, collectionsMerkle, leaf)) {
             if (!collectionsAddressDidUse[msg.sender]) {
@@ -230,7 +231,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function _mintInternal(address _to, uint256 _amount, uint8 _traitCount) internal {
-        unchecked {
+        unchecked { // TODO: is this definitely ok?
             for (uint i; i < _amount; ++i) {
                 uint256 tokenId = ++nextTokenId;
                 _mint(_to, tokenId);
@@ -266,6 +267,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
                 chonk.bottomId = traitsIds[1];
                 chonk.topId = traitsIds[2];
                 chonk.hairId = traitsIds[3];
+
+                // DEPLOY: REMOVE!
+                // chonk.headId = traitsIds[4];
+                // chonk.faceId = traitsIds[5];
+                // chonk.accessoryId = traitsIds[6];
             }
          }
     }
@@ -739,7 +745,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // Boilerplate
-    
+
     function supportsInterface(bytes4 interfaceId) public view override(IERC165, ERC721Enumerable) returns (bool) {
         return super.supportsInterface(interfaceId);
     }

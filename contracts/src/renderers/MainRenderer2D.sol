@@ -213,7 +213,7 @@ contract MainRenderer2D {
             );
         }
 
-        if (traitSvgs.length > _maxTraitsToOutput) {
+        if (traitTokens.length > _maxTraitsToOutput) {
             buffer = abi.encodePacked(
                 buffer,
                 baseSvgPart,
