@@ -8,28 +8,28 @@ interface IChonkStorage {
         // The token id of the Chonk
         uint256 tokenId;
 
-        // The token id of the head, if applicable
+        // The token id of the head, 0 if unequipped
         uint256 headId;
 
-        // The token id of the hair, if applicable
+        // The token id of the hair, 0 if unequipped
         uint256 hairId;
 
-        // The token id of the face, if applicable
+        // The token id of the face, 0 if unequipped
         uint256 faceId;
 
-        // The token id of the accessory, if applicable
+        // The token id of the accessory, 0 if unequipped
         uint256 accessoryId;
 
-        // The token id of the top, if applicable
+        // The token id of the top, 0 if unequipped
         uint256 topId;
 
-        // The token id of the bottom, if applicable
+        // The token id of the bottom, 0 if unequipped
         uint256 bottomId;
 
-        // The token id of the shoes, if applicable
+        // The token id of the shoes, 0 if unequipped
         uint256 shoesId;
 
-        // Randomly set in ChonksMain.mint() but can be updated by holder
+        // Randomly set in ChonksMain.mint() but can be updated by holder at any time
         uint8 bodyIndex;
 
         // RRGGBB colour of the background, default blue #0D6E9D set in ChonksMain.sol mint(), and setBackgroundColor()
@@ -40,7 +40,7 @@ interface IChonkStorage {
     }
 
     struct BodyMetadata {
-        // Not token id, it refers to the number used in ChonksMain.addNewBody
+        // Refers to the number used in ChonksMain.addNewBody; Not token id
         uint256 bodyIndex;
 
         // e.g. 'Skin Tone 1'
