@@ -13,9 +13,9 @@ import { keccak256, getAddress } from "viem";
 import { MINT_PRICE} from "@/contract_data";
 import { mainContract, tokenURIABI } from "@/contract_data";
 import { useReadContract } from "wagmi";
-import { addresses as friendsListAddresses } from './friendsListAddresses.json';
-import { addresses as creatorListAddresses } from './creatorListAddresses.json';
-import { addresses as specialCollectionsAddresses } from './specialCollectionsAddresses.json';
+import collectionsUpdated from '@/chonklists/outputs/collections-updated.json'; // 5
+import friendsUpdated from '@/chonklists/outputs/friends-updated.json'; // 6
+import creatorUpdated from '@/chonklists/outputs/creator-updated.json'; // 7
 
 const TokenImage = ({ tokenId }: { tokenId: number }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -146,16 +146,16 @@ export default function Mint() {
         };
 
         // Process friends list
-        const friendsRoot = generateMerkleRoot(friendsListAddresses);
+        const friendsRoot = generateMerkleRoot(friendsUpdated);
         console.log('Friends List Merkle Root:', friendsRoot);
         setFriendsListMerkleRoot(friendsRoot);
 
         // Process special collections list
-        const specialRoot = generateMerkleRoot(specialCollectionsAddresses);
+        const specialRoot = generateMerkleRoot(collectionsUpdated);
         console.log('Special Collections Merkle Root:', specialRoot);
         setSpecialCollectionsMerkleRoot(specialRoot);
 
-        const creatorRoot = generateMerkleRoot(creatorListAddresses);
+        const creatorRoot = generateMerkleRoot(creatorUpdated);
         console.log('Creator List Merkle Root:', creatorRoot);
         setCreatorListMerkleRoot(creatorRoot);
     }, []);
