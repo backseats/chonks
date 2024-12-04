@@ -41,9 +41,9 @@ const TokenImage = ({ tokenId }: { tokenId: number }) => {
     }
 
     return (
-        <img 
-            src={imageUrl} 
-            alt={`Chonk ${tokenId}`} 
+        <img
+            src={imageUrl}
+            alt={`Chonk ${tokenId}`}
             className="w-[100px] h-[100px] object-cover"
         />
     );
@@ -51,7 +51,7 @@ const TokenImage = ({ tokenId }: { tokenId: number }) => {
 
 export default function Mint() {
     const MAX_MINT_AMOUNT = 10;
-    
+
     const [isMintOpen, setIsMintOpen] = useState(true);
     const [isMintOver, setIsMintOver] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -77,7 +77,7 @@ export default function Mint() {
 
     const [timeRemaining, setTimeRemaining] = useState<number>(0);
     const [countdownDisplay, setCountdownDisplay] = useState('');
-    
+
     const [revealStatus, setRevealStatus] = useState<{ isRevealed: boolean | null, epoch: number | null }>({
         isRevealed: null,
         epoch: null
@@ -106,7 +106,7 @@ export default function Mint() {
             const hours = Math.floor(timeRemaining / 3600);
             const minutes = Math.floor((timeRemaining % 3600) / 60);
             const seconds = timeRemaining % 60;
-            
+
             setCountdownDisplay(
                 `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
             );
@@ -189,14 +189,14 @@ export default function Mint() {
         setIsFriend(friendResult);
         setIsSpecial(specialResult);
         setIsCreator(creatorResult);
-       
+
         console.log('Address Verification Summary (after state updates):', {
             address,
             isFriend: friendResult,
             isSpecial: specialResult,
             isCreator: creatorResult
         });
-       
+
 
     }, [address]);
 
@@ -282,9 +282,9 @@ export default function Mint() {
                     //     console.log('Setting reveal status...');
                     //     console.log('isRevealed:', isRevealed);
                     //     console.log('epoch:', epoch);
-                    //     setRevealStatus({ 
-                    //         isRevealed, 
-                    //         epoch: epoch ? Number(epoch) : null 
+                    //     setRevealStatus({
+                    //         isRevealed,
+                    //         epoch: epoch ? Number(epoch) : null
                     //     });
                     // }
                     return prev !== null ? prev - 1 : null;
@@ -323,17 +323,17 @@ export default function Mint() {
                     <div className="mx-[20px] sm:mx-[3.45vw] "> {/* EDGES */}
 
                         <section className={`border-l border-r flex flex-col items-center justify-center bg-white py-[6.9vw] md:py-[3.45vw] px-[2.5vw] md:w-[69vw] md:mx-auto`}>
-                            <h1 className="text-[6.9vw] md:text-[3.45vw] mb-8"> 
+                            <h1 className="text-[6.9vw] md:text-[3.45vw] mb-8">
                                 {isMintOver ? 'Mint Closed' : 'Mint a Chonk' + (isMintOpen ? '' : '... Soon!')}
                             </h1>
-                            
+
                             {isMintOver ? (
                                 <div className="text-[3.45vw] md:text-[1.25vw] text-center mb-[3.45vw]">
                                     Release 1 Mint is now closed <br />Head on over to our <Link href="/marketplace" className="underline text-chonk-blue ">marketplace</Link>!
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center gap-[1.725vw]">
-                                    
+
                                     { isMintOpen ? (
                                         <>
                                             <div className="md:text-[1.25vw] text-[3.4vw]">Desired Quantity</div>
@@ -398,11 +398,11 @@ export default function Mint() {
                                     { address && (
                                         <div className="text-[3.4vw] md:text-[1.25vw] mt-2 text-center">
                                             {
-                                            isCreator ? 
+                                            isCreator ?
                                                 <div className="text-green-500">Congrats, you&apos;re on the Creator List! For every Chonk you mint, you&apos;ll get 7 traits. But only in your first transaction!</div>
-                                            : isFriend ? 
+                                            : isFriend ?
                                                 <div className="text-green-500">Congrats, you&apos;re on the Friends List! For every Chonk you mint, you&apos;ll get 6 traits. But only in your first transaction!</div>
-                                            : isSpecial ? 
+                                            : isSpecial ?
                                                 <div className="text-green-500">Congrats, you&apos;re on the Special Collections List! For every Chonk you mint, you&apos;ll get 5 traits. But only in your first transaction!</div>
                                             : <div className="text-red-500">Your wallet is not on a Chonklist :(</div>
                                             }
@@ -428,7 +428,7 @@ export default function Mint() {
                                         <p>
                                             Need to Bridge? <Link target='_blank' href="https://relay.link/bridge/base?fromChainId=1&toCurrency=0x0000000000000000000000000000000000000000&fromCurrency=0x0000000000000000000000000000000000000000" className="underline text-chonk-blue ">Use Relay</Link>
                                         </p>
-                
+
                                     </div>
 
                                     <div className="mt-[1.725vw] w-full max-w-2xl border-t border-gray-300 pt-[3.45vw]">
@@ -436,7 +436,7 @@ export default function Mint() {
                                         <div className="space-y-[1vw]">
                                             <div>
                                                 <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">1. How much is a Chonk?</h3>
-                                                <p className="md:text-[1.25vw] text-[2.5vw]"> Each Chonk costs {MINT_PRICE} ETH on BASE to mint, approximatley $33 USD. You can use <Link target='_blank' href="https://relay.link/bridge/base?fromChainId=1&toCurrency=0x0000000000000000000000000000000000000000&fromCurrency=0x0000000000000000000000000000000000000000" className="underline text-chonk-blue ">Relay</Link> to bridge.</p>
+                                                <p className="md:text-[1.25vw] text-[2.5vw]"> Each Chonk costs {MINT_PRICE} ETH on BASE to mint, approximatley $38 USD. You can use <Link target='_blank' href="https://relay.link/bridge/base?fromChainId=1&toCurrency=0x0000000000000000000000000000000000000000&fromCurrency=0x0000000000000000000000000000000000000000" className="underline text-chonk-blue ">Relay</Link> to bridge.</p>
                                             </div>
                                             <div>
                                                 <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">2. How many Chonks can I mint?</h3>
@@ -462,8 +462,8 @@ export default function Mint() {
                                             <div>
                                                 <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">6. Will the team be minting?</h3>
                                                 <p className="md:text-[1.25vw] text-[2.5vw]">
-                                                    We will be minting some Chonks for giveaways and collabs. 
-                                                    And potentially to round off the number of Chonk &amp; Trait NFTs (we have plans). 
+                                                    We will be minting some Chonks for giveaways and collabs.
+                                                    And potentially to round off the number of Chonk &amp; Trait NFTs (we have plans).
                                                     We will do this within 2 hours of the mint ending and it will be no more than 5% of the total supply.</p>
                                             </div>
                                         </div>
@@ -514,7 +514,7 @@ export default function Mint() {
                                                         className="hover:text-chonk-blue"
                                                     >
                                                         <TokenImage tokenId={id} />
-                                                    
+
                                                         {id}
                                                     </Link>
                                                 </div>
@@ -530,7 +530,7 @@ export default function Mint() {
                                                     Your traits are can now be revealed...<br />Click on your chonk(s) to view and equip them
                                                     {/* {revealStatus.isRevealed !== null && (
                                                         <div>
-                                                            {revealStatus.isRevealed 
+                                                            {revealStatus.isRevealed
                                                                 ? "Your traits are now revealed - click on your chonk(s) to view and equip them"
                                                                 : "Waiting for traits to be revealed..."
                                                             }
