@@ -178,7 +178,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
-        for (uint i; i < 330; ++i) {
+        for (uint i; i < 10; ++i) {
             bytes32[] memory empty;
             mint(4, empty); // Mints N bodies/tokens
             // setChonkAttributes(i+1,"0D6E9D",0,true); // set them all to 3d for testing
@@ -206,7 +206,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded(); // DEPLOY bring back in
         if (msg.value != price * _amount) revert InsufficientFunds();
 
-        uint8 traitCount = 7; // DEPLOY: 4!
+        uint8 traitCount = 4; // DEPLOY: 4!
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
         if (MerkleProofLib.verify(_merkleProof, collectionsMerkle, leaf)) {
             if (!collectionsAddressDidUse[msg.sender]) {
@@ -266,9 +266,9 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             chonk.hairId = traitsIds[3];
 
             // DEPLOY: REMOVE!
-            chonk.headId = traitsIds[4];
-            chonk.faceId = traitsIds[5];
-            chonk.accessoryId = traitsIds[6];
+            // chonk.headId = traitsIds[4];
+            // chonk.faceId = traitsIds[5];
+            // chonk.accessoryId = traitsIds[6];
         }
     }
 
@@ -317,70 +317,111 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     // If 0, it will ignore
-    function equipAll(
-        uint256 _chonkTokenId,
-        uint256 _headTokenId,
-        uint256 _hairTokenId,
-        uint256 _faceTokenId,
-        uint256 _accessoryTokenId,
-        uint256 _topTokenId,
-        uint256 _bottomTokenId,
-        uint256 _shoesTokenId
+    // function equipAll(
+    //     uint256 _chonkTokenId,
+    //     uint256 _headTokenId,
+    //     uint256 _hairTokenId,
+    //     uint256 _faceTokenId,
+    //     uint256 _accessoryTokenId,
+    //     uint256 _topTokenId,
+    //     uint256 _bottomTokenId,
+    //     uint256 _shoesTokenId
+    // ) public onlyChonkOwner(_chonkTokenId) {
+    //     StoredChonk storage chonk = chonkTokens[_chonkTokenId];
+    //     address tbaForChonk = tokenIdToTBAAccountAddress[_chonkTokenId];
+
+    //     if (_headTokenId != 0) {
+    //         chonkEquipHelper.performValidations(tbaForChonk, _headTokenId, TraitCategory.Name.Head);
+    //         chonk.headId = _headTokenId;
+
+    //         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _headTokenId, uint8(TraitCategory.Name.Head));
+    //     }
+
+    //     if (_hairTokenId != 0) {
+    //         chonkEquipHelper.performValidations(tbaForChonk, _hairTokenId, TraitCategory.Name.Hair);
+    //         chonk.hairId = _hairTokenId;
+
+    //         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _hairTokenId, uint8(TraitCategory.Name.Hair));
+    //     }
+
+    //     if (_faceTokenId != 0) {
+    //         chonkEquipHelper.performValidations(tbaForChonk, _faceTokenId, TraitCategory.Name.Face);
+    //         chonk.faceId = _faceTokenId;
+
+    //         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _faceTokenId, uint8(TraitCategory.Name.Face));
+    //     }
+
+    //     if (_accessoryTokenId != 0) {
+    //         chonkEquipHelper.performValidations(tbaForChonk, _accessoryTokenId, TraitCategory.Name.Accessory);
+    //         chonk.accessoryId = _accessoryTokenId;
+
+    //         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _accessoryTokenId, uint8(TraitCategory.Name.Accessory));
+    //     }
+
+    //     if (_topTokenId != 0) {
+    //         chonkEquipHelper.performValidations(tbaForChonk, _topTokenId, TraitCategory.Name.Top);
+    //         chonk.topId = _topTokenId;
+
+    //         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _topTokenId, uint8(TraitCategory.Name.Top));
+    //     }
+
+    //     if (_bottomTokenId != 0) {
+    //         chonkEquipHelper.performValidations(tbaForChonk, _bottomTokenId, TraitCategory.Name.Bottom);
+    //         chonk.bottomId = _bottomTokenId;
+
+    //         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _bottomTokenId, uint8(TraitCategory.Name.Bottom));
+    //     }
+
+    //     if (_shoesTokenId != 0) {
+    //         chonkEquipHelper.performValidations(tbaForChonk, _shoesTokenId, TraitCategory.Name.Shoes);
+    //         chonk.shoesId = _shoesTokenId;
+
+    //         emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _shoesTokenId, uint8(TraitCategory.Name.Shoes));
+    //     }
+
+    //     emit EquipAll(ownerOf(_chonkTokenId), _chonkTokenId);
+    // }
+
+    function equipMany(
+      uint256 _chonkTokenId,
+      uint256[] calldata _traitTokenIds,
+      uint8[] calldata _traitCategories
     ) public onlyChonkOwner(_chonkTokenId) {
         StoredChonk storage chonk = chonkTokens[_chonkTokenId];
-        address tbaForChonk = tokenIdToTBAAccountAddress[_chonkTokenId];
+        address owner = ownerOf(_chonkTokenId);
+        address tba = tokenIdToTBAAccountAddress[_chonkTokenId];
 
-        if (_headTokenId != 0) {
-            chonkEquipHelper.performValidations(tbaForChonk, _headTokenId, TraitCategory.Name.Head);
-            chonk.headId = _headTokenId;
+        for (uint256 idx = 0; idx < _traitTokenIds.length; idx++) {
+            uint256 _traitTokenId = _traitTokenIds[idx];
+            uint8 _traitCategory = _traitCategories[idx];
 
-            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _headTokenId, uint8(TraitCategory.Name.Head));
+            TraitCategory.Name traitCategoryEnum = TraitCategory.Name(_traitCategory);
+
+            chonkEquipHelper.performValidations(tba, _traitTokenId, traitCategoryEnum);
+
+            if (_traitCategory == uint8(TraitCategory.Name.Head)) {
+                chonk.headId = _traitTokenId;
+            } else if (_traitCategory == uint8(TraitCategory.Name.Hair)) {
+                chonk.hairId = _traitTokenId;
+            } else if (_traitCategory == uint8(TraitCategory.Name.Face)) {
+                chonk.faceId = _traitTokenId;
+            } else if (_traitCategory == uint8(TraitCategory.Name.Accessory)) {
+                chonk.accessoryId = _traitTokenId;
+            } else if (_traitCategory == uint8(TraitCategory.Name.Top)) {
+                chonk.topId = _traitTokenId;
+            } else if (_traitCategory == uint8(TraitCategory.Name.Bottom)) {
+                chonk.bottomId = _traitTokenId;
+            } else if (_traitCategory == uint8(TraitCategory.Name.Shoes)) {
+                chonk.shoesId = _traitTokenId;
+            }
+
+            emit Equip(owner, _chonkTokenId, _traitTokenId, _traitCategory);
         }
 
-        if (_hairTokenId != 0) {
-            chonkEquipHelper.performValidations(tbaForChonk, _hairTokenId, TraitCategory.Name.Hair);
-            chonk.hairId = _hairTokenId;
-
-            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _hairTokenId, uint8(TraitCategory.Name.Hair));
-        }
-
-        if (_faceTokenId != 0) {
-            chonkEquipHelper.performValidations(tbaForChonk, _faceTokenId, TraitCategory.Name.Face);
-            chonk.faceId = _faceTokenId;
-
-            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _faceTokenId, uint8(TraitCategory.Name.Face));
-        }
-
-        if (_accessoryTokenId != 0) {
-            chonkEquipHelper.performValidations(tbaForChonk, _accessoryTokenId, TraitCategory.Name.Accessory);
-            chonk.accessoryId = _accessoryTokenId;
-
-            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _accessoryTokenId, uint8(TraitCategory.Name.Accessory));
-        }
-
-        if (_topTokenId != 0) {
-            chonkEquipHelper.performValidations(tbaForChonk, _topTokenId, TraitCategory.Name.Top);
-            chonk.topId = _topTokenId;
-
-            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _topTokenId, uint8(TraitCategory.Name.Top));
-        }
-
-        if (_bottomTokenId != 0) {
-            chonkEquipHelper.performValidations(tbaForChonk, _bottomTokenId, TraitCategory.Name.Bottom);
-            chonk.bottomId = _bottomTokenId;
-
-            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _bottomTokenId, uint8(TraitCategory.Name.Bottom));
-        }
-
-        if (_shoesTokenId != 0) {
-            chonkEquipHelper.performValidations(tbaForChonk, _shoesTokenId, TraitCategory.Name.Shoes);
-            chonk.shoesId = _shoesTokenId;
-
-            emit Equip(ownerOf(_chonkTokenId), _chonkTokenId, _shoesTokenId, uint8(TraitCategory.Name.Shoes));
-        }
-
-        emit EquipAll(ownerOf(_chonkTokenId), _chonkTokenId);
+        emit EquipAll(owner, _chonkTokenId);
     }
+
+
 
     /// tokenURI/Rendering
 
@@ -446,23 +487,40 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         );
     }
 
-    function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
-        string memory bodySvg;
-        string memory traitsSvg;
-        string memory traitsAttributes;
-        string memory backpackSVGs;
-        ChonkData memory chonkdata;
-
+    function _gatherData(uint256 _tokenId) internal view returns (
+        string memory bodySvg,
+        bytes  memory bodyZmap,
+        string memory traitsSvg,
+        bytes  memory traitZmaps,
+        string memory traitsAttributes,
+        string memory backpackSVGs,
+        bytes  memory fullZmap,
+        ChonkData memory chonkdata
+    ) {
         StoredChonk memory storedChonk = getChonk(_tokenId);
-        (bodySvg, ) = getBodySvgAndMetadata(storedChonk);
-        (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedChonk);
+        (bodySvg, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
+        (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
         backpackSVGs = getBackpackSVGs(_tokenId);
 
         chonkdata.backgroundColor = storedChonk.backgroundColor;
         chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
         chonkdata.bodyName =  bodyIndexToMetadata[storedChonk.bodyIndex].bodyName;
-        // chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D"; we're in renderAsDataUri2D so don't need to send this
         chonkdata.descriptionParts = descriptionParts; // stuffing descriptionParts in here to avoid stack too deep
+
+        fullZmap = bytes.concat(bodyZmap, traitZmaps);
+    }
+
+    function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
+        (
+            string memory bodySvg,
+            bytes  memory bodyZmap,
+            string memory traitsSvg,
+            bytes  memory traitZmaps,
+            string memory traitsAttributes,
+            string memory backpackSVGs,
+            bytes  memory fullZmap,
+            ChonkData memory chonkdata
+        ) = _gatherData(_tokenId);
 
         return mainRenderer2D.renderAsDataUri(
             _tokenId,
@@ -475,25 +533,16 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     }
 
     function renderAsDataUri3D(uint256 _tokenId) public view returns (string memory) {
-        string memory bodySvg;
-        string memory traitsSvg;
-        bytes  memory bodyZmap;
-        bytes  memory traitZmaps;
-        bytes  memory fullZmap;
-        string memory traitsAttributes;
-        ChonkData memory chonkdata;
-
-        StoredChonk memory storedChonk = getChonk(_tokenId);
-        (bodySvg, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
-        (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
-
-        fullZmap = bytes.concat(bodyZmap, traitZmaps);
-
-        chonkdata.backgroundColor = storedChonk.backgroundColor;
-        chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
-        chonkdata.bodyName =  bodyIndexToMetadata[storedChonk.bodyIndex].bodyName;
-        // chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D"; we're in renderAsDataUri3D so don't need to send this
-        chonkdata.descriptionParts = descriptionParts;
+        (
+            string memory bodySvg,
+            bytes  memory bodyZmap,
+            string memory traitsSvg,
+            bytes  memory traitZmaps,
+            string memory traitsAttributes,
+            string memory backpackSVGs,
+            bytes  memory fullZmap,
+            ChonkData memory chonkdata
+        ) = _gatherData(_tokenId);
 
         return mainRenderer3D.renderAsDataUri(
             _tokenId,
@@ -504,6 +553,69 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             chonkdata
         );
     }
+
+    // function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
+    //     string memory bodySvg;
+    //     string memory traitsSvg;
+    //     string memory traitsAttributes;
+    //     string memory backpackSVGs;
+    //     ChonkData memory chonkdata;
+
+    //     StoredChonk memory storedChonk = getChonk(_tokenId);
+    //     (bodySvg, ) = getBodySvgAndMetadata(storedChonk);
+    //     (traitsSvg, traitsAttributes) = traitsContract.getSvgAndMetadata(storedChonk);
+    //     backpackSVGs = getBackpackSVGs(_tokenId);
+
+    //     chonkdata.backgroundColor = storedChonk.backgroundColor;
+    //     chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
+    //     chonkdata.bodyName =  bodyIndexToMetadata[storedChonk.bodyIndex].bodyName;
+    //     // chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D"; we're in renderAsDataUri2D so don't need to send this
+    //     chonkdata.descriptionParts = descriptionParts; // stuffing descriptionParts in here to avoid stack too deep
+
+    //     return mainRenderer2D.renderAsDataUri(
+    //         _tokenId,
+    //         bodySvg,
+    //         traitsSvg,
+    //         traitsAttributes,
+    //         backpackSVGs,
+    //         chonkdata
+    //     );
+    // }
+
+    
+
+    // function renderAsDataUri3D(uint256 _tokenId) public view returns (string memory) {
+    //     string memory bodySvg;
+    //     string memory traitsSvg;
+    //     bytes  memory bodyZmap;
+    //     bytes  memory traitZmaps;
+    //     bytes  memory fullZmap;
+    //     string memory traitsAttributes;
+    //     ChonkData memory chonkdata;
+
+    //     StoredChonk memory storedChonk = getChonk(_tokenId);
+    //     (bodySvg, bodyZmap,) = getBodySVGZmapsAndMetadata(storedChonk);
+    //     (traitsSvg, traitZmaps, traitsAttributes) = traitsContract.getSvgZmapsAndMetadata(storedChonk);
+
+    //     fullZmap = bytes.concat(bodyZmap, traitZmaps);
+
+    //     chonkdata.backgroundColor = storedChonk.backgroundColor;
+    //     chonkdata.numOfItemsInBackpack = getTraitsForChonkId(_tokenId).length;
+    //     chonkdata.bodyName =  bodyIndexToMetadata[storedChonk.bodyIndex].bodyName;
+    //     // chonkdata.rendererSet = getTokenRenderZ(_tokenId) ? "3D" : "2D"; we're in renderAsDataUri3D so don't need to send this
+    //     chonkdata.descriptionParts = descriptionParts;
+
+    //     return mainRenderer3D.renderAsDataUri(
+    //         _tokenId,
+    //         bodySvg,
+    //         traitsSvg,
+    //         traitsAttributes,
+    //         fullZmap,
+    //         chonkdata
+    //     );
+    // }
+
+    
 
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
         return (getChonk(_tokenId).render3D) ? renderAsDataUri3D(_tokenId) : renderAsDataUri2D(_tokenId);
