@@ -432,15 +432,142 @@ contract ChonksMainTest is ChonksBaseTest {
     function test_transferWithPendingMarketplaceOffers() public {}
 
     // Chonk Makeover Tests
-    function test_chonkMakeoverComplete() public {}
+    function test_chonkMakeoverComplete() public {
+        deployerSetup();
 
-    function test_chonkMakeoverPartial() public {}
+        address user = address(1);
+        mintAToken(user);
 
-    function test_chonkMakeoverWithInvalidBody() public {}
+        vm.prank(user);
+        uint256[] memory traitTokenIds = new uint256[](4);
+        uint8[] memory traitCategories = new uint8[](4);
 
-    function test_chonkMakeoverWithInvalidColor() public {}
+        traitTokenIds[0] = 1; // Shoes
+        traitTokenIds[1] = 2; // Bottom
+        traitTokenIds[2] = 3; // Top
+        traitTokenIds[3] = 4; // Hair
+        
+        traitCategories[0] = uint8(TraitCategory.Name.Shoes);
+        traitCategories[1] = uint8(TraitCategory.Name.Bottom);
+        traitCategories[2] = uint8(TraitCategory.Name.Top);
+        traitCategories[3] = uint8(TraitCategory.Name.Hair);
+        
+       
+        main.chonkMakeover(1, traitTokenIds, traitCategories, 1, "0D6E9D", true);
+        IChonkStorage.StoredChonk memory chonk = main.getChonk(1);
+        assertEq(chonk.render3D, true, "Renderer should be 3D");
+        assertEq(chonk.backgroundColor, "0D6E9D", "Background color should be 0D6E9D");
+        assertEq(chonk.headId, 0);
+        assertEq(chonk.hairId, 4);
+        assertEq(chonk.faceId, 0);
+        assertEq(chonk.accessoryId, 0);
+        assertEq(chonk.topId, 3);
+        assertEq(chonk.bottomId, 2);
+        assertEq(chonk.shoesId, 1);
+        
+    }
 
-    function test_chonkMakeoverMultipleTimes() public {}
+    function test_chonkMakeoverWithInvalidBody() public {
+
+        deployerSetup();
+
+        address user = address(1);
+        mintAToken(user);
+
+        vm.prank(user);
+        uint256[] memory traitTokenIds = new uint256[](4);
+        uint8[] memory traitCategories = new uint8[](4);
+
+        traitTokenIds[0] = 1; // Shoes
+        traitTokenIds[1] = 2; // Bottom
+        traitTokenIds[2] = 3; // Top
+        traitTokenIds[3] = 4; // Hair
+        
+        traitCategories[0] = uint8(TraitCategory.Name.Shoes);
+        traitCategories[1] = uint8(TraitCategory.Name.Bottom);
+        traitCategories[2] = uint8(TraitCategory.Name.Top);
+        traitCategories[3] = uint8(TraitCategory.Name.Hair);
+        
+        vm.expectRevert(ChonksMain.InvalidBodyIndex.selector);
+        main.chonkMakeover(1, traitTokenIds, traitCategories, 5, "0D6E9D", true);
+    }
+
+    function test_chonkMakeoverWithInvalidColor() public {
+        deployerSetup();
+
+        address user = address(1);
+        mintAToken(user);
+
+        vm.prank(user);
+        uint256[] memory traitTokenIds = new uint256[](4);
+        uint8[] memory traitCategories = new uint8[](4);
+
+        traitTokenIds[0] = 1; // Shoes
+        traitTokenIds[1] = 2; // Bottom
+        traitTokenIds[2] = 3; // Top
+        traitTokenIds[3] = 4; // Hair
+        
+        traitCategories[0] = uint8(TraitCategory.Name.Shoes);
+        traitCategories[1] = uint8(TraitCategory.Name.Bottom);
+        traitCategories[2] = uint8(TraitCategory.Name.Top);
+        traitCategories[3] = uint8(TraitCategory.Name.Hair);
+        
+        vm.expectRevert(ChonksMain.InvalidColor.selector);
+        main.chonkMakeover(1, traitTokenIds, traitCategories, 4, "ZZZZZZ", true);
+    }
+
+    function test_chonkMakeoverWithInvalidEquippedTrait() public {
+        deployerSetup();
+
+        address user = address(1);
+        mintAToken(user);
+
+        vm.prank(user);
+        uint256[] memory traitTokenIds = new uint256[](4);
+        uint8[] memory traitCategories = new uint8[](4);
+
+        traitTokenIds[0] = 4; // Shoes
+        traitTokenIds[1] = 2; // Bottom
+        traitTokenIds[2] = 3; // Top
+        traitTokenIds[3] = 4; // Hair
+        // traitTokenIds[4] = 0; // Head
+        // traitTokenIds[5] = 0; // Face
+        // traitTokenIds[6] = 0; // Accessory
+        
+        traitCategories[0] = uint8(TraitCategory.Name.Shoes);
+        traitCategories[1] = uint8(TraitCategory.Name.Bottom);
+        traitCategories[2] = uint8(TraitCategory.Name.Top);
+        traitCategories[3] = uint8(TraitCategory.Name.Hair);
+        // traitCategories[4] = uint8(TraitCategory.Name.Head);
+        // traitCategories[5] = uint8(TraitCategory.Name.Face);
+        // traitCategories[6] = uint8(TraitCategory.Name.Accessory);
+        
+        // Call equipMany
+        vm.expectRevert(IncorrectTraitType.selector);
+        
+        main.chonkMakeover(1, traitTokenIds, traitCategories, 4, "ZZZZZZ", true);
+    }
+
+    // function test_chonkMakeoverMultipleTimes() public {
+    //     vm.startPrank(deployer);
+    //     main.setFirstReleaseDataMinter(address(dataContract));
+    //     traits.addMinter(address(dataContract));
+    //     traits.setChonksMain(address(main));
+    //     traits.setMarketplace(address(market));
+    //     vm.stopPrank();
+
+    //     address user = address(1);
+    //     vm.startPrank(user);
+    //     bytes32[] memory empty;
+    //     main.mint(1, empty);
+        
+    //     main.setChonkAttributes(1, "FF5733", 2, true);
+    //     main.setChonkAttributes(1, "00FF00", 2, false);
+    //     main.setChonkAttributes(1, "0000FF", 1, true); // Change attributes multiple times
+
+    //     assertEq(main.tokenURI(1), "expectedFinalTokenURI"); // Replace with expected final token URI
+    //     vm.stopPrank();
+    // }
 
     // Background Color Tests
     function test_setValidBackgroundColor() public {}
@@ -626,6 +753,51 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.expectRevert(); // Reverts because non-owner cannot toggle
         // main.setTokenRender3D(1, true);
         main.setChonkAttributes(1, "069420", 1, true);
+    }
+
+    function test_toggleBetween2DAnd3DDirect() public {
+        // Setup contracts and mint a token
+        vm.startPrank(deployer);
+        main.setFirstReleaseDataMinter(address(dataContract));
+        main.setMainRenderer2D(address(mainRenderer2D));
+        main.setMainRenderer3D(address(mainRenderer3D));
+        traits.setChonksMain(address(main));
+        traits.addMinter(address(dataContract));
+        traits.setMarketplace(address(market));
+        vm.stopPrank();
+
+        // Mint tokens
+        address user = address(1);
+        vm.prank(user);
+        bytes32[] memory empty;
+        main.mint(5, empty);
+        assertEq(main.balanceOf(user), 5);
+
+        // Initially should be in 2D mode
+        IChonkStorage.StoredChonk memory chonk = main.getChonk(1);
+        assertEq(chonk.render3D, false, "Initial renderer should be 2D");
+
+        // // Toggle to 3D
+        vm.startPrank(user);
+        main.setTokenRender3D(1, true);
+        // main.setChonkAttributes(1, "069420", 1, true);
+        chonk = main.getChonk(1);
+        assertEq(chonk.render3D, true, "Renderer should be 3D");
+
+        // // Toggle back to 2D
+        vm.startPrank(user);
+        main.setTokenRender3D(1, false);
+        // main.setChonkAttributes(1, "069420", 1, false);
+        chonk = main.getChonk(1);
+        assertEq(chonk.render3D, false, "Renderer should be back to 2D");
+
+        // Test that only token owner can toggle
+        vm.stopPrank();
+        address nonOwner = address(2);
+        vm.prank(nonOwner);
+        vm.expectRevert(); // Reverts because non-owner cannot toggle
+        main.setTokenRender3D(1, true);
+        // main.setChonkAttributes(1, "069420", 1, true);
     }
 
     function test_3DSetters() public {
@@ -1056,6 +1228,29 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(main.getChonk(1).bodyIndex, newIndex);
     }
 
+    function test_changeSkinToneDirect() public {
+        deployerSetup();
+
+        address user = address(1);
+        mintAToken(user);
+
+        uint8 beforeIndex = main.getChonk(1).bodyIndex;
+        uint8 newIndex;
+        if (beforeIndex == 4) {
+            newIndex = 0;
+        } else {
+            newIndex = beforeIndex + 1;
+        }
+        vm.prank(user);
+        console.log("beforeIndex", beforeIndex);
+        console.log("newIndex", newIndex);
+
+        main.setBodyIndex(1, newIndex);
+        // main.setChonkAttributes(1, "069420", newIndex, false);
+
+        assertEq(main.getChonk(1).bodyIndex, newIndex);
+    }
+
     error InvalidColor();
 
     function test_changeBackgroundColorInvalidColor() public {
@@ -1068,6 +1263,18 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.expectRevert(InvalidColor.selector);
         // main.setBackgroundColor(1, "0694209");
         main.setChonkAttributes(1, "0694209", 1, false);
+    }
+
+     function test_changeBackgroundColorInvalidColorDirect() public {
+        deployerSetup();
+
+        address user = address(1);
+        mintAToken(user);
+
+        vm.prank(user);
+        vm.expectRevert(InvalidColor.selector);
+        main.setBackgroundColor(1, "0694209");
+        // main.setChonkAttributes(1, "0694209", 1, false);
     }
 
     function test_changeBackgroundColorInvalidColor2() public {
@@ -1093,6 +1300,23 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.prank(user);
         // main.setBackgroundColor(1, "424242");
         main.setChonkAttributes(1, "424242", 1, false);
+
+        chonk = main.getChonk(1);
+        assertEq(chonk.backgroundColor, "424242");
+    }
+
+    function test_changeBackgroundColorDirect() public {
+        deployerSetup();
+
+        address user = address(1);
+        mintAToken(user);
+
+        IChonkStorage.StoredChonk memory chonk = main.getChonk(1);
+        assertEq(chonk.backgroundColor, "0D6E9D");
+
+        vm.prank(user);
+        main.setBackgroundColor(1, "424242");
+        // main.setChonkAttributes(1, "424242", 1, false);
 
         chonk = main.getChonk(1);
         assertEq(chonk.backgroundColor, "424242");

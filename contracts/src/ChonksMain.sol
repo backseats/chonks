@@ -450,6 +450,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         fullZmap = bytes.concat(bodyZmap, traitZmaps);
     }
 
+    function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
+        return (getChonk(_tokenId).render3D) ? renderAsDataUri3D(_tokenId) : renderAsDataUri2D(_tokenId);
+    }
+
     function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
         (
             string memory bodySvg,
@@ -494,8 +498,18 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         );
     }
 
-    function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
-        return (getChonk(_tokenId).render3D) ? renderAsDataUri3D(_tokenId) : renderAsDataUri2D(_tokenId);
+    function chonkMakeover(
+        uint256 _chonkTokenId,
+        uint256[] calldata _traitTokenIds,
+        uint8[] calldata _traitCategories,
+        uint8 _bodyIndex,
+        string memory _backgroundColor,
+        bool _render3D
+    ) public onlyChonkOwner(_chonkTokenId) {
+        equipMany(_chonkTokenId, _traitTokenIds, _traitCategories);
+        setBodyIndex(_chonkTokenId, _bodyIndex);
+        setBackgroundColor(_chonkTokenId, _backgroundColor);
+        setTokenRender3D(_chonkTokenId, _render3D);
     }
 
     /// Getters
@@ -639,52 +653,45 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Public Setters
 
-    // function setBackgroundColor(uint256 _chonkTokenId, string memory _color) public onlyChonkOwner(_chonkTokenId) {
-    //     bytes memory colorBytes = bytes(_color);
-    //     if (colorBytes.length != 6) revert InvalidColor();
-
-    //     // Ensure all characters are valid hex characters (0-9, a-f, A-F)
-    //     for (uint i; i < 6; i++) {
-    //         if (
-    //             !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
-    //             !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
-    //             !(colorBytes[i] >= 0x61 && colorBytes[i] <= 0x66)    // a-f
-    //         ) {
-    //             revert InvalidColor(); // Invalid character found
-    //         }
-    //     }
-
-    //     chonkTokens[_chonkTokenId].backgroundColor = _color;
-
-    //     emit BackgroundColor(ownerOf(_chonkTokenId), _chonkTokenId, _color );
-    // }
-
-    // function setBodyIndex(uint256 _chonkTokenId, uint8 _bodyIndex) public onlyChonkOwner(_chonkTokenId) {
-    //     if (_bodyIndex > 4) revert InvalidBodyIndex();
-
-    //     chonkTokens[_chonkTokenId].bodyIndex = _bodyIndex;
-    //     emit BodyIndex(ownerOf(_chonkTokenId), _chonkTokenId, _bodyIndex );
-    // }
-
-    // function setTokenRender3D(uint256 _tokenId, bool _render3D) public onlyChonkOwner(_tokenId) {
-    //     chonkTokens[_tokenId].render3D = _render3D;
-    //     emit Render3D(ownerOf(_tokenId), _tokenId, _render3D);
-    // }
-
-    function setChonkAttributes(uint256 _tokenId, string memory _color, uint8 _bodyIndex, bool _render3D) public onlyChonkOwner(_tokenId) {
-        bytes memory colorBytes = bytes(_color);
-        if (colorBytes.length != 6) revert InvalidColor();
+    function setBodyIndex(uint256 _chonkTokenId, uint8 _bodyIndex) public onlyChonkOwner(_chonkTokenId) {
         if (_bodyIndex > 4) revert InvalidBodyIndex();
 
+        chonkTokens[_chonkTokenId].bodyIndex = _bodyIndex;
+        emit BodyIndex(ownerOf(_chonkTokenId), _chonkTokenId, _bodyIndex );
+    }
+
+    function setTokenRender3D(uint256 _tokenId, bool _render3D) public onlyChonkOwner(_tokenId) {
+        chonkTokens[_tokenId].render3D = _render3D;
+        emit Render3D(ownerOf(_tokenId), _tokenId, _render3D);
+    }
+
+    function validateColor(string memory _color) internal pure {
+        bytes memory colorBytes = bytes(_color);
+        if (colorBytes.length != 6) revert InvalidColor();
+
+        // Ensure all characters are valid hex characters (0-9, a-f, A-F)
         for (uint i; i < 6; i++) {
             if (
                 !(colorBytes[i] >= 0x30 && colorBytes[i] <= 0x39) && // 0-9
                 !(colorBytes[i] >= 0x41 && colorBytes[i] <= 0x46) && // A-F
                 !(colorBytes[i] >= 0x61 && colorBytes[i] <= 0x66)    // a-f
             ) {
-                revert InvalidColor();
+                revert InvalidColor(); // Invalid character found
             }
         }
+    }
+
+    function setBackgroundColor(uint256 _chonkTokenId, string memory _color) public onlyChonkOwner(_chonkTokenId) {
+        validateColor(_color); // Call the helper function
+
+        chonkTokens[_chonkTokenId].backgroundColor = _color;
+
+        emit BackgroundColor(ownerOf(_chonkTokenId), _chonkTokenId, _color );
+    }
+
+    function setChonkAttributes(uint256 _tokenId, string memory _color, uint8 _bodyIndex, bool _render3D) public onlyChonkOwner(_tokenId) {
+        validateColor(_color); // Call the helper function
+        if (_bodyIndex > 4) revert InvalidBodyIndex();
 
         chonkTokens[_tokenId].backgroundColor = _color;
         chonkTokens[_tokenId].bodyIndex = _bodyIndex;
