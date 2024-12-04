@@ -322,7 +322,6 @@ contract FirstReleaseDataMinter is Ownable {
         uint256 _traitIndex,
         string memory _traitName,
         TraitCategory.Name _traitType,
-        string memory _animations,
         bytes memory _colorMap,
         bytes memory _zMap,
         address _creatorAddress,
