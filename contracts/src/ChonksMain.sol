@@ -192,8 +192,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function teamMint(address _to, uint256 _amount, uint8 _traitCount) public onlyOwner {
         if (_traitCount < 4 || _traitCount > 7) revert InvalidTraitCount();
-        if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
-        if (block.timestamp > initialMintStartTime + 26 hours) revert MintEnded();
+        // if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted(); // DEPLOY bring back in
+        // if (block.timestamp > initialMintStartTime + 26 hours) revert MintEnded(); // DEPLOY bring back in
 
         _mintInternal(_to, _amount, _traitCount);
     }
@@ -202,8 +202,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (address(firstReleaseDataMinter) == address(0)) revert FirstReleaseDataMinterNotSet();
 
         if (_amount == 0 || _amount > MAX_MINT_AMOUNT) revert InvalidMintAmount();
-        if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
-        if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded();
+        // if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted(); // DEPLOY bring back in
+        // if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded(); // DEPLOY bring back in
         if (msg.value != price * _amount) revert InsufficientFunds();
 
         uint8 traitCount = 4; // DEPLOY: 4!
@@ -753,7 +753,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             return;
         }
 
-        if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint();
+        // if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint(); // DEPLOY bring back in
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
          if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();
