@@ -456,13 +456,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function renderAsDataUri2D(uint256 _tokenId) public view returns (string memory) {
         (
-            string memory bodySvg,
-            bytes  memory bodyZmap,
-            string memory traitsSvg,
-            bytes  memory traitZmaps,
+            string memory bodySvg,,
+            string memory traitsSvg,,
             string memory traitsAttributes,
-            string memory backpackSVGs,
-            bytes  memory fullZmap,
+            string memory backpackSVGs,,
             ChonkData memory chonkdata
         ) = _gatherData(_tokenId);
 
@@ -478,12 +475,9 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function renderAsDataUri3D(uint256 _tokenId) public view returns (string memory) {
         (
-            string memory bodySvg,
-            bytes  memory bodyZmap,
-            string memory traitsSvg,
-            bytes  memory traitZmaps,
-            string memory traitsAttributes,
-            string memory backpackSVGs,
+            string memory bodySvg,,
+            string memory traitsSvg,,
+            string memory traitsAttributes,,
             bytes  memory fullZmap,
             ChonkData memory chonkdata
         ) = _gatherData(_tokenId);
