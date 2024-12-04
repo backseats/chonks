@@ -1,6 +1,5 @@
 import { http, createConfig } from "wagmi";
-import { baseSepolia, base, mainnet } from "wagmi/chains";
-import { createPublicClient } from 'viem'
+import { baseSepolia, base } from "wagmi/chains";
 
 // Only for local dev
 // export const publicClient = createPublicClient({
@@ -11,11 +10,11 @@ import { createPublicClient } from 'viem'
 //   transport: http('http://localhost:8545'),
 // });
 
+// DEPLOY: remove mainnet and base sepolia
 export const config = createConfig({
-  chains: [baseSepolia, base, mainnet],
+  chains: [baseSepolia, base],
   transports: {
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
-    [mainnet.id]: http(),
+    [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`),
+    [baseSepolia.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_SEPOLIA_RPC_URL}`),
   },
 });
