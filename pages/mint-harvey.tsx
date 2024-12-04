@@ -182,9 +182,9 @@ export default function Mint() {
             return isValid;
         };
 
-        const friendResult = verifyAddress(friendsListAddresses, 'Friends List');
-        const specialResult = verifyAddress(specialCollectionsAddresses, 'Special Collections');
-        const creatorResult = verifyAddress(creatorListAddresses, 'Creator List');
+        const friendResult = verifyAddress(friendsUpdated, 'Friends List');
+        const specialResult = verifyAddress(collectionsUpdated, 'Special Collections');
+        const creatorResult = verifyAddress(creatorUpdated, 'Creator List');
 
         setIsFriend(friendResult);
         setIsSpecial(specialResult);
