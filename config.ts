@@ -10,7 +10,7 @@ import { baseSepolia, base } from "wagmi/chains";
 //   transport: http('http://localhost:8545'),
 // });
 
-// DEPLOY: remove mainnet and base sepolia
+// DEPLOY: remove base sepolia
 export const config = createConfig({
   chains: [baseSepolia, base],
   transports: {

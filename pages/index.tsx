@@ -102,14 +102,14 @@ export default function Home() {
 
      // Add new scroll trigger animation for TBA section
      if (tba1Ref.current && tba2Ref.current && tba3Ref.current) {
-      
+
       const tlTBA = gsap.timeline({
         scrollTrigger: {
             trigger: "#tbas",
             start: "top 30%",
             end: 'top 0%',
             scrub: 1,
-            
+
             // markers: true,
             onLeaveBack: () => {
                 // console.log("tlTBAs on LeaveBack");
@@ -133,9 +133,9 @@ export default function Home() {
       delay: 1,
     }, 0);
 
-    
 
-     
+
+
     }
 
     return () => {
@@ -193,15 +193,15 @@ export default function Home() {
 
       <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
 
-        {/* 
+        {/*
           ***************************************************
           ************************ HEAD *********************
           ***************************************************
       */}
 
-        
 
-        {/* 
+
+        {/*
           ***************************************************
           ************************ NAV **********************
           ***************************************************
@@ -229,7 +229,7 @@ export default function Home() {
             <a href="#tbas" onClick={(e) => scrollToSection(e, '#tbas')} className="hover:opacity-70 transition-opacity">
               TBAs
             </a>
-            
+
             <a href="#studio" onClick={(e) => scrollToSection(e, '#tbas')} className="hover:opacity-70 transition-opacity">
               Studio
             </a>
@@ -240,16 +240,16 @@ export default function Home() {
               Team
             </a>
           </div>
-          
-         
+
+
             <button
               disabled
               className="px-4 py-2 bg-gray-300 text-gray-600  font-source-code-pro text-sm cursor-not-allowed"
             >
               Mint Soon
             </button>
-         
-          
+
+
         </nav>
 
 
@@ -263,7 +263,7 @@ export default function Home() {
 
           <div className="mx-[20px] sm:mx-[6.9vw]"> {/* EDGES */}
 
-            {/* 
+            {/*
             ***************************************************
             ************************ HERO *********************
             ***************************************************
@@ -275,7 +275,7 @@ export default function Home() {
               </h1>
             </section>
 
-            {/* 
+            {/*
             ***************************************************
             ************* BLANK FULL DEPTH SECTION ************
             ***************************************************
@@ -283,12 +283,12 @@ export default function Home() {
 
             <section ref={chonkAppearRef} className={`chonkAppear borderTopFull border-l border-r h-[100vh] md:h-[200vh] `}>
               {/* Content of the section */}
-              
-            
+
+
             </section>
 
 
-            {/* 
+            {/*
             ***************************************************
             **************** FULL WIDTH SECTION ***************
             ***************************************************
@@ -298,14 +298,14 @@ export default function Home() {
 
             <section id="intro" className={`border-t border-l border-r py-[6.9vw] bg-[#0D6E9D] text-white `}>
               <h2 className="font-source-code-pro text-[5.175vw] md:text-[3.4vw] leading-[1.4] font-weight-600 mx-[3.3vw] py-[3.3vw]">
-                Chonks is a fully onchain customizable PFP collection on Base. <br /><br />Launching in November.
+                Chonks is a fully onchain customizable PFP collection on Base. <br /><br />Launching December 4th, 2024. Minting for 24 hours.
               </h2>
 
             </section>
 
 
-            
-            {/* 
+
+            {/*
             ***************************************************
             **************** 50/50 SECTION ******************
             ***************************************************
@@ -419,7 +419,7 @@ export default function Home() {
               </div>
             </section>
 
-            {/* 
+            {/*
             ***************************************************
             ****************** Scroll Gallery *****************
             ***************************************************
@@ -590,7 +590,7 @@ export default function Home() {
                 <p>X, Y and colour values for the 2D version....</p>
                 <p>X, Y & Z and colour values for the 3D version.</p>
                 <p>You can then output your Chonk as 3D if you wish - and we can do fun stuff down the track with games, 3d printing and so much more.</p> */}
-                <p className=""> 
+                <p className="">
                   <i><strong>Coming Soon: Chonks Ztudio</strong> (it&apos;s a voxel studio, get it?)</i>
                 </p>
                 {/* <p className="">
@@ -607,7 +607,7 @@ export default function Home() {
                  */}
               </div>
             </section>
-            
+
 
             {/* Marketplace Section */}
             <section id="marketplace" className="border-t border-l border-r pt-[13.8vw] bg-white">
@@ -619,12 +619,12 @@ export default function Home() {
                   Inspired by our beloved Cryptopunks, we&apos;ve built a fully onchain marketplace where you can buy & sell Chonks and individual Traits.
                 </p> */}
               </div>
-              
+
 
               <div className="mx-[3.45vw] font-source-code-pro font-weight-600 ">
 
                 <div className="flex flex-col gap-4">
-                  
+
                   <div className="flex items-start gap-4">
                     <Image
                       src="/bullet.svg"
@@ -639,7 +639,7 @@ export default function Home() {
 
                   </div>
 
-                 
+
 
                   <div className="flex items-start gap-4">
                     <Image
@@ -651,9 +651,9 @@ export default function Home() {
                     />
                     {/* <p>All offers and bids are stored onchain using Base&apos;s low gas fees.</p> */}
                     <p>Buy a Chonk and all of its Traits or collect your favorite Traits to dress your Chonk. It&apos;s all up to you.</p>
-                  
+
                   </div>
-                  
+
                   {/* <div className="flex items-start gap-4">
                     <Image
                       src="/bullet.svg"
@@ -664,7 +664,7 @@ export default function Home() {
                     />
                     <p>By using our marketplace, you can be confident in knowing your Chonk will come with the Traits you bidded for.</p>
                   </div> */}
-                  
+
 
                   <div className="flex items-start gap-4">
                     <Image
@@ -678,7 +678,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                
+
 
               </div>
 
@@ -693,11 +693,11 @@ export default function Home() {
                   />
                 </div>
 
-             
+
 
             </section>
 
-            {/* 
+            {/*
             ***************************************************
             ******************* GRID Section ******************
             ***************************************************
@@ -711,7 +711,7 @@ export default function Home() {
               </div>
             </section> */}
 
-            {/* 
+            {/*
             ***************************************************
             ********************* OUR TEAM ********************
             ***************************************************
@@ -719,11 +719,11 @@ export default function Home() {
 
             <Team />
 
-            
 
 
 
-            {/* 
+
+            {/*
             ***************************************************
             **************** LARGE TEXT SECTION ***************
             ***************************************************
@@ -734,7 +734,7 @@ export default function Home() {
                 This is the end of the website. Write something funny here! Can't think of anything - so have frog chonk peering over the edge.
 
               </h2>
-            
+
             </section> */}
 
             <section  className={`chonkRotate borderTopFull border-l border-r h-[33vh] bg-white`}>
@@ -742,7 +742,7 @@ export default function Home() {
             </section>
 
 
-            </div> 
+            </div>
           {/* end of edges */}
 
           <LFC />
