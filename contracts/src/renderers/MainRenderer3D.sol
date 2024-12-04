@@ -106,6 +106,7 @@ contract MainRenderer3D is Ownable {
             .tagContent = "html%257Bheight%253A100%2525%257Dbody%257Bmin-height%253A100%2525%253Bmargin%253A0%253Bpadding%253A0%257Dcanvas%257Bpadding%253A0%253Bmargin%253Aauto%253Bdisplay%253Ablock%253Bposition%253Aabsolute%253Btop%253A0%253Bbottom%253A0%253Bleft%253A0%253Bright%253A0%257D";
         headTags[0].tagClose = "%253C%252Fstyle%253E";
 
+        // Shoutout to Sterling Crispin and BrainWorms
         HTMLTag[] memory bodyTags = new HTMLTag[](12);
         bodyTags[0].name = "gunzipScripts-0.0.1.js";
         bodyTags[0].tagType = HTMLTagType.scriptBase64DataURI;

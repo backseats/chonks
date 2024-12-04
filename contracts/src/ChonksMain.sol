@@ -178,7 +178,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     // DEPLOY: Remove
     function _debugPostConstructorMint() public {
-        for (uint i; i < 10; ++i) {
+        for (uint i; i < 330; ++i) {
             bytes32[] memory empty;
             mint(4, empty); // Mints N bodies/tokens
             // setChonkAttributes(i+1,"0D6E9D",0,true); // set them all to 3d for testing
@@ -206,7 +206,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         // if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded(); // DEPLOY bring back in
         if (msg.value != price * _amount) revert InsufficientFunds();
 
-        uint8 traitCount = 4; // DEPLOY: 4!
+        uint8 traitCount = 7; // DEPLOY: 4!
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
         if (MerkleProofLib.verify(_merkleProof, collectionsMerkle, leaf)) {
             if (!collectionsAddressDidUse[msg.sender]) {
@@ -266,9 +266,9 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             chonk.hairId = traitsIds[3];
 
             // DEPLOY: REMOVE!
-            // chonk.headId = traitsIds[4];
-            // chonk.faceId = traitsIds[5];
-            // chonk.accessoryId = traitsIds[6];
+            chonk.headId = traitsIds[4];
+            chonk.faceId = traitsIds[5];
+            chonk.accessoryId = traitsIds[6];
         }
     }
 
@@ -381,44 +381,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
         emit EquipAll(ownerOf(_chonkTokenId), _chonkTokenId);
     }
-
-    // Commented out due to bytecode size limit - if we can get it below 24576 bytes, we can add it back
-    // function chonkMakeover(
-    //     uint256 _chonkTokenId,
-    //     uint256 _headTokenId,
-    //     uint256 _hairTokenId,
-    //     uint256 _faceTokenId,
-    //     uint256 _accessoryTokenId,
-    //     uint256 _topTokenId,
-    //     uint256 _bottomTokenId,
-    //     uint256 _shoesTokenId,
-    //     uint8 _bodyIndex, // Note, this must be set even if you want to keep the Chonk's current skin tone
-    //     string memory _backgroundColor
-    // ) public onlyChonkOwner(_chonkTokenId) {
-    //     equipAll(_chonkTokenId, _headTokenId, _hairTokenId, _faceTokenId, _accessoryTokenId, _topTokenId, _bottomTokenId, _shoesTokenId);
-    //     setBodyIndex(_chonkTokenId, _bodyIndex);
-    //     setBackgroundColor(_chonkTokenId, _backgroundColor);
-    // }
-
-    /// Validations
-
-    // function _validateTBAOwnership(address _tbaForChonk, uint256 _traitTokenId) internal view {
-    //     address ownerOfTrait = traitsContract.ownerOf(_traitTokenId);
-    //     if (ownerOfTrait != _tbaForChonk) revert IncorrectTBAOwner();
-    // }
-
-    // function _validateTraitType(uint256 _traitTokenId, TraitCategory.Name _traitType) internal view {
-    //     // TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitType(_traitTokenId);
-    //     TraitCategory.Name traitTypeofTokenIdToBeSet = traitsContract.getTraitMetadata(_traitTokenId).traitType;
-    //     if (keccak256(abi.encodePacked(uint(traitTypeofTokenIdToBeSet))) != keccak256(abi.encodePacked(uint(_traitType))))
-    //         revert IncorrectTraitType();
-    // }
-
-    // function _equipValidation(uint256 _chonkTokenId, uint256 _traitTokenId) view internal returns (TraitCategory.Name traitType) {
-    //     _validateTBAOwnership(tokenIdToTBAAccountAddress[_chonkTokenId], _traitTokenId);
-    //     traitType = traitsContract.getTraitMetadata(_traitTokenId).traitType;
-    //     _validateTraitType(_traitTokenId, traitType);
-    // }
 
     /// tokenURI/Rendering
 

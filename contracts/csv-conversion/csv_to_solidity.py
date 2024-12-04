@@ -11,12 +11,13 @@ def csv_to_solidity_commands(csv_file_path):
       trait_index = row["Index"]
       trait_name = row["Trait Name"]
       category = row["Category (e.g. Bottom)"] if row["Category (e.g. Bottom)"] else "Accessory"
-      animation = row["Animation"] if row["Animation"] else ""
+      # animation = row["Animation"] if row["Animation"] else ""
       color_map = row["Color Map"]
       z_map = row["z Map"]
 
       # Format Solidity command
-      command = f'addNewTrait({trait_index}, "{trait_name}", TraitCategory.Name.{category}, "{animation}", hex"{color_map}", "{z_map}", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );'
+      # command = f'addNewTrait({trait_index}, "{trait_name}", TraitCategory.Name.{category}, "{animation}", hex"{color_map}", "{z_map}", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "marka" );'
+      command = f'addNewTrait({trait_index}, "{trait_name}", TraitCategory.Name.{category}, hex"{color_map}", "{z_map}", 0xA1454995CcCC837FaC7Ef1D91A1544730c79B306, "Chonks Team" );'
       solidity_commands.append(command)
 
   return solidity_commands
