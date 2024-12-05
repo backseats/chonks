@@ -246,9 +246,8 @@ export default function Home() {
             <Link href="/mint" className="hover:opacity-70 transition-opacity">
               <button
                 className="px-4 py-2 bg-black text-white font-source-code-pro text-sm"
-                disabled={true}
               >
-                Mint at 10p
+                Mint Now
               </button>
             </Link>
 
