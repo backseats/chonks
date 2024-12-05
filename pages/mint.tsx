@@ -536,7 +536,7 @@ export default function Mint() {
                                         <div className="font-bold">
                                             {traitRevealCountdown === 0 ? (
                                                 <>
-                                                    Your traits are can now be revealed...<br />Click on your chonk(s) to view and equip them
+                                                    Your traits can now be revealed...<br />Click on your chonk(s) to view and equip them
                                                     {/* {revealStatus.isRevealed !== null && (
                                                         <div>
                                                             {revealStatus.isRevealed
