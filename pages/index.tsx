@@ -557,7 +557,7 @@ export default function Home() {
                   <p>The Studio will be open to everyone so they can have fun unleashing their Chonk creativity. We can&apos;t wait to see what you will create!</p>
                 </div>
                 <div className={`sm:w-1/2 px-[3.45vw] pb-[3.45vw] md:py-[6.9vw] p-4  `}>
-                  <p><i><strong>Approved Creators</strong></i> will be able to use the Studio to deploy their Traits to the official collection for future Season releases. Simples.</p>
+                  <p><i><strong>Approved Creators</strong></i> will be able to use the Studio to deploy their Traits to the official collection for future Season releases. Simple.</p>
                 </div>
               </div>
             </section>
