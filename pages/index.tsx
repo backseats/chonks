@@ -231,7 +231,7 @@ export default function Home() {
               TBAs
             </a>
 
-            <a href="#studio" onClick={(e) => scrollToSection(e, '#tbas')} className="hover:opacity-70 transition-opacity">
+            <a href="#studio" onClick={(e) => scrollToSection(e, '#studio')} className="hover:opacity-70 transition-opacity">
               Studio
             </a>
             <a href="#marketplace" onClick={(e) => scrollToSection(e, '#marketplace')} className="hover:opacity-70 transition-opacity">
