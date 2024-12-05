@@ -9,6 +9,7 @@ import Chonk3d from '../components/home/Chonk3d';
 import Footer from '../components/layout/Footer';
 import LFC from '../components/layout/LFC';
 import Team from '../components/home/Team';
+import Link from 'next/link';
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
@@ -242,12 +243,13 @@ export default function Home() {
           </div>
 
 
-            <button
-              disabled
-              className="px-4 py-2 bg-gray-300 text-gray-600  font-source-code-pro text-sm cursor-not-allowed"
-            >
-              Mint Soon
-            </button>
+            <Link href="/mint" className="hover:opacity-70 transition-opacity">
+              <button
+                className="px-4 py-2 bg-black text-white font-source-code-pro text-sm"
+              >
+                Mint Now
+              </button>
+            </Link>
 
 
         </nav>

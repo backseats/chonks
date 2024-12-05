@@ -43,7 +43,7 @@ export default function MenuBar(props: Props) {
 
         <div> | </div>
 
-        <Link href="/mint-harvey" className="hover:opacity-70 transition-opacity">
+        <Link href="/mint" className="hover:opacity-70 transition-opacity">
           Mint
         </Link>
 
