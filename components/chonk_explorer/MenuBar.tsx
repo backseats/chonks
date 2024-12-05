@@ -7,7 +7,6 @@ import {
   traitsABI,
   chainId
 } from "@/contract_data";
-import { baseSepolia } from "viem/chains";
 import { useRouter } from "next/navigation";
 import { Address } from "viem";
 import Image from "next/image";

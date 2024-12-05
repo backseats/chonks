@@ -2,7 +2,6 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useReadContract } from 'wagmi';
 import { mainContract, mainABI, traitsContract, traitsABI, tokenURIABI, chainId } from '@/contract_data';
-import { baseSepolia } from 'viem/chains';
 import { Chonk } from '@/types/Chonk';
 import { Trait } from '@/types/Trait';
 

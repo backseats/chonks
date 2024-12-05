@@ -10,11 +10,10 @@ import { baseSepolia, base } from "wagmi/chains";
 //   transport: http('http://localhost:8545'),
 // });
 
-// DEPLOY: remove base sepolia
 export const config = createConfig({
-  chains: [baseSepolia, base],
+  chains: [base],
   transports: {
     [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`),
-    [baseSepolia.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_SEPOLIA_RPC_URL}`),
+    // [baseSepolia.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_SEPOLIA_RPC_URL}`),
   },
 });
