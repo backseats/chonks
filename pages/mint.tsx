@@ -56,6 +56,7 @@ export default function Mint() {
     const { chain } = useAccount();
 
     const [isMintOpen, setIsMintOpen] = useState(true);
+    const [isInsufficientBalance, setIsInsufficientBalance] = useState(false);
     const [isMintOver, setIsMintOver] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedChonk, setSelectedChonk] = useState<number | null>(null);
@@ -65,7 +66,7 @@ export default function Mint() {
     const [transactionhashMinting, setTransactionhashMinting] = useState<string | null>(null);
 
     const { address } = useAccount();
-    const { mint, isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected, hashMinting, mainContractTokens, traitTokens, totalSupply, mintStatus } = useMintFunction();
+    const { mint, isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected, hashMinting, mainContractTokens, traitTokens, totalSupply, mintStatus, userBalance } = useMintFunction();
     const [mounted, setMounted] = React.useState(false);
 
     const [friendsListMerkleRoot, setFriendsListMerkleRoot] = useState<string | null>(null);
@@ -221,6 +222,16 @@ export default function Mint() {
     }, [hashMinting]);
 
     useEffect(() => {
+        console.log('userBalance', userBalance);
+
+        if (userBalance && userBalance.value <= BigInt(MINT_PRICE * 10**18 * mintAmount)) {
+            console.log("Insufficient Balance");
+            setIsInsufficientBalance(true);
+        }
+
+    }, [userBalance, mintAmount]);
+
+    useEffect(() => {
         if (isPending || isConfirming) {
             setIsModalOpen(true);
         } else if (isMintingSuccess) {
@@ -265,6 +276,7 @@ export default function Mint() {
 
     // Update the mint button state
     const getMintButtonText = () => {
+        
         if (chain?.id !== chainId) return "Switch to Base";
         if (isPending) return "Confirm in Wallet...";
         if (isConfirming) return "Minting...";
@@ -393,13 +405,16 @@ export default function Mint() {
                                             }}
                                         />
                                     ) : isMintOpen ? (
-                                        <button
-                                            onClick={handleMint}
-                                            disabled={isPending || isConfirming}
-                                            className="bg-chonk-blue border border-chonk-blue hover:border-black hover:text-gray-200 text-white source-sans-pro py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
-                                        >
-                                            {getMintButtonText()}
-                                        </button>
+                                        <>
+                                            <button
+                                                onClick={handleMint}
+                                                disabled={isPending || isConfirming}
+                                                className="bg-chonk-blue border border-chonk-blue hover:border-black hover:text-gray-200 text-white source-sans-pro py-2 px-4 disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                                            >
+                                                {getMintButtonText()}
+                                            </button>
+                                            {isInsufficientBalance && <div className="text-red-500 text-center">Insufficient balance on Base <br /><Link target='_blank' href="https://relay.link/bridge/base?fromChainId=1&toCurrency=0x0000000000000000000000000000000000000000&fromCurrency=0x0000000000000000000000000000000000000000" className="underline text-red-500 ">Use Relay to Bridge</Link></div>}
+                                        </>
                                     ) : (
                                         <div></div>
                                     )}

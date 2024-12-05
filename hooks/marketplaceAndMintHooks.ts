@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { useAccount } from "wagmi";
+import { useAccount, useBalance } from "wagmi";
 import { parseEther } from 'viem';
 import { formatEther } from "viem";
 
@@ -51,6 +51,15 @@ export function useMintFunction() {
   const [isMintRejected, setIsMintRejected] = useState(false);
   const [mainContractTokens, setMainContractTokens] = useState<number[]>();
   const [traitTokens, setTraitTokens] = useState<number[]>();
+
+  const { address } = useAccount();
+  // New hook to check user's balance on Base
+  const { data: userBalance } = useBalance({
+    address,
+    chainId,
+  });
+
+  // console.log('userBalance', userBalance);
 
   const { data: totalSupply } = useReadContract({
     address: mainContract,
@@ -193,6 +202,7 @@ export function useMintFunction() {
     traitTokens,
     totalSupply: totalSupply ? Number(totalSupply) : undefined,
     mintStatus,
+    userBalance
   };
 }
 
@@ -637,6 +647,7 @@ const hasActiveOffer = useMemo(() => {
     handleCancelOfferTrait,
     handleBidOnChonk,
     handleAcceptBidForChonk,
-    handleWithdrawBidOnChonk
+    handleWithdrawBidOnChonk,
+    
   };
 }
