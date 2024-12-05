@@ -1,7 +1,8 @@
 import Head from 'next/head'
 import MenuBar from '@/components/mint/MenuBar';
 import React, { useState, useEffect } from 'react';
-import { useAccount } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
+import { switchChain } from '@wagmi/core'
 import { useMintFunction } from "../hooks/marketplaceAndMintHooks";
 import Footer from '@/components/layout/Footer';
 import LFC from '@/components/layout/LFC';
@@ -11,11 +12,11 @@ import Link from 'next/link'
 import { MerkleTree } from 'merkletreejs';
 import { keccak256, getAddress } from "viem";
 import { MINT_PRICE} from "@/contract_data";
-import { mainContract, tokenURIABI } from "@/contract_data";
-import { useReadContract } from "wagmi";
+import { mainContract, tokenURIABI, chainId} from "@/contract_data";
 import collectionsUpdated from '@/chonklists/outputs/collections-updated.json'; // 5
 import friendsUpdated from '@/chonklists/outputs/friends-updated.json'; // 6
 import creatorUpdated from '@/chonklists/outputs/creator-updated.json'; // 7
+import { config } from '@/config'
 
 const TokenImage = ({ tokenId }: { tokenId: number }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -51,6 +52,9 @@ const TokenImage = ({ tokenId }: { tokenId: number }) => {
 
 export default function Mint() {
     const MAX_MINT_AMOUNT = 10;
+    const MAX_MINT_AMOUNT = 10
+
+    const { chain } = useAccount();
 
     const [isMintOpen, setIsMintOpen] = useState(true);
     const [isMintOver, setIsMintOver] = useState(false);
@@ -236,6 +240,11 @@ export default function Mint() {
     }, [isPending, isConfirming, isMintingSuccess, isMintingError, isMintRejected]);
 
     const handleMint = async () => {
+      if (chain?.id !== chainId) {
+            await switchChain(config, { chainId: chainId })
+            return;
+        }
+
         try {
             setIsModalOpen(true);
             await mint(mintAmount, proofToUse);
@@ -257,6 +266,7 @@ export default function Mint() {
 
     // Update the mint button state
     const getMintButtonText = () => {
+        if (chain?.id !== chainId) return "Switch to Base";
         if (isPending) return "Confirm in Wallet...";
         if (isConfirming) return "Minting...";
         return (
