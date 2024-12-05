@@ -134,7 +134,7 @@ export default function ActivityAndOffersSection({
                                         </td>
                                         <td className="py-2 text-right">
                                             <Link
-                                                href={`https://sepolia.basescan.org/tx/${event.txHash}`}
+                                                href={`https://basescan.org/tx/${event.txHash}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center justify-end hover:underline"
@@ -208,7 +208,7 @@ export default function ActivityAndOffersSection({
                                             : transfer.to_address ? truncateEthAddress(transfer.to_address) : "-"}</td>
                                         <td className="py-2 flex items-center justify-end">
                                             <Link
-                                                href={`https://sepolia.basescan.org/tx/${transfer.transaction}`}
+                                                href={`https://basescan.org/tx/${transfer.transaction}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="flex items-center hover:underline"

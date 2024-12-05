@@ -75,13 +75,13 @@ export default function PriceAndActionsSection({
 
     useEffect(() => {
         if (isListingRejected) {
-            setLocalListingRejected(true); // neeeded because we want to clear the rejection here 
+            setLocalListingRejected(true); // neeeded because we want to clear the rejection here
         }
     }, [isListingRejected]);
 
     useEffect(() => {
         if (isListChonkLoading) {
-            setLocalListingPending(true); // neeeded because we want to clear the rejection here 
+            setLocalListingPending(true); // neeeded because we want to clear the rejection here
         }
     }, [isListChonkLoading]);
 
@@ -370,7 +370,7 @@ export default function PriceAndActionsSection({
 
                                 <div className="text-sm mt-4 break-all max-w-[80%]">
                                     <button
-                                        onClick={() => window.open(`https://sepolia.basescan.org/tx/${hashListChonk}`, '_blank')}
+                                        onClick={() => window.open(`https://basescan.org/tx/${hashListChonk}`, '_blank')}
                                         className="bg-white text-black border border-black px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
                                     >
                                         View on Basescan
@@ -554,4 +554,4 @@ export default function PriceAndActionsSection({
             )}
         </>
     );
-} 
+}

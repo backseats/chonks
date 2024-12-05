@@ -583,7 +583,7 @@ export default function Mint() {
                                 <div className="md:text-[1vw] text-[2.5vw] mt-4 break-all max-w-[80%]">
                                     {/* <div className="font-bold mb-1">Transaction hashMinting:</div> */}
                                     <button
-                                        onClick={() => window.open(`https://sepolia.basescan.org/tx/${transactionhashMinting}`, '_blank')}
+                                        onClick={() => window.open(`https://basescan.org/tx/${transactionhashMinting}`, '_blank')}
                                         className="bg-white text-black border border-black px-4 py-2  hover:bg-gray-100 transition-colors"
                                     >
                                         View on Basescan
