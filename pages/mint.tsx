@@ -276,7 +276,7 @@ export default function Mint() {
 
     // Update the mint button state
     const getMintButtonText = () => {
-        
+
         if (chain?.id !== chainId) return "Switch to Base";
         if (isPending) return "Confirm in Wallet...";
         if (isConfirming) return "Minting...";
@@ -460,7 +460,7 @@ export default function Mint() {
                                         <div className="space-y-[1vw]">
                                             <div>
                                                 <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">1. How much is a Chonk?</h3>
-                                                <p className="md:text-[1.25vw] text-[2.5vw]"> Each Chonk costs {MINT_PRICE} ETH on BASE to mint, approximatley $38 USD. You can use <Link target='_blank' href="https://relay.link/bridge/base?fromChainId=1&toCurrency=0x0000000000000000000000000000000000000000&fromCurrency=0x0000000000000000000000000000000000000000" className="underline text-chonk-blue ">Relay</Link> to bridge.</p>
+                                                <p className="md:text-[1.25vw] text-[2.5vw]"> Each Chonk costs {MINT_PRICE} ETH on BASE to mint, approximately $38 USD. You can use <Link target='_blank' href="https://relay.link/bridge/base?fromChainId=1&toCurrency=0x0000000000000000000000000000000000000000&fromCurrency=0x0000000000000000000000000000000000000000" className="underline text-chonk-blue ">Relay</Link> to bridge.</p>
                                             </div>
                                             <div>
                                                 <h3 className="md:text-[1.725vw] text-[3.4vw] mb-[0.8625vw] text-chonk-blue">2. How many Chonks can I mint?</h3>
