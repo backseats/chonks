@@ -1,5 +1,6 @@
 import { http, createConfig } from "wagmi";
 import { baseSepolia, base } from "wagmi/chains";
+import { coinbaseWallet } from "wagmi/connectors";
 
 // Only for local dev
 // export const publicClient = createPublicClient({
@@ -12,6 +13,9 @@ import { baseSepolia, base } from "wagmi/chains";
 
 export const config = createConfig({
   chains: [base],
+  connectors: [
+    coinbaseWallet({ appName: 'Chonks', preference: 'all' }),
+  ],
   transports: {
     [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`),
     // [baseSepolia.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_SEPOLIA_RPC_URL}`),
