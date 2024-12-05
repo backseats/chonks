@@ -21,17 +21,18 @@ To deploy Chonks to Base Sepolia:
 13. comment out 2nd lot, uncomment 3rd lot, run `./add-more-traits-base-sepolia.sh`
 13. comment out 3rd lot, uncomment 4th lot, run `./add-more-traits-base-sepolia.sh`
 13. comment out 4th lot, uncomment 5th lot, run `./add-more-traits-base-sepolia.sh`
+14. comment out 5th lot, uncomment 6th lot, run `./add-more-traits-base-sepolia.sh`
 
-14. Set the price before we set the mint start time: 0.01e is wei : 10000000000000000
-15. run `main.teamReserve()`
+15. Set the price before we set the mint start time: 0.01e is wei : 10000000000000000
+16. run `main.teamReserve()`
 
-16. run `main.setMintStartTime()` and `traits.setMintStartTime()` with the same UNIX timestamp: https://www.unixtimestamp.com/
+17. run `main.setMintStartTime()` and `traits.setMintStartTime()` with the same UNIX timestamp: https://www.unixtimestamp.com/
 
-17. update descriptions:
+18. update descriptions:
     forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/ChonksMain.s.sol:ChonksUpdateDescriptionScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --broadcast -vvvv
 
 
-18. set withdraw address to 0xE5c8893e69907e7d90a0f012C477CA30Ec61c3B9
+19. set withdraw address to 0xE5c8893e69907e7d90a0f012C477CA30Ec61c3B9
 
 
 NOTE: if (code: -32603, message: replacement transaction underpriced, data: None) error: send a tx in mm, i just transfer another account .0001 eth
