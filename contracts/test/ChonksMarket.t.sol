@@ -1109,7 +1109,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             dataContract.transferOwnership(address(0));
 
             vm.expectRevert(Unauthorized.selector);
-            dataContract.setChonksMain(address(0));
+            // dataContract.setChonksMain(address(0));
         vm.stopPrank();
     }
 

@@ -45,7 +45,7 @@ contract ChonksBaseTest is Test {
         // console.log('Chonk manager address', address(main));
 
         // comment out this for testing test_teamMintNotStarted
-        traits = new ChonkTraits(localDeploy);
+        traits = new ChonkTraits();
         main.setMintStartTime(block.timestamp); // advance time 1 minute
 
         chonkEquipHelper = new ChonkEquipHelper(address(main), address(traits));
@@ -54,7 +54,7 @@ contract ChonksBaseTest is Test {
         vm.warp(block.timestamp + 1 minutes);
         // console.log('traits address', address(traits));
 
-        dataContract = new FirstReleaseDataMinter(address(main), address(traits), localDeploy);
+        dataContract = new FirstReleaseDataMinter(address(main), address(traits));
         // console.log('FirstReleaseDataMinter address', address(dataContract));
 
         market = new ChonksMarket(

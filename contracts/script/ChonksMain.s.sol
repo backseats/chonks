@@ -51,7 +51,7 @@ contract ChonksMainScript is Script {
         main.setMainRenderer3D(address(mainRenderer3D));
 
         // local deploy: false
-        traits = new ChonkTraits(localDeploy);
+        traits = new ChonkTraits();
         console.log("ChonkTraits Address:", address(traits));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(traits));
         main.setTraitsContract(traits);
@@ -65,7 +65,7 @@ contract ChonksMainScript is Script {
         // traits.setBodyRenderer(bodyRenderer);
 
         // Attach the data contract to ChonkTraits
-        firstReleaseDataMinter = new FirstReleaseDataMinter(address(main), address(traits), localDeploy);
+        firstReleaseDataMinter = new FirstReleaseDataMinter(address(main), address(traits));
         main.setFirstReleaseDataMinter(address(firstReleaseDataMinter));
         // Allows traits to be added
         traits.addMinter(address(firstReleaseDataMinter));
@@ -149,7 +149,7 @@ contract ChonksTraitsScript is Script {
         ChonksMain main = ChonksMain(0xeEd47d1c0702F146b242E91569E0A711d65ad229); // insert contract address here
 
          // local deploy: false
-        traits = new ChonkTraits(localDeploy);
+        traits = new ChonkTraits();
 
         console.log("ChonkTraits Address:", address(traits));
         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(traits));
@@ -301,7 +301,7 @@ contract ChonksRenderersScript is Script {
         // traits.setBodyRenderer(bodyRenderer);
 
         // Attach the data contract to ChonkTraits
-        firstReleaseDataMinter = new FirstReleaseDataMinter(address(main), address(traits), localDeploy);
+        firstReleaseDataMinter = new FirstReleaseDataMinter(address(main), address(traits));
         main.setFirstReleaseDataMinter(address(firstReleaseDataMinter));
         traits.addMinter(address(firstReleaseDataMinter));
 
@@ -432,7 +432,7 @@ contract FirstReleaseDataMinterAddMoreTraitsScript is Script {
         // fsrm.frdm.addNewTrait(61, "Red", TraitCategory.Name.Shoes,"", hex"0b17d4001b0c17d4001b1017d4001b1117d4001b","0b1705d4001b0c1705d4001b101705d4001b111705d4001b0b1706d4001b0c1706d4001b101706d4001b111706d4001b");
 
         // need to put latest.txt in ...
-        
+
         vm.stopBroadcast();
     }
 

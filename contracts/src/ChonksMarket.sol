@@ -66,7 +66,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     uint256 public royaltyPercentage; // starts at 250 (for 2.5%)
     address public teamWallet;
 
-    bool public paused;
+    bool public paused = true;
     bool public pausabilityRevoked;
 
     // Offers
@@ -239,7 +239,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint8 _royaltyPercentage,
         address _teamWallet
     ) {
-        // console.log("ChonksMarket constructor called, msg.sender:", msg.sender);
         _initializeOwner(msg.sender);
 
         CHONKS_MAIN = ChonksMain(_chonksMain);

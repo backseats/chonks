@@ -21,7 +21,6 @@ import { MainRenderer3D } from "./renderers/MainRenderer3D.sol";
 
 // The Traits ERC-721 Contract
 import { ChonkTraits } from "./ChonkTraits.sol";
-
 import { ChonkEquipHelper } from "./ChonkEquipHelper.sol";
 
 // Associated Interfaces and Libraries
@@ -33,8 +32,6 @@ import { TraitCategory } from "./TraitCategory.sol";
 // Other Chonks Associated Contracts
 import { ChonksMarket } from "./ChonksMarket.sol";
 import { FirstReleaseDataMinter } from "./FirstReleaseDataMinter.sol";
-
-// import "forge-std/console.sol"; // DEPLOY: remove
 
 /*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -75,8 +72,6 @@ import { FirstReleaseDataMinter } from "./FirstReleaseDataMinter.sol";
 */
 
 contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC4906, ReentrancyGuard {
-
-    // bool _localDeploy; // DEPLOY: remove
 
     // ERC-6551 Boilerplate addresses
     IRegistry constant REGISTRY = IRegistry(0x000000006551c19487814612e58FE06813775758);
@@ -178,15 +173,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         deploymentTime = block.timestamp;
     }
 
-    // DEPLOY: Remove
-    function _debugPostConstructorMint() public {
-        for (uint i; i < 10; ++i) {
-            bytes32[] memory empty;
-            mint(4, empty); // Mints N bodies/tokens
-            // setChonkAttributes(i+1,"0D6E9D",0,true); // set them all to 3d for testing
-        }
-    }
-
     function teamReserve() public onlyOwner {
         if (totalSupply() > 2) revert CanOnlyReserveFirstTwo();
         _mintInternal(msg.sender, 2, 7);
@@ -194,8 +180,8 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     function teamMint(address _to, uint256 _amount, uint8 _traitCount) public onlyOwner {
         if (_traitCount < 4 || _traitCount > 7) revert InvalidTraitCount();
-        // if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted(); // DEPLOY bring back in
-        // if (block.timestamp > initialMintStartTime + 26 hours) revert MintEnded(); // DEPLOY bring back in
+        if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
+        if (block.timestamp > initialMintStartTime + 26 hours) revert MintEnded();
 
         _mintInternal(_to, _amount, _traitCount);
     }
@@ -204,11 +190,11 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         if (address(firstReleaseDataMinter) == address(0)) revert FirstReleaseDataMinterNotSet();
 
         if (_amount == 0 || _amount > MAX_MINT_AMOUNT) revert InvalidMintAmount();
-        // if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted(); // DEPLOY bring back in
-        // if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded(); // DEPLOY bring back in
+        if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
+        if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded();
         if (msg.value != price * _amount) revert InsufficientFunds();
 
-        uint8 traitCount = 4; // DEPLOY: 4!
+        uint8 traitCount = 4;
         bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
         if (MerkleProofLib.verify(_merkleProof, collectionsMerkle, leaf)) {
             if (!collectionsAddressDidUse[msg.sender]) {
@@ -238,7 +224,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             address tokenBoundAccountAddress = REGISTRY.createAccount(
                 ACCOUNT_PROXY, // implementation address
                 0, // salt
-                84532, // chainId // DEPLOY: 8453
+                8453, // chainId
                 address(this), // tokenContract
                 tokenId // tokenId
             );
@@ -261,16 +247,10 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             // Set the default background color
             chonk.backgroundColor = "0D6E9D";
 
-            // 4 traits to begin with....
             chonk.shoesId = traitsIds[0];
             chonk.bottomId = traitsIds[1];
             chonk.topId = traitsIds[2];
             chonk.hairId = traitsIds[3];
-
-            // DEPLOY: REMOVE!
-            // chonk.headId = traitsIds[4];
-            // chonk.faceId = traitsIds[5];
-            // chonk.accessoryId = traitsIds[6];
         }
     }
 
@@ -508,7 +488,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
 
     /// Getters
 
-    // Gets complete zMap for a Chonk, body and traits - TODO: proably should add getChonkColorMap
+    // Gets complete zMap for a Chonk, body and traits
     function getChonkZMap(uint256 _tokenId) public view returns (string memory) {
         bytes memory traitZmaps;
 
@@ -520,8 +500,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         );
     }
 
-    // need to get the indiviual zMaps for body and traits
-    // TODO: proably should add getBodyColorMap
     function getBodyZMap(uint256 _tokenId) public view returns (string memory) {
         bytes memory bodyZmap;
 
@@ -533,10 +511,6 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
     function getChonk(uint256 _tokenId) public view returns (IChonkStorage.StoredChonk memory) {
         return chonkTokens[_tokenId];
     }
-
-    // function getTokenRenderZ(uint256 _chonkTokenId) public view returns (bool) {
-    //     return chonkTokens[_chonkTokenId].render3D;
-    // }
 
     function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
         IChonkStorage.StoredChonk memory storedChonk = getChonk(_chonkId);
@@ -705,7 +679,7 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
             return;
         }
 
-        // if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint(); // DEPLOY bring back in
+        if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint();
 
         // Ensure you can't transfer a Chonk to a TBA (Chonks can't hold Chonks)
          if (tbaAddressToTokenId[to] != 0) revert CantTransferToTBAs();

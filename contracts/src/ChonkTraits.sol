@@ -26,13 +26,10 @@ import { ChonksMarket } from "./ChonksMarket.sol";
 
 interface IRenderMinterV1 {
     function explainTrait(
-        bool localDeploy,
         ITraitStorage.StoredTrait calldata storedTrait,
         uint128 randomness
     ) external view returns (ITraitStorage.StoredTrait memory);
 }
-
-// import "forge-std/console.sol"; // DEPLOY: remove
 
 /*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -98,8 +95,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     // These are Chonks-related contracts that are approved to invalidate operator approvals
     mapping (address => bool) public approvedInvalidators;
 
-    bool _localDeploy; // DEPLOY: remove
-
     // The next token ID to be minted
     uint256 public nextTokenId;
 
@@ -135,10 +130,8 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         _;
     }
 
-    constructor(bool localDeploy_) ERC721("Chonk Traits", "CHONK TRAITS") {
+    constructor() ERC721("Chonk Traits", "CHONK TRAITS") {
         _initializeOwner(msg.sender);
-        _localDeploy = localDeploy_;
-        // descriptionParts = _descriptionParts;
         traitRenderer = new TraitRenderer();
     }
 
@@ -152,7 +145,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     /// @dev Called in DataMinter contracts to add Traits
-    function setTraitIndexToMetadata(uint256 _traitIndex, TraitMetadata memory _metadata) public { // onlyMinter(msg.sender) { // DEPLOY: bring back in, breaks tests with it in
+    function setTraitIndexToMetadata(uint256 _traitIndex, TraitMetadata memory _metadata) public onlyMinter(msg.sender) {
         traitIndexToMetadata[_traitIndex] = _metadata;
     }
 
@@ -247,7 +240,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         if (storedTrait.dataMinterContract == address(0) && storedTrait.seed == 0)
             revert TraitNotFound(_tokenId);
 
-        return dataContract.explainTrait(_localDeploy, storedTrait, randomness);
+        return dataContract.explainTrait(storedTrait, randomness);
     }
 
     /// @notice Lets you easily go from the Trait token id to the Trait Metadata, as explained by the DataMinter contract the Trait was minted with
@@ -433,7 +426,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             return;
         }
 
-        // if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint(); // DEPLOY bring back in
+        if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint();
 
         // Check if the Trait is equipped on the Chonk, revert if so
         (,,, bool isEquipped) = chonksMain.getFullPictureForTrait(tokenId);

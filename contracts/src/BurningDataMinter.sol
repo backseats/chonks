@@ -11,7 +11,7 @@ import { ITraitStorage } from './interfaces/ITraitStorage.sol';
 import { ChonksMain } from './ChonksMain.sol';
 import { ChonkTraits } from './ChonkTraits.sol';
 import { TraitCategory } from './TraitCategory.sol';
-import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
+// import { IRenderMinterV1 } from './interfaces/IRenderMinterV1.sol';
 import { Utils } from './common/Utils.sol';
 
 // DEPLOY: remove

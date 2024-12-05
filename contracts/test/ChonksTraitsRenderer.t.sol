@@ -28,7 +28,7 @@ contract ChonksTraitsRendererTest is AbstractTest {
 
         // main = new ChonksMain(localDeploy);
         main = new ChonksMain();
-        traits = new ChonkTraits(localDeploy);
+        traits = new ChonkTraits();
         console.log('Chonk traits address', address(traits));
 
         console.log("Adding Ghost...");
@@ -36,7 +36,7 @@ contract ChonksTraitsRendererTest is AbstractTest {
 
         main.setTraitsContract(traits);
 
-        dataContract = new FirstReleaseDataMinter(address(main), address(traits), localDeploy); // if true, addNewTrait called for all traits
+        dataContract = new FirstReleaseDataMinter(address(main), address(traits)); // if true, addNewTrait called for all traits
         console.log('FirstReleaseDataMinter address', address(dataContract));
 
         main.setMintStartTime(block.timestamp);
@@ -60,7 +60,7 @@ contract ChonksTraitsRendererTest is AbstractTest {
         traits.addMinter(address(dataContract));
         main.setFirstReleaseDataMinter(address(dataContract));
 
-        main._debugPostConstructorMint();
+        // main._debugPostConstructorMint();
 
         vm.stopPrank();
     }
