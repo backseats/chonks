@@ -1,9 +1,9 @@
 import { mainContract, tokenURIABI } from '@/contract_data';
 import { createPublicClient, http } from 'viem';
-import { baseSepolia } from 'viem/chains';
+import { baseSepolia, base } from 'viem/chains';
 
 const client = createPublicClient({
-    chain: baseSepolia,
+    chain: base,
     transport: http()
 });
 

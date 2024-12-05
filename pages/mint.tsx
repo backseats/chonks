@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer';
 import LFC from '@/components/layout/LFC';
 import { FaEthereum } from "react-icons/fa6";
 import { ConnectKitButton } from "connectkit";
+// import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link'
 import { MerkleTree } from 'merkletreejs';
 import { keccak256, getAddress } from "viem";
