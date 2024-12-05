@@ -28,11 +28,13 @@ To deploy Chonks to Base Sepolia:
 
 17. run `main.setMintStartTime()` and `traits.setMintStartTime()` with the same UNIX timestamp: https://www.unixtimestamp.com/
 
-18. update descriptions:
-    forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/ChonksMain.s.sol:ChonksUpdateDescriptionScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --broadcast -vvvv
+17. update descriptions:
+    forge script --rpc-url $BASE_RPC_URL script/ChonksMain.s.sol:ChonksUpdateDescriptionScript --private-key $BASE_PRIVATE_KEY --chain-id 8453 --broadcast -vvvv
 
-
-19. set withdraw address to 0xE5c8893e69907e7d90a0f012C477CA30Ec61c3B9
+Set price
+team mint
+Set our merkle trees
+18. set withdraw address to 0xE5c8893e69907e7d90a0f012C477CA30Ec61c3B9
 
 
 NOTE: if (code: -32603, message: replacement transaction underpriced, data: None) error: send a tx in mm, i just transfer another account .0001 eth
