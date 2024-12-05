@@ -413,7 +413,7 @@ export default function Mint() {
                                                 <div className="text-green-500">Congrats, you&apos;re on the Friends List! For every Chonk you mint, you&apos;ll get 6 traits. But only in your first transaction!</div>
                                             : isSpecial ?
                                                 <div className="text-green-500">Congrats, you&apos;re on the Special Collections List! For every Chonk you mint, you&apos;ll get 5 traits. But only in your first transaction!</div>
-                                            : <div className="text-red-500">Your wallet is not on a Chonklist :(</div>
+                                            : <div/>
                                             }
                                         </div>
                                     )}
