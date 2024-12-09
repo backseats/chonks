@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAccount, useReadContract } from 'wagmi';
 import { mainContract, mainABI, chainId } from '@/contract_data';
 import { Chonk } from '@/types/Chonk';
-
+import { ConnectKitButton } from 'connectkit';
 interface ListingsProps {
     isSidebarVisible: boolean;
 }
@@ -30,7 +30,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
         chainId,
     }) as { data: BigInt[] };
 
-    console.log("allChonkTokenIds", allChonkTokenIds); // this is good, works
+    // console.log("allChonkTokenIds", allChonkTokenIds); // this is good, works
 
 
 
@@ -82,7 +82,33 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
     );
 
     return (
-        <div className={`${isSidebarVisible ? 'w-3/4' : 'w-full'} `}>
+        <div className="w-full">
+
+            {/* if no address, show connect button */}
+            {!address && (
+                <div className="flex flex-col border border-black bg-white p-4 h-[300px] justify-center items-center">
+                    <p className="text-lg">Connect your wallet to view your chonks</p>
+                    <ConnectKitButton
+                                    // theme="web"
+                                    customTheme={{
+                                        "--ck-font-family": "'Source Code Pro', monospace",
+                                        "--ck-primary-button-background": "#2F7BA7",
+                                        "--ck-primary-button-hover-background": "#FFFFFF",
+                                        "--ck-primary-button-hover-color": "#2F7BA7",
+                                        "--ck-primary-button-border-radius": "0px",
+                                        "--ck-primary-button-font-weight": "600",
+                                        "--ck-connectbutton-background": "#2F7BA7",
+                                        "--ck-connectbutton-hover-background": "#111111",
+                                        "--ck-connectbutton-hover-color": "#FFFFFF",
+                                        "--ck-connectbutton-border-radius": "0px",
+                                        "--ck-connectbutton-color": "#FFFFFF",
+                                        "--ck-connectbutton-font-weight": "600",
+                                        "--ck-connectbutton-font-size": "21px",
+                                    }}
+                                />
+                </div>
+            )}
+
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
                 {chonks.map(({ id, data }) => (
                     data === null ? (

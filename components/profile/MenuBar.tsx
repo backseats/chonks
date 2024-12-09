@@ -46,11 +46,11 @@ export default function MenuBar(props: Props) {
           Your Chonks
         </Link>
 
-        <div> | </div>
+        {/* <div> | </div>
 
         <Link href="/mint" className="hover:opacity-70 transition-opacity ">
           Mint
-        </Link>
+        </Link> */}
 
       </div>
 
