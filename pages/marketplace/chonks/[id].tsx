@@ -226,6 +226,9 @@ export default function ChonkDetail({ id }: { id: string }) {
                 category: Category.Shoes,
                 isEquipped: storedChonk.shoesId !== 0n,
             },
+            bodyIndex: parseInt(storedChonk.bodyIndex.toString()),
+            backgroundColor: storedChonk.backgroundColor,
+            render3D: storedChonk.render3D
         });
     }, [storedChonk]);
 

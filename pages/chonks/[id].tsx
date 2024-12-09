@@ -221,7 +221,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       },
       bodyIndex: parseInt(storedChonk.bodyIndex.toString()),
       backgroundColor: storedChonk.backgroundColor,
-      render3D: storedChonk.render3D,
+      render3D: storedChonk.render3D
     });
   }, [storedChonk]);
 
