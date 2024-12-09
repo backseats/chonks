@@ -5,7 +5,6 @@ import {
   mainContract,
   mainABI,
   traitsContract,
-  tokenURIABI,
   traitsABI,
   chainId
 } from "@/contract_data";
@@ -35,7 +34,7 @@ export function useTraitData(traitTokenId: string) {
 
   const { data: traitTokenURIData } = useReadContract({
     address: traitsContract,
-    abi: tokenURIABI,
+    abi: mainABI,
     functionName: "tokenURI",
     args: [traitTokenId],
     chainId,

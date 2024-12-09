@@ -8,7 +8,6 @@ import {
   mainABI,
   mainContract,
   traitsContract,
-  tokenURIABI,
   traitsABI,
   chainId
 } from "@/contract_data";
@@ -60,7 +59,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   // Get main body tokenURI
   const { data: tokenURIData } = useReadContract({
     address: mainContract,
-    abi: tokenURIABI,
+    abi: mainABI,
     functionName: TOKEN_URI,
     args: [BigInt(id)],
     chainId,
@@ -182,10 +181,16 @@ export default function ChonkDetail({ id }: { id: string }) {
     tokenId: id.toString(),
   });
 
-  if (address) {
-    console.log("address is", address);
-    console.log("tba address is", tbaAddress);
-  }
+  const tbaAddress2 = tokenboundClient.getAccount({
+    tokenContract: mainContract,
+    tokenId: "35665", // hardcoded for now
+  });
+
+  // if (address && tbaAddress && tbaAddress2) {
+  //   console.log("address is", address);
+  //   console.log("tba address is", tbaAddress);
+  //   console.log("tba address 2 is", tbaAddress2);
+  // }
 
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
@@ -338,9 +343,10 @@ export default function ChonkDetail({ id }: { id: string }) {
                       console.log("stored", stored);
 
                       // @ts-ignore
-                      if (stored[key].tokenId == 0) return null;
-
-                      // console.log(stored[key].toString());
+                      if (stored[key]?.tokenId == 0) return null;
+                      // Type assertion to handle indexing
+                      // const traitData = stored[key as keyof typeof stored];
+                      // console.log("traitData", traitData);
 
                       return (
                         <div key={index}>
@@ -351,6 +357,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                             isEquipped={true}
                             selectedCategory={"All"}
                             isYours={isOwner}
+                            tbaAddress={tbaAddress}
+                            tbaAddress2={tbaAddress2}
                           />
                         </div>
                       );

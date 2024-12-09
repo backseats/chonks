@@ -58,7 +58,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
             for (const chonk of updatedChonks) {
                 if (chonk.data === null) {
                     try {
-                        const response = await fetch(`/api/chonks/tokenURI/${chonk.id}`);
+                        const response = await fetch(`/api/chonks/renderAsDataUri2d/${chonk.id}`);
                         const data = await response.json();
                         chonk.data = data;
                     } catch (error) {
@@ -125,16 +125,16 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
                             key={id}
                             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
                         >
-                            {/* <img
+                            <img
                                 src={data.image }
                                 alt={`Chonk #${id}`}
                                 className="w-full h-auto"
-                            /> */}
+                            />
 
-                                <iframe 
+                                {/* <iframe 
                                     className=" top-0 left-0 w-full h-full" 
                                     src={data.animation_url}
-                                ></iframe>
+                                ></iframe> */}
 
 
                             <div className="mt-4 space-y-2 p-4">

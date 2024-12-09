@@ -12,23 +12,23 @@ export default async function handler(req: any, res: any) {
 
     try {
         // Get token URI from contract
-        const tokenURI = await client.readContract({
+        const renderAsDataUri2D = await client.readContract({
             address: mainContract,
             abi: mainABI,
-            functionName: 'tokenURI',
-            // functionName: 'renderAsDataUri2D',
+            // functionName: 'tokenURI',
+            functionName: 'renderAsDataUri2D',
             args: [BigInt(id)]
         }) as string;
 
         // Parse the base64 encoded data
         // console.log(tokenURI);
-        const base64String = tokenURI.split(",")[1];
+        const base64String = renderAsDataUri2D.split(",")[1];
         const jsonString = atob(base64String);
         const jsonData = JSON.parse(jsonString);
 
         res.status(200).json(jsonData);
     } catch (error) {
-        console.error('Error fetching token URI:', error);
-        res.status(500).json({ error: 'Failed to fetch token URI' });
+        console.error('Error fetching renderAsDataUri2D:', error);
+        res.status(500).json({ error: 'Failed to fetch token renderAsDataUri2D' });
     }
 } 
