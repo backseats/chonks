@@ -501,7 +501,7 @@ const Grid: React.FC = () => {
 
     if (showGrid) setShowGrid(false);
 
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     if (folder) {
       folder.file("chonk-traits-transparent.svg", svgContent);
