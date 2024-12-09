@@ -18,15 +18,12 @@ export default function OwnershipSection(props: Props) {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-center mt-4 mb-1">Chonk #{id}</h1>
+      <h1 className="text-2xl  text-center mt-4 mb-1">Chonk #{id}</h1>
 
       {/* TODO: ENS for owner, heads up on the network, might need to use mainnet ens as well as basename */}
       {owner && (
-        <div className="w-full flex justify-center mb-4">
-          Owned by{" "}
-          <strong>
-            {address && address === owner ? "You" : truncateEthAddress(owner)}
-          </strong>
+        <div className="w-full flex justify-center mb-4 font-bold">
+          Owned by {address && address === owner ? "You" : truncateEthAddress(owner)}
         </div>
       )}
 

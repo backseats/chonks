@@ -314,14 +314,14 @@ export default function ChonkDetail({ id }: { id: string }) {
                                         className="w-full h-auto"
                                     />
 
-                                    <TraitsSection
+                                    {/* <TraitsSection
                                         id={id}
                                         tokenData={tokenData}
                                         equippedTraits={null}
                                         isOpen={isTraitsOpen}
                                         onToggle={() => setIsTraitsOpen(!isTraitsOpen)}
                                         type="trait"
-                                    />
+                                    /> */}
 
                                 </div>
                                 <div className="w-3/5">

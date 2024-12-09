@@ -24,6 +24,7 @@ import BodySwitcher from "../../components/chonk_explorer/BodySwitcher";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
 import RendererSwitcher from "@/components/chonk_explorer/RendererSwitcher";
+import BGColorSwitcher from "@/components/chonk_explorer/BGColorSwitcher";
 
 
 export default function ChonkDetail({ id }: { id: string }) {
@@ -297,13 +298,19 @@ export default function ChonkDetail({ id }: { id: string }) {
               isYours={isOwner}
             />
 
-            <MainChonkImage id={id} tokenData={tokenData} />  
+            <MainChonkImage 
+              id={id} 
+              tokenData={tokenData} 
+            />  
 
-            <RendererSwitcher chonkId={id} is3D={currentChonk?.render3D ?? false} />
+            <RendererSwitcher 
+              chonkId={id} 
+              is3D={currentChonk?.render3D ?? false} 
+              isYours={isOwner}
+            />
 
+            {/* i don't think we need this backseats?  */}
             {/* <EquippedAttributes tokenData={tokenData} /> */}
-
-            
 
             {/* Equipped Attributes Grids */}
             <div className="flex flex-col mt-12">
@@ -352,7 +359,7 @@ export default function ChonkDetail({ id }: { id: string }) {
               </div>
 
               <div className="mt-12">
-                <span className="text-2xl font-bold mt-12 ml-12">In Your Pack</span>
+                <span className="text-2xl font-bold mt-12 ml-12">Additional Traits In Your Backpack</span>
 
                 <div className="flex justify-center mt-8">
                   {filteredTraitTokenIds && (
@@ -375,6 +382,20 @@ export default function ChonkDetail({ id }: { id: string }) {
                   />
                 </p>
               </div>
+
+              <div>
+                <p className="text-2xl font-bold mt-12 ml-12">
+                  {isOwner ? "Your" : "This"} Background Color
+                  <BGColorSwitcher 
+                    id={id} 
+                    isYours={isOwner}
+                    bodyIndex={currentChonk?.bodyIndex ?? 0}
+                    backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
+                  />
+                </p>
+              </div>
+
+
             </div>
           </div>
         ) : (

@@ -1,6 +1,7 @@
 import {
     useSetBodyIndexFunction
 } from "@/hooks/bodyHooks";
+import Image from "next/image";
 
 interface Props {
     chonkId: string;
@@ -25,7 +26,7 @@ export default function Body(props: Props) {
 
     return (
         <div className="relative w-[200px] h-[200px] text-[1vw] border-2 border-black-500">
-            <img src={`/${path}`} className="w-full h-full" />
+            <Image src={`/${path}`} alt={name} width={200} height={200} />
 
             {isSelected && (
                 <div className="absolute top-2 right-2 text-green-500 text-xl">

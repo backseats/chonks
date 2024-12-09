@@ -61,7 +61,7 @@ export default function EquipmentContainer(props: Props) {
           </div>
         </>
       ) : (
-        <p className="text-lg">No Traits to Display</p>
+        <p className="text-lg text-gray-500">No Traits to Display</p>
       )}
     </div>
   );
