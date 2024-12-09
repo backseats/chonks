@@ -22,17 +22,17 @@ export default function OwnershipSection(props: Props) {
 
       {/* TODO: ENS for owner, heads up on the network, might need to use mainnet ens as well as basename */}
       {owner && (
-        <p className="text-center">
+        <div className="w-full flex justify-center mb-4">
           Owned by{" "}
           <strong>
             {address && address === owner ? "You" : truncateEthAddress(owner)}
           </strong>
-        </p>
+        </div>
       )}
 
-      {isYours && <Approvals address={address} tbaAddress={tbaAddress} />}
+      {/* {isYours && <Approvals address={address} tbaAddress={tbaAddress} />} */}
 
-      <EquippedAttributes tokenData={tokenData} />
+      
     </>
   );
 }

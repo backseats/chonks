@@ -22,3 +22,23 @@ export function useSetBodyIndexFunction(chonkId: string, bodyIndex: number) {
 
   return { setBodyIndex };
 } 
+
+
+export function useSetTokenRender3DFunction(chonkId: string, render3d: boolean) {
+
+  console.log("chonkId", chonkId);
+  console.log("render3d", render3d);
+  const { writeContract } = useWriteContract();
+
+  const setTokenRender3D = useCallback(() => {
+    writeContract({
+      address: mainContract,
+      abi: mainABI,
+      functionName: "setTokenRender3D",
+      args: [parseInt(chonkId), Boolean(render3d)],
+      chainId,
+    });
+  }, [writeContract, chonkId, render3d]);
+
+  return { setTokenRender3D };
+} 

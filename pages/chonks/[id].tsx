@@ -21,63 +21,10 @@ import OwnershipSection from "@/components/chonk_explorer/OwnershipSection";
 import Trait from "@/components/chonk_explorer/Trait";
 import { useTraitRevealStatus } from "@/hooks/useTraitRevealStatus";
 import BodySwitcher from "../../components/chonk_explorer/BodySwitcher";
+import { decodeAndSetData } from "@/lib/decodeAndSetData";
+import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
+import RendererSwitcher from "@/components/chonk_explorer/RendererSwitcher";
 
-
-// type CurrentChonk = {
-//   tokenId: number;
-//   hat: {
-//     tokenId: number; // 0 if not equipped
-//     category: Category;
-//     isEquipped: boolean;
-//   };
-//   hair: {
-//     tokenId: number;
-//     category: Category;
-//     isEquipped: boolean;
-//   };
-//   glasses: {
-//     tokenId: number;
-//     category: Category;
-//     isEquipped: boolean;
-//   };
-//   handheld: {
-//     tokenId: number;
-//     category: Category;
-//     isEquipped: boolean;
-//   };
-//   shirt: {
-//     tokenId: number;
-//     category: Category;
-//     isEquipped: boolean;
-//   };
-//   pants: {
-//     tokenId: number;
-//     category: Category;
-//     isEquipped: boolean;
-//   };
-//   shoes: {
-//     tokenId: number;
-//     category: Category;
-//     isEquipped: boolean;
-//   };
-// };
-
-export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
-  // const decodedContent = decodeURIComponent(data);
-  // const base64String = decodedContent.split("data:application/json,")[1];
-  // // Parse as JSON and stringify with proper formatting
-  // const jsonData = JSON.parse(base64String);
-
-  // console.log(jsonData);
-
-  const base64String = data.split(",")[1];
-  const jsonString = atob(base64String);
-  const jsonData = JSON.parse(jsonString) as Chonk;
-
-  // console.log(jsonData);
-
-  setData(jsonData);
-}
 
 export default function ChonkDetail({ id }: { id: string }) {
 
@@ -341,8 +288,6 @@ export default function ChonkDetail({ id }: { id: string }) {
       <div className="w-[1280px] mx-auto ">
         {tokenData ? (
           <div>
-            <MainChonkImage id={id} tokenData={tokenData} />
-
             <OwnershipSection
               id={id}
               tokenData={tokenData}
@@ -351,6 +296,14 @@ export default function ChonkDetail({ id }: { id: string }) {
               tbaAddress={tbaAddress}
               isYours={isOwner}
             />
+
+            <MainChonkImage id={id} tokenData={tokenData} />  
+
+            <RendererSwitcher chonkId={id} is3D={currentChonk?.render3D ?? false} />
+
+            {/* <EquippedAttributes tokenData={tokenData} /> */}
+
+            
 
             {/* Equipped Attributes Grids */}
             <div className="flex flex-col mt-12">

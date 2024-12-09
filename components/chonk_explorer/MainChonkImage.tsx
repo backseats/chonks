@@ -12,6 +12,8 @@ interface Props {
 export default function MainChonkImage(props: Props) {
   const { id, tokenData } = props;
 
+  console.log("MainChonkImage tokenData", tokenData);
+
   const router = useRouter();
 
   const { data: totalSupply } = useReadContract({
@@ -35,7 +37,7 @@ export default function MainChonkImage(props: Props) {
   return (
     <div className="flex justify-center">
       <div className="flex flex-row items-center gap-6">
-        <button
+        {/* <button
           className={`mb-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 ${
             parseInt(id) === 1 ? "opacity-50" : ""
           }`}
@@ -43,20 +45,28 @@ export default function MainChonkImage(props: Props) {
           disabled={parseInt(id) <= 1}
         >
           Previous
-        </button>
+        </button> */}
 
-        <Image
+        <div className="relative w-[400px] h-[400px] max-w-[100vw]">
+          <iframe 
+            className="absolute top-0 left-0 w-full h-full" 
+            src={tokenData.animation_url}
+          ></iframe>
+        </div>
+
+        {/* <Image
           src={tokenData.image}
           alt={tokenData.name}
           width={400}
           height={400}
-        />
-        <button
+        /> */}
+
+        {/* <button
           className="mt-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
           onClick={() => handleNavigation("next")}
         >
           Next
-        </button>
+        </button> */}
       </div>
     </div>
   );

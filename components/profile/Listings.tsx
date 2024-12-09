@@ -115,7 +115,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
                         <LoadingCard key={id} />
                     ) : (
                         <Link
-                            target="_blank"
+                          
                             href={`/chonks/${id}`}
                             key={id}
                             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"

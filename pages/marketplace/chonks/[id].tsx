@@ -24,6 +24,7 @@ import PriceAndActionsSection from '@/components/marketplace/chonks/PriceAndActi
 // import { formatEther } from "viem";
 // import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { CurrentChonk } from "@/types/CurrentChonk";
+import { decodeAndSetData } from "@/lib/decodeAndSetData";
 
 // type ChonkOffer = {
 //     priceInWei: bigint;
@@ -32,24 +33,6 @@ import { CurrentChonk } from "@/types/CurrentChonk";
 //     onlySellTo: string;
 //     encodedTraitIds: string;
 // }
-
-export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
-    // const decodedContent = decodeURIComponent(data);
-    // const base64String = decodedContent.split("data:application/json,")[1];
-    // // Parse as JSON and stringify with proper formatting
-    // const jsonData = JSON.parse(base64String);
-
-    
-
-    const base64String = data.split(",")[1];
-    const jsonString = atob(base64String);
-    // console.log(jsonData);
-    const jsonData = JSON.parse(jsonString) as Chonk;
-
-    console.log(jsonData);
-
-    setData(jsonData);
-}
 
 export default function ChonkDetail({ id }: { id: string }) {
     // const router = useRouter()

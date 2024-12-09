@@ -61,7 +61,13 @@ export default function MenuBar() {
         {/* Right */}
         <div className="flex flex-row gap-4">
           <button
-            className="px-4 py-2 bg-green-500 rounded hover:bg-green-600 text-white"
+            className="px-4 py-2 bg-white hover:bg-gray-100 text-black border border-black"
+            onClick={() => router.push("/profile")}
+          >
+            Your Chonks
+          </button>
+          <button
+            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white"
             onClick={() => router.push("/studio")}
           >
             Chonks Studio
@@ -69,6 +75,7 @@ export default function MenuBar() {
 
           <ConnectKitButton />
         </div>
+        
       </div>
     </div>
   );
