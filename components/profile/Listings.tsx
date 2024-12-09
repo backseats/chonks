@@ -111,20 +111,32 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
 
             <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
                 {chonks.map(({ id, data }) => (
+
+                    
+
                     data === null ? (
                         <LoadingCard key={id} />
                     ) : (
+
+                        
                         <Link
                           
                             href={`/chonks/${id}`}
                             key={id}
                             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
                         >
-                            <img
-                                src={data.image || "/marka/marka-chonk.svg"}
+                            {/* <img
+                                src={data.image }
                                 alt={`Chonk #${id}`}
                                 className="w-full h-auto"
-                            />
+                            /> */}
+
+                                <iframe 
+                                    className=" top-0 left-0 w-full h-full" 
+                                    src={data.animation_url}
+                                ></iframe>
+
+
                             <div className="mt-4 space-y-2 p-4">
                                 <h3 className="text-[1.2vw] font-bold">Chonk #{id}</h3>
                                 {/* <span className="text-[1vw]">[price to go here]</span>
