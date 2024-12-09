@@ -351,7 +351,9 @@ export default function Mint() {
 
                             {isMintOver ? (
                                 <div className="text-[3.45vw] md:text-[1.25vw] text-center mb-[3.45vw]">
-                                    Release 1 Mint is now closed <br />Head on over to our <Link href="/marketplace" className="underline text-chonk-blue ">marketplace</Link>!
+                                    Release 1 Mint is now closed 
+                                    {/* <br />Head on over to our <Link href="/marketplace" className="underline text-chonk-blue ">marketplace</Link>! */}
+                                    <br /><Link href="/profile" className="underline text-chonk-blue ">View your Chonks here</Link>!
                                 </div>
                             ) : (
                                 <div className="flex flex-col items-center gap-[1.725vw]">

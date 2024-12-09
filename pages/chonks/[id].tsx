@@ -3,6 +3,7 @@ import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { getAddress } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
+import { CurrentChonk } from "@/types/CurrentChonk";
 import {
   mainABI,
   mainContract,
@@ -19,46 +20,47 @@ import MainChonkImage from "@/components/chonk_explorer/MainChonkImage";
 import OwnershipSection from "@/components/chonk_explorer/OwnershipSection";
 import Trait from "@/components/chonk_explorer/Trait";
 import { useTraitRevealStatus } from "@/hooks/useTraitRevealStatus";
+import BodySwitcher from "../../components/chonk_explorer/BodySwitcher";
 
 
-type CurrentChonk = {
-  tokenId: number;
-  hat: {
-    tokenId: number; // 0 if not equipped
-    category: Category;
-    isEquipped: boolean;
-  };
-  hair: {
-    tokenId: number;
-    category: Category;
-    isEquipped: boolean;
-  };
-  glasses: {
-    tokenId: number;
-    category: Category;
-    isEquipped: boolean;
-  };
-  handheld: {
-    tokenId: number;
-    category: Category;
-    isEquipped: boolean;
-  };
-  shirt: {
-    tokenId: number;
-    category: Category;
-    isEquipped: boolean;
-  };
-  pants: {
-    tokenId: number;
-    category: Category;
-    isEquipped: boolean;
-  };
-  shoes: {
-    tokenId: number;
-    category: Category;
-    isEquipped: boolean;
-  };
-};
+// type CurrentChonk = {
+//   tokenId: number;
+//   hat: {
+//     tokenId: number; // 0 if not equipped
+//     category: Category;
+//     isEquipped: boolean;
+//   };
+//   hair: {
+//     tokenId: number;
+//     category: Category;
+//     isEquipped: boolean;
+//   };
+//   glasses: {
+//     tokenId: number;
+//     category: Category;
+//     isEquipped: boolean;
+//   };
+//   handheld: {
+//     tokenId: number;
+//     category: Category;
+//     isEquipped: boolean;
+//   };
+//   shirt: {
+//     tokenId: number;
+//     category: Category;
+//     isEquipped: boolean;
+//   };
+//   pants: {
+//     tokenId: number;
+//     category: Category;
+//     isEquipped: boolean;
+//   };
+//   shoes: {
+//     tokenId: number;
+//     category: Category;
+//     isEquipped: boolean;
+//   };
+// };
 
 export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
   // const decodedContent = decodeURIComponent(data);
@@ -78,6 +80,7 @@ export function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
 }
 
 export default function ChonkDetail({ id }: { id: string }) {
+
   const TOKEN_URI = "tokenURI";
 
   const { address } = useAccount();
@@ -162,7 +165,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
     setCurrentChonk({
       tokenId: parseInt(id),
-      hat: {
+      head: {
         tokenId:
           storedChonk.headId === 0n
             ? 0
@@ -178,7 +181,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         category: Category.Top,
         isEquipped: storedChonk.hairId !== 0n,
       },
-      glasses: {
+      face: {
         tokenId:
           storedChonk.faceId === 0n
             ? 0
@@ -186,7 +189,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         category: Category.Face,
         isEquipped: storedChonk.faceId !== 0n,
       },
-      handheld: {
+      accessory: {
         tokenId:
           storedChonk.accessoryId === 0n
             ? 0
@@ -194,13 +197,13 @@ export default function ChonkDetail({ id }: { id: string }) {
         category: Category.Accessory,
         isEquipped: storedChonk.accessoryId !== 0n,
       },
-      shirt: {
+      top: {
         tokenId:
           storedChonk.topId === 0n ? 0 : parseInt(storedChonk.topId.toString()),
         category: Category.Top,
         isEquipped: storedChonk.topId !== 0n,
       },
-      pants: {
+      bottom: {
         tokenId:
           storedChonk.bottomId === 0n
             ? 0
@@ -216,6 +219,9 @@ export default function ChonkDetail({ id }: { id: string }) {
         category: Category.Shoes,
         isEquipped: storedChonk.shoesId !== 0n,
       },
+      bodyIndex: parseInt(storedChonk.bodyIndex.toString()),
+      backgroundColor: storedChonk.backgroundColor,
+      render3D: storedChonk.render3D,
     });
   }, [storedChonk]);
 
@@ -252,7 +258,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     console.log("allTraitTokenIds", allTraitTokenIds);
 
     // need to check if the trait is revealed
-
 
     const headIdIndex =
       // @ts-ignore
@@ -362,11 +367,15 @@ export default function ChonkDetail({ id }: { id: string }) {
                         key === "seed" ||
                         key === "isRevealed" ||
                         key === "bodyIndex" ||
-                        key === "tokenId"
+                        key === "tokenId" ||
+                        key === "backgroundColor" ||
+                        key === "render3D" 
                       )
                         return null;
 
                       const stored = currentChonk;
+
+                      console.log("stored", stored);
 
                       // @ts-ignore
                       if (stored[key].tokenId == 0) return null;
@@ -389,8 +398,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                 </div>
               </div>
 
-              <div>
-                <p className="text-2xl font-bold mt-12 ml-12">In Your Pack</p>
+              <div className="mt-12">
+                <span className="text-2xl font-bold mt-12 ml-12">In Your Pack</span>
 
                 <div className="flex justify-center mt-8">
                   {filteredTraitTokenIds && (
@@ -401,6 +410,17 @@ export default function ChonkDetail({ id }: { id: string }) {
                     />
                   )}
                 </div>
+              </div>
+
+              <div>
+                <p className="text-2xl font-bold mt-12 ml-12">
+                  {isOwner ? "Your" : "This"} Chonk Skin Tone
+                  <BodySwitcher 
+                    chonkId={id}
+                    isYours={isOwner}
+                    yourBodyIndex={currentChonk?.bodyIndex ?? 0}
+                  />
+                </p>
               </div>
             </div>
           </div>

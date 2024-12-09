@@ -37,4 +37,7 @@ export type CurrentChonk = {
         category: Category;
         isEquipped: boolean;
     };
+    bodyIndex: number;
+    backgroundColor: string;
+    render3D: boolean;
 }; 
