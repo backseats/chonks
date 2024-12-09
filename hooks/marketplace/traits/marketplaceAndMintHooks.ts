@@ -8,7 +8,6 @@ import {
   mainABI,
   traitsContract,
   marketplaceContract,
-  tokenURIABI,
   traitsABI,
   marketplaceABI,
   chainId,

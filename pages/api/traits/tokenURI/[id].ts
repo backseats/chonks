@@ -1,4 +1,4 @@
-import { traitsContract, tokenURIABI, chainId } from '@/contract_data';
+import { traitsContract, traitsABI, chainId } from '@/contract_data';
 import { createPublicClient, http } from 'viem';
 import { baseSepolia } from 'viem/chains'; // TODO: Base
 
@@ -14,7 +14,7 @@ export default async function handler(req: any, res: any) {
         // Get token URI from contract
         const tokenURI = await client.readContract({
             address: traitsContract,
-            abi: tokenURIABI,
+            abi: traitsABI,
             functionName: 'tokenURI',
             args: [BigInt(id)]
         }) as string;

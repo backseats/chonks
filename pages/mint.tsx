@@ -13,7 +13,7 @@ import Link from 'next/link'
 import { MerkleTree } from 'merkletreejs';
 import { keccak256, getAddress } from "viem";
 import { MINT_PRICE} from "@/contract_data";
-import { mainContract, tokenURIABI, chainId} from "@/contract_data";
+import { mainContract, mainABI, chainId} from "@/contract_data";
 import collectionsUpdated from '@/chonklists/outputs/collections-updated.json'; // 5
 import friendsUpdated from '@/chonklists/outputs/friends-updated.json'; // 6
 import creatorUpdated from '@/chonklists/outputs/creator-updated.json'; // 7
@@ -24,7 +24,7 @@ const TokenImage = ({ tokenId }: { tokenId: number }) => {
 
     const { data: tokenURIData } = useReadContract({
         address: mainContract,
-        abi: tokenURIABI,
+        abi: mainABI,
         functionName: 'tokenURI',
         args: [BigInt(tokenId)],
     });

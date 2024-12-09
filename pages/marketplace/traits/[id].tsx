@@ -10,7 +10,6 @@ import {
     marketplaceContract,
     marketplaceABI,
     traitsContract,
-    tokenURIABI,
     chainId,
 } from "@/contract_data";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
@@ -113,7 +112,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     // Get main body tokenURI
     const { data: tokenURIData } = useReadContract({
         address: traitsContract,
-        abi: tokenURIABI,
+        abi: mainABI,
         functionName: TOKEN_URI,
         args: [BigInt(id)],
         chainId,

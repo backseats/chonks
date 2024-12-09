@@ -17,15 +17,15 @@ interface Props {
   isEquipped: boolean;
   selectedCategory: string;
   isYours: boolean;
-  tbaAddress: Address;
-  tbaAddress2: Address;
+  // tbaAddress: Address;
+  // tbaAddress2: Address;
 }
 
 export default function Trait(props: Props) {
-  const { chonkId, traitTokenId, isEquipped, selectedCategory, isYours, tbaAddress, tbaAddress2 } =
+  const { chonkId, traitTokenId, isEquipped, selectedCategory, isYours } =
     props;
 
-  const { transferTrait } = useTBATransferTrait(tbaAddress, tbaAddress2, traitTokenId);
+  // const { transferTrait } = useTBATransferTrait(tbaAddress, tbaAddress2, traitTokenId);
 
   console.log("traitTokenId", traitTokenId);
 

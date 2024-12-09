@@ -357,8 +357,6 @@ export default function ChonkDetail({ id }: { id: string }) {
                             isEquipped={true}
                             selectedCategory={"All"}
                             isYours={isOwner}
-                            tbaAddress={tbaAddress}
-                            tbaAddress2={tbaAddress2}
                           />
                         </div>
                       );
