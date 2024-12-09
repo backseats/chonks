@@ -27,7 +27,7 @@ export default function Trait(props: Props) {
 
   // const { transferTrait } = useTBATransferTrait(tbaAddress, tbaAddress2, traitTokenId);
 
-  console.log("traitTokenId", traitTokenId);
+  // console.log("traitTokenId", traitTokenId);
 
   // A data object w/ name, desc, image, attributes
   const traitData = useTraitData(traitTokenId);

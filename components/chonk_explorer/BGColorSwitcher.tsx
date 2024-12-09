@@ -40,7 +40,7 @@ export default function BGColorSwitcher(props: Props) {
                 />
                 {isYours && (
                     <button
-                        onClick={() => setBackgroundColor}
+                        onClick={setBackgroundColor}
                         className={`p-2  transition-colors w-full ${
                             isLightColor(selectedColor) ? "text-black" : "text-white"
                         }`}

@@ -45,15 +45,18 @@ export function useSetTokenRender3DFunction(chonkId: string, render3d: boolean) 
 
 export function useSetBackgroundColorFunction(chonkId: string, color: string) {
 
-  console.log("chonkId", chonkId);
-  console.log("color", color);
+  // console.log("chonkId", chonkId);
+  // console.log("color", color);
   // if color starts with #, remove it
   const colorWithoutHash = color.startsWith("#") ? color.slice(1) : color;
-  console.log("colorWithoutHash", colorWithoutHash);
+  // console.log("colorWithoutHash", colorWithoutHash);
 
   const { writeContract } = useWriteContract();
 
   const setBackgroundColor = useCallback(() => {
+
+    console.log("chonkId", chonkId);
+    
     writeContract({
       address: mainContract,
       abi: mainABI,

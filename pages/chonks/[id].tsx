@@ -201,14 +201,14 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId,
   }) as { data: BigInt[] };
 
-  console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
+  // console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
 
   // This gets the ids that are equipped to the chonk
   useEffect(() => {
     if (!storedChonk) return;
 
-    console.log("storedChonk", storedChonk);
-    console.log("allTraitTokenIds", allTraitTokenIds);
+    // console.log("storedChonk", storedChonk);
+    // console.log("allTraitTokenIds", allTraitTokenIds);
 
     // need to check if the trait is revealed
 
@@ -340,7 +340,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                       const stored = currentChonk;
 
-                      console.log("stored", stored);
+                      // console.log("stored", stored);
 
                       // @ts-ignore
                       if (stored[key]?.tokenId == 0) return null;
