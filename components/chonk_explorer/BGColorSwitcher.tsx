@@ -38,16 +38,17 @@ export default function BGColorSwitcher(props: Props) {
                     disableAlpha={true}
                     onChange={(color) => setSelectedColor(color.hex)}
                 />
-
-                <button
-                    onClick={() => setBackgroundColor()}
-                    className={`p-2  transition-colors w-full ${
-                        isLightColor(selectedColor) ? "text-black" : "text-white"
-                    }`}
+                {isYours && (
+                    <button
+                        onClick={() => setBackgroundColor}
+                        className={`p-2  transition-colors w-full ${
+                            isLightColor(selectedColor) ? "text-black" : "text-white"
+                        }`}
                     style={{ backgroundColor: selectedColor }}
-                >
-                    Save
-                </button>
+                    >
+                        Save
+                    </button>
+                )}
             </div>
         </div>
     );
