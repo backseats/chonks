@@ -408,7 +408,6 @@ export default function ChonkDetail({ id }: { id: string }) {
                       <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
                           <BodySwitcher
                             chonkId={id}
-                            isYours={isOwner}
                             yourBodyIndex={currentChonk?.bodyIndex ?? 0}
                           />
                       </div>
@@ -421,7 +420,6 @@ export default function ChonkDetail({ id }: { id: string }) {
                         <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
                           <BGColorSwitcher
                             id={id}
-                            isYours={isOwner}
                             bodyIndex={currentChonk?.bodyIndex ?? 0}
                             backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
                           />

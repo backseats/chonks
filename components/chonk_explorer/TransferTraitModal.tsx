@@ -51,18 +51,18 @@ return (
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       onClick={handleModalBackgroundClick}
     >
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+      <div className="bg-white p-8 shadow-lg max-w-md w-full">
         {/* Top Bar */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-medium">Transfer Your {traitName}</h2>
         </div>
 
-        <div className="mb-4">
+        <div className="mb-4 mt-6">
           <label className="block text-[14px] font-medium text-gray-700 mb-2">
             Select the Chonk to Transfer To
           </label>
           <select
-            className="w-full text-sm px-3 py-2 text-gray-700 border rounded-lg focus:outline-none focus:border-blue-500"
+            className="w-full text-sm px-3 py-2 text-gray-700 border rounded-md focus:outline-none focus:border-blue-500"
             value={selectedChonkId || ""}
             onChange={(e) => setSelectedChonkId(e.target.value)}
           >
@@ -76,7 +76,7 @@ return (
           </select>
         </div>
 
-        <div className="flex justify-end space-x-4">
+        <div className="flex justify-end space-x-4 text-[14px] mt-8">
           <button
             className="px-4 py-2 border border-black hover:bg-gray-100"
             onClick={closeModal}

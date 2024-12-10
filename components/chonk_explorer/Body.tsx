@@ -8,12 +8,11 @@ interface Props {
     bodyId: number;
     name: string;
     path: string;
-    isYours: boolean;
     isSelected: boolean;
 }
 
 export default function Body(props: Props) {
-    const { chonkId, bodyId, name, path, isYours, isSelected } = props;
+    const { chonkId, bodyId, name, path, isSelected } = props;
 
     const { setBodyIndex } = useSetBodyIndexFunction(
         chonkId,
@@ -35,7 +34,7 @@ export default function Body(props: Props) {
             )}
 
 
-            {isYours && !isSelected ? (
+            {!isSelected ? (
                 <button
                     className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2 hover:bg-opacity-75"
                     onClick={setBodyIndex}
