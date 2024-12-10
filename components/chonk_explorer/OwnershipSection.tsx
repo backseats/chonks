@@ -37,7 +37,7 @@ export default function OwnershipSection(props: Props) {
             <div>Owned by {address && address === owner ? "You" : truncateEthAddress(owner)}</div>
             <span
               onClick={handleCopy}
-              className="text-gray-500 text-sm ml-1 mt-1 cursor-pointer transition-opacity duration-200"
+              className="text-gray-500 text-sm ml-2 mt-1 cursor-pointer transition-opacity duration-200"
             >
               (Backpack address: <u>{copied ? "Copied!" : truncateEthAddress(tbaAddress)}</u>)
             </span>
