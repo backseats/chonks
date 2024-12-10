@@ -34,7 +34,7 @@ export default function OwnershipSection(props: Props) {
       {owner && (
         <div className="w-full flex justify-center mb-4 font-bold">
           <div className="flex items-center">
-            <div>Owned by {address && address === owner ? "You" : truncateEthAddress(owner)}</div>
+            <div className="text-lg">Owned by {address && address === owner ? "You" : truncateEthAddress(owner)}</div>
             <span
               onClick={handleCopy}
               className="text-gray-500 text-sm ml-2 mt-1 cursor-pointer transition-opacity duration-200"

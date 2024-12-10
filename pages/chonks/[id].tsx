@@ -25,7 +25,10 @@ import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
 import RendererSwitcher from "@/components/chonk_explorer/RendererSwitcher";
 import BGColorSwitcher from "@/components/chonk_explorer/BGColorSwitcher";
 import Head from "next/head";
-
+import { useBasePaintOwnership } from "@/hooks/useBasepaintOwnership";
+import { useSongDaymannOwnership } from "@/hooks/useSingADayMannOwnership";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function ChonkDetail({ id }: { id: string }) {
 
@@ -182,16 +185,8 @@ export default function ChonkDetail({ id }: { id: string }) {
     tokenId: id.toString(),
   });
 
-  const tbaAddress2 = tokenboundClient.getAccount({
-    tokenContract: mainContract,
-    tokenId: "35665", // hardcoded for now
-  });
-
-  // if (address && tbaAddress && tbaAddress2) {
-  //   console.log("address is", address);
-  //   console.log("tba address is", tbaAddress);
-  //   console.log("tba address 2 is", tbaAddress2);
-  // }
+  const basePaintOwnership = useBasePaintOwnership(tbaAddress);
+  const songDaymannOwnership = useSongDaymannOwnership(tbaAddress);
 
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
@@ -320,19 +315,17 @@ export default function ChonkDetail({ id }: { id: string }) {
                 isYours={isOwner}
               />
 
+              <div className="flex flex-col items-center">
               <MainChonkImage
                 id={id}
                 tokenData={tokenData}
               />
 
-              <RendererSwitcher
+              { isOwner && <RendererSwitcher
                 chonkId={id}
                 is3D={currentChonk?.render3D ?? false}
-                isYours={isOwner}
-              />
-
-              {/* i don't think we need this backseats?  */}
-              {/* <EquippedAttributes tokenData={tokenData} /> */}
+              /> }
+              </div>
 
               {/* Equipped Attributes Grids */}
               <div className="flex flex-col mt-12">
@@ -382,21 +375,18 @@ export default function ChonkDetail({ id }: { id: string }) {
                   </div>
                 </div>
 
-                <div className="flex flex-col mt-12 ">
-                  <div>
-                    <div className="text-2xl font-bold mt-12 w-full text-center">Additional Traits In {isOwner ? "Your" : "Their"} Backpack</div>
-
-                    <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
-                      {filteredTraitTokenIds && (
-                        <EquipmentContainer
-                          chonkId={id.toString()}
-                          traitTokenIds={filteredTraitTokenIds}
-                          isYours={isOwner}
-                          tokenboundClient={tokenboundClient}
-                          tbaAddress={tbaAddress}
-                        />
-                      )}
-                    </div>
+                <div className="flex flex-col mt-12">
+                  <div className="text-2xl font-bold mt-12 w-full text-center">Additional Traits In {isOwner ? "Your" : "Their"} Backpack</div>
+                  <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
+                    {filteredTraitTokenIds && (
+                      <EquipmentContainer
+                        chonkId={id.toString()}
+                        traitTokenIds={filteredTraitTokenIds}
+                        isYours={isOwner}
+                        tokenboundClient={tokenboundClient}
+                        tbaAddress={tbaAddress}
+                      />
+                    )}
                   </div>
                 </div>
 
@@ -428,6 +418,28 @@ export default function ChonkDetail({ id }: { id: string }) {
                     </div>
                   </>
                 )}
+
+                <div className="flex flex-col mt-6">
+                  <div className="text-2xl font-bold mt-12 w-full text-center my-6">Backpack Collectibles</div>
+
+                  <div className="flex flex-row gap-4 justify-center items-center my-6">
+                    { basePaintOwnership && (
+                      <Link href="https://basepaint.xyz/canvas/485" target="_blank" rel="noopener noreferrer">
+                        <Image src="/basepaint485.png" alt="Base Paint" width={300} height={300} />
+                      </Link>
+                    )}
+
+                    { !songDaymannOwnership && (
+                      <Link href="https://opensea.io/assets/base/0xb3bad5fe12268edc8a52ff786076c1d1fa92ef0d/2" target="_blank" rel="noopener noreferrer">
+                        <Image src="/mannsong.png" alt="Song Daymann" width={300} height={300} />
+                      </Link>
+                    )}
+                  </div>
+
+                  {/* basepaint and songdaymann
+                   */}
+                </div>
+
               </div>
             </div>
           ) : (
