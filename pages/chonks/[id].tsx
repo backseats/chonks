@@ -419,26 +419,24 @@ export default function ChonkDetail({ id }: { id: string }) {
                   </>
                 )}
 
-                <div className="flex flex-col mt-6">
+                { (basePaintOwnership || songDaymannOwnership) && <div className="flex flex-col mt-6">
                   <div className="text-2xl font-bold mt-12 w-full text-center my-6">Backpack Collectibles</div>
 
-                  <div className="flex flex-row gap-4 justify-center items-center my-6">
-                    { basePaintOwnership && (
-                      <Link href="https://basepaint.xyz/canvas/485" target="_blank" rel="noopener noreferrer">
-                        <Image src="/basepaint485.png" alt="Base Paint" width={300} height={300} />
-                      </Link>
-                    )}
+                    <div className="flex flex-row gap-4 justify-center items-center my-6">
+                      { basePaintOwnership && (
+                        <Link href="https://basepaint.xyz/canvas/485" target="_blank" rel="noopener noreferrer">
+                          <Image src="/basepaint485.png" alt="Base Paint" width={300} height={300} />
+                        </Link>
+                      )}
 
-                    { !songDaymannOwnership && (
-                      <Link href="https://opensea.io/assets/base/0xb3bad5fe12268edc8a52ff786076c1d1fa92ef0d/2" target="_blank" rel="noopener noreferrer">
-                        <Image src="/mannsong.png" alt="Song Daymann" width={300} height={300} />
-                      </Link>
-                    )}
+                      { songDaymannOwnership && (
+                        <Link href="https://opensea.io/assets/base/0xb3bad5fe12268edc8a52ff786076c1d1fa92ef0d/2" target="_blank" rel="noopener noreferrer">
+                          <Image src="/mannsong.png" alt="Song Daymann" width={300} height={300} />
+                        </Link>
+                      )}
+                    </div>
                   </div>
-
-                  {/* basepaint and songdaymann
-                   */}
-                </div>
+                }
 
               </div>
             </div>
