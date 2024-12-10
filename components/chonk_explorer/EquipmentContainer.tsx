@@ -8,17 +8,14 @@ import { useAccount } from "wagmi";
 interface Props {
   chonkId: string;
   tbaAddress: Address;
-  toTbaAddress?: Address;
   traitTokenIds: BigInt[];
   isYours: boolean;
   tokenboundClient: TokenboundClient;
 }
 
 export default function EquipmentContainer(props: Props) {
-  const { chonkId, tbaAddress, toTbaAddress = null, traitTokenIds, isYours, tokenboundClient } = props;
+  const { chonkId, tbaAddress, traitTokenIds, isYours, tokenboundClient } = props;
   const { address } = useAccount();
-
-  console.log('isYours', isYours);
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
