@@ -43,40 +43,55 @@ export default function MenuBar() {
   const mintTrait = () => writeTraitContract(config(traitsContract, traitsABI));
 
   return (
-    <div className="w-full border-b border-gray-200 py-4 px-6 mb-8">
-      <div className="w-[1280px] mx-auto flex justify-between items-center">
-        {/* Left */}
-        <Link href="/" className="hover:opacity-70 transition-opacity">
-          <h1 className="text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
-            <Image
-              src="/chonks-logo.svg"
-            alt="Chonks"
-            width={48}
-            height={48}
-            className="h-12 md:h-12 w-auto"
-          />
-          </h1>
-        </Link>
+    <>
+      <nav id="top" className="w-full flex justify-between px-4 py-4 bg-white">
+        <div className="">
+          {/* Left */}
+          <Link href="/" className="hover:opacity-70 transition-opacity">
+            <h1 className="text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
+              <Image
+                src="/chonks-logo.svg"
+                alt="Chonks"
+                width={48}
+                height={48}
+                className="h-12 md:h-12 w-auto"
+              />
+            </h1>
+          </Link>
 
-        {/* Right */}
-        <div className="flex flex-row gap-4">
-          <button
-            className="px-4 py-2 bg-white hover:bg-gray-100 text-black border border-black"
-            onClick={() => router.push("/profile")}
-          >
-            Your Chonks
-          </button>
-          <button
-            className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white"
-            onClick={() => router.push("/studio")}
-          >
-            Chonks Studio
-          </button>
-
-          <ConnectKitButton />
         </div>
-        
+
+        <div className="">
+          {/* Right */}
+
+          <div className="flex flex-row gap-4">
+            <button
+              className="px-4 py-2 bg-black text-white font-source-code-pro text-sm hidden md:flex"
+              onClick={() => router.push("/profile")}
+            >
+              Your Chonks
+            </button>
+
+            {/* <button
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white"
+              onClick={() => router.push("/studio")}
+            >
+              Chonks Studio
+            </button> */}
+
+            <ConnectKitButton />
+          </div>
+
+        </div>
+      </nav>
+      <div className="flex w-full h-12 md:hidden">
+        <button
+          className="px-4 py-2 bg-black text-white font-source-code-pro text-sm w-full mx-3"
+          onClick={() => router.push("/profile")}
+        >
+          Your Chonks
+        </button>
       </div>
-    </div>
+    </>
   );
 }

@@ -52,7 +52,7 @@ export default function BGColorSwitcher(props: Props) {
                                 }`}
                             style={{ backgroundColor: selectedColor }}
                         >
-                            Save Background Color
+                            Set Background Color
                         </button>
                     )}
                 </div>
