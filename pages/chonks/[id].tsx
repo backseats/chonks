@@ -403,7 +403,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                 {isOwner && (
                   <>
                     <div className="flex flex-col mt-12">
-                      <div className="text-2xl font-bold mt-12 w-full text-center">Your Chonk's Skin Tone</div>
+                      <div className="text-2xl font-bold mt-12 w-full text-center">Your Chonk&apos;s Skin Tone</div>
 
                       <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
                           <BodySwitcher
