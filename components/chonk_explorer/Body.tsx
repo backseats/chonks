@@ -25,7 +25,7 @@ export default function Body(props: Props) {
     // const isEquipped = useIsBodyEquipped(chonkId, bodyId);
 
     return (
-        <div className="relative w-[200px] h-[200px] text-[1vw] border-2 border-black-500">
+        <div className="relative w-full text-sm border-2 border-black-500">
             <Image src={`/${path}`} alt={name} width={200} height={200} />
 
             {isSelected && (

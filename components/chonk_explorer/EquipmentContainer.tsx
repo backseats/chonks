@@ -33,10 +33,10 @@ export default function EquipmentContainer(props: Props) {
   // then i filter below by the selectedCategory
 
   return (
-    <div className="flex flex-col pt-4">
+    <>
       {traitTokenIds.length > 0 ? (
         <>
-          <div className="flex flex-row gap-2">
+          {/* <div className="flex flex-row gap-2">
             {categories.map((category) => (
               <CategoryButton
                 key={category}
@@ -45,24 +45,25 @@ export default function EquipmentContainer(props: Props) {
                 onClick={() => handleCategoryChange(category)}
               />
             ))}
-          </div>
+          </div> */}
 
-          <div className="grid grid-cols-4 gap-4 mt-4">
+       
             {traitTokenIds.map((tokenId, index) => (
-              <Trait
-                key={index}
-                chonkId={chonkId}
-                traitTokenId={tokenId.toString()}
-                isEquipped={false}
-                selectedCategory={selectedCategory}
-                isYours={isYours}
-              />
+              <div key={index}>
+                <Trait
+                  key={index}
+                  chonkId={chonkId}
+                  traitTokenId={tokenId.toString()}
+                  isEquipped={false}
+                  selectedCategory={selectedCategory}
+                  isYours={isYours}
+                />
+              </div>
             ))}
-          </div>
         </>
       ) : (
         <p className="text-lg text-gray-500">No Traits to Display</p>
       )}
-    </div>
+    </>
   );
 }

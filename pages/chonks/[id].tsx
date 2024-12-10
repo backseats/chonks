@@ -24,6 +24,7 @@ import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
 import RendererSwitcher from "@/components/chonk_explorer/RendererSwitcher";
 import BGColorSwitcher from "@/components/chonk_explorer/BGColorSwitcher";
+import Head from "next/head";
 
 
 export default function ChonkDetail({ id }: { id: string }) {
@@ -288,125 +289,149 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   return (
     <>
-      <MenuBar />
 
-      {/* Might need to move this width above the MenuBar */}
-      <div className="w-[1280px] mx-auto ">
-        {tokenData ? (
-          <div>
-            <OwnershipSection
-              id={id}
-              tokenData={tokenData}
-              owner={owner}
-              address={address}
-              tbaAddress={tbaAddress}
-              isYours={isOwner}
+        <Head>
+            <title>Chonk #{id} Explorer </title>
+            <meta name="description" content={`Chonk #${id} Explorer - Chonks`} />
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
             />
+            <link rel="icon" href="/favicon.ico" />
+            <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+            <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+            <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+            <link rel="manifest" href="/site.webmanifest" />
+        </Head>
 
-            <MainChonkImage 
-              id={id} 
-              tokenData={tokenData} 
-            />  
+      <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
+        
+        <MenuBar />
 
-            <RendererSwitcher 
-              chonkId={id} 
-              is3D={currentChonk?.render3D ?? false} 
-              isYours={isOwner}
-            />
+        <div className="w-full mx-auto ">
+          {tokenData ? (
+            <div>
+              <OwnershipSection
+                id={id}
+                tokenData={tokenData}
+                owner={owner}
+                address={address}
+                tbaAddress={tbaAddress}
+                isYours={isOwner}
+              />
 
-            {/* i don't think we need this backseats?  */}
-            {/* <EquippedAttributes tokenData={tokenData} /> */}
+              <MainChonkImage 
+                id={id} 
+                tokenData={tokenData} 
+              />  
 
-            {/* Equipped Attributes Grids */}
-            <div className="flex flex-col mt-12">
-              <div>
-                <p className="text-2xl font-bold pb-2 ml-12">
-                  {isOwner ? "Your" : "This"} Chonk Is Wearing
-                </p>
+              <RendererSwitcher 
+                chonkId={id} 
+                is3D={currentChonk?.render3D ?? false} 
+                isYours={isOwner}
+              />
 
-                <div className="flex flex-row mt-2 gap-4 justify-center">
-                  {currentChonk &&
-                    Object.keys(currentChonk).map((key, index) => {
-                      if (
-                        key === "epoch" ||
-                        key === "seed" ||
-                        key === "isRevealed" ||
-                        key === "bodyIndex" ||
-                        key === "tokenId" ||
-                        key === "backgroundColor" ||
-                        key === "render3D" 
-                      )
-                        return null;
+              {/* i don't think we need this backseats?  */}
+              {/* <EquippedAttributes tokenData={tokenData} /> */}
 
-                      const stored = currentChonk;
+              {/* Equipped Attributes Grids */}
+              <div className="flex flex-col mt-12">
+                <div>
+                  <div className="text-2xl font-bold mt-12 w-full text-center">{isOwner ? "Your" : "This"} Chonk Is Wearing</div>
 
-                      // console.log("stored", stored);
+                  <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
+                    {currentChonk &&
+                      Object.keys(currentChonk).map((key, index) => {
+                        if (
+                          key === "epoch" ||
+                          key === "seed" ||
+                          key === "isRevealed" ||
+                          key === "bodyIndex" ||
+                          key === "tokenId" ||
+                          key === "backgroundColor" ||
+                          key === "render3D" 
+                        )
+                          return null;
 
-                      // @ts-ignore
-                      if (stored[key]?.tokenId == 0) return null;
-                      // Type assertion to handle indexing
-                      // const traitData = stored[key as keyof typeof stored];
-                      // console.log("traitData", traitData);
+                        const stored = currentChonk;
 
-                      return (
-                        <div key={index}>
-                          <Trait
-                            chonkId={id}
-                            // @ts-ignore
-                            traitTokenId={stored[key].tokenId.toString()}
-                            isEquipped={true}
-                            selectedCategory={"All"}
-                            isYours={isOwner}
-                          />
-                        </div>
-                      );
-                    })}
+                        // console.log("stored", stored);
+
+                        // @ts-ignore
+                        if (stored[key]?.tokenId == 0) return null;
+                        // Type assertion to handle indexing
+                        // const traitData = stored[key as keyof typeof stored];
+                        // console.log("traitData", traitData);
+
+                        return (
+                          <div key={index}>
+                            <Trait
+                              chonkId={id}
+                              // @ts-ignore
+                              traitTokenId={stored[key].tokenId.toString()}
+                              isEquipped={true}
+                              selectedCategory={"All"}
+                              isYours={isOwner}
+                            />
+                          </div>
+                        );
+                      })}
+                  </div>
                 </div>
-              </div>
 
-              <div className="mt-12">
-                <span className="text-2xl font-bold mt-12 ml-12">Additional Traits In Your Backpack</span>
+                <div className="flex flex-col mt-12 ">
+                  <div>
+                    <div className="text-2xl font-bold mt-12 w-full text-center">Additional Traits In Your Backpack</div>
 
-                <div className="flex justify-center mt-8">
-                  {filteredTraitTokenIds && (
-                    <EquipmentContainer
-                      chonkId={id.toString()}
-                      traitTokenIds={filteredTraitTokenIds}
-                      isYours={isOwner}
-                    />
-                  )}
+                    <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
+                      {filteredTraitTokenIds && (
+                        <EquipmentContainer
+                          chonkId={id.toString()}
+                          traitTokenIds={filteredTraitTokenIds}
+                          isYours={isOwner}
+                        />
+                      )}
+                    </div>
+                  </div>
                 </div>
+
+                <div className="flex flex-col mt-12 " >
+
+                  <div className="text-2xl font-bold mt-12 w-full text-center">{isOwner ? "Your" : "This"} Chonk Skin Tone</div>
+                 
+                  <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
+                      <BodySwitcher 
+                        chonkId={id}
+                        isYours={isOwner}
+                        yourBodyIndex={currentChonk?.bodyIndex ?? 0}
+                      />
+                  </div>
+                
+                </div>
+
+                <div>
+                  <p className="flex flex-col mt-12 ">
+                    
+
+                    <div className="text-2xl font-bold mt-12 w-full text-center">{isOwner ? "Your" : "This"} Background Color</div>
+                    <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
+                      <BGColorSwitcher 
+                        id={id} 
+                        isYours={isOwner}
+                        bodyIndex={currentChonk?.bodyIndex ?? 0}
+                        backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
+                      />
+                    </div>
+                  </p>
+                </div>
+
+
               </div>
-
-              <div>
-                <p className="text-2xl font-bold mt-12 ml-12">
-                  {isOwner ? "Your" : "This"} Chonk Skin Tone
-                  <BodySwitcher 
-                    chonkId={id}
-                    isYours={isOwner}
-                    yourBodyIndex={currentChonk?.bodyIndex ?? 0}
-                  />
-                </p>
-              </div>
-
-              <div>
-                <p className="text-2xl font-bold mt-12 ml-12">
-                  {isOwner ? "Your" : "This"} Background Color
-                  <BGColorSwitcher 
-                    id={id} 
-                    isYours={isOwner}
-                    bodyIndex={currentChonk?.bodyIndex ?? 0}
-                    backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
-                  />
-                </p>
-              </div>
-
-
             </div>
-          </div>
-        ) : (
-          <p>Loading...</p>
-        )}
+          ) : (
+            <p>Loading...</p>
+          )}
+        </div>
       </div>
     </>
   );

@@ -60,7 +60,7 @@ export default function Trait(props: Props) {
 
   return traitData ? (
     <>
-      <div className="relative w-[200px] h-[200px] max-w-[200px] max-h-[200px]">
+      <div className="relative w-full text-sm">
         <img src={isRevealed ? traitData.image : "/unrevealed.svg"} className="w-full h-full" />
 
         {isYours ? (

@@ -117,7 +117,7 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
 
 
                             <div className="mt-4 space-y-2 p-4">
-                                <h3 className="text-[1.2vw] font-bold">Chonk #{id}</h3>
+                                <h3 className="text-[3.45vw] md:text-[1.2vw] font-bold">Chonk #{id}</h3>
                             </div>
                         </Link>
                     )

@@ -19,7 +19,7 @@ export default function RendererSwitcher(props: Props) {
     );
 
     return (
-        <div className="text-center text-lg text-gray-500 my-6">
+        <div className="text-center text-lg text-gray-500 my-6 mx-2">
             <div className="text-black font-weight-600 mb-2">
                 {is3D ? "3D" : "2D"} mode on
                 {isYours && (
