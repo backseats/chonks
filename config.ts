@@ -1,5 +1,5 @@
 import { http, createConfig } from "wagmi";
-import { baseSepolia, base } from "wagmi/chains";
+import { base } from "wagmi/chains";
 import { coinbaseWallet, injected } from "wagmi/connectors";
 // import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 
@@ -20,7 +20,6 @@ export const config = createConfig({
   ],
   transports: {
     [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`),
-    // [baseSepolia.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_SEPOLIA_RPC_URL}`),
   },
 });
 

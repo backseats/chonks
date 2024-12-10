@@ -305,7 +305,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         </Head>
 
       <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
-        
+
         <MenuBar />
 
         <div className="w-full mx-auto ">
@@ -320,14 +320,14 @@ export default function ChonkDetail({ id }: { id: string }) {
                 isYours={isOwner}
               />
 
-              <MainChonkImage 
-                id={id} 
-                tokenData={tokenData} 
-              />  
+              <MainChonkImage
+                id={id}
+                tokenData={tokenData}
+              />
 
-              <RendererSwitcher 
-                chonkId={id} 
-                is3D={currentChonk?.render3D ?? false} 
+              <RendererSwitcher
+                chonkId={id}
+                is3D={currentChonk?.render3D ?? false}
                 isYours={isOwner}
               />
 
@@ -349,7 +349,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                           key === "bodyIndex" ||
                           key === "tokenId" ||
                           key === "backgroundColor" ||
-                          key === "render3D" 
+                          key === "render3D"
                         )
                           return null;
 
@@ -372,6 +372,9 @@ export default function ChonkDetail({ id }: { id: string }) {
                               isEquipped={true}
                               selectedCategory={"All"}
                               isYours={isOwner}
+                              tbaAddress={tbaAddress}
+                              tokenboundClient={tokenboundClient}
+                              address={address}
                             />
                           </div>
                         );
@@ -381,7 +384,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                 <div className="flex flex-col mt-12 ">
                   <div>
-                    <div className="text-2xl font-bold mt-12 w-full text-center">Additional Traits In Your Backpack</div>
+                    <div className="text-2xl font-bold mt-12 w-full text-center">Additional Traits In {isOwner ? "Your" : "Their"} Backpack</div>
 
                     <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
                       {filteredTraitTokenIds && (
@@ -389,43 +392,44 @@ export default function ChonkDetail({ id }: { id: string }) {
                           chonkId={id.toString()}
                           traitTokenIds={filteredTraitTokenIds}
                           isYours={isOwner}
+                          tokenboundClient={tokenboundClient}
+                          tbaAddress={tbaAddress}
                         />
                       )}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col mt-12 " >
+                {isOwner && (
+                  <>
+                    <div className="flex flex-col mt-12">
+                      <div className="text-2xl font-bold mt-12 w-full text-center">Your Chonk Skin Tone</div>
 
-                  <div className="text-2xl font-bold mt-12 w-full text-center">{isOwner ? "Your" : "This"} Chonk Skin Tone</div>
-                 
-                  <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
-                      <BodySwitcher 
-                        chonkId={id}
-                        isYours={isOwner}
-                        yourBodyIndex={currentChonk?.bodyIndex ?? 0}
-                      />
-                  </div>
-                
-                </div>
+                      <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
+                          <BodySwitcher
+                            chonkId={id}
+                            isYours={isOwner}
+                            yourBodyIndex={currentChonk?.bodyIndex ?? 0}
+                          />
+                      </div>
 
-                <div>
-                  <p className="flex flex-col mt-12 ">
-                    
-
-                    <div className="text-2xl font-bold mt-12 w-full text-center">{isOwner ? "Your" : "This"} Background Color</div>
-                    <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
-                      <BGColorSwitcher 
-                        id={id} 
-                        isYours={isOwner}
-                        bodyIndex={currentChonk?.bodyIndex ?? 0}
-                        backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
-                      />
                     </div>
-                  </p>
-                </div>
 
-
+                    <div>
+                      <p className="flex flex-col mt-12">
+                        <div className="text-2xl font-bold mt-12 w-full text-center">Your Background Color</div>
+                        <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
+                          <BGColorSwitcher
+                            id={id}
+                            isYours={isOwner}
+                            bodyIndex={currentChonk?.bodyIndex ?? 0}
+                            backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
+                          />
+                        </div>
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           ) : (

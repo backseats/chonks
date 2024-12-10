@@ -9,25 +9,39 @@ import {
 } from "@/hooks/traitHooks";
 import { useTBATransferTrait } from "@/hooks/useTBATransferTrait";
 import { Address } from "viem";
+import { TokenboundClient } from "@tokenbound/sdk";
+import { useState } from "react";
+import TransferTraitModal from "./TransferTraitModal";
+
 export const categoryList = Object.values(Category);
 
 interface Props {
   chonkId: string;
+  address: Address | undefined;
   traitTokenId: string;
+  tbaAddress: Address;
+  toTbaAddress?: Address | null;
   isEquipped: boolean;
   selectedCategory: string;
   isYours: boolean;
-  // tbaAddress: Address;
-  // tbaAddress2: Address;
+  tokenboundClient: TokenboundClient;
 }
 
 export default function Trait(props: Props) {
-  const { chonkId, traitTokenId, isEquipped, selectedCategory, isYours } =
-    props;
+  const {
+    chonkId,
+    address = undefined,
+    traitTokenId,
+    isEquipped,
+    selectedCategory,
+    isYours,
+    tokenboundClient,
+    tbaAddress,
+  } = props;
 
-  // const { transferTrait } = useTBATransferTrait(tbaAddress, tbaAddress2, traitTokenId);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
 
-  // console.log("traitTokenId", traitTokenId);
+  const { transferTrait } = useTBATransferTrait(tokenboundClient);
 
   // A data object w/ name, desc, image, attributes
   const traitData = useTraitData(traitTokenId);
@@ -35,10 +49,6 @@ export default function Trait(props: Props) {
   const traitType = useTraitType(traitTokenId);
   // e.g. "Blue Pants"
   const traitName = useTraitName(traitTokenId);
-
-  // console.log("tbaAddress", tbaAddress);
-  // console.log("tbaAddress2", tbaAddress2);
-  // console.log("traitTokenId", traitTokenId);
 
   const isRevealed = useIsRevealed(traitTokenId);
 
@@ -58,9 +68,35 @@ export default function Trait(props: Props) {
     return null;
   }
 
+  const handleTransferTrait = (toTbaAddress: Address) => {
+    transferTrait(tbaAddress, toTbaAddress, traitTokenId);
+    setIsTransferModalOpen(false);
+  };
+
+  const handleModalBackgroundClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      setIsTransferModalOpen(false);
+    }
+  };
+
   return traitData ? (
     <>
-      <div className="relative w-full text-sm">
+      <div className="relative w-full text-sm" data-token-id={traitTokenId}>
+        { !isEquipped && isYours && <button
+          className="absolute top-0 right-0 bg-black bg-opacity-50 text-white py-1 px-2 text-sm"
+          onClick={() => setIsTransferModalOpen(true)}
+        >
+          Transfer Trait
+        </button> }
+
+        { !isEquipped && isYours && <button
+          className="absolute top-0 left-0 bg-black opacity-50 bg-opacity-50 text-white py-1 px-2 text-sm"
+          onClick={() => {}}
+          disabled={true}
+        >
+          Sell Trait
+        </button> }
+
         <img src={isRevealed ? traitData.image : "/unrevealed.svg"} className="w-full h-full" />
 
         {isYours ? (
@@ -83,18 +119,19 @@ export default function Trait(props: Props) {
             </span>
           </button>
         )}
-        {/* {!isEquipped && (
-          <Link className="no-underline hover:underline text-chonk-blue py-2"
-            onClick={(e) => {
-              e.preventDefault();
-              transferTrait();
-            }}
-            href="#"
-          >
-            Transfer Trait
-          </Link>
-        )} */}
-      </div> 
+      </div>
+
+      {isTransferModalOpen && (
+        <TransferTraitModal
+          closeModal={() => setIsTransferModalOpen(false)}
+          handleModalBackgroundClick={handleModalBackgroundClick}
+          onTransfer={handleTransferTrait}
+          tokenboundClient={tokenboundClient}
+          chonkId={chonkId}
+          address={address}
+          traitName={`${traitName} ${traitType}`}
+        />
+      )}
     </>
   ) : (
     <div className="relative w-[200px] h-[200px]"></div>

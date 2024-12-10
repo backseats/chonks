@@ -3,6 +3,7 @@ import Approvals from "./Approvals";
 import { Chonk } from "@/types/Chonk";
 import { Address } from "viem";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
+import { useState } from "react";
 
 interface Props {
   id: string;
@@ -15,21 +16,37 @@ interface Props {
 
 export default function OwnershipSection(props: Props) {
   const { id, tokenData, owner, address, tbaAddress, isYours } = props;
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(tbaAddress);
+    setCopied(true);
+    setTimeout(() => {
+      setCopied(false);
+    }, 1500);
+  };
 
   return (
     <>
-      <h1 className="text-2xl  text-center mt-4 mb-1">Chonk #{id}</h1>
+      <h1 className="text-2xl text-center mt-4 mb-1">Chonk #{id}</h1>
 
       {/* TODO: ENS for owner, heads up on the network, might need to use mainnet ens as well as basename */}
       {owner && (
         <div className="w-full flex justify-center mb-4 font-bold">
-          Owned by {address && address === owner ? "You" : truncateEthAddress(owner)}
+          <div className="flex items-center">
+            <div>Owned by {address && address === owner ? "You" : truncateEthAddress(owner)}</div>
+            <span
+              onClick={handleCopy}
+              className="text-gray-500 text-sm ml-1 mt-1 cursor-pointer transition-opacity duration-200"
+            >
+              (Backpack address: <u>{copied ? "Copied!" : truncateEthAddress(tbaAddress)}</u>)
+            </span>
+          </div>
         </div>
       )}
 
       {/* {isYours && <Approvals address={address} tbaAddress={tbaAddress} />} */}
 
-      
     </>
   );
 }

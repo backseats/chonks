@@ -1,34 +1,23 @@
-import { mainABI, traitsABI, marketplaceContract, traitsContract, chainId} from "@/contract_data";
+import { traitsABI, traitsContract, chainId} from "@/contract_data";
 import { Address, encodeFunctionData } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
-import { useWalletClient } from "wagmi";
 
-export function useTBATransferTrait(tbaAddress1: Address, tbaAddress2: Address, traitId: string) {
+export function useTBATransferTrait(tokenboundClient: TokenboundClient) {
 
-//   console.log("tbaAddress1", tbaAddress1);
-//   console.log("tbaAddress2", tbaAddress2);
-//   console.log("traitId", traitId);
-
-  const { data: walletClient } = useWalletClient();
-  const tokenboundClient = new TokenboundClient({
-      walletClient,
-      chainId,
-  });
-
-  const encodedData = () => {
+  const encodedData = (from: Address, to: Address, traitId: string) => {
     return encodeFunctionData({
       abi: traitsABI,
-      functionName: "transferFrom",
-      args: [tbaAddress1, tbaAddress2, traitId],
+      functionName: "safeTransferFrom",
+      args: [from, to, traitId],
     });
   };
 
-  const transferTrait = () => {
+  const transferTrait = (from: Address, to: Address, traitId: string) => {
     tokenboundClient.execute({
-      account: tbaAddress1,
+      account: from,
       to: traitsContract,
       value: 0n,
-      data: encodedData(),
+      data: encodedData(from, to, traitId),
       chainId,
     });
   }

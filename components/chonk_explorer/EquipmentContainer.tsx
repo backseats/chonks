@@ -1,15 +1,24 @@
 import { useState } from "react";
 import Trait from "./Trait";
 import CategoryButton from "./CategoryButton";
+import { Address } from "viem";
+import { TokenboundClient } from "@tokenbound/sdk";
+import { useAccount } from "wagmi";
 
 interface Props {
   chonkId: string;
+  tbaAddress: Address;
+  toTbaAddress?: Address;
   traitTokenIds: BigInt[];
   isYours: boolean;
+  tokenboundClient: TokenboundClient;
 }
 
 export default function EquipmentContainer(props: Props) {
-  const { chonkId, traitTokenIds, isYours } = props;
+  const { chonkId, tbaAddress, toTbaAddress = null, traitTokenIds, isYours, tokenboundClient } = props;
+  const { address } = useAccount();
+
+  console.log('isYours', isYours);
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
@@ -28,10 +37,6 @@ export default function EquipmentContainer(props: Props) {
     setSelectedCategory(category);
   };
 
-  // what i really want to do here is take the traitTokenIds and get their traitType which i can do with the `useTraitType` hook
-
-  // then i filter below by the selectedCategory
-
   return (
     <>
       {traitTokenIds.length > 0 ? (
@@ -47,19 +52,21 @@ export default function EquipmentContainer(props: Props) {
             ))}
           </div> */}
 
-       
-            {traitTokenIds.map((tokenId, index) => (
-              <div key={index}>
-                <Trait
-                  key={index}
-                  chonkId={chonkId}
-                  traitTokenId={tokenId.toString()}
-                  isEquipped={false}
-                  selectedCategory={selectedCategory}
-                  isYours={isYours}
-                />
-              </div>
-            ))}
+          {traitTokenIds.map((tokenId, index) => (
+            <div key={index}>
+              <Trait
+                key={index}
+                chonkId={chonkId}
+                traitTokenId={tokenId.toString()}
+                isEquipped={false}
+                selectedCategory={selectedCategory}
+                isYours={isYours}
+                tokenboundClient={tokenboundClient}
+                tbaAddress={tbaAddress}
+                address={address}
+              />
+            </div>
+          ))}
         </>
       ) : (
         <p className="text-lg text-gray-500">No Traits to Display</p>

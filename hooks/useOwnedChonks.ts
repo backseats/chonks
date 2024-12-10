@@ -1,19 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useReadContract } from "wagmi";
 import { mainContract, mainABI } from "@/contract_data";
-
+import { Address } from 'viem';
 interface OwnedChonk {
     id: string;
 }
 
-export function useOwnedChonks(address: string | undefined) {
+export function useOwnedChonks(address: Address | undefined) {
+    if (!address) {
+        console.log('useOwnedChonks address undefined')
+        return { ownedChonks: [] };
+    }
+
     const [ownedChonks, setOwnedChonks] = useState<OwnedChonk[]>([]);
 
     const { data: tokenIds, error: contractError } = useReadContract({
         address: mainContract,
         abi: mainABI,
         functionName: 'walletOfOwner',
-        args: [address]
+        args: [address],
     });
 
     useEffect(() => {
@@ -33,7 +38,7 @@ export function useOwnedChonks(address: string | undefined) {
             console.error('Error processing token IDs:', error);
             setOwnedChonks([]);
         }
-    }, [tokenIds, contractError]);
+    }, [tokenIds, contractError, address]);
 
     return { ownedChonks };
 }
