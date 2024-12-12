@@ -1,7 +1,5 @@
-import { useState } from "react";
 import Body from "./Body";
-import bodies from "../../contracts/csv-conversion/bodies.json";
-
+import { useSetBodyIndexFunction } from "@/hooks/bodyHooks";
 interface Props {
   chonkId: string;
   yourBodyIndex: number;
@@ -10,28 +8,28 @@ interface Props {
 export default function BodySwitcher(props: Props) {
   const { chonkId, yourBodyIndex } = props;
 
+  const { setBodyIndex } = useSetBodyIndexFunction();
+
+  const colors = [
+    '#EAD9D9',
+    '#EFB25D',
+    '#BA8136',
+    '#8A5E24',
+    '#493212'
+  ];
+
   return (
-    <>
-      {bodies.bodies.length > 0 ? (
-        <>
-
-            {bodies.bodies.map((body, index) => (
-              <div key={index}>
-              <Body
-                key={index}
-                chonkId={chonkId}
-                  bodyId={body.id}
-                  name={body.name}
-                  path={body.path}
-                  isSelected={yourBodyIndex === index}
-                />
-              </div>
-            ))}
-
-        </>
-      ) : (
-        <p className="text-lg">No Bodies to Display</p>
-      )}
-    </>
-  );
+    <div className="flex flex-row gap-2 mt-2">
+      {colors.map((color, index) => (
+        <div
+          key={index}
+          className={`w-8 h-8 cursor-pointer ${
+            yourBodyIndex === index ? 'border-2 border-black/80' : ''
+          }`}
+          style={{backgroundColor: color}}
+          onClick={() => setBodyIndex(chonkId, index)}
+        />
+      ))}
+    </div>
+  )
 }

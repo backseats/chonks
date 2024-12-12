@@ -19,7 +19,8 @@ import MenuBar from "@/components/chonk_explorer/MenuBar";
 import MainChonkImage from "@/components/chonk_explorer/MainChonkImage";
 import OwnershipSection from "@/components/chonk_explorer/OwnershipSection";
 import Trait from "@/components/chonk_explorer/Trait";
-import BodySwitcher from "../../components/chonk_explorer/BodySwitcher";
+import { useTraitRevealStatus } from "@/hooks/useTraitRevealStatus";
+import BodySwitcher from "@/components/chonk_explorer/BodySwitcher";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import BGColorSwitcher from "@/components/chonk_explorer/BGColorSwitcher";
 import Head from "next/head";
@@ -460,32 +461,16 @@ export default function ChonkDetail({ id }: { id: string }) {
                 </div>
 
                 {isOwner && (
-                  <>
-                    <div className="flex flex-col mt-12">
-                      <div className="text-2xl font-bold mt-12 w-full text-center">Your Chonk&apos;s Skin Tone</div>
-
-                      <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
-                          <BodySwitcher
-                            chonkId={id}
-                            yourBodyIndex={currentChonk?.bodyIndex ?? 0}
-                          />
+                  <div className="flex flex-col mt-12">
+                      <div className="text-2xl font-bold mt-12 w-full text-center">Set Background Color</div>
+                      <div className="flex flex-wrap gap-4 justify-center w-full text-center">
+                        <BGColorSwitcher
+                          id={id}
+                          bodyIndex={currentChonk?.bodyIndex ?? 0}
+                          backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
+                        />
                       </div>
-
-                    </div>
-
-                    <div>
-                      <p className="flex flex-col mt-12">
-                        <div className="text-2xl font-bold mt-12 w-full text-center">Set Background Color</div>
-                        <div className="flex flex-wrap gap-4 justify-center w-full text-center">
-                          <BGColorSwitcher
-                            id={id}
-                            bodyIndex={currentChonk?.bodyIndex ?? 0}
-                            backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
-                          />
-                        </div>
-                      </p>
-                    </div>
-                  </>
+                  </div>
                 )}
 
                 { (basePaintOwnership || songDaymannOwnership || farWestOwnership) && <div className="flex flex-col mt-6">

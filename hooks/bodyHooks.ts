@@ -7,10 +7,10 @@ import {
   chainId
 } from "@/contract_data";
 
-export function useSetBodyIndexFunction(chonkId: string, bodyIndex: number) {
+export function useSetBodyIndexFunction() {
   const { writeContract } = useWriteContract();
 
-  const setBodyIndex = useCallback(() => {
+  const setBodyIndex = (chonkId: string, bodyIndex: number) => {
     writeContract({
       address: mainContract,
       abi: mainABI,
@@ -18,10 +18,10 @@ export function useSetBodyIndexFunction(chonkId: string, bodyIndex: number) {
       args: [parseInt(chonkId), bodyIndex],
       chainId,
     });
-  }, [writeContract, chonkId, bodyIndex]);
+  };
 
   return { setBodyIndex };
-} 
+}
 
 
 export function useSetTokenRender3DFunction(chonkId: string, render3d: boolean) {
@@ -41,7 +41,7 @@ export function useSetTokenRender3DFunction(chonkId: string, render3d: boolean) 
   }, [writeContract, chonkId, render3d]);
 
   return { setTokenRender3D };
-} 
+}
 
 export function useSetBackgroundColorFunction(chonkId: string, color: string) {
 
@@ -56,7 +56,7 @@ export function useSetBackgroundColorFunction(chonkId: string, color: string) {
   const setBackgroundColor = useCallback(() => {
 
     console.log("chonkId", chonkId);
-    
+
     writeContract({
       address: mainContract,
       abi: mainABI,
@@ -67,4 +67,4 @@ export function useSetBackgroundColorFunction(chonkId: string, color: string) {
   }, [writeContract, chonkId, colorWithoutHash]);
 
   return { setBackgroundColor };
-} 
+}
