@@ -1,5 +1,5 @@
-import Body from "./Body";
 import { useSetBodyIndexFunction } from "@/hooks/bodyHooks";
+
 interface Props {
   chonkId: string;
   yourBodyIndex: number;
@@ -23,7 +23,7 @@ export default function BodySwitcher(props: Props) {
       {colors.map((color, index) => (
         <div
           key={index}
-          className={`w-8 h-8 cursor-pointer ${
+          className={`w-8 h-8 cursor-pointer bg-${color} ${
             yourBodyIndex === index ? 'border-2 border-black/80' : ''
           }`}
           style={{ backgroundColor: color }}
