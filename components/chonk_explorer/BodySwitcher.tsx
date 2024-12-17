@@ -26,7 +26,7 @@ export default function BodySwitcher(props: Props) {
           className={`w-8 h-8 cursor-pointer ${
             yourBodyIndex === index ? 'border-2 border-black/80' : ''
           }`}
-          style={{backgroundColor: color}}
+          style={{ backgroundColor: color }}
           onClick={() => setBodyIndex(chonkId, index)}
         />
       ))}
