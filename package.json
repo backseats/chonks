@@ -28,6 +28,7 @@
     "jszip": "^3.10.1",
     "keccak256": "^1.0.6",
     "leva": "^0.9.35",
+    "lucide-react": "^0.468.0",
     "merkletreejs": "^0.4.0",
     "next": "14.2.3",
     "react": "^18",

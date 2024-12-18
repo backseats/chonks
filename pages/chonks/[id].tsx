@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { useReadContract, useWalletClient, useAccount } from "wagmi";
-import { getAddress } from "viem";
+import { useReadContract, useWalletClient, useAccount, useWriteContract } from "wagmi";
+import { getAddress, isAddress } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
 import { CurrentChonk } from "@/types/CurrentChonk";
@@ -29,6 +29,7 @@ import { useBasePaintOwnership } from "@/hooks/useBasepaintOwnership";
 import { useSongDaymannOwnership, useFarWestOwnership } from "@/hooks/useSingADayMannOwnership";
 import Image from "next/image";
 import Link from "next/link";
+import { SendHorizontal } from "lucide-react";
 
 export default function ChonkDetail({ id }: { id: string }) {
 
@@ -189,7 +190,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const songDaymannOwnership = useSongDaymannOwnership(tbaAddress);
   const farWestOwnership = useFarWestOwnership(tbaAddress); // TODO: generalize this
 
-  // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
+  // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
     address: traitsContract,
     abi: traitsABI,
@@ -283,9 +284,52 @@ export default function ChonkDetail({ id }: { id: string }) {
     setFilteredTraitTokenIds(filteredTraitTokenIds);
   }, [allTraitTokenIds, storedChonk]);
 
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [recipientAddress, setRecipientAddress] = useState("");
+  const [addressError, setAddressError] = useState("");
+  const [txHash, setTxHash] = useState<string | null>(null);
+
+  const { writeContract, data: hash, isSuccess, isPending, reset } = useWriteContract();
+
+  useEffect(() => {
+    if (hash) {
+      setTxHash(hash);
+    }
+  }, [hash]);
+
+  useEffect(() => {
+    if (isSuccess) {
+      // Auto close modal after success
+      setTimeout(() => {
+        setShowSendModal(false);
+        setRecipientAddress("");
+        setAddressError("");
+        setTxHash(null);
+        reset();
+      }, 3000);
+    }
+  }, [isSuccess]);
+
+  const handleSendChonk = async () => {
+    if (!isAddress(recipientAddress)) {
+      setAddressError("Please enter a valid Ethereum address");
+      return;
+    }
+
+    try {
+      await writeContract({
+        address: mainContract,
+        abi: mainABI,
+        functionName: "transferFrom",
+        args: [address, recipientAddress, BigInt(id)],
+      });
+    } catch (error) {
+      console.error("Error sending Chonk:", error);
+    }
+  };
+
   return (
     <>
-
         <Head>
             <title>{`Chonk #${id} Explorer`}</title>
             <meta name="description" content={`Chonk #${id} Explorer - Chonks`} />
@@ -305,6 +349,15 @@ export default function ChonkDetail({ id }: { id: string }) {
         <MenuBar />
 
         <div className="w-full mx-auto ">
+          <div className="flex flex-col items-end">
+            <button
+              onClick={() => setShowSendModal(true)}
+              className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black"
+            >
+              <SendHorizontal size={24} />
+            </button>
+          </div>
+
           {tokenData ? (
             <div>
               <OwnershipSection
@@ -452,6 +505,75 @@ export default function ChonkDetail({ id }: { id: string }) {
           )}
         </div>
       </div>
+
+      {showSendModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-[90%] max-w-md">
+            <h2 className="text-xl font-bold mb-4 text-center">
+              {isSuccess ? "Transfer Was Successful" :
+               isPending ? "Confirming Transfer in your Wallet" :
+               `Transfer Chonk #${id}`}
+            </h2>
+
+            {!isSuccess && !isPending && (
+              <input
+                type="text"
+                placeholder="0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+                value={recipientAddress}
+                onChange={(e) => {
+                  setRecipientAddress(e.target.value);
+                  setAddressError("");
+                }}
+                className="w-full p-2 border-2 border-black rounded mb-2 text-sm"
+              />
+            )}
+
+            {!isSuccess && !isPending && addressError && (
+              <div className="text-red-500 text-sm pb-2">{addressError}</div>
+            )}
+
+            <div className="flex justify-end gap-2 mt-4">
+              {!isSuccess && !isPending && (
+                <button
+                  onClick={() => {
+                    setShowSendModal(false);
+                    setRecipientAddress("");
+                    setAddressError("");
+                    setTxHash(null);
+                  }}
+                  className="px-4 py-2 border-2 border-black rounded"
+                >
+                  Cancel
+                </button>
+              )}
+
+              {isPending && txHash ? (
+                <a
+                  href={`https://basescan.org/tx/${txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 pt-[10px] bg-black text-white rounded hover:bg-gray-800"
+                >
+                  View transaction
+                </a>
+              ) : !isPending && !isSuccess && (
+                <button
+                  onClick={handleSendChonk}
+                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+                >
+                  Send Chonk
+                </button>
+              )}
+
+              {isSuccess && (
+                <div className="text-green-600 text-center w-full">
+                  Closing in a moment
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
