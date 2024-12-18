@@ -436,7 +436,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                         </Link>
                       )}
 
-                      { !farWestOwnership && (
+                      { farWestOwnership && (
                         <Link href="https://opensea.io/assets/base/0x0000000080d04343d60d06e1a36aaf46c9242805/2002501" target="_blank" rel="noopener noreferrer">
                           <Image src="/fw2501.png" alt="Far West" width={300} height={300} />
                         </Link>
