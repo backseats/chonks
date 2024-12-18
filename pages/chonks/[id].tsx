@@ -501,7 +501,9 @@ export default function ChonkDetail({ id }: { id: string }) {
               </div>
             </div>
           ) : (
-            <p>Loading...</p>
+            <div className="h-screen flex items-center justify-center">
+              <p>Loading the Chonkiness</p>
+            </div>
           )}
         </div>
       </div>

@@ -16,7 +16,9 @@ interface Props {
 
 export default function OwnershipSection(props: Props) {
   const { id, tokenData, owner, address, tbaAddress, isYours } = props;
+
   const [copied, setCopied] = useState(false);
+  const [ownerCopied, setOwnerCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(tbaAddress);
@@ -24,6 +26,16 @@ export default function OwnershipSection(props: Props) {
     setTimeout(() => {
       setCopied(false);
     }, 1500);
+  };
+
+  const handleOwnerCopy = () => {
+    if (owner) {
+      navigator.clipboard.writeText(owner);
+      setOwnerCopied(true);
+      setTimeout(() => {
+        setOwnerCopied(false);
+      }, 1500);
+    }
   };
 
   return (
@@ -34,7 +46,9 @@ export default function OwnershipSection(props: Props) {
       {owner && (
         <div className="w-full flex justify-center mb-4 font-bold">
           <div className="flex items-center">
-            <div className="text-lg">Owned by {address && address === owner ? "You" : truncateEthAddress(owner)}</div>
+            <div className="text-lg cursor-pointer" onClick={handleOwnerCopy}>
+              Owned by {address && address === owner ? "You" : (ownerCopied ? "Copied!" : truncateEthAddress(owner))}
+            </div>
             <span
               onClick={handleCopy}
               className="text-gray-500 text-sm ml-2 mt-1 cursor-pointer transition-opacity duration-200"
