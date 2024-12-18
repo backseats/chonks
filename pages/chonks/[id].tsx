@@ -350,12 +350,12 @@ export default function ChonkDetail({ id }: { id: string }) {
 
         <div className="w-full mx-auto ">
           <div className="flex flex-col items-end">
-            <button
+            { isOwner && <button
               onClick={() => setShowSendModal(true)}
               className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black"
             >
               <SendHorizontal size={24} />
-            </button>
+            </button> }
           </div>
 
           {tokenData ? (
