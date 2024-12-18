@@ -287,7 +287,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     <>
 
         <Head>
-            <title>Chonk #{id} Explorer </title>
+            <title>{`Chonk #${id} Explorer`}</title>
             <meta name="description" content={`Chonk #${id} Explorer - Chonks`} />
             <meta
                 name="viewport"
