@@ -420,7 +420,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                   </>
                 )}
 
-                { (basePaintOwnership || songDaymannOwnership) && <div className="flex flex-col mt-6">
+                { (basePaintOwnership || songDaymannOwnership || farWestOwnership) && <div className="flex flex-col mt-6">
                   <div className="text-2xl font-bold mt-12 w-full text-center my-6">Backpack Collectibles</div>
 
                     <div className="flex flex-row gap-4 justify-center items-center my-6">
