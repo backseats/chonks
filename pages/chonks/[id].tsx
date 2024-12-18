@@ -26,7 +26,7 @@ import RendererSwitcher from "@/components/chonk_explorer/RendererSwitcher";
 import BGColorSwitcher from "@/components/chonk_explorer/BGColorSwitcher";
 import Head from "next/head";
 import { useBasePaintOwnership } from "@/hooks/useBasepaintOwnership";
-import { useSongDaymannOwnership } from "@/hooks/useSingADayMannOwnership";
+import { useSongDaymannOwnership, useFarWestOwnership } from "@/hooks/useSingADayMannOwnership";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -187,6 +187,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   const basePaintOwnership = useBasePaintOwnership(tbaAddress);
   const songDaymannOwnership = useSongDaymannOwnership(tbaAddress);
+  const farWestOwnership = useFarWestOwnership(tbaAddress); // TODO: generalize this
 
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
@@ -432,6 +433,12 @@ export default function ChonkDetail({ id }: { id: string }) {
                       { songDaymannOwnership && (
                         <Link href="https://opensea.io/assets/base/0xb3bad5fe12268edc8a52ff786076c1d1fa92ef0d/2" target="_blank" rel="noopener noreferrer">
                           <Image src="/mannsong.png" alt="Song Daymann" width={300} height={300} />
+                        </Link>
+                      )}
+
+                      { !farWestOwnership && (
+                        <Link href="https://opensea.io/assets/base/0x0000000080d04343d60d06e1a36aaf46c9242805/2002501" target="_blank" rel="noopener noreferrer">
+                          <Image src="/fw2501.png" alt="Far West" width={300} height={300} />
                         </Link>
                       )}
                     </div>
