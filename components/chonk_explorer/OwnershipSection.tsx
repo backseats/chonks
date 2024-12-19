@@ -40,18 +40,18 @@ export default function OwnershipSection(props: Props) {
 
   return (
     <>
-      <h1 className="text-2xl text-center mt-4 mb-1">Chonk #{id}</h1>
+      <h1 className="text-2xl text-center mt-6 mb-1">Chonk #{id}</h1>
 
       {/* TODO: ENS for owner, heads up on the network, might need to use mainnet ens as well as basename */}
       {owner && (
         <div className="w-full flex justify-center mb-4 font-bold">
-          <div className="flex items-center">
-            <div className="text-lg cursor-pointer" onClick={handleOwnerCopy}>
+          <div className="flex flex-col sm:flex-row items-center">
+            <div className="text-lg cursor-pointer sm:mt-4 mt-4 mb-2 sm:mb-0" onClick={handleOwnerCopy}>
               Owned by {address && address === owner ? "You" : (ownerCopied ? "Copied!" : truncateEthAddress(owner))}
             </div>
             <span
               onClick={handleCopy}
-              className="text-gray-500 text-sm ml-2 mt-1 cursor-pointer transition-opacity duration-200"
+              className="text-gray-500 text-sm sm:ml-2 sm:mt-4 cursor-pointer transition-opacity duration-200"
             >
               (Backpack address: <u>{copied ? "Copied!" : truncateEthAddress(tbaAddress)}</u>)
             </span>
