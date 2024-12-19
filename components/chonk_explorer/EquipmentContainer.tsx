@@ -69,7 +69,7 @@ export default function EquipmentContainer(props: Props) {
           </div>
         </>
       ) : (
-        <p className="text-lg text-gray-500">No Traits to Display</p>
+        <p className="flex justify-center text-lg text-gray-500">No Traits to Display</p>
       )}
     </>
   );
