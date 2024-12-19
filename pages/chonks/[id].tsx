@@ -464,15 +464,15 @@ export default function ChonkDetail({ id }: { id: string }) {
                 {isOwner && (
                   <div className="flex flex-col mt-12">
                       <div className="text-2xl font-bold mt-12 w-full text-center">Set Background Color</div>
-                      <div className="flex flex-wrap gap-4 justify-center w-full text-center">
-                        <BGColorSwitcher
-                          id={id}
-                          bodyIndex={currentChonk?.bodyIndex ?? 0}
-                          backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
-                        />
-                      </div>
-                  </div>
-                )}
+                        <div className="flex flex-wrap gap-4 justify-center w-full text-center">
+                          <BGColorSwitcher
+                            id={id}
+                            backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
+                            render2dData={renderData2D}
+                          />
+                        </div>
+                    </div>
+                  )}
 
                 { (basePaintOwnership || songDaymannOwnership || farWestOwnership) && <div className="flex flex-col mt-6">
                   <div className="text-2xl font-bold mt-12 w-full text-center my-6">Backpack Collectibles</div>
