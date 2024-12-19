@@ -537,7 +537,7 @@ export default function Home() {
                 Chonks Studio
               </h2>
               <p className="font-source-code-pro  font-weight-600 mx-[3.45vw] mb-[3.45vw]">
-                We&apos;ve built an online Studio so anyone can create a Chonk.
+                We&apos;ve built an online Studio so anyone can create a Chonk - <Link href="/studio" target="_blank" className="underline text-[#0D6E9D] hover:no-underline">now open to all here</Link>.
               </p>
               <div className="w-full px-[3.45vw]">
                 <video
