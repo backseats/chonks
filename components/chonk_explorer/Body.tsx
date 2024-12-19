@@ -14,10 +14,7 @@ interface Props {
 export default function Body(props: Props) {
     const { chonkId, bodyId, name, path, isSelected } = props;
 
-    const { setBodyIndex } = useSetBodyIndexFunction(
-        chonkId,
-        bodyId
-    );
+    const { setBodyIndex } = useSetBodyIndexFunction();
 
     // You'll need to implement these hooks similar to traitHooks
     // const { equip, unequip } = useBodyEquipFunction(chonkId, bodyId);
@@ -33,11 +30,10 @@ export default function Body(props: Props) {
                 </div>
             )}
 
-
             {!isSelected ? (
                 <button
                     className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2 hover:bg-opacity-75"
-                    onClick={setBodyIndex}
+                    onClick={() => setBodyIndex(chonkId, bodyId)}
                 >
                     <span>
                         Set {name}
