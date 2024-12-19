@@ -406,7 +406,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                   <div className="text-2xl font-bold mt-12 w-full text-center">{isOwner ? "Your" : "This"} Chonk Is Wearing</div>
 
                   {/* Updated grid layout */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8 px-4 sm:px-8">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8 px-4 sm:px-8 max-w-[1400px] mx-auto">
                     {currentChonk &&
                       Object.keys(currentChonk).map((key, index) => {
                         if (
@@ -426,7 +426,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                         if (stored[key]?.tokenId == 0) return null;
 
                         return (
-                          <div key={index} className="w-full sm:w-[300px] sm:h-[300px]">
+                          <div key={index} className="aspect-square w-full">
                             <Trait
                               chonkId={id}
                               // @ts-ignore
@@ -446,15 +446,17 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                 <div className="flex flex-col mt-12">
                   <div className="text-2xl font-bold mt-12 mb-8 w-full text-center">Additional Traits In {isOwner ? "Your" : "Their"} Backpack</div>
-                  {filteredTraitTokenIds && (
-                    <EquipmentContainer
-                      chonkId={id.toString()}
-                      traitTokenIds={filteredTraitTokenIds}
-                      isYours={isOwner}
-                      tokenboundClient={tokenboundClient}
-                      tbaAddress={tbaAddress}
-                    />
-                  )}
+                  <div className="max-w-[1400px] mx-auto w-full">
+                    {filteredTraitTokenIds && (
+                      <EquipmentContainer
+                        chonkId={id.toString()}
+                        traitTokenIds={filteredTraitTokenIds}
+                        isYours={isOwner}
+                        tokenboundClient={tokenboundClient}
+                        tbaAddress={tbaAddress}
+                      />
+                    )}
+                  </div>
                 </div>
 
                 {isOwner && (

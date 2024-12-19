@@ -50,9 +50,9 @@ export default function EquipmentContainer(props: Props) {
             ))}
           </div> */}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 sm:px-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 sm:px-8 max-w-[1400px] mx-auto">
             {traitTokenIds.map((tokenId, index) => (
-              <div key={index} className="w-full sm:w-[300px] sm:h-[300px]">
+              <div key={index} className="aspect-square w-full">
                 <Trait
                   key={index}
                   chonkId={chonkId}
