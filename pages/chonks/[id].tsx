@@ -399,6 +399,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                 render3dData={renderData3D}
                 is3D={currentChonk?.render3D ?? false}
                 isOwner={isOwner}
+                currentChonkBodyIndex={isOwner ? currentChonk?.bodyIndex ?? 0 : null}
               />
 
               {/* Equipped Attributes Grids */}

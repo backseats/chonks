@@ -1,5 +1,6 @@
 import { Chonk } from "@/types/Chonk";
 import RendererSwitcher from "./RendererSwitcher";
+import BodySwitcher from "./BodySwitcher";
 
 interface Props {
   chonkId: string;
@@ -7,10 +8,11 @@ interface Props {
   render3dData: Chonk | null;
   is3D: boolean;
   isOwner: boolean;
+  currentChonkBodyIndex: number | null;
 }
 
 export default function MainChonkImage(props: Props) {
-  const { chonkId, render2dData, render3dData, is3D, isOwner } = props;
+  const { chonkId, render2dData, render3dData, is3D, isOwner, currentChonkBodyIndex } = props;
 
   const iframeContainerSize = "relative w-[400px] h-[400px] max-w-[100vw]"
   const iframeSize = "absolute top-0 left-0 w-full h-full"
@@ -35,10 +37,18 @@ export default function MainChonkImage(props: Props) {
 
 
       </div>
-      { isOwner && <RendererSwitcher
-        chonkId={chonkId}
-        is3D={is3D}
-      /> }
+
+      <div className="flex flex-row justify-between max-w-[400px] sm:max-w-full">
+        { isOwner && <RendererSwitcher
+          chonkId={chonkId}
+          is3D={is3D}
+        /> }
+
+        { isOwner && <BodySwitcher
+          chonkId={chonkId}
+          yourBodyIndex={currentChonkBodyIndex ?? 0}
+        /> }
+      </div>
     </div>
     </div>
   );
