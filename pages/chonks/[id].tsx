@@ -9,7 +9,8 @@ import {
   mainContract,
   traitsContract,
   traitsABI,
-  chainId
+  chainId,
+  renderAsDataUriABI
 } from "@/contract_data";
 import { StoredChonk } from "@/types/StoredChonk";
 import EquipmentContainer from "@/components/chonk_explorer/EquipmentContainer";
@@ -18,11 +19,8 @@ import MenuBar from "@/components/chonk_explorer/MenuBar";
 import MainChonkImage from "@/components/chonk_explorer/MainChonkImage";
 import OwnershipSection from "@/components/chonk_explorer/OwnershipSection";
 import Trait from "@/components/chonk_explorer/Trait";
-import { useTraitRevealStatus } from "@/hooks/useTraitRevealStatus";
 import BodySwitcher from "../../components/chonk_explorer/BodySwitcher";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
-import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
-import RendererSwitcher from "@/components/chonk_explorer/RendererSwitcher";
 import BGColorSwitcher from "@/components/chonk_explorer/BGColorSwitcher";
 import Head from "next/head";
 import { useBasePaintOwnership } from "@/hooks/useBasepaintOwnership";
@@ -44,6 +42,10 @@ export default function ChonkDetail({ id }: { id: string }) {
   });
 
   const [tokenData, setTokenData] = useState<Chonk | null>(null);
+
+  const [renderData2D, setRenderData2D] = useState<Chonk | null>(null);
+  const [renderData3D, setRenderData3D] = useState<Chonk | null>(null);
+
   const [filteredTraitTokenIds, setFilteredTraitTokenIds] = useState<BigInt[]>(
     []
   );
@@ -83,14 +85,35 @@ export default function ChonkDetail({ id }: { id: string }) {
     return getAddress(owner) === getAddress(address);
   }, [owner, address]);
 
+  const { data: render2dData } = useReadContract({
+    address: mainContract,
+    abi: renderAsDataUriABI,
+    functionName: "renderAsDataUri2D",
+    args: [BigInt(id)],
+    chainId,
+  }) as { data: string };
+
+  const { data: render3dData } = useReadContract({
+    address: mainContract,
+    abi: renderAsDataUriABI,
+    functionName: "renderAsDataUri3D",
+    args: [BigInt(id)],
+    chainId,
+  }) as { data: string };
+
   useEffect(() => {
     if (tokenURIData) {
       decodeAndSetData(tokenURIData, setTokenData);
     }
-    // else {
-    //   console.log("No tokenURI data");
-    // }
-  }, [tokenURIData]);
+  }, [tokenURIData])
+
+  useEffect(() => {
+    if (render2dData) decodeAndSetData(render2dData, setRenderData2D);
+  }, [render2dData]);
+
+  useEffect(() => {
+    if (render3dData) decodeAndSetData(render3dData, setRenderData3D);
+  }, [render3dData]);
 
   // Get the trait ids that are equipped to the body
   const { data: storedChonk } = useReadContract({
@@ -369,17 +392,13 @@ export default function ChonkDetail({ id }: { id: string }) {
                 isYours={isOwner}
               />
 
-              <div className="flex flex-col items-center">
               <MainChonkImage
-                id={id}
-                tokenData={tokenData}
-              />
-
-              { isOwner && <RendererSwitcher
                 chonkId={id}
+                render2dData={renderData2D}
+                render3dData={renderData3D}
                 is3D={currentChonk?.render3D ?? false}
-              /> }
-              </div>
+                isOwner={isOwner}
+              />
 
               {/* Equipped Attributes Grids */}
               <div className="flex flex-col mt-12">

@@ -26,3 +26,45 @@ export const MINT_PRICE = 0.01;
 //         type: "function",
 //       },
 //     ]
+
+
+export const renderAsDataUriABI = [
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256"
+      }
+    ],
+    name: "renderAsDataUri2D",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string"
+      }
+    ],
+    stateMutability: "view",
+    type: "function"
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256"
+      }
+    ],
+    name: "renderAsDataUri3D",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string"
+      }
+    ],
+    stateMutability: "view",
+    type: "function"
+  }
+];

@@ -11,8 +11,8 @@ export default function RendererSwitcher(props: Props) {
     const { setTokenRender3D } = useSetTokenRender3DFunction(chonkId, !is3D);
 
     return (
-        <div className="text-left w-[400px] text-lg mt-2 mx-2 text-black font-weight-600 mb-2">
-            {is3D ? "3D Chonk " : "2D Chonk "}
+        <div className="text-left w-[400px] text-lg mt-2 text-black font-weight-600 mb-2">
+            {is3D ? "Contract set to 3D " : "Contract set to 2D "}
 
             <button
                 onClick={(e) => {
@@ -22,7 +22,7 @@ export default function RendererSwitcher(props: Props) {
                 }}
                 className="text-chonk-blue underline hover:no-underline"
             >
-                {is3D ? "(set to 2D)" : "(set to 3D)"}
+                {is3D ? "(go 2D)" : "(go 3D)"}
             </button>
         </div>
     );

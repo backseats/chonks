@@ -1,73 +1,45 @@
-import Image from "next/image";
 import { Chonk } from "@/types/Chonk";
-import { useRouter } from "next/navigation";
-import { useReadContract } from "wagmi";
-import { mainContract, mainABI, chainId } from "@/contract_data";
+import RendererSwitcher from "./RendererSwitcher";
 
 interface Props {
-  id: string;
-  tokenData: Chonk | null;
+  chonkId: string;
+  render2dData: Chonk | null;
+  render3dData: Chonk | null;
+  is3D: boolean;
+  isOwner: boolean;
 }
 
 export default function MainChonkImage(props: Props) {
-  const { id, tokenData } = props;
+  const { chonkId, render2dData, render3dData, is3D, isOwner } = props;
 
-  console.log("MainChonkImage tokenData", tokenData);
-
-  const router = useRouter();
-
-  const { data: totalSupply } = useReadContract({
-    address: mainContract,
-    abi: mainABI,
-    functionName: "totalSupply",
-    chainId,
-  }) as { data: bigint };
-
-  const totalSupplyNumber = totalSupply ? Number(totalSupply) : 0;
-
-  const handleNavigation = (direction: "prev" | "next") => {
-    let newId = direction === "prev" ? parseInt(id) - 1 : parseInt(id) + 1;
-    if (newId < 1) newId = 1;
-    if (newId > totalSupplyNumber) newId = totalSupplyNumber;
-    router.push(`/chonks/${newId}`);
-  };
-
-  if (!tokenData) return null;
+  const iframeContainerSize = "relative w-[400px] h-[400px] max-w-[100vw]"
+  const iframeSize = "absolute top-0 left-0 w-full h-full"
 
   return (
-    <div className="flex justify-center">
-      <div className="flex flex-row items-center gap-6">
-        {/* <button
-          className={`mb-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 ${
-            parseInt(id) === 1 ? "opacity-50" : ""
-          }`}
-          onClick={() => handleNavigation("prev")}
-          disabled={parseInt(id) <= 1}
-        >
-          Previous
-        </button> */}
-
-        <div className="relative w-[400px] h-[400px] max-w-[100vw]">
-          <iframe 
-            className="absolute top-0 left-0 w-full h-full" 
-            src={tokenData.animation_url}
+    <div className="flex flex-col items-center">
+    <div>
+      <div className="flex flex-col md:flex-row justify-center items-center gap-6 mt-4">
+        { render2dData && <div className={iframeContainerSize}>
+          <iframe
+            className={iframeSize}
+            src={render2dData?.animation_url}
           ></iframe>
-        </div>
+        </div> }
 
-        {/* <Image
-          src={tokenData.image}
-          alt={tokenData.name}
-          width={400}
-          height={400}
-        /> */}
+        { render3dData && <div className={iframeContainerSize}>
+          <iframe
+            className={iframeSize}
+            src={render3dData?.animation_url}
+          ></iframe>
+        </div> }
 
-        {/* <button
-          className="mt-2 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-          onClick={() => handleNavigation("next")}
-        >
-          Next
-        </button> */}
+
       </div>
+      { isOwner && <RendererSwitcher
+        chonkId={chonkId}
+        is3D={is3D}
+      /> }
+    </div>
     </div>
   );
 }
