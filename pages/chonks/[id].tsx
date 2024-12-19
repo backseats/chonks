@@ -367,7 +367,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             <link rel="manifest" href="/site.webmanifest" />
         </Head>
 
-      <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
+      <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw] pb-12 sm:pb-6">
 
         <MenuBar />
 
@@ -405,7 +405,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                 <div>
                   <div className="text-2xl font-bold mt-12 w-full text-center">{isOwner ? "Your" : "This"} Chonk Is Wearing</div>
 
-                  <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
+                  {/* Updated grid layout */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8 px-4 sm:px-8">
                     {currentChonk &&
                       Object.keys(currentChonk).map((key, index) => {
                         if (
@@ -421,16 +422,11 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                         const stored = currentChonk;
 
-                        // console.log("stored", stored);
-
                         // @ts-ignore
                         if (stored[key]?.tokenId == 0) return null;
-                        // Type assertion to handle indexing
-                        // const traitData = stored[key as keyof typeof stored];
-                        // console.log("traitData", traitData);
 
                         return (
-                          <div key={index}>
+                          <div key={index} className="w-full sm:w-[300px] sm:h-[300px]">
                             <Trait
                               chonkId={id}
                               // @ts-ignore
@@ -449,18 +445,16 @@ export default function ChonkDetail({ id }: { id: string }) {
                 </div>
 
                 <div className="flex flex-col mt-12">
-                  <div className="text-2xl font-bold mt-12 w-full text-center">Additional Traits In {isOwner ? "Your" : "Their"} Backpack</div>
-                  <div className="flex flex-wrap mt-8 gap-4 justify-center w-full text-center">
-                    {filteredTraitTokenIds && (
-                      <EquipmentContainer
-                        chonkId={id.toString()}
-                        traitTokenIds={filteredTraitTokenIds}
-                        isYours={isOwner}
-                        tokenboundClient={tokenboundClient}
-                        tbaAddress={tbaAddress}
-                      />
-                    )}
-                  </div>
+                  <div className="text-2xl font-bold mt-12 mb-8 w-full text-center">Additional Traits In {isOwner ? "Your" : "Their"} Backpack</div>
+                  {filteredTraitTokenIds && (
+                    <EquipmentContainer
+                      chonkId={id.toString()}
+                      traitTokenIds={filteredTraitTokenIds}
+                      isYours={isOwner}
+                      tokenboundClient={tokenboundClient}
+                      tbaAddress={tbaAddress}
+                    />
+                  )}
                 </div>
 
                 {isOwner && (

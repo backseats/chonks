@@ -79,9 +79,12 @@ export default function Trait(props: Props) {
     }
   };
 
+  const buttonClass = "absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2"
+
   return traitData ? (
     <>
-      <div className="relative w-full text-sm" data-token-id={traitTokenId}>
+      <div className="relative w-full h-full text-lg sm:text-[15px]" data-token-id={traitTokenId}>
+
         { !isEquipped && isYours && <button
           className="absolute top-0 right-0 bg-black bg-opacity-50 text-white py-1 px-2 text-sm"
           onClick={() => setIsTransferModalOpen(true)}
@@ -97,11 +100,15 @@ export default function Trait(props: Props) {
           Sell Trait
         </button> }
 
-        <img src={isRevealed ? traitData.image : "/unrevealed.svg"} className="w-full h-full" />
+        <img
+          src={isRevealed ? traitData.image : "/unrevealed.svg"}
+          className="w-full h-full object-contain"
+          alt={traitName || "Trait"}
+        />
 
         {isYours ? (
           <button
-            className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2"
+            className={buttonClass}
             onClick={isRevealed ? (isEquipped ? unequip : equip) : () => { }}
             disabled={!isRevealed || (isEquipped && traitName == "")}
           >
@@ -111,7 +118,7 @@ export default function Trait(props: Props) {
           </button>
         ) : (
           <button
-            className="absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2"
+            className={buttonClass}
             onClick={() => { }}
           >
             <span className={isEquipped && traitName == "" || !isRevealed ? "opacity-50" : ""}>
@@ -134,6 +141,6 @@ export default function Trait(props: Props) {
       )}
     </>
   ) : (
-    <div className="relative w-[200px] h-[200px]"></div>
+    <div className="relative w-full h-full" />
   );
 }

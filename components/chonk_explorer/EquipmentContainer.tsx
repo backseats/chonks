@@ -38,6 +38,7 @@ export default function EquipmentContainer(props: Props) {
     <>
       {traitTokenIds.length > 0 ? (
         <>
+          {/* Category buttons commented out for now */}
           {/* <div className="flex flex-row gap-2">
             {categories.map((category) => (
               <CategoryButton
@@ -49,21 +50,23 @@ export default function EquipmentContainer(props: Props) {
             ))}
           </div> */}
 
-          {traitTokenIds.map((tokenId, index) => (
-            <div key={index}>
-              <Trait
-                key={index}
-                chonkId={chonkId}
-                traitTokenId={tokenId.toString()}
-                isEquipped={false}
-                selectedCategory={selectedCategory}
-                isYours={isYours}
-                tokenboundClient={tokenboundClient}
-                tbaAddress={tbaAddress}
-                address={address}
-              />
-            </div>
-          ))}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-4 sm:px-8">
+            {traitTokenIds.map((tokenId, index) => (
+              <div key={index} className="w-full sm:w-[300px] sm:h-[300px]">
+                <Trait
+                  key={index}
+                  chonkId={chonkId}
+                  traitTokenId={tokenId.toString()}
+                  isEquipped={false}
+                  selectedCategory={selectedCategory}
+                  isYours={isYours}
+                  tokenboundClient={tokenboundClient}
+                  tbaAddress={tbaAddress}
+                  address={address}
+                />
+              </div>
+            ))}
+          </div>
         </>
       ) : (
         <p className="text-lg text-gray-500">No Traits to Display</p>
