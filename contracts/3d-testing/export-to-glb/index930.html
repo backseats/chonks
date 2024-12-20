@@ -1,0 +1,546 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - exporter - gltf</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<link type="text/css" rel="stylesheet" href="main.css">
+	</head>
+	<body>
+		<div id="info">
+			<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - exporter - gltf
+		</div>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://threejs.org/build/three.module.js",
+					"three/addons/": "https://threejs.org/examples/jsm/"
+				}
+			}
+		</script>
+
+		<script type="module">
+
+			import * as THREE from 'three';
+
+			import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+			import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+			import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+			import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+			import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+			import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+			function exportGLTF( input, filename = 'scene') {
+
+				const gltfExporter = new GLTFExporter();
+
+				const options = {
+					trs: params.trs,
+					onlyVisible: params.onlyVisible,
+					binary: params.binary,
+					maxTextureSize: params.maxTextureSize
+				};
+				gltfExporter.parse(
+					input,
+					function ( result ) {
+
+						if ( result instanceof ArrayBuffer ) {
+
+							saveArrayBuffer( result,  `${filename}.glb` );
+
+						} else {
+
+							const output = JSON.stringify( result, null, 2 );
+							console.log( output );
+							saveString( output,  `${filename}.gltf` );
+
+						}
+
+					},
+					function ( error ) {
+
+						console.log( 'An error happened during parsing', error );
+
+					},
+					options
+				);
+
+			}
+
+			const link = document.createElement( 'a' );
+			link.style.display = 'none';
+			document.body.appendChild( link ); // Firefox workaround, see #6594
+
+			function save( blob, filename ) {
+
+				link.href = URL.createObjectURL( blob );
+				link.download = filename;
+				link.click();
+
+				// URL.revokeObjectURL( url ); breaks Firefox...
+
+			}
+
+			function saveString( text, filename ) {
+
+				save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+			}
+
+
+			function saveArrayBuffer( buffer, filename ) {
+
+				save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
+
+			}
+
+			let container;
+
+			let camera, object, object2, object3, material, material2, material3, geometry, scene1, bodyGroup, shoesGroup, bottomGroup, topGroup, headGroup, hairGroup, faceGroup, accessoryGroup, cubesGroup, scene2, renderer;
+			let gridHelper, sphere, model, coffeemat, cube;
+
+			let CHONK, zBody, zShirt;
+
+			const params = {
+				trs: false,
+				onlyVisible: true,
+				binary: true,
+				maxTextureSize: 4096,
+				exportScene1: exportScene1,
+				exportScenes: exportScenes,
+				exportSphere: exportSphere,
+				exportCubes: exportCubes,
+				exportChonk: exportChonk,
+				exportModel: exportModel,
+				exportObjects: exportObjects,
+				exportSceneObject: exportSceneObject,
+				exportCompressedObject: exportCompressedObject,
+			};
+
+			const bodyZMap = "0b1705BA81360c1705BA8136101705BA8136111705BA81360b1605BA81360c1605BA81360d1605BA81360f1605BA8136101605BA8136111605BA81360b1505BA81360c1505BA81360d1505BA81360e1505BA81360f1505BA8136101505BA8136111505BA8136091405BA81360a14059A6D2E0b1405BA81360c1405BA81360d1405BA81360e1405BA81360f1405BA8136101405BA8136111405BA81361214059A6D2E131405BA8136091305BA81360a13059A6D2E0b1305BA81360c1305BA81360d1305BA81360e1305BA81360f1305BA8136101305BA8136111305BA81361213059A6D2E131305BA8136091205BA81360a1205BA81360b1205BA81360c12059A6D2E0d1205BA81360e1205BA81360f1205BA81361012059A6D2E111205BA8136121205BA8136131205BA81360a1105BA81360b1105BA81360c1105BA81360d1105BA81360e1105BA81360f1105BA8136101105BA8136111105BA8136121105BA81360b1706BA81360c1706BA8136101706BA8136111706BA81360b1504BA81360c1504BA81360d1504BA81360e1504BA81360f1504BA8136101504BA8136111504BA81360b1404BA81360c1404BA81360d1404BA81360e1404BA81360f1404BA8136101404BA8136111404BA81360b1304BA81360c1304BA81360d1304BA81360e1304BA81360f1304BA8136101304BA8136111304BA81360b1204BA81360c1204BA81360d1204BA81360e1204BA81360f1204BA8136101204BA8136111204BA81360b1104BA81360c1104BA81360d1104BA81360e1104BA81360f1104BA8136101104BA8136111104BA81360b10059A6D2E0c10059A6D2E0d10059A6D2E0e10059A6D2E0f10059A6D2E1010059A6D2E1110059A6D2E0b10049A6D2E0c10049A6D2E0d10049A6D2E0e10049A6D2E0f10049A6D2E1010049A6D2E1110049A6D2E0b0f05BA81360c0f05BA81360d0f05BA81360e0f05BA81360f0f05BA8136100f05BA8136110f05BA8136120f05BA81360a0e05BA81360b0e05BA81360c0e05BA81360d0e05BA81360e0e05BA81360f0e05BA8136100e05BA8136110e05BA8136120e05BA8136130e05BA81360a0d05BA81360b0d05BA81360c0d05BA81360d0d05BA81360e0d05BA81360f0d05BA8136100d05BA8136110d05BA8136120d05BA8136130d05BA81360a0c05BA81360b0c05BA81360c0c05BA81360d0c05BA81360e0c05BA81360f0c05BA8136100c05BA8136110c05BA8136120c05BA8136130c05BA81360a0b05BA81360b0b05BA81360c0b05BA81360d0b05BA81360e0b05BA81360f0b05BA8136100b05BA8136110b05BA8136120b05BA8136130b05BA81360a0a05BA81360b0a05BA81360c0a05BA81360d0a05BA81360e0a05BA81360f0a05BA8136100a05BA8136110a05BA8136120a05BA8136130a05BA81360b0905BA81360c0905BA81360d0905BA81360e0905BA81360f0905BA8136100905BA8136110905BA8136120905BA81360b0f04BA81360c0f04BA81360d0f04BA81360e0f04BA81360f0f04BA8136100f04BA8136110f04BA8136120f04BA81360a0e04BA81360b0e04BA81360c0e04BA81360d0e04BA81360e0e04BA81360f0e04BA8136100e04BA8136110e04BA8136120e04BA8136130e04BA81360a0d04BA81360b0d04BA81360c0d04BA81360d0d04BA81360e0d04BA81360f0d04BA8136100d04BA8136110d04BA8136120d04BA8136130d04BA81360a0c04BA81360b0c04BA81360c0c04BA81360d0c04BA81360e0c04BA81360f0c04BA8136100c04BA8136110c04BA8136120c04BA8136130c04BA81360a0b04BA81360b0b04BA81360c0b04BA81360d0b04BA81360e0b04BA81360f0b04BA8136100b04BA8136110b04BA8136120b04BA8136130b04BA81360a0a04BA81360b0a04BA81360c0a04BA81360d0a04BA81360e0a04BA81360f0a04BA8136100a04BA8136110a04BA8136120a04BA8136130a04BA81360b0904BA81360c0904BA81360d0904BA81360e0904BA81360f0904BA8136100904BA8136110904BA8136120904BA81360b0f03BA81360c0f03BA81360d0f03BA81360e0f03BA81360f0f03BA8136100f03BA8136110f03BA81360a0e03BA81360b0e03BA81360c0e03BA81360d0e03BA81360e0e03BA81360f0e03BA8136100e03BA8136110e03BA8136120e03BA8136130e03BA81360a0d03BA81360b0d03BA81360c0d03BA81360d0d03BA81360e0d03BA81360f0d03BA8136100d03BA8136110d03BA8136120d03BA8136130d03BA81360a0c03BA81360b0c03BA81360c0c03BA81360d0c03BA81360e0c03BA81360f0c03BA8136100c03BA8136110c03BA8136120c03BA8136130c03BA81360a0b03BA81360b0b03BA81360c0b03BA81360d0b03BA81360e0b03BA81360f0b03BA8136100b03BA8136110b03BA8136120b03BA8136130b03BA81360b0a03BA81360c0a03BA81360d0a03BA81360e0a03BA81360f0a03BA8136100a03BA8136110a03BA8136120a03BA81360b0f06BA81360c0f06BA81360d0f06BA81360e0f06BA81360f0f06BA8136100f06BA8136110f06BA8136120f06BA81360a0e06BA81360b0e06BA81360c0e06BA81360d0e06BA81360e0e06BA81360f0e06BA8136100e06BA8136110e06BA8136120e06BA8136130e06BA81360a0d06BA81360b0d06BA81360c0d06ffffff0d0d060000000e0d069A6D2E0f0d069A6D2E100d069A6D2E110d06ffffff120d06000000130d06BA81360a0c06BA81360b0c06BA81360c0c06ffffff0d0c060000000e0c06BA81360f0c06BA8136100c06BA8136110c06ffffff120c06000000130c06BA81360a0b06BA81360b0b06BA81360c0b06BA81360d0b06BA81360e0b06BA81360f0b06BA8136100b06BA8136110b06BA8136120b06BA8136130b06BA81360a0a06BA81360b0a06BA81360c0a06BA81360d0a06BA81360e0a06BA81360f0a06BA8136100a06BA8136110a06BA8136120a06BA8136130a06BA81360b0906BA81360c0906BA81360d0906BA81360e0906BA81360f0906BA8136100906BA8136110906BA8136120906BA8136090d059A6D2E090c059A6D2E";
+			// can get this from ChonksMain.getBodyZMap(uint256 _tokenId)
+
+            const shoesZMap = "0b17050000000c1705dedede101705000000111705dedede1017060000000b17060000000c1706dedede111706dedede"
+
+            const bottomZMap = "0b15051ba00f0c15051ba00f0d15051ba00f0e1505e6de3b0f15051ba00f1015051ba00f1115051ba00f0b160578dded0c1605edeceb0d160578dded0f160578dded101605edeceb11160578dded1115041ba00f1015041ba00f0e15041ba00f0f15041ba00f0d15041ba00f0c15041ba00f0b15041ba00f";
+
+			const topZMap = "0a1105e7e6e50b11059a01000c1105f1f6f80d11059a01000e1105f1f6f80f11059a0100101105f1f6f81111059a0100121105f1f6f8091205e7e6e50a1205e7e6e50b1205f1f6f80c12059a01000d1205f1f6f80e12059a01000f1205f1f6f81012059a0100111205f1f6f8121205f1f6f8131205f1f6f8091305e7e6e50a1305e7e6e50b13059a01000c1305f1f6f80d13059a01000e1305f1f6f80f13059a0100101305f1f6f81113059a0100121305f1f6f8131305f1f6f80b1405f1f6f80c14059a01000d1405f1f6f80e14059a01000f1405f1f6f81014059a0100111405f1f6f80b11049a01000b13049a01000c12049a01000d11049a01000d13049a01000e12049a01000f11049a01000f13049a01000e14049a01000c14049a01001014049a01001113049a01001012049a01001111049a0100111204e7e6e5101104e7e6e50f1204e7e6e5101304e7e6e5111404e7e6e50f1404e7e6e50e1304e7e6e50e1104e7e6e50d1204e7e6e50d1404e7e6e50c1304e7e6e50c1104e7e6e50b1204e7e6e50b1404e7e6e5";
+			// can get this and others from ChonkTraits.getZMapForTokenId(uint256 _tokenId) : tokenId of the trait, which you can get from ChonksMain getTraitsForChonkId
+
+			const hairZMap = "0e0607da0a400f0607da0a40100607da0a40110607da0a400c0707da0a400d0707da0a400e0707da0a400f0707da0a400b0807da0a400c0807da0a400d0807da0a400e0807da0a400f0807da0a40100807da0a40110807da0a40120807da0a400b0907da0a400c0907da0a400d0907da0a400e0907da0a400f0907da0a40100907da0a40110907da0a40120907da0a40130907da0a400a0a07da0a400b0a07da0a400c0a07da0a400d0a07da0a400e0a07da0a400f0a07da0a40100a07da0a40110a07da0a40120a07da0a40130a07da0a400a0b07da0a400b0b07da0a400c0b07da0a400a0c07da0a400a0d07da0a40120906da0a40110906da0a40100906da0a400f0906da0a400e0906da0a400d0906da0a400c0906da0a400b0906da0a40120905da0a40110905da0a40120904da0a40110904da0a40100905da0a400f0905da0a400d0905da0a400e0905da0a400b0905da0a400c0905da0a40100904da0a400e0904da0a400f0904da0a400d0904da0a400b0904da0a400c0904da0a400a0905da0a400a0a06da0a40120a03da0a40110a03da0a40100a03da0a400f0a03da0a400e0a03da0a400d0a03da0a400c0a03da0a400a0a05da0a400a0b06da0a400b0a03da0a400a0a04da0a40130906da0a40130905da0a40130904da0a400f0506ff00410e0506ff00410d0606ff00410c0606ff00410b0706ff00410a0806ff0041100706ff0041110706ff0041120706ff0041130706ff0041140706ff0041150706ff0041160706ff0041140806ff0041130806ff0041100506ff0041110506ff0041120506ff00410a0906ff0041110606da0a40100606da0a400f0606da0a400e0606da0a40110605da0a400f0605da0a40100605da0a400e0605da0a400d0605da0a400c0605da0a40100705da0a40110705da0a40120705da0a40130805da0a40120805da0a40110805da0a40100805da0a400f0805da0a400d0805da0a400b0805da0a400c0805da0a400e0805da0a400f0705da0a400e0705da0a400d0705da0a400c0705da0a40120804da0a40110804da0a40100804da0a400e0804da0a400f0804da0a400d0804da0a400c0804da0a40120b03da0a40130b03da0a40110b03da0a40100b03da0a400f0b03da0a400e0b03da0a400d0b03da0a400c0b03da0a400b0b03da0a400a0b03da0a400a0b04da0a400a0b05da0a400a0c06da0a40130a04da0a40";
+
+            const faceZMap = "0b0b07cc27270c0b07cc27270d0b07cc27270e0b07cc2727100b07cc2727110b07cc2727120b07cc2727130b07cc2727090c07cc27270a0c07cc27270b0c07cc27270c0c07dedede0d0c070000000e0c07cc27270f0c07cc2727100c07cc2727110c07dedede120c07000000130c07cc27270b0d07cc27270c0d07dedede0d0d070000000e0d07cc2727100d07cc2727110d07dedede120d07000000130d07cc27270b0e07cc27270c0e07cc27270d0e07cc27270e0e07cc2727100e07cc2727110e07cc2727120e07cc2727130e07cc2727090c06cc2727090c05cc2727090d05cc2727";
+			
+            const headZMap = "1104060000001304060000000e0506000000110506000000120506ffffff130506000000140506ffffff0d06060000001006060000001106060000001206060000001306060000000d07060000000f07060000001007060000001107060000000e08060000000f0806000000100806000000110806000000";
+            
+            const accessoryZMap = "1611062c382f17110627cd381811062c382f16120627cd3817120627cd3818120627cd381513062f9c10181306e7371615140627cd381315062f9c101615062f9c1013160627cd3817160627cd381417062f9c1015170627cd381617062f9c10";
+            
+
+            init();
+
+
+
+			function init() {
+
+				function parseZColorMap(colorMap, group) {
+					for (let i = 0; i < colorMap.length; i += 12) {
+						const x = parseInt(colorMap.slice(i, i + 2), 16);
+						const y = parseInt(colorMap.slice(i + 2, i + 4), 16);
+						const z = parseInt(colorMap.slice(i + 4, i + 6), 16);
+						const r = parseInt(colorMap.slice(i + 6, i + 8), 16);
+						const g = parseInt(colorMap.slice(i + 8, i + 10), 16);
+						const b = parseInt(colorMap.slice(i + 10, i + 12), 16);
+						const color = (r << 16) + (g << 8) + b; //r << 16 shifts the red component 16 bits to the left.
+						const adjustedX = x  - 14;
+						const adjustedY = y + 14;
+						const adjustedZ = z - 5;
+						const invertedY = 29 - adjustedY; // Assuming a 30x30 grid, invert y
+						addBox(group, color, adjustedX, invertedY, adjustedZ); //let's just make the middle of the body 5 for now
+					}
+				}
+
+				container = document.createElement( 'div' );
+				document.body.appendChild( container );
+
+				// Make linear gradient texture
+
+				const data = new Uint8ClampedArray( 100 * 100 * 4 );
+
+				for ( let y = 0; y < 100; y ++ ) {
+
+					for ( let x = 0; x < 100; x ++ ) {
+
+						const stride = 4 * ( 100 * y + x );
+
+						data[ stride ] = Math.round( 255 * y / 99 );
+						data[ stride + 1 ] = Math.round( 255 - 255 * y / 99 );
+						data[ stride + 2 ] = 0;
+						data[ stride + 3 ] = 255;
+
+					}
+
+				}
+
+				const gradientTexture = new THREE.DataTexture( data, 100, 100, THREE.RGBAFormat );
+				gradientTexture.minFilter = THREE.LinearFilter;
+				gradientTexture.magFilter = THREE.LinearFilter;
+				gradientTexture.needsUpdate = true;
+
+				scene1 = new THREE.Scene();
+				scene1.background = new THREE.Color('#0D6E9D'); // Hex code for light blue
+				scene1.name = 'Scene1';
+
+				// ---------------------------------------------------------------------
+				// Perspective Camera
+				// ---------------------------------------------------------------------
+				camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 2000 );
+				camera.position.set( 20, 20, 0 );
+
+				camera.name = 'PerspectiveCamera';
+				scene1.add( camera );
+
+				// ---------------------------------------------------------------------
+				// Ambient light
+				// ---------------------------------------------------------------------
+				const ambientLight = new THREE.AmbientLight( 0xcccccc );
+				ambientLight.name = 'AmbientLight';
+				scene1.add( ambientLight );
+
+				// ---------------------------------------------------------------------
+				// DirectLight
+				// ---------------------------------------------------------------------
+				const dirLight = new THREE.DirectionalLight( 0xffffff, 3 );
+				dirLight.target.position.set( 0, 0, - 1 );
+				dirLight.add( dirLight.target );
+				dirLight.lookAt( - 1, - 1, 0 );
+				dirLight.name = 'DirectionalLight';
+				scene1.add( dirLight );
+
+				// ---------------------------------------------------------------------
+				// Grid
+				// ---------------------------------------------------------------------
+				gridHelper = new THREE.GridHelper( 2000, 20, 0xc1c1c1, 0x8d8d8d );
+				gridHelper.position.y = - 50;
+				gridHelper.name = 'Grid';
+				// scene1.add( gridHelper );
+
+				// ---------------------------------------------------------------------
+				// Axes
+				// ---------------------------------------------------------------------
+				const axes = new THREE.AxesHelper( 500 );
+				axes.name = 'AxesHelper';
+				// scene1.add( axes );
+
+
+
+				// ---------------------------------------------------------------------
+				// Groups
+				// ---------------------------------------------------------------------
+				cubesGroup = new THREE.Group();
+				cubesGroup.name = 'Group';
+				// scene1.add( cubesGroup );
+
+				// const group2 = new THREE.Group();
+				// group2.name = 'subGroup';
+				// group2.position.set( 0, 50, 0 );
+				// group1.add( group2 );
+
+				// object2 = new THREE.Mesh( new THREE.BoxGeometry( 30, 30, 30 ), material );
+				// object2.name = 'Cube in group';
+				// object2.position.set( 0, 0, 400 );
+				// group2.add( object2 );
+
+				//
+
+				// my cubes
+				material = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				material2 = new THREE.MeshStandardMaterial( { color: 0x00ff000 } );
+				material3 = new THREE.MeshStandardMaterial( { color: 0x0000ff } );
+
+				cube = new THREE.Mesh( new THREE.BoxGeometry( 50, 50, 50 ), material );
+				cube.position.set( -0, 0, 0 );
+				cube.name = 'Cube';
+				cubesGroup.add( cube );
+
+				object2 = new THREE.Mesh( new THREE.BoxGeometry( 50, 50, 50 ), material2 );
+				object2.position.set( 0, 0, 50 );
+				// object2.rotation.set( 0, 45, 0 );
+				object2.name = 'SubCube';
+				cubesGroup.add( object2 );
+
+				object3 = new THREE.Mesh( new THREE.BoxGeometry( 50, 50, 50 ), material3 );
+				object3.position.set( 0, 0, 100 );
+				// object2.rotation.set( 0, 45, 0 );
+				object3.name = 'SubSubCube';
+				cubesGroup.add( object3 );
+
+				// scene1.add(cubesGroup)
+
+
+				const geom = new THREE.BoxGeometry(1, 1, 1);
+
+				function addBox( group, color, x, y, z ) {
+				let mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({ color: color }))
+				mesh.position.set( x, y, z );
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				group.add( mesh );
+				return mesh;
+				}
+
+				CHONK = new THREE.Group();
+				CHONK.name = 'CHONK';
+				CHONK.castShadow = false;
+				CHONK.receiveShadow = false;
+
+				bodyGroup = new THREE.Group();
+				bodyGroup.name = 'Body';
+				bodyGroup.castShadow = false;
+				bodyGroup.receiveShadow = false;
+				bodyGroup.rotateY(Math.PI / 2);
+
+                shoesGroup = new THREE.Group();
+				shoesGroup.name = 'Shoes';
+				shoesGroup.castShadow = false;
+				shoesGroup.receiveShadow = false;
+				shoesGroup.rotateY(Math.PI / 2);
+
+                bottomGroup = new THREE.Group();
+				bottomGroup.name = 'Bottom';
+				bottomGroup.castShadow = false;
+				bottomGroup.receiveShadow = false;
+				bottomGroup.rotateY(Math.PI / 2);
+
+				topGroup = new THREE.Group();
+				topGroup.name = 'Top';
+				topGroup.castShadow = false;
+				topGroup.receiveShadow = false;
+				topGroup.rotateY(Math.PI / 2);
+
+                hairGroup = new THREE.Group();
+				hairGroup.name = 'Hair';
+				hairGroup.castShadow = false;
+				hairGroup.receiveShadow = false;
+				hairGroup.rotateY(Math.PI / 2);
+
+                faceGroup = new THREE.Group();
+				faceGroup.name = 'Face';
+				faceGroup.castShadow = false;
+				faceGroup.receiveShadow = false;
+				faceGroup.rotateY(Math.PI / 2);
+
+                headGroup = new THREE.Group();
+				headGroup.name = 'Head';
+				headGroup.castShadow = false;
+				headGroup.receiveShadow = false;
+				headGroup.rotateY(Math.PI / 2);
+
+                accessoryGroup = new THREE.Group();
+				accessoryGroup.name = 'Accesory';
+				accessoryGroup.castShadow = false;
+				accessoryGroup.receiveShadow = false;
+				accessoryGroup.rotateY(Math.PI / 2);
+
+
+				parseZColorMap(bodyZMap, bodyGroup);
+                parseZColorMap(shoesZMap, shoesGroup);
+				parseZColorMap(bottomZMap, bottomGroup);
+				parseZColorMap(topZMap, topGroup);
+                parseZColorMap(hairZMap, hairGroup);
+                parseZColorMap(headZMap, headGroup);
+                
+                parseZColorMap(faceZMap, faceGroup);
+                parseZColorMap(accessoryZMap, accessoryGroup);
+
+				// this order doesn't affect three.js output BUT DOES affect glb output - so inverse the order and put body last
+				CHONK.add( accessoryGroup );
+                CHONK.add( headGroup );
+                CHONK.add( hairGroup );
+                CHONK.add( faceGroup );
+				CHONK.add( topGroup );
+				CHONK.add( bottomGroup );
+				CHONK.add( shoesGroup );
+				CHONK.add( bodyGroup );
+				scene1.add( CHONK );
+
+				// ---------------------------------------------------------------------
+				// Hierarchy
+				// ---------------------------------------------------------------------
+				// const mapWood = new THREE.TextureLoader().load( 'https://threejs.org/examples/textures/hardwood2_diffuse.jpg' );
+				// material = new THREE.MeshStandardMaterial( { map: mapWood, side: THREE.DoubleSide } );
+
+				// material = new THREE.MeshStandardMaterial( { color: 0xff0000 } );
+				// material2 = new THREE.MeshStandardMaterial( { color: 0x00ff000 } );
+				// material3 = new THREE.MeshStandardMaterial( { color: 0x0000ff } );
+
+				// cube = new THREE.Mesh( new THREE.BoxGeometry( 50, 50, 50 ), material );
+				// cube.position.set( -0, 0, 0 );
+				// cube.name = 'Cube';
+				// scene1.add( cube );
+
+				// object2 = new THREE.Mesh( new THREE.BoxGeometry( 50, 50, 50 ), material2 );
+				// object2.position.set( 0, 0, 50 );
+				// // object2.rotation.set( 0, 45, 0 );
+				// object2.name = 'SubCube';
+				// cube.add( object2 );
+
+				// object3 = new THREE.Mesh( new THREE.BoxGeometry( 50, 50, 50 ), material3 );
+				// object3.position.set( 0, 0, 100 );
+				// // object2.rotation.set( 0, 45, 0 );
+				// object3.name = 'SubSubCube';
+				// cube.add( object3 );
+
+				//
+
+
+
+
+
+				renderer = new THREE.WebGLRenderer( { antialias: true } );
+				renderer.setPixelRatio( window.devicePixelRatio );
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				renderer.setAnimationLoop( animate );
+				renderer.toneMapping = THREE.ACESFilmicToneMapping;
+				renderer.toneMappingExposure = 1;
+
+				container.appendChild( renderer.domElement );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize );
+
+				// ---------------------------------------------------------------------
+				// Exporting compressed textures and meshes (KTX2 / Draco / Meshopt)
+				// ---------------------------------------------------------------------
+				// const ktx2Loader = new KTX2Loader()
+				// 	.setTranscoderPath( 'jsm/libs/basis/' )
+				// 	.detectSupport( renderer );
+
+				// const gltfLoader = new GLTFLoader().setPath( 'https://threejs.org/examples/models/gltf/' );
+				// gltfLoader.setKTX2Loader( ktx2Loader );
+				// gltfLoader.setMeshoptDecoder( MeshoptDecoder );
+				// gltfLoader.load( 'coffeemat.glb', function ( gltf ) {
+
+				// 	gltf.scene.position.x = 400;
+				// 	gltf.scene.position.z = - 200;
+
+				// 	// scene1.add( gltf.scene );
+
+				// 	coffeemat = gltf.scene;
+
+				// } );
+
+				//
+
+				const gui = new GUI();
+
+				let h = gui.addFolder( 'Settings' );
+				h.add( params, 'trs' ).name( 'Use TRS' );
+				h.add( params, 'onlyVisible' ).name( 'Only Visible Objects' );
+				h.add( params, 'binary' ).name( 'Binary (GLB)' );
+				h.add( params, 'maxTextureSize', 2, 8192 ).name( 'Max Texture Size' ).step( 1 );
+
+				h = gui.addFolder( 'Export' );
+				// h.add( params, 'exportScene1' ).name( 'Export Scene 1' );
+				// h.add( params, 'exportScenes' ).name( 'Export Scene 1 and 2' );
+				// h.add( params, 'exportSphere' ).name( 'Export Sphere' );
+				// h.add( params, 'exportCubes' ).name( 'Export Cubes' );
+				h.add( params, 'exportChonk' ).name( 'Export Chonk' );
+				// h.add( params, 'exportModel' ).name( 'Export Model' );
+				// h.add( params, 'exportObjects' ).name( 'Export Sphere With Grid' );
+				// h.add( params, 'exportSceneObject' ).name( 'Export Scene 1 and Object' );
+				// h.add( params, 'exportCompressedObject' ).name( 'Export Coffeemat (from compressed data)' );
+
+				gui.open();
+
+			}
+
+			function exportScene1() {
+
+				exportGLTF( scene1 );
+
+			}
+
+			function exportScenes() {
+
+				exportGLTF( [ scene1, scene2 ] );
+
+			}
+
+			function exportSphere() {
+
+				exportGLTF( sphere );
+
+			}
+
+			function exportCubes() {
+
+				exportGLTF( cubesGroup );
+
+			}
+
+			function exportChonk() {
+
+				exportGLTF( CHONK, "CHONK" );
+
+			}
+
+			function exportModel() {
+
+				exportGLTF( model );
+
+			}
+
+			function exportObjects() {
+
+				exportGLTF( [ sphere, gridHelper ] );
+
+			}
+
+			function exportSceneObject() {
+
+				exportGLTF( [ scene1, gridHelper ] );
+
+			}
+
+			function exportCompressedObject() {
+
+				exportGLTF( [ coffeemat ] );
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+			}
+
+			//
+
+			function animate() {
+
+				const timer = Date.now() * 0.0001;
+
+				// camera.position.x = Math.cos( timer ) * 800;
+				// camera.position.z = Math.sin( timer ) * 800;
+
+				camera.lookAt( scene1.position );
+				renderer.render( scene1, camera );
+
+			}
+
+			// add OrbitControls
+			const controls = new OrbitControls( camera, renderer.domElement );
+			controls.enableDamping = true;
+			controls.dampingFactor = 0.05;
+
+
+		</script>
+
+	</body>
+</html>
