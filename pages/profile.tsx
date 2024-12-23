@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import MenuBar from '@/components/profile/MenuBar';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { VscListFilter, VscSearch } from "react-icons/vsc";
 import Stats from '@/components/marketplace/Stats';
 import Tabs from '@/components/marketplace/Tabs';
@@ -8,8 +8,16 @@ import Sidebar from '@/components/marketplace/Sidebar';
 import Listings from '@/components/profile/Listings';
 import Actions from '@/components/marketplace/Actions';
 import { useMarketplaceActions } from '@/hooks/marketplaceAndMintHooks';
+import { Address } from 'viem';
+import { useAccount } from 'wagmi';
 
-export default function Profile() {
+interface Props {
+  possibleAddress: Address | undefined;
+}
+
+export default function Profile(props: Props) {
+    const { possibleAddress } = props;
+
     const [priceMin, setPriceMin] = useState('');
     const [priceMax, setPriceMax] = useState('');
     const [selectedTraits, setSelectedTraits] = useState<Record<string, string[]>>({});
@@ -17,11 +25,29 @@ export default function Profile() {
     const [searchId, setSearchId] = useState('');
     const [sortOrder, setSortOrder] = useState<'low-to-high' | 'high-to-low' | ''>('');
     const [activeTab, setActiveTab] = useState('Chonks');
+    const [mounted, setMounted] = useState(false);
+
+    const { address } = useAccount();
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const _address = !!possibleAddress ? possibleAddress : address;
+
+    console.log("possibleAddress", possibleAddress);
+    console.log("address", address);
+    console.log("_address", _address);
+    debugger
+
+    if (!mounted) {
+        return null;
+    }
 
     return (
         <>
             <Head>
-                <title>Your Chonks</title>
+                <title>{possibleAddress ? `${possibleAddress}'s Chonks` : 'Your Chonks'}</title>
                 <meta name="description" content="Your Chonks| Chonks" />
                 <meta
                     name="viewport"
@@ -74,6 +100,7 @@ export default function Profile() {
                             /> */}
                             <Listings
                                 isSidebarVisible={isSidebarVisible}
+                                address={_address}
                                 // setSelectedChonk={setSelectedChonk}
                                 // setIsModalOpen={setIsModalOpen}
                             />

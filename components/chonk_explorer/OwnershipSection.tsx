@@ -4,6 +4,7 @@ import { Chonk } from "@/types/Chonk";
 import { Address } from "viem";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface Props {
   id: string;
@@ -17,8 +18,9 @@ interface Props {
 export default function OwnershipSection(props: Props) {
   const { id, tokenData, owner, address, tbaAddress, isYours } = props;
 
+  const router = useRouter();
+
   const [copied, setCopied] = useState(false);
-  const [ownerCopied, setOwnerCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(tbaAddress);
@@ -28,13 +30,11 @@ export default function OwnershipSection(props: Props) {
     }, 1500);
   };
 
-  const handleOwnerCopy = () => {
-    if (owner) {
-      navigator.clipboard.writeText(owner);
-      setOwnerCopied(true);
-      setTimeout(() => {
-        setOwnerCopied(false);
-      }, 1500);
+  const goToOwnerProfile = () => {
+    if (isYours) {
+      router.push(`/profile`)
+    } else if (owner) {
+      router.push(`/profile/${owner}`)
     }
   };
 
@@ -46,9 +46,10 @@ export default function OwnershipSection(props: Props) {
       {owner && (
         <div className="w-full flex justify-center mb-4 font-bold">
           <div className="flex flex-col sm:flex-row items-center">
-            <div className="text-lg cursor-pointer sm:mt-4 mt-4 mb-2 sm:mb-0" onClick={handleOwnerCopy}>
-              Owned by {address && address === owner ? "You" : (ownerCopied ? "Copied!" : truncateEthAddress(owner))}
+            <div className={`text-lg underline cursor-pointer sm:mt-4 mt-4 mb-2 sm:mb-0`} onClick={goToOwnerProfile}>
+              {isYours ? "Owned by You" : `Owned By ${truncateEthAddress(owner)}`}
             </div>
+
             <span
               onClick={handleCopy}
               className="text-gray-500 text-sm sm:ml-2 sm:mt-4 cursor-pointer transition-opacity duration-200"

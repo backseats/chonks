@@ -4,14 +4,16 @@ import { useAccount, useReadContract } from 'wagmi';
 import { mainContract, mainABI, chainId } from '@/contract_data';
 import { Chonk } from '@/types/Chonk';
 import { ConnectKitButton } from 'connectkit';
+import { Address } from 'viem';
+
 interface ListingsProps {
     isSidebarVisible: boolean;
+    address: Address | undefined;
 }
 
-export default function Listings({ isSidebarVisible }: ListingsProps) {
-    const [chonks, setChonks] = useState<Array<{ id: number; data: Chonk | null }>>([]);
+export default function Listings({ isSidebarVisible, address }: ListingsProps) {
 
-    const { address } = useAccount();
+  const [chonks, setChonks] = useState<Array<{ id: number; data: Chonk | null }>>([]);
 
     const { data: allChonkTokenIds } = useReadContract({
         address: mainContract,
