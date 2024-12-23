@@ -514,7 +514,7 @@ export default function ChonkDetail({ id }: { id: string }) {
           <div className="bg-white p-6 rounded-lg w-[90%] max-w-md">
             <h2 className="text-xl font-bold mb-4 text-center">
               {isSuccess ? "Transfer Was Successful" :
-               isPending ? "Confirming Transfer in your Wallet" :
+               isPending ? "Confirm the Transfer with your Wallet" :
                `Transfer Chonk #${id}`}
             </h2>
 
