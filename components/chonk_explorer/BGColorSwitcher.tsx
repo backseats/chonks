@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSetBackgroundColorFunction} from "@/hooks/bodyHooks";
 import Colorful from "@uiw/react-color-colorful";
 import { isLightColor } from "@/utils/colorUtils";
@@ -12,44 +11,58 @@ interface Props {
 }
 
 export default function BGColorSwitcher(props: Props) {
-
   const { id, backgroundColor, render2dData } = props;
 
-    const [selectedColor, setSelectedColor] = useState<string>(backgroundColor ? `#${backgroundColor}` : "#48A6FA");
+  const defaultColor = "0F6E9D";
+  const [selectedColor, setSelectedColor] = useState<string>(`#${backgroundColor || defaultColor}`);
 
-    const { setBackgroundColor } = useSetBackgroundColorFunction(id, selectedColor);
+  // Update selectedColor when backgroundColor prop changes
+  useEffect(() => {
+    setSelectedColor(`#${backgroundColor || defaultColor}`);
+  }, [backgroundColor]);
 
-    return (
-        <div className="flex flex-col items-center justify-center gap-2 text-sm text-gray-500 my-6">
+  const { setBackgroundColor } = useSetBackgroundColorFunction(id, selectedColor);
+  const { setBackgroundColor: resetBackgroundColor } = useSetBackgroundColorFunction(id, defaultColor);
 
-          <div className="flex flex-row items-center justify-center gap-2 text-sm text-gray-500 my-6">
-            <iframe
-              src={render2dData?.animation_url}
-              width={200}
-              height={200}
-              style={{
-                  backgroundColor: selectedColor
-              }}
-            />
+  return (
+    <div className="flex flex-col items-center justify-center gap-2 text-sm text-gray-500 my-6">
+      <div className="flex flex-row items-center justify-center gap-2 text-sm text-gray-500 my-6">
+        <iframe
+          src={render2dData?.animation_url}
+          width={200}
+          height={200}
+          style={{
+            backgroundColor: selectedColor
+          }}
+        />
 
-            <div className="flex flex-col gap-2 justify-between w-full">
-              <Colorful
-                color={selectedColor}
-                disableAlpha={true}
-                onChange={(color) => setSelectedColor(color.hex)}
-                style={{ width: '200px', height: '200px' }}
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={setBackgroundColor}
-            className={`p-2 transition-colors w-full ${isLightColor(selectedColor) ? "text-black" : "text-white"
-                }`}
-            style={{ backgroundColor: selectedColor }}
-          >
-            Update Background Color
-          </button>
+        <div className="flex flex-col gap-2 justify-between w-full">
+          <Colorful
+            color={selectedColor}
+            disableAlpha={true}
+            onChange={(color) => setSelectedColor(color.hex)}
+            style={{ width: '200px', height: '200px' }}
+          />
+        </div>
       </div>
-    );
+
+      <button
+        onClick={setBackgroundColor}
+        className={`p-2 transition-colors w-full ${isLightColor(selectedColor) ? "text-black" : "text-white"}`}
+        style={{ backgroundColor: selectedColor }}
+      >
+        Update Background Color
+      </button>
+
+      { backgroundColor !== defaultColor && (
+        <button
+          onClick={resetBackgroundColor}
+          className="p-2 transition-colors w-full text-white"
+          style={{ backgroundColor: `#${defaultColor}` }}
+        >
+          Reset Background Color
+        </button>
+      )}
+    </div>
+  );
 }
