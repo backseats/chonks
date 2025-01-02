@@ -42,3 +42,5 @@ Keep this open in a tab to see if we broke anything as we develop and it hot rel
 * New RPC URL: http://127.0.0.1:8545
 * Chain ID 84532
 * Currency Symbol ETH
+
+(deploy)
