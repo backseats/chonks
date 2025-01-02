@@ -1,5 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
-import { useReadContract, useWalletClient, useAccount, useWriteContract } from "wagmi";
+import {
+  useReadContract,
+  useWalletClient,
+  useAccount,
+  useWriteContract,
+} from "wagmi";
 import { getAddress, isAddress } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
@@ -10,7 +15,7 @@ import {
   traitsContract,
   traitsABI,
   chainId,
-  renderAsDataUriABI
+  renderAsDataUriABI,
 } from "@/contract_data";
 import { StoredChonk } from "@/types/StoredChonk";
 import EquipmentContainer from "@/components/chonk_explorer/EquipmentContainer";
@@ -25,13 +30,17 @@ import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import BGColorSwitcher from "@/components/chonk_explorer/BGColorSwitcher";
 import Head from "next/head";
 import { useBasePaintOwnership } from "@/hooks/useBasepaintOwnership";
-import { useSongDaymannOwnership, useFarWestOwnership } from "@/hooks/useSingADayMannOwnership";
+import {
+  useSongDaymannOwnership,
+  useFarWestOwnership,
+  useOneBitChonksOwnership,
+  useClassOfTwentyFour,
+} from "@/hooks/useSingADayMannOwnership";
 import Image from "next/image";
 import Link from "next/link";
 import { SendHorizontal } from "lucide-react";
 
 export default function ChonkDetail({ id }: { id: string }) {
-
   const TOKEN_URI = "tokenURI";
 
   const { address } = useAccount();
@@ -106,7 +115,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     if (tokenURIData) {
       decodeAndSetData(tokenURIData, setTokenData);
     }
-  }, [tokenURIData])
+  }, [tokenURIData]);
 
   useEffect(() => {
     if (render2dData) decodeAndSetData(render2dData, setRenderData2D);
@@ -197,7 +206,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       },
       bodyIndex: parseInt(storedChonk.bodyIndex.toString()),
       backgroundColor: storedChonk.backgroundColor,
-      render3D: storedChonk.render3D
+      render3D: storedChonk.render3D,
     });
   }, [storedChonk]);
 
@@ -213,7 +222,8 @@ export default function ChonkDetail({ id }: { id: string }) {
   const basePaintOwnership = useBasePaintOwnership(tbaAddress);
   const songDaymannOwnership = useSongDaymannOwnership(tbaAddress);
   const farWestOwnership = useFarWestOwnership(tbaAddress); // TODO: generalize this
-
+  const oneBitChonksOwnership = useOneBitChonksOwnership(tbaAddress);
+  const classOfTwentyFourOwnership = useClassOfTwentyFour(tbaAddress);
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
     address: traitsContract,
@@ -313,7 +323,13 @@ export default function ChonkDetail({ id }: { id: string }) {
   const [addressError, setAddressError] = useState("");
   const [txHash, setTxHash] = useState<string | null>(null);
 
-  const { writeContract, data: hash, isSuccess, isPending, reset } = useWriteContract();
+  const {
+    writeContract,
+    data: hash,
+    isSuccess,
+    isPending,
+    reset,
+  } = useWriteContract();
 
   useEffect(() => {
     if (hash) {
@@ -354,32 +370,47 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   return (
     <>
-        <Head>
-            <title>{`Chonk #${id} Explorer`}</title>
-            <meta name="description" content={`Chonk #${id} Explorer - Chonks`} />
-            <meta
-                name="viewport"
-                content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
-            />
-            <link rel="icon" href="/favicon.ico" />
-            <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-            <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-            <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-            <link rel="manifest" href="/site.webmanifest" />
-        </Head>
+      <Head>
+        <title>{`Chonk #${id} Explorer`}</title>
+        <meta name="description" content={`Chonk #${id} Explorer - Chonks`} />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+        />
+        <link rel="icon" href="/favicon.ico" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href="/favicon-32x32.png"
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href="/favicon-16x16.png"
+        />
+        <link rel="manifest" href="/site.webmanifest" />
+      </Head>
 
       <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw] pb-12 sm:pb-6">
-
         <MenuBar />
 
         <div className="w-full mx-auto ">
           <div className="flex flex-col items-end">
-            { isOwner && <button
-              onClick={() => setShowSendModal(true)}
-              className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black"
-            >
-              <SendHorizontal size={24} />
-            </button> }
+            {isOwner && (
+              <button
+                onClick={() => setShowSendModal(true)}
+                className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black"
+              >
+                <SendHorizontal size={24} />
+              </button>
+            )}
           </div>
 
           {tokenData ? (
@@ -399,13 +430,17 @@ export default function ChonkDetail({ id }: { id: string }) {
                 render3dData={renderData3D}
                 is3D={currentChonk?.render3D ?? false}
                 isOwner={isOwner}
-                currentChonkBodyIndex={isOwner ? currentChonk?.bodyIndex ?? 0 : null}
+                currentChonkBodyIndex={
+                  isOwner ? currentChonk?.bodyIndex ?? 0 : null
+                }
               />
 
               {/* Equipped Attributes Grids */}
               <div className="flex flex-col mt-12">
                 <div>
-                  <div className="text-2xl font-bold mt-12 w-full text-center">{isOwner ? "Your" : "This"} Chonk Is Wearing</div>
+                  <div className="text-2xl font-bold mt-12 w-full text-center">
+                    {isOwner ? "Your" : "This"} Chonk Is Wearing
+                  </div>
 
                   {/* Updated grid layout */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8 px-4 sm:px-8 max-w-[1400px] mx-auto">
@@ -447,7 +482,9 @@ export default function ChonkDetail({ id }: { id: string }) {
                 </div>
 
                 <div className="flex flex-col mt-12">
-                  <div className="text-2xl font-bold mt-12 mb-8 w-full text-center">Additional Traits In {isOwner ? "Your" : "Their"} Backpack</div>
+                  <div className="text-2xl font-bold mt-12 mb-8 w-full text-center">
+                    Additional Traits In {isOwner ? "Your" : "Their"} Backpack
+                  </div>
                   <div className="max-w-[1400px] mx-auto w-full">
                     {filteredTraitTokenIds && (
                       <EquipmentContainer
@@ -463,42 +500,118 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                 {isOwner && (
                   <div className="flex flex-col mt-12">
-                      <div className="text-2xl font-bold mt-12 w-full text-center">Set Background Color</div>
-                        <div className="flex flex-wrap gap-4 justify-center w-full text-center">
-                          <BGColorSwitcher
-                            id={id}
-                            backgroundColor={currentChonk?.backgroundColor ?? "#48A6FA"}
-                            render2dData={renderData2D}
-                          />
-                        </div>
+                    <div className="text-2xl font-bold mt-12 w-full text-center">
+                      Set Background Color
                     </div>
-                  )}
-
-                { (basePaintOwnership || songDaymannOwnership || farWestOwnership) && <div className="flex flex-col mt-6">
-                  <div className="text-2xl font-bold mt-12 w-full text-center my-6">Backpack Collectibles</div>
-
-                    <div className="flex flex-row gap-4 justify-center items-center my-6">
-                      { basePaintOwnership && (
-                        <Link href="https://basepaint.xyz/canvas/485" target="_blank" rel="noopener noreferrer">
-                          <Image src="/basepaint485.png" alt="Base Paint" width={300} height={300} />
-                        </Link>
-                      )}
-
-                      { songDaymannOwnership && (
-                        <Link href="https://opensea.io/assets/base/0xb3bad5fe12268edc8a52ff786076c1d1fa92ef0d/2" target="_blank" rel="noopener noreferrer">
-                          <Image src="/mannsong.png" alt="Song Daymann" width={300} height={300} />
-                        </Link>
-                      )}
-
-                      { farWestOwnership && (
-                        <Link href="https://opensea.io/assets/base/0x0000000080d04343d60d06e1a36aaf46c9242805/2002501" target="_blank" rel="noopener noreferrer">
-                          <Image src="/fw2501.png" alt="Far West" width={300} height={300} />
-                        </Link>
-                      )}
+                    <div className="flex flex-wrap gap-4 justify-center w-full text-center">
+                      <BGColorSwitcher
+                        id={id}
+                        backgroundColor={
+                          currentChonk?.backgroundColor ?? "#48A6FA"
+                        }
+                        render2dData={renderData2D}
+                      />
                     </div>
                   </div>
-                }
+                )}
 
+                {(basePaintOwnership ||
+                  songDaymannOwnership ||
+                  farWestOwnership ||
+                  oneBitChonksOwnership.hasAssets ||
+                  classOfTwentyFourOwnership.hasAssets) && (
+                  <div className="flex flex-col mt-6">
+                    <div className="text-2xl font-bold mt-12 w-full text-center my-6">
+                      Backpack Collectibles
+                    </div>
+
+                    <div className="flex flex-row gap-4 justify-center items-center my-6">
+                      {basePaintOwnership && (
+                        <Link
+                          href="https://basepaint.xyz/canvas/485"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Image
+                            src="/basepaint485.png"
+                            alt="Base Paint"
+                            width={300}
+                            height={300}
+                          />
+                        </Link>
+                      )}
+
+                      {songDaymannOwnership && (
+                        <Link
+                          href="https://opensea.io/assets/base/0xb3bad5fe12268edc8a52ff786076c1d1fa92ef0d/2"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Image
+                            src="/mannsong.png"
+                            alt="Song Daymann"
+                            width={300}
+                            height={300}
+                          />
+                        </Link>
+                      )}
+
+                      {farWestOwnership && (
+                        <Link
+                          href="https://opensea.io/assets/base/0x0000000080d04343d60d06e1a36aaf46c9242805/2002501"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Image
+                            src="/fw2501.png"
+                            alt="Far West"
+                            width={300}
+                            height={300}
+                          />
+                        </Link>
+                      )}
+
+                      {oneBitChonksOwnership.hasAssets &&
+                        oneBitChonksOwnership.assets.map((asset: any) => (
+                          <Link
+                            key={asset.id}
+                            href={`https://opensea.io/assets/base/0x22ca771878c9bd8c594969e871d01267553eeac2/${asset.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <div className="flex flex-col items-center">
+                              <Image
+                                src={asset.imageUrl}
+                                alt={`One Bit Chonks #${asset.id}`}
+                                width={300}
+                                height={300}
+                              />
+                              {/* <div className="mt-2 text-lg font-medium">
+                                One Bit Chonk #{asset.id}
+                              </div> */}
+                            </div>
+                          </Link>
+                        ))}
+
+                      {classOfTwentyFourOwnership.hasAssets &&
+                        classOfTwentyFourOwnership.assets.map((asset: any) => (
+                          <Link
+                            key={asset.id}
+                            href={`https://opensea.io/assets/base/0xc3a9812cb19fb2495a88f77a09b2f1099276e87e/${asset.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <Image
+                              src={asset.imageUrl}
+                              alt={`Class of 2024 #${asset.id}`}
+                              width={300}
+                              height={300}
+                            />
+                          </Link>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
@@ -513,9 +626,11 @@ export default function ChonkDetail({ id }: { id: string }) {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg w-[90%] max-w-md">
             <h2 className="text-xl font-bold mb-4 text-center">
-              {isSuccess ? "Transfer Was Successful" :
-               isPending ? "Confirm the Transfer with your Wallet" :
-               `Transfer Chonk #${id}`}
+              {isSuccess
+                ? "Transfer Was Successful"
+                : isPending
+                ? "Confirm the Transfer with your Wallet"
+                : `Transfer Chonk #${id}`}
             </h2>
 
             {!isSuccess && !isPending && (
@@ -559,13 +674,16 @@ export default function ChonkDetail({ id }: { id: string }) {
                 >
                   View transaction
                 </a>
-              ) : !isPending && !isSuccess && (
-                <button
-                  onClick={handleSendChonk}
-                  className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-                >
-                  Send Chonk
-                </button>
+              ) : (
+                !isPending &&
+                !isSuccess && (
+                  <button
+                    onClick={handleSendChonk}
+                    className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+                  >
+                    Send Chonk
+                  </button>
+                )
               )}
 
               {isSuccess && (
