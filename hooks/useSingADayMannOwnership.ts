@@ -3,6 +3,8 @@ import { Address } from 'viem';
 import { chainId } from "@/contract_data";
 import { useQuery } from '@tanstack/react-query';
 
+// abis
+
 const abi = [
   {
     inputs: [
@@ -28,33 +30,22 @@ const erc721Abi = [
   }
 ] as const;
 
+/// types
 
-export function useSongDaymannOwnership(tbaAddress: Address) {
-  const { data: balance } = useReadContract({
-    address: "0xb3bad5fe12268edc8a52ff786076c1d1fa92ef0d",
-    abi,
-    functionName: "balanceOf",
-    args: [tbaAddress, 2n],
-    chainId,
-  });
-
-  return balance && balance > 0;
+type NFTAsset = {
+  imageUrl: string;
+  name: string;
+  id: string;
 }
 
-export function useFarWestOwnership(tbaAddress: Address) {
-  const { data: balance } = useReadContract({
-    address: "0x0000000080d04343d60d06e1a36aaf46c9242805",
-    abi: erc721Abi,
-    functionName: "balanceOf",
-    args: [tbaAddress],
-    chainId,
-  });
-
-  return balance && balance > 0;
+type NFTOwnershipResult = {
+  hasAssets: boolean;
+  assets: NFTAsset[];
 }
 
-// Generic hook for checking NFT ownership and fetching metadata
-function useNFTOwnership(tbaAddress: Address, contractAddress: Address) {
+// internal hooks
+
+function _useNFTOwnership(tbaAddress: Address, contractAddress: Address): NFTOwnershipResult {
   const { data: balance } = useReadContract({
     address: contractAddress,
     abi: erc721Abi,
@@ -102,10 +93,32 @@ function useNFTOwnership(tbaAddress: Address, contractAddress: Address) {
   };
 }
 
-export function useOneBitChonksOwnership(tbaAddress: Address) {
-  return useNFTOwnership(tbaAddress, "0x22ca771878c9bd8c594969e871d01267553eeac2");
+function _useSimpleNFTOwnership(tbaAddress: Address, contractAddress: Address, tokenId?: bigint): boolean {
+  const { data: balance } = useReadContract({
+    address: contractAddress,
+    abi: tokenId ? abi : erc721Abi,
+    functionName: "balanceOf",
+    args: tokenId ? [tbaAddress, tokenId] : [tbaAddress],
+    chainId,
+  });
+
+  return Boolean(balance && balance > 0n);
 }
 
-export function useClassOfTwentyFour(tbaAddress: Address) {
-  return useNFTOwnership(tbaAddress, "0xc3a9812cb19fb2495a88f77a09b2f1099276e87e");
+// exported hooks
+
+export function useSongDaymannOwnership(tbaAddress: Address): boolean {
+  return _useSimpleNFTOwnership(tbaAddress, "0xb3bad5fe12268edc8a52ff786076c1d1fa92ef0d", 2n);
+}
+
+export function useFarWestOwnership(tbaAddress: Address): boolean {
+  return _useSimpleNFTOwnership(tbaAddress, "0x0000000080d04343d60d06e1a36aaf46c9242805");
+}
+
+export function useOneBitChonksOwnership(tbaAddress: Address): NFTOwnershipResult {
+  return _useNFTOwnership(tbaAddress, "0x22ca771878c9bd8c594969e871d01267553eeac2");
+}
+
+export function useClassOfTwentyFour(tbaAddress: Address): NFTOwnershipResult {
+  return _useNFTOwnership(tbaAddress, "0xc3a9812cb19fb2495a88f77a09b2f1099276e87e");
 }
