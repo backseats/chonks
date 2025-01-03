@@ -886,7 +886,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
               />
             </div>
 
-            <div className="border-t border-gray-200 pt-6  mt-6">
+            <div className="border-t border-gray-200 pt-6 mt-6 mx-2">
               <BodyPresets setBackgroundBody={setBackgroundBody} />
 
               <button
