@@ -119,6 +119,10 @@ export function useOneBitChonksOwnership(tbaAddress: Address): NFTOwnershipResul
   return _useNFTOwnership(tbaAddress, "0x22ca771878c9bd8c594969e871d01267553eeac2");
 }
 
+export function useRetroChonksOwnership(tbaAddress: Address): NFTOwnershipResult {
+  return _useNFTOwnership(tbaAddress, "0x27af311ad4b2955a4692774573d6d04ca66aa016");
+}
+
 export function useClassOfTwentyFour(tbaAddress: Address): NFTOwnershipResult {
   return _useNFTOwnership(tbaAddress, "0xc3a9812cb19fb2495a88f77a09b2f1099276e87e");
 }

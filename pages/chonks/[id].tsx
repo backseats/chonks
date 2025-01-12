@@ -34,8 +34,9 @@ import {
   useSongDaymannOwnership,
   useFarWestOwnership,
   useOneBitChonksOwnership,
+  useRetroChonksOwnership,
   useClassOfTwentyFour,
-} from "@/hooks/useSingADayMannOwnership";
+} from "@/hooks/useSongADayMannOwnership";
 import Image from "next/image";
 import Link from "next/link";
 import { SendHorizontal } from "lucide-react";
@@ -224,6 +225,8 @@ export default function ChonkDetail({ id }: { id: string }) {
   const farWestOwnership = useFarWestOwnership(tbaAddress); // TODO: generalize this
   const oneBitChonksOwnership = useOneBitChonksOwnership(tbaAddress);
   const classOfTwentyFourOwnership = useClassOfTwentyFour(tbaAddress);
+  const retroChonksOwnership = useRetroChonksOwnership(tbaAddress);
+
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
     address: traitsContract,
@@ -519,6 +522,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                   songDaymannOwnership ||
                   farWestOwnership ||
                   oneBitChonksOwnership.hasAssets ||
+                  retroChonksOwnership.hasAssets ||
                   classOfTwentyFourOwnership.hasAssets) && (
                   <div className="flex flex-col mt-6">
                     <div className="text-2xl font-bold mt-12 w-full text-center my-6">
@@ -588,6 +592,28 @@ export default function ChonkDetail({ id }: { id: string }) {
                               />
                               {/* <div className="mt-2 text-lg font-medium">
                                 One Bit Chonk #{asset.id}
+                              </div> */}
+                            </div>
+                          </Link>
+                        ))}
+
+                      {retroChonksOwnership.hasAssets &&
+                        retroChonksOwnership.assets.map((asset: any) => (
+                          <Link
+                            key={asset.id}
+                            href={`https://opensea.io/assets/base/0x27af311ad4b2955a4692774573d6d04ca66aa016/${asset.id}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <div className="flex flex-col items-center">
+                              <Image
+                                src={asset.imageUrl}
+                                alt={`Retro Chonks #${asset.id}`}
+                                width={300}
+                                height={300}
+                              />
+                              {/* <div className="mt-2 text-lg font-medium">
+                                Retro Chonk #{asset.id}
                               </div> */}
                             </div>
                           </Link>
