@@ -7,7 +7,8 @@ import "../src/ChonksMain.sol";
 
 // import { BodyRenderer } from "../src/renderers/BodyRenderer.sol";
 import { ChonkTraits } from "../src/ChonkTraits.sol";
-import { FirstReleaseDataMinter } from "../src/FirstReleaseDataMinter.sol";
+// import { FirstReleaseDataMinter } from "../src/FirstReleaseDataMinter.sol";
+import { FirstReleaseTokenMigrator } from "../src/FirstReleaseTokenMigrator.sol";
 import { MainRenderer2D } from "../src/renderers/MainRenderer2D.sol";
 import { MainRenderer3D } from '../src/renderers/MainRenderer3D.sol';
 import { EncodeURI } from '../src/EncodeURI.sol';
@@ -172,7 +173,7 @@ contract ChonksTraitsScript is Script {
 
         main.setTraitsContract(traits);
 
-        traits.setChonksMain(address(main));
+        // traits.setChonksMain(address(main));
 
         // Set the body renderer on both contracts
         // bodyRenderer = new BodyRenderer();
@@ -206,7 +207,6 @@ contract ChonksMarketplaceScript is Script {
         ChonkTraits traits = ChonkTraits(0x6B8f34E0559aa9A5507e74aD93374D9745CdbF09);
 
         //  market = new ChonksMarket(
-        //     address(main),
         //     address(traits),
         //     250, // fee basis points
         //     address(deployer)
@@ -214,7 +214,6 @@ contract ChonksMarketplaceScript is Script {
 
          // local deploy: false
         market = new ChonksMarket(
-            address(main),
             address(traits),
             250, // fee basis points
             address(msg.sender)
@@ -277,7 +276,7 @@ contract ChonksMintScript is Script {
 
         //function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {
         bytes32[] memory emptyProof;
-        main.mint{value: 0.01 ether}(1, emptyProof);
+        // main.mint{value: 0.01 ether}(1, emptyProof);
 
 
         vm.stopBroadcast();
@@ -718,6 +717,19 @@ contract FirstReleaseDataMinterAddMoreTraitsScript is Script {
         vm.stopBroadcast();
     }
 
+}
+
+// forge script --rpc-url $BASE_MAINNET_RPC_URL script/ChonksMain.s.sol:AddFinalTraitScript --private-key $BASE_PRIVATE_KEY --broadcast -vvvv
+
+contract AddFinalTraitScript is Script {
+    function run() external {
+        vm.startBroadcast();
+
+        FirstReleaseDataMinter dataContract = FirstReleaseDataMinter(0x7a929e4D752c488b263C5F7FfA8f1465010eb3Bb);
+        dataContract.addNewTrait(1018, "Newsboy Cap Blue", TraitCategory.Name.Head, hex"0b0560b4ff0c05349fff0d0560b4ff0e05349fff0f0560b4ff1005349fff110560b4ff0a0660b4ff0b06349fff0c0660b4ff0d06349fff0e0660b4ff0f06349fff100660b4ff1106349fff120660b4ff090760b4ff0a07349fff0b0760b4ff0c07349fff0d0760b4ff0e07349fff0f0760b4ff1007349fff110760b4ff1207349fff0908349fff0a0860b4ff0b08349fff0c0860b4ff0d08349fff0e0860b4ff0f08349fff100860b4ff1108349fff120860b4ff090960b4ff0a09349fff0b0960b4ff0c090069c30d090069c30e090069c30f090069c310090069c311090069c312090069c313090069c30a0a0069c30b0a0069c30f0a349fff100a349fff110a349fff120a349fff130a349fff140a349fff150a349fff", "0b050560b4ff0c0505349fff0d050560b4ff0e0505349fff0f050560b4ff100505349fff11050560b4ff0a060560b4ff0b0605349fff0c060560b4ff0d0605349fff0e060560b4ff0f0605349fff10060560b4ff110605349fff12060560b4ff09070560b4ff0a0705349fff0b070560b4ff0c0705349fff0d070560b4ff0e0705349fff0f070560b4ff100705349fff11070560b4ff120705349fff090805349fff0a080560b4ff0b0805349fff0c080560b4ff0d0805349fff0e080560b4ff0f0805349fff10080560b4ff110805349fff12080560b4ff09090560b4ff0a0905349fff0b090560b4ff0c09050069c30d09050069c30e09050069c30f09050069c31009050069c31109050069c31209050069c31309050069c30a0a050069c30b0a050069c30f0a05349fff100a05349fff110a05349fff120a05349fff130a05349fff140a05349fff150a05349fff0b090660b4ff0c080660b4ff0a080660b4ff0e080660b4ff10080660b4ff12080660b4ff11070660b4ff0f070660b4ff0d070660b4ff0b070660b4ff0c060660b4ff0e060660b4ff10060660b4ff0d050460b4ff0f050460b4ff10060460b4ff0e060460b4ff0c060460b4ff0a060460b4ff0b070460b4ff0d070460b4ff0f070460b4ff11070460b4ff12080460b4ff10080460b4ff0e080460b4ff0c080460b4ff0a080460b4ff0b090460b4ff09090460b4ff0f0606349fff0d0606349fff0b0606349fff0a0706349fff0c0706349fff0e0706349fff100706349fff110806349fff0f0806349fff0d0806349fff0b0806349fff0a0906349fff090806349fff090804349fff0a0704349fff0b0604349fff0c0504349fff0e0504349fff100504349fff0f0604349fff110604349fff120704349fff100704349fff0d0604349fff0e0704349fff0c0704349fff0b0804349fff0d0804349fff0f0804349fff110804349fff0c09060069c30d09060069c30e09060069c30f09060069c31009060069c31109060069c31209060069c31309060069c31309040069c31109040069c31209040069c31009040069c30e09040069c30c09040069c30d09040069c30f09040069c30b0a060069c30a0a060069c30a0a040069c30b0a040069c30a0904349fff150a04349fff140a04349fff130a04349fff120a04349fff110a04349fff100a04349fff0f0a04349fff150a06349fff140a06349fff130a06349fff120a06349fff110a06349fff100a06349fff0f0a06349fff0a0a030069c30b0a030069c30c0a030069c30d0a030069c30e0a030069c30f0a030069c3100a030069c3110a030069c3120a030069c31109030069c31009030069c30f09030069c30e09030069c30d09030069c30c09030069c30b09030069c30a09030069c310080360b4ff0e080360b4ff0c080360b4ff110803349fff0f0803349fff0d0803349fff0b0803349fff09070460b4ff11070360b4ff0f070360b4ff0d070360b4ff0b070360b4ff100703349fff0e0703349fff0c0703349fff0a080360b4ff0f0a07349fff100a07349fff110a07349fff120a07349fff130a07349fff140a07349fff150a07349fff130a030069c3", 0xA1454995CcCC837FaC7Ef1D91A1544730c79B306, "Chonks Team" );
+
+        vm.stopBroadcast();
+    }
 }
 
 contract TBACommandsScript is Script {

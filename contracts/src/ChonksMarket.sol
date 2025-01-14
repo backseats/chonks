@@ -60,7 +60,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     // Storage
 
-    ChonksMain public immutable CHONKS_MAIN;
+    ChonksMain public immutable CHONKS_MAIN = ChonksMain(0x07152bfde079b5319e5308C43fB1Dbc9C76cb4F9);
     ChonkTraits public immutable CHONK_TRAITS;
 
     uint256 public royaltyPercentage; // starts at 250 (for 2.5%)
@@ -234,14 +234,12 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     /// Constructor
 
     constructor(
-        address _chonksMain,
         address _chonkTraits,
         uint8 _royaltyPercentage,
         address _teamWallet
     ) {
         _initializeOwner(msg.sender);
 
-        CHONKS_MAIN = ChonksMain(_chonksMain);
         CHONK_TRAITS = ChonkTraits(_chonkTraits);
         royaltyPercentage = _royaltyPercentage;
         teamWallet = _teamWallet;

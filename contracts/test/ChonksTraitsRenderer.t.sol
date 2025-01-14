@@ -44,7 +44,6 @@ contract ChonksTraitsRendererTest is AbstractTest {
         vm.warp(block.timestamp + 1 minutes);
 
         market = new ChonksMarket(
-            address(main),
             address(traits),
             250, // fee basis points
             address(deployer)
@@ -54,8 +53,7 @@ contract ChonksTraitsRendererTest is AbstractTest {
 
         main.setMarketplace(address(market));
         traits.setMarketplace(address(market));
-        traits.setChonksMain(address(main));
-
+        // traits.setChonksMain(address(main));
 
         traits.addMinter(address(dataContract));
         main.setFirstReleaseDataMinter(address(dataContract));
