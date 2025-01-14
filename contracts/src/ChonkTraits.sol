@@ -130,10 +130,8 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     /// Errors
 
     error AddressCantBurn();
-    error CantApproveWithoutTraits();
     error CantTransfer();
     error CantTransferEquipped();
-    error MintStartTimeAlreadySet();
     error NotATBA();
     error NotAValidMinterContract();
     error NotYourTrait();
