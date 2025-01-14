@@ -751,6 +751,10 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     yOffset: number,
     affix: boolean = false
   ) => {
+    if (bytes.startsWith("0x")) {
+      bytes = bytes.slice(2);
+    }
+
     // console.log('affix: ', affix);
     // affix = true;
     // Initialize a 30x30 array filled with empty strings

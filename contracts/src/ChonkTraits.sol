@@ -265,11 +265,11 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     /// @notice Get the data for a given epoch
-    /// @param index The identifier of the epoch to fetch
-    function getEpochData(uint256 index) view public returns(CommitReveal.Epoch memory) {
-        if (index <= 777) return chonkTraitsV1.getEpochData(index); // DEPLOY ensure still 777 or update
+    /// @param _index The identifier of the epoch to fetch
+    function getEpochData(uint256 _index) view public returns(CommitReveal.Epoch memory) {
+        if (_index <= 777) return chonkTraitsV1.getEpochData(_index); // DEPLOY ensure still 777 or update
 
-        return traitTokens.epochs[index];
+        return traitTokens.epochs[_index];
     }
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {

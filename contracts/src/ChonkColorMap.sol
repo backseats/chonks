@@ -6,7 +6,6 @@ import { IChonkStorage } from "./interfaces/IChonkStorage.sol";
 
 interface IChonksMain {
     function getChonk(uint256 _tokenId) external view returns (IChonkStorage.StoredChonk memory);
-    function bodyIndexToMetadata(uint256 _bodyIndex) external view returns (IChonkStorage.BodyMetadata memory);
 }
 
 interface IChonkTraits {
@@ -25,18 +24,12 @@ contract ChonkColorMap {
         owner = msg.sender;
     }
 
-    function getColorMapForChonk(uint256 _chonkId, bool _withBody) public view returns (bytes memory) {
-        bytes memory colorMap;
+    function getColorMapForChonk(uint256 _chonkId) public view returns (bytes memory) {
         IChonkStorage.StoredChonk memory storedChonk = CHONKS_MAIN.getChonk(_chonkId);
-
-        if (_withBody) {
-            IChonkStorage.BodyMetadata memory bodyMetadata = CHONKS_MAIN.bodyIndexToMetadata(storedChonk.bodyIndex);
-            bytes memory bodyColorMap = bodyMetadata.colorMap;
-            colorMap = bytes.concat(colorMap, bodyColorMap);
-        }
 
         uint256[7] memory tokenIds = [storedChonk.headId, storedChonk.hairId, storedChonk.faceId, storedChonk.accessoryId, storedChonk.topId, storedChonk.bottomId, storedChonk.shoesId];
 
+        bytes memory colorMap;
         for (uint256 i; i < tokenIds.length; ++i) {
             if (tokenIds[i] == 0) continue;
 
@@ -47,6 +40,14 @@ contract ChonkColorMap {
         }
 
         return colorMap;
+    }
+
+    function getBackgroundColorForChonk(uint256 _chonkId) public view returns (string memory) {
+        return CHONKS_MAIN.getChonk(_chonkId).backgroundColor;
+    }
+
+    function getBodyIndexForChonk(uint256 _chonkId) public view returns (uint8) {
+        return CHONKS_MAIN.getChonk(_chonkId).bodyIndex;
     }
 
     /// Ownable functions
