@@ -33,7 +33,7 @@ contract ChonkColorMapTest is Test {
         newTraitsContract.setMarketplace(address(newMarketplace));
 
         newMigrator.updateEpochOnce();
-        newMigrator.mirror(1, 100); // migrates token ids 1-100
+        newMigrator.migrateBatch(400); // migrates token ids 1-100
 
         vm.stopPrank();
     }

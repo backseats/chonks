@@ -67,8 +67,7 @@ contract ChonksMainTest is ChonksBaseTest {
 
             ChonksMarket newMarketplace = new ChonksMarket(address(newTraitsContract), 250, TREASURY);
 
-            FirstReleaseDataMinter newDataContract = new
-            FirstReleaseDataMinter(address(main), address(newTraitsContract));
+            FirstReleaseDataMinter newDataContract = new FirstReleaseDataMinter(address(main), address(newTraitsContract));
 
             newMigrator = new FirstReleaseTokenMigrator(address(newTraitsContract));
 
@@ -267,11 +266,11 @@ contract ChonksMainTest is ChonksBaseTest {
             assertEq(newTraitsContract.balanceOf(tbas[0]), 0);
             assertEq(newTraitsContract.balanceOf(tbas[1]), 0);
 
-            newMigrator.mirror(1, 100);
+            newMigrator.migrateBatch(400);
 
             // cant do it again
             vm.expectRevert("ERC721: token already minted");
-            newMigrator.mirror(1, 100);
+            newMigrator.migrateBatch(400);
 
             // NOTE: test may break in the future if traits move
             assertEq(oldTraitsContract.balanceOf(0xcb16004F6E10820Ba6314310334E2E72A701c8BA), 5);
@@ -311,7 +310,7 @@ contract ChonksMainTest is ChonksBaseTest {
             tbas[0] = address(tba1); // #1
             tbas[1] = address(tba2); // #2
 
-            newMigrator.mirror(1, 100);
+            newMigrator.migrateBatch(400);
 
             assertEq(oldTraitsContract.balanceOf(tba1), 5);
             assertEq(oldTraitsContract.balanceOf(tba2), 9);
@@ -383,7 +382,7 @@ contract ChonksMainTest is ChonksBaseTest {
             tbas[0] = address(tba1); // #1
             tbas[1] = address(tba2); // #2
 
-            newMigrator.mirror(1, 100);
+            newMigrator.migrateBatch(400);
 
             assertEq(oldTraitsContract.balanceOf(tba1), 5);
             assertEq(oldTraitsContract.balanceOf(tba2), 9);
@@ -437,7 +436,7 @@ contract ChonksMainTest is ChonksBaseTest {
             tbas[0] = address(tba1); // #1
             tbas[1] = address(tba2); // #2
 
-            newMigrator.mirror(1, 100);
+            newMigrator.migrateBatch(400);
 
             assertEq(oldTraitsContract.balanceOf(tba1), 5);
             assertEq(oldTraitsContract.balanceOf(tba2), 9);
@@ -522,7 +521,7 @@ contract ChonksMainTest is ChonksBaseTest {
             tbas[0] = address(tba1); // #1
             tbas[1] = address(tba2); // #2
 
-            newMigrator.mirror(1, 100); // migrates token ids 1-100
+            newMigrator.migrateBatch(400); // migrates token ids 1-100
 
             // check balances are the same in the old and new traits contracts
             assertEq(oldTraitsContract.balanceOf(tba1), 5);
@@ -933,6 +932,29 @@ contract ChonksMainTest is ChonksBaseTest {
 
         (,,,isEquipped) = main.getFullPictureForTrait(1);
         assertTrue(isEquipped);
+    }
+
+    function test_batchMigrationTest() public {
+        vm.startPrank(deployer);
+            newMigrator.updateEpochOnce();
+
+            vm.expectRevert();
+            address owner = newTraitsContract.ownerOf(1);
+            vm.expectRevert();
+            owner = newTraitsContract.ownerOf(400);
+
+            newMigrator.migrateBatch(400);
+
+            owner = newTraitsContract.ownerOf(1);
+            console.log("owner of 1", owner);
+            owner = newTraitsContract.ownerOf(400);
+            console.log("owner of 400", owner);
+
+            assertEq(newTraitsContract.totalSupply(), 400);
+
+            newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 800);
+        vm.stopPrank();
     }
 
     // tests for: transferring traits back in, empty tba, new trait owner, function parity, clearing your own approvals, adding new traits (making sure theyre in the new traits contract), single approve
