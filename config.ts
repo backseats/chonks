@@ -19,8 +19,7 @@ export const config = createConfig({
     // injected()
   ],
   transports: {
-    // [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`),
-    [base.id]: http("https://mainnet.base.org"),
+    [base.id]: http(`${process.env.NEXT_PUBLIC_BASE_MAINNET_RPC_URL}`),
   },
 });
 
