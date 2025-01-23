@@ -241,6 +241,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   // This gets the ids that are equipped to the chonk
   useEffect(() => {
     if (!storedChonk) return;
+    if (!allTraitTokenIds) return;
 
     // console.log("storedChonk", storedChonk);
     // console.log("allTraitTokenIds", allTraitTokenIds);
