@@ -701,7 +701,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         // drain (addr1)
         address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
         address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
-        uint256[] memory traitsForChonk1 = traits.walletOfOwner(tbaForChonk1);
+        uint256[] memory traitsForChonk1 = newTraitsContract.walletOfOwner(tbaForChonk1);
         vm.startPrank(tbaForChonk1);
             for (uint256 i; i < traitsForChonk1.length; i++) {
                 uint256 traitId = traitsForChonk1[i];
@@ -735,7 +735,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         // move traits from chonk 2 to chonk 1
         address tbaForChonk1 = main.tokenIdToTBAAccountAddress(1);
         address tbaForChonk2 = main.tokenIdToTBAAccountAddress(2);
-        uint256[] memory traitsForChonk2 = traits.walletOfOwner(tbaForChonk2);
+        uint256[] memory traitsForChonk2 = newTraitsContract.walletOfOwner(tbaForChonk2);
         uint256 traitId = traitsForChonk2[0];
 
         // be the tba of chonk 2
@@ -1075,7 +1075,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             main.unequipAll(1); // marka 02/12/24: unequip all before burning
 
             address tba = main.tokenIdToTBAAccountAddress(1);
-            assertEq(traits.ownerOf(1), tba);
+            assertEq(newTraitsContract.ownerOf(1), tba);
 
             minter.burnAndMint(1, 1);
         vm.stopPrank();
@@ -1101,7 +1101,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             // main.setApprovalForAll(address(minter), true);
 
             address tba = main.tokenIdToTBAAccountAddress(1);
-            assertEq(traits.ownerOf(1), tba);
+            assertEq(newTraitsContract.ownerOf(1), tba);
 
             uint256[] memory traitIds = new uint256[](3);
             traitIds[0] = 1;
@@ -1424,433 +1424,422 @@ contract ChonksMarketTest is ChonksBaseTest {
 
     /// Approvals/Approval Clearing
 
-//     function test_approvalsShouldClearMarketplaceApproval() public {
-//         address user1 = address(1);
-//         address user2 = address(2);
-//         address user3 = address(3);
-//         address user4 = address(4);
-
-//         vm.startPrank(user1);
-//             // mint and approve a bunch of things
-//             bytes32[] memory empty;
-//             main.mint(1, empty);
-//             main.setApprovalForAllChonksMarketplace(1, address(market), true);
-//             main.setApprovalForAllChonksMarketplace(1, user2, true);
-//             main.setApprovalForAllChonksMarketplace(1, user3, true);
-
-//             address[] memory operators = main.getChonkIdToApprovedOperators(1);
-//             assertEq(operators.length, 3);
-//             assertEq(operators[0], address(market));
-//             assertEq(operators[1], user2);
-//             assertEq(operators[2], user3);
-
-//             // sell it
-//             market.offerChonkToAddress(1, 1 wei, user4);
-//         vm.stopPrank();
-
-//         vm.prank(user4);
-//         vm.warp(block.timestamp + 48 hours);
-//         market.buyChonk{value: 1 wei}(1);
-
-//         // approvals should be cleared
-//         assertEq(main.ownerOf(1), user4);
-
-//         operators = main.getChonkIdToApprovedOperators(1);
-//         assertEq(operators.length, 0);
-
-//         assertEq(main.getApproved(1), address(0));
-//         assertEq(main.isApprovedForAll(user1, address(market)), false);
-//         assertEq(main.isApprovedForAll(user1, user2), false);
-//         assertEq(main.isApprovedForAll(user1, user3), false);
-//         assertEq(main.isApprovedForAll(user4, address(market)), false);
-//         assertEq(main.isApprovedForAll(user4, user2), false);
-//         assertEq(main.isApprovedForAll(user4, user3), false);
-
-//         // Attempt the Yoink
-//         vm.prank(user1);
-//         vm.expectRevert("ERC721: caller is not token owner nor approved");
-//         main.transferFrom(user4, user1, 1);
-//     }
-
-//     function test_approvalsShouldClear() public {
-//         address user1 = address(1);
-//         address user2 = address(2);
-//         address user3 = address(3);
-//         address user4 = address(4);
-
-//         vm.startPrank(user1);
-//             // mint and approve a bunch of things
-//             bytes32[] memory empty;
-//             main.mint(2, empty);
-
-//             vm.warp(block.timestamp + 48 hours);
-//             main.setApprovalForAll(address(market), true);
-//             main.setApprovalForAll(user2, true);
-//             main.setApprovalForAll(user3, true);
-
-//             address[] memory operators = main.getChonkIdToApprovedOperators(1);
-//             assertEq(operators.length, 3);
-//             assertEq(operators[0], address(market));
-//             assertEq(operators[1], user2);
-//             assertEq(operators[2], user3);
-
-//             address[] memory operators2 = main.getChonkIdToApprovedOperators(2);
-//             assertEq(operators2.length, 3);
-//             assertEq(operators2[0], address(market));
-//             assertEq(operators2[1], user2);
-//             assertEq(operators2[2], user3);
-
-//             // sell it
-//             market.offerChonkToAddress(1, 1 wei, user4);
-//         vm.stopPrank();
-
-//         vm.prank(user4);
-//         market.buyChonk{value: 1 wei}(1);
-
-//         // approvals should be cleared
-//         assertEq(main.ownerOf(1), user4);
-
-//         operators = main.getChonkIdToApprovedOperators(1);
-//         assertEq(operators.length, 0);
-
-//         // Should still be 3 because we used the non-marketplace approval function which approves all chonks owned by the user
-//         operators2 = main.getChonkIdToApprovedOperators(2);
-//         assertEq(operators2.length, 3);
-
-//         assertEq(main.getApproved(1), address(0));
-
-//         assertEq(main.isApprovedForAll(user1, address(market)), false);
-//         assertEq(main.isApprovedForAll(user1, user2), false);
-//         assertEq(main.isApprovedForAll(user1, user3), false);
-
-//         assertEq(main.isApprovedForAll(user4, address(market)), false);
-//         assertEq(main.isApprovedForAll(user4, user2), false);
-//         assertEq(main.isApprovedForAll(user4, user3), false);
-
-//         // // Attempt the Yoink
-//         vm.prank(user1);
-//         vm.expectRevert("ERC721: caller is not token owner nor approved");
-//         main.transferFrom(user4, user1, 1);
-//     }
-
-//     // Singular
-//     function test_approvalShouldClear() public {
-//         address user1 = address(1);
-//         address user4 = address(4);
-
-//         vm.startPrank(user1);
-//             // mint and approve a bunch of things
-//             bytes32[] memory empty;
-
-//             main.mint(1, empty);
-
-//             vm.warp(block.timestamp + 48 hours);
-
-//             main.approve(address(market), 1);
-
-//             address[] memory operators = main.getChonkIdToApprovedOperators(1);
-//             assertEq(operators.length, 1);
-//             assertEq(operators[0], address(market));
-//             assertEq(main.getApproved(1), address(market));
-//             assertEq(main.isApprovedForAll(user1, address(market)), false);
-//             assertEq(main.isApprovedForAll(user4, address(market)), false);
-
-//             // sell it
-//             market.offerChonkToAddress(1, 1 wei, user4);
-//         vm.stopPrank();
-
-//         vm.prank(user4);
-//         vm.warp(block.timestamp + 48 hours);
-//         market.buyChonk{value: 1 wei}(1);
-
-//         // approvals should be cleared
-//         assertEq(main.ownerOf(1), user4);
-
-//         operators = main.getChonkIdToApprovedOperators(1);
-//         assertEq(operators.length, 0);
-
-//         assertEq(main.getApproved(1), address(0)); // this is reset in the 721 transfer function
-//         assertEq(main.isApprovedForAll(user1, address(market)), false);
-//         assertEq(main.isApprovedForAll(user4, address(market)), false);
-//     }
-
-//     function test_tbaApprovalShouldFail() public {
-//         address user1 = address(1);
-
-//         vm.startPrank(user1);
-//         bytes32[] memory empty;
-//         main.mint(1, empty);
-
-//         address tba = main.tokenIdToTBAAccountAddress(1);
-//         vm.startPrank(tba);
-//             vm.expectRevert(Unauthorized.selector);
-//             main.setApprovalForAll(address(market), true);
-//             vm.expectRevert(Unauthorized.selector);
-//             main.setApprovalForAll(tba, true);
-//         vm.stopPrank();
-//     }
-
-//     function test_tbaApprovalMarketplaceShouldFail() public {
-//         address user1 = address(1);
-
-//         vm.startPrank(user1);
-//         bytes32[] memory empty;
-//         main.mint(1, empty);
-
-//         address tba = main.tokenIdToTBAAccountAddress(1);
-//         vm.startPrank(tba);
-//             vm.expectRevert(Unauthorized.selector);
-//             main.setApprovalForAllChonksMarketplace(1, address(market), true);
-//             vm.expectRevert(Unauthorized.selector);
-//             main.setApprovalForAllChonksMarketplace(1, tba, true);
-//         vm.stopPrank();
-//     }
-
-//     function test_tbaApproveShouldFail() public {
-//         vm.prank(address(1));
-//         bytes32[] memory empty;
-//         main.mint(1, empty);
-
-//         address tba = main.tokenIdToTBAAccountAddress(1);
-//         vm.prank(tba);
-//         vm.expectRevert(Unauthorized.selector);
-//         main.approve(address(market), 1);
-//     }
-
-//     function test_deployingANewMarketplace() public {
-//         // I need to replace the marketplace on ChonksMain
-//         address user = address(1);
-//         vm.startPrank(user);
-//             bytes32[] memory empty;
-//             main.mint(1, empty);
-//         vm.stopPrank();
-
-//         address bidder = address(2);
-//         vm.deal(bidder, 1 ether);
-//         vm.warp(block.timestamp + 48 hours);
-//         vm.startPrank(bidder);
-//             market.bidOnChonk{value: 1 ether}(1);
-//         vm.stopPrank();
-
-//         (address bidderAddr, uint256 amountInWei,,) = market.getChonkBid(1);
-//         assertEq(bidderAddr, bidder);
-//         assertEq(amountInWei, 1 ether);
-
-//         // Oops there was a problem with the marketplace. Deploying a new one
-
-//         ChonksMarket newMarketplace = new ChonksMarket(address(traits), 250, TREASURY);
-//         vm.startPrank(deployer);
-//             market.pause(true);
-//             main.setMarketplace(address(newMarketplace));
-//         vm.stopPrank();
-
-//         // The bid should still be there
-//         (bidderAddr, amountInWei,,) = market.getChonkBid(1);
-//         assertEq(bidderAddr, bidder);
-//         assertEq(amountInWei, 1 ether);
-
-//         // remove your bid
-//         vm.startPrank(bidder);
-//             uint256 startingBal = bidder.balance;
-//             assertEq(address(market).balance, 1 ether);
-//             market.withdrawBidOnChonk(1);
-//             assertEq(address(market).balance, 0);
-//             assertGt(bidder.balance, startingBal);
-//         vm.stopPrank();
-
-//         vm.startPrank(user);
-//             main.setApprovalForAll(address(newMarketplace), true);
-//             newMarketplace.offerChonk(1, 1 ether);
-//         vm.stopPrank();
-
-//         vm.prank(bidder);
-//         newMarketplace.buyChonk{value: 1 ether}(1);
-
-//         assertEq(main.ownerOf(1), bidder);
-//     }
-
-//     function test_cleanUpMarketplaceOffersAndBids() public {
-//         address user = address(1);
-//         address bidder = address(2);
-//         address buyer = address(3);
-
-//         vm.startPrank(user);
-//             bytes32[] memory empty;
-//             main.mint(1, empty);
-
-//             vm.warp(block.timestamp + 48 hours);
-//             main.setApprovalForAll(address(market), true);
-//             market.offerChonk(1, 1 ether);
-//         vm.stopPrank();
-
-//         // bid
-//         vm.deal(bidder, 1 ether);
-//         vm.prank(bidder);
-//         market.bidOnChonk{value: 0.5 ether}(1);
-
-//         // another bid
-
-//         uint256 startingBal = bidder.balance;
-
-//         // buy it
-//         vm.deal(buyer, 2 ether);
-//         vm.startPrank(buyer);
-//             // first bid
-//             market.bidOnChonk{value: 0.6 ether}(1);
-//             // ehh they'll buy it
-//             market.buyChonk{value: 1 ether}(1);
-//         vm.stopPrank();
-
-//         assertEq(main.ownerOf(1), buyer);
-//         assertGt(bidder.balance, startingBal); // check they got their money back
-
-//         // Check offer is gone
-//         (uint256 price, address seller,,,,) = market.getChonkOffer(1);
-//         assertEq(price, 0);
-//         assertEq(seller, address(0));
-
-//         // Check bids are gone
-//         (address bidderAddr, uint256 amountInWei,,) = market.getChonkBid(1);
-//         assertEq(bidderAddr, address(0));
-//         assertEq(amountInWei, 0);
-//     }
-
-//     function test_cleanUpMarketplaceTraitOffersAndBids() public {
-//         address user = address(1);
-//         address bidder = address(2);
-//         address buyer = address(3);
-
-//         vm.startPrank(user);
-//             bytes32[] memory empty;
-//             main.mint(1, empty);
-
-//             main.unequipAll(1);
-
-//             // vm.warp(block.timestamp + 48 hours);
-//             main.setApprovalForAll(address(market), true);
-//         vm.stopPrank();
-
-//         address tba = main.tokenIdToTBAAccountAddress(1);
-//         vm.startPrank(tba);
-//             traits.setApprovalForAll(address(market), true); // do i need? i think so
-//             vm.expectRevert(NotYourTrait.selector);
-//             market.offerTrait(1, 1, 1 ether);
-//         vm.stopPrank();
-
-//         vm.startPrank(user);
-//             // marka 28/11/24: commented out as we aren't auto equipping traits anymore
-//             // vm.expectRevert(TraitEquipped.selector);
-//             // market.offerTrait(1, 1, 1 ether);
-
-//             // main.unequip(1, TraitCategory.Name.Shoes);
-//             // main.unequip(1, TraitCategory.Name.Bottom);
-
-//             market.offerTrait(1, 1, 1 ether); // shoes
-//             market.offerTrait(2, 1, 1 ether); // bottom
-//         vm.stopPrank();
-
-//         vm.deal(bidder, 1 ether);
-//         vm.startPrank(bidder);
-//             // vm.warp(contractDeploymentBlock + 10);
-//             main.mint(1, empty);
-//             uint256 startingBal = bidder.balance;
-
-//             // vm.warp(block.timestamp + 48 hours);
-//             market.bidOnTrait{value: 0.5 ether}(1, 2); // his chonk is 2
-//             assertLt(bidder.balance, startingBal);
-//         vm.stopPrank();
-
-//         vm.deal(buyer, 2 ether);
-//         vm.startPrank(buyer);
-//             // vm.warp(contractDeploymentBlock);
-//             main.mint(1, empty); // his chonk is 3
-
-//             // vm.warp(block.timestamp + 48 hours);
-//             market.bidOnTrait{value: 0.6 ether}(1, 3);
-//             market.buyTrait{value: 1 ether}(1, 3);
-//             assertEq(bidder.balance, startingBal); // got your money back
-//         vm.stopPrank();
-
-//         assertEq(traits.ownerOf(1), main.tokenIdToTBAAccountAddress(3));
-
-//         // verify the offer is gone
-//         (uint256 price, address seller,,) = market.getTraitOffer(1);
-//         assertEq(price, 0);
-//         assertEq(seller, address(0));
-
-//         // verify the bids are gone
-//         (address bidderAddr, address bidderTBA, uint256 amountInWei) = market.getTraitBid(1);
-//         assertEq(bidderAddr, address(0));
-//         assertEq(bidderTBA, address(0));
-//         assertEq(amountInWei, 0);
-//     }
-
-//     function test_cleanUpTraitBidsAndOffersOnChonkSale() public {
-//         address user = address(1);
-//         address bidder = address(2);
-//         address buyer = address(3);
-
-//         vm.startPrank(user);
-//             bytes32[] memory empty;
-//             main.mint(1, empty);
-//             main.unequipAll(1);
-//             main.setApprovalForAll(address(market), true);
-//         vm.stopPrank();
-
-//         address tba = main.tokenIdToTBAAccountAddress(1);
-//         vm.startPrank(tba);
-//             traits.setApprovalForAll(address(market), true); // do i need? i think so
-//             vm.expectRevert(NotYourTrait.selector);
-//             market.offerTrait(1, 1, 1 ether);
-//         vm.stopPrank();
-
-//         vm.startPrank(user);
-//             // marka 28/11/24: commented out as we aren't auto equipping traits anymore
-//             // vm.expectRevert(TraitEquipped.selector);
-//             // market.offerTrait(1, 1, 1 ether);
-
-//             // main.unequip(1, TraitCategory.Name.Shoes);
-//             // main.unequip(1, TraitCategory.Name.Bottom);
-//             market.offerChonk(1, 1 ether);
-//             market.offerTrait(1, 1, 1 ether); // shoes
-//             market.offerTrait(2, 1, 1 ether); // bottom
-//         vm.stopPrank();
-
-//         vm.deal(bidder, 2 ether);
-//         vm.startPrank(bidder);
-//             main.mint(1, empty);
-//             uint256 startingBal = bidder.balance;
-//             market.bidOnChonk{value: 0.75 ether}(1);
-//             market.bidOnTrait{value: 0.5 ether}(1, 2); // his chonk is 2
-//             assertLt(bidder.balance, startingBal);
-//         vm.stopPrank();
-
-//         vm.deal(buyer, 2 ether);
-//         vm.startPrank(buyer);
-//             main.mint(1, empty); // his chonk is 3
-
-//             vm.warp(block.timestamp + 48 hours);
-//             market.bidOnTrait{value: 0.6 ether}(1, 3);
-//             market.buyChonk{value: 1 ether}(1);
-
-//             assertLt(bidder.balance, startingBal);
-//         vm.stopPrank();
-
-//         assertEq(main.ownerOf(1), buyer);
-
-//         // verify the offer is gone
-//         (uint256 price, address seller,,) = market.getTraitOffer(1);
-//         assertEq(price, 0);
-//         assertEq(seller, address(0));
-
-//         // verify the bids are gone
-//         (address bidderAddr, address bidderTBA, uint256 amountInWei) = market.getTraitBid(1);
-//         assertEq(bidderAddr, address(0));
-//         assertEq(bidderTBA, address(0));
-//         assertEq(amountInWei, 0);
-
-//         // TODO: verify the trait approvals are gone
-//     }
+    function test_approvalsShouldClearMarketplaceApproval() public {
+        address user1 = deployer;
+        address user2 = address(2);
+        address user3 = address(3);
+        address user4 = address(4);
+
+        assertEq(main.isApprovedForAll(user1, address(market)), false);
+        assertEq(main.isApprovedForAll(user1, user2), false);
+        assertEq(main.isApprovedForAll(user1, user3), false);
+
+        vm.startPrank(user1);
+            main.setApprovalForAllChonksMarketplace(1, address(market), true);
+            main.setApprovalForAllChonksMarketplace(1, user2, true);
+            main.setApprovalForAllChonksMarketplace(1, user3, true);
+
+            assertEq(main.isApprovedForAll(user1, address(market)), true);
+            assertEq(main.isApprovedForAll(user1, user2), true);
+            assertEq(main.isApprovedForAll(user1, user3), true);
+
+            // sell it
+            market.offerChonkToAddress(1, 1 wei, user);
+        vm.stopPrank();
+
+        address[] memory operators = main.getChonkIdToApprovedOperators(1);
+        assertEq(operators.length, 3);
+        assertEq(operators[0], address(market));
+        assertEq(operators[1], user2);
+        assertEq(operators[2], user3);
+
+        vm.prank(user);
+        market.buyChonk{value: 1 wei}(1); // might need to use vm.deal if this user's balance doesnt work for us since it's a fork and might be changing leading to a failed test
+
+        // approvals should be cleared
+        assertEq(main.ownerOf(1), user);
+
+        operators = main.getChonkIdToApprovedOperators(1);
+        assertEq(operators.length, 0);
+
+        assertEq(main.getApproved(1), address(0));
+        assertEq(main.isApprovedForAll(user1, address(market)), false);
+        assertEq(main.isApprovedForAll(user1, user2), false);
+        assertEq(main.isApprovedForAll(user1, user3), false);
+        assertEq(main.isApprovedForAll(user, address(market)), false);
+        assertEq(main.isApprovedForAll(user, user2), false);
+        assertEq(main.isApprovedForAll(user, user3), false);
+
+        // Attempt the Yoink
+        vm.prank(user1);
+        vm.expectRevert("ERC721: caller is not token owner nor approved");
+        main.transferFrom(user, user1, 1);
+    }
+
+    function test_approvalsShouldClearMarketplaceApproval2() public {
+        address user1 = deployer;
+        address user2 = address(2);
+        address user3 = address(3);
+        address user4 = address(4);
+
+        assertEq(main.isApprovedForAll(user1, address(market)), false);
+        assertEq(main.isApprovedForAll(user1, user2), false);
+        assertEq(main.isApprovedForAll(user1, user3), false);
+
+        vm.startPrank(user1);
+            main.setApprovalForAll(address(market), true);
+            main.setApprovalForAll(user2, true);
+            main.setApprovalForAll(user3, true);
+
+            assertEq(main.isApprovedForAll(user1, address(market)), true);
+            assertEq(main.isApprovedForAll(user1, user2), true);
+            assertEq(main.isApprovedForAll(user1, user3), true);
+
+            // sell it
+            market.offerChonkToAddress(1, 1 wei, user);
+        vm.stopPrank();
+
+        address[] memory operators = main.getChonkIdToApprovedOperators(1);
+        assertEq(operators.length, 3);
+        assertEq(operators[0], address(market));
+        assertEq(operators[1], user2);
+        assertEq(operators[2], user3);
+
+        vm.prank(user);
+        market.buyChonk{value: 1 wei}(1);
+
+        // approvals should be cleared
+        assertEq(main.ownerOf(1), user);
+
+        operators = main.getChonkIdToApprovedOperators(1);
+        assertEq(operators.length, 0);
+
+        assertEq(main.getApproved(1), address(0));
+        assertEq(main.isApprovedForAll(user1, address(market)), false);
+        assertEq(main.isApprovedForAll(user1, user2), false);
+        assertEq(main.isApprovedForAll(user1, user3), false);
+        assertEq(main.isApprovedForAll(user, address(market)), false);
+        assertEq(main.isApprovedForAll(user, user2), false);
+        assertEq(main.isApprovedForAll(user, user3), false);
+
+        // Attempt the Yoink
+        vm.prank(user1);
+        vm.expectRevert("ERC721: caller is not token owner nor approved");
+        main.transferFrom(user, user1, 1);
+    }
+
+    function test_approvalsShouldClear() public {
+        address user1 = deployer;
+        address user2 = address(2);
+        address user3 = address(3);
+
+        vm.startPrank(user1);
+            main.setApprovalForAll(address(market), true);
+            main.setApprovalForAll(user2, true);
+            main.setApprovalForAll(user3, true);
+
+            address[] memory operators = main.getChonkIdToApprovedOperators(1);
+            assertEq(operators.length, 3);
+            assertEq(operators[0], address(market));
+            assertEq(operators[1], user2);
+            assertEq(operators[2], user3);
+
+            address[] memory operators2 = main.getChonkIdToApprovedOperators(2);
+            assertEq(operators2.length, 3);
+            assertEq(operators2[0], address(market));
+            assertEq(operators2[1], user2);
+            assertEq(operators2[2], user3);
+
+            // sell it
+            market.offerChonkToAddress(1, 1 wei, user);
+        vm.stopPrank();
+
+        vm.prank(user);
+        market.buyChonk{value: 1 wei}(1);
+
+        // approvals should be cleared
+        assertEq(main.ownerOf(1), user);
+
+        operators = main.getChonkIdToApprovedOperators(1);
+        assertEq(operators.length, 0);
+
+        // Should still be 3 because we used the non-marketplace approval function which approves all chonks owned by the user
+        operators2 = main.getChonkIdToApprovedOperators(2);
+        assertEq(operators2.length, 3);
+
+        assertEq(main.getApproved(1), address(0));
+
+        assertEq(main.isApprovedForAll(user1, address(market)), false);
+        assertEq(main.isApprovedForAll(user1, user2), false);
+        assertEq(main.isApprovedForAll(user1, user3), false);
+
+        assertEq(main.isApprovedForAll(user, address(market)), false);
+        assertEq(main.isApprovedForAll(user, user2), false);
+        assertEq(main.isApprovedForAll(user, user3), false);
+
+        // // Attempt the Yoink
+        vm.prank(user1);
+        vm.expectRevert("ERC721: caller is not token owner nor approved");
+        main.transferFrom(user, user1, 1);
+    }
+
+    // Singular
+
+    function test_approvalShouldClear() public {
+        address user1 = deployer;
+        address user4 = user;
+
+        vm.startPrank(user1);
+            assertEq(main.getApproved(1), address(0));
+            main.approve(address(market), 1);
+
+            address[] memory operators = main.getChonkIdToApprovedOperators(1);
+            assertEq(operators.length, 1);
+            assertEq(operators[0], address(market));
+            assertEq(main.getApproved(1), address(market));
+            assertEq(main.isApprovedForAll(user1, address(market)), false);
+            assertEq(main.isApprovedForAll(user4, address(market)), false);
+
+            // sell it
+            market.offerChonkToAddress(1, 1 wei, user4);
+        vm.stopPrank();
+
+        vm.prank(user4);
+        market.buyChonk{value: 1 wei}(1);
+
+        // approvals should be cleared
+        assertEq(main.ownerOf(1), user4);
+
+        operators = main.getChonkIdToApprovedOperators(1);
+        assertEq(operators.length, 0);
+
+        assertEq(main.getApproved(1), address(0)); // this is reset in the 721 transfer function
+        assertEq(main.isApprovedForAll(user1, address(market)), false);
+        assertEq(main.isApprovedForAll(user4, address(market)), false);
+    }
+
+    function test_tbaApprovalShouldFail() public {
+        address tba = main.tokenIdToTBAAccountAddress(1);
+
+        vm.startPrank(tba);
+            vm.expectRevert(Unauthorized.selector);
+            main.setApprovalForAll(address(market), true);
+            vm.expectRevert(Unauthorized.selector);
+            main.setApprovalForAll(tba, true);
+        vm.stopPrank();
+    }
+
+    function test_tbaApprovalMarketplaceShouldFail() public {
+        address tba = main.tokenIdToTBAAccountAddress(1);
+
+        vm.startPrank(tba);
+            vm.expectRevert(Unauthorized.selector);
+            main.setApprovalForAllChonksMarketplace(1, address(market), true);
+            vm.expectRevert(Unauthorized.selector);
+            main.setApprovalForAllChonksMarketplace(1, tba, true);
+        vm.stopPrank();
+    }
+
+    function test_tbaApproveShouldFail() public {
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        vm.prank(tba);
+        vm.expectRevert(Unauthorized.selector);
+        main.approve(address(market), 1);
+    }
+
+    function test_deployingANewMarketplace() public {
+        address bidder = user;
+
+        vm.deal(bidder, 1 ether);
+        vm.prank(bidder);
+        market.bidOnChonk{value: 1 ether}(1);
+
+        (address bidderAddr, uint256 amountInWei,,) = market.getChonkBid(1);
+        assertEq(bidderAddr, bidder);
+        assertEq(amountInWei, 1 ether);
+
+        // Oops there was a problem with the marketplace. Deploying a new one
+        ChonksMarket newMarketplace = new ChonksMarket(address(newTraitsContract), 250, TREASURY);
+        vm.startPrank(deployer);
+            market.pause(true);
+            main.setMarketplace(address(newMarketplace));
+        vm.stopPrank();
+
+        // The bid should still be there
+        (bidderAddr, amountInWei,,) = market.getChonkBid(1);
+        assertEq(bidderAddr, bidder);
+        assertEq(amountInWei, 1 ether);
+
+        uint256 startingBal = bidder.balance;
+        assertEq(address(market).balance, 1 ether);
+
+        // remove your bid on the old marketplace
+        vm.prank(bidder);
+        vm.roll(block.number + 50);
+        market.withdrawBidOnChonk(1);
+
+        assertEq(address(market).balance, 0);
+        assertGt(bidder.balance, startingBal);
+
+        vm.startPrank(deployer);
+            main.setApprovalForAll(address(newMarketplace), true);
+            newMarketplace.offerChonk(1, 1 ether);
+        vm.stopPrank();
+
+        vm.prank(bidder);
+        newMarketplace.buyChonk{value: 1 ether}(1);
+
+        assertEq(main.ownerOf(1), bidder);
+    }
+
+    function test_cleanUpMarketplaceOffersAndBids() public {
+        address bidder = address(2);
+        address buyer = address(3);
+
+        vm.startPrank(deployer);
+            main.setApprovalForAll(address(market), true);
+            market.offerChonk(1, 1 ether);
+        vm.stopPrank();
+
+        // bid
+        vm.deal(bidder, 1 ether);
+        vm.prank(bidder);
+        market.bidOnChonk{value: 0.5 ether}(1);
+
+        // another bid
+
+        uint256 startingBal = bidder.balance;
+
+        // buy it
+        vm.deal(buyer, 2 ether);
+        vm.startPrank(buyer);
+            // first bid
+            market.bidOnChonk{value: 0.6 ether}(1);
+            // ehh they'll buy it
+            market.buyChonk{value: 1 ether}(1);
+        vm.stopPrank();
+
+        assertEq(main.ownerOf(1), buyer);
+        assertGt(bidder.balance, startingBal); // check they got their money back
+
+        // Check offer is gone
+        (uint256 price, address seller,,,,) = market.getChonkOffer(1);
+        assertEq(price, 0);
+        assertEq(seller, address(0));
+
+        // Check bids are gone
+        (address bidderAddr, uint256 amountInWei,,) = market.getChonkBid(1);
+        assertEq(bidderAddr, address(0));
+        assertEq(amountInWei, 0);
+    }
+
+    function test_cleanUpMarketplaceTraitOffersAndBids() public {
+        address bidder = user;
+        address buyer = 0x7C00c9F0E7AeD440c0C730a9bD9Ee4F49de20D5C; // chonk 76-84
+
+        vm.startPrank(deployer);
+            main.unequipAll(1);
+            main.setApprovalForAll(address(market), true);
+        vm.stopPrank();
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        vm.startPrank(tba);
+            newTraitsContract.setApprovalForAll(address(market), true);
+
+            vm.expectRevert(NotYourTrait.selector);
+            market.offerTrait(10, 1, 1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(deployer);
+            market.offerTrait(1, 1, 1 ether); // shoes (trait id 1)
+            market.offerTrait(2, 1, 1 ether); // bottom (trait id 2)
+        vm.stopPrank();
+
+        vm.deal(bidder, 1 ether);
+        uint256 startingBal = bidder.balance;
+        vm.prank(bidder);
+        market.bidOnTrait{value: 0.5 ether}(1, 3); // his chonk is 3
+
+        assertLt(bidder.balance, startingBal);
+
+        vm.deal(buyer, 2 ether);
+        vm.startPrank(buyer);
+            market.bidOnTrait{value: 0.6 ether}(1, 76); // chonk 76
+            market.buyTrait{value: 1 ether}(1, 76);
+        vm.stopPrank();
+
+        assertEq(bidder.balance, startingBal); // got your money back
+
+        assertEq(newTraitsContract.ownerOf(1), main.tokenIdToTBAAccountAddress(76));
+
+        // verify the offer is gone
+        (uint256 price, address seller,,) = market.getTraitOffer(1);
+        assertEq(price, 0);
+        assertEq(seller, address(0));
+
+        // verify the bids are gone
+        (address bidderAddr, address bidderTBA, uint256 amountInWei) = market.getTraitBid(1);
+        assertEq(bidderAddr, address(0));
+        assertEq(bidderTBA, address(0));
+        assertEq(amountInWei, 0);
+    }
+
+    function test_cleanUpTraitBidsAndOffersOnChonkSale() public {
+        address bidder = user;
+        address buyer = 0x7C00c9F0E7AeD440c0C730a9bD9Ee4F49de20D5C; // chonk 76-84
+
+        vm.startPrank(deployer);
+            main.unequipAll(1);
+            main.setApprovalForAll(address(market), true);
+        vm.stopPrank();
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        vm.startPrank(tba);
+            newTraitsContract.setApprovalForAll(address(market), true);
+            vm.expectRevert(NotYourTrait.selector);
+            market.offerTrait(10, 1, 1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(deployer);
+            market.offerChonk(1, 1 ether);
+            market.offerTrait(1, 1, 1 ether); // shoes
+            market.offerTrait(2, 1, 1 ether); // bottom
+        vm.stopPrank();
+
+        vm.deal(bidder, 2 ether);
+        uint256 startingBal = bidder.balance;
+        vm.startPrank(bidder);
+            market.bidOnChonk{value: 0.75 ether}(1);
+            market.bidOnTrait{value: 0.5 ether}(1, 3); // his chonk is 3
+        vm.stopPrank();
+
+        assertEq(newTraitsContract.isApprovedForAll(tba, address(market)), true);
+
+        assertLt(bidder.balance, startingBal);
+
+        vm.deal(buyer, 2 ether);
+        vm.startPrank(buyer);
+            market.bidOnTrait{value: 0.6 ether}(1, 76);
+            market.buyChonk{value: 1 ether}(1);
+        vm.stopPrank();
+
+        assertLt(bidder.balance, startingBal);
+
+        assertEq(main.ownerOf(1), buyer);
+
+        // verify the offer is gone
+        (uint256 price, address seller,,) = market.getTraitOffer(1);
+        assertEq(price, 0);
+        assertEq(seller, address(0));
+
+        // verify the bids are gone
+        (address bidderAddr, address bidderTBA, uint256 amountInWei) = market.getTraitBid(1);
+        assertEq(bidderAddr, address(0));
+        assertEq(bidderTBA, address(0));
+        assertEq(amountInWei, 0);
+
+        assertEq(newTraitsContract.isApprovedForAll(tba, address(market)), false);
+    }
 
 
 //     /*
