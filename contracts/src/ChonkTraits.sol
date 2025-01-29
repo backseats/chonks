@@ -24,6 +24,8 @@ import { TraitRenderer } from "./renderers/TraitRenderer.sol";
 import { ChonksMain } from "./ChonksMain.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 
+import { console } from "forge-std/console.sol"; // DEPLOY: remove
+
 interface IRenderMinterV1 {
     function explainTrait(
         ITraitStorage.StoredTrait calldata storedTrait,
@@ -484,6 +486,18 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             return;
         }
 
+        // If burning
+        if (to == address(0)) {
+            _cleanUpMarketplaceOffersAndBids(tokenId, to);
+
+            // If burning, store the owning Chonk ID for Marketplace cleanup later
+            address tba = ownerOf(tokenId);
+            _transientChonkId = chonksMain.tbaAddressToTokenId(tba);
+
+            super._beforeTokenTransfer(from, to, tokenId);
+            return;
+        }
+
         // Ensure the `to` address is a TBA
         if (chonksMain.tbaAddressToTokenId(to) == 0) revert NotATBA();
 
@@ -495,18 +509,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         // If there's an Offer on the Trait, seller is not 0
         if (seller != address(0)) {
             if (msg.sender != address(marketplace)) revert CantTransfer();
-        }
-
-        // If burning
-        if (to == address(0)) {
-            _cleanUpMarketplaceOffersAndBids(tokenId, to);
-
-            // If burning, store the owning Chonk ID for Marketplace cleanup later
-            address tba = ownerOf(tokenId);
-            _transientChonkId = chonksMain.tbaAddressToTokenId(tba);
-
-            super._beforeTokenTransfer(from, to, tokenId);
-            return;
         }
 
         _cleanUpMarketplaceOffersAndBids(tokenId, to);
@@ -527,13 +529,15 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
             uint256 id = _transientChonkId;
             _transientChonkId = 0;
             marketplace.removeChonkOfferOnTraitTransfer(id);
+
+            marketplace.setChonkCooldownPeriod(id);
             return;
         }
 
-        // Delete the Offer on Chonk ID after the transfer
+        // After the transfer, set the cooldown period for the Chonk
         address tba = ownerOf(_traitTokenId);
         uint256 chonkId = chonksMain.tbaAddressToTokenId(tba);
-        marketplace.removeChonkOfferOnTraitTransfer(chonkId);
+        marketplace.setChonkCooldownPeriod(chonkId);
     }
 
     // Approvals
