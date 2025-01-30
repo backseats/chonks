@@ -267,10 +267,8 @@ contract ChonksMainTest is ChonksBaseTest {
             assertEq(newTraitsContract.balanceOf(tbas[1]), 0);
 
             newMigrator.migrateBatch(400);
-
-            // cant do it again
-            vm.expectRevert("ERC721: token already minted");
             newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 800);
 
             // NOTE: test may break in the future if traits move
             assertEq(oldTraitsContract.balanceOf(0xcb16004F6E10820Ba6314310334E2E72A701c8BA), 5);
@@ -521,7 +519,7 @@ contract ChonksMainTest is ChonksBaseTest {
             tbas[0] = address(tba1); // #1
             tbas[1] = address(tba2); // #2
 
-            newMigrator.migrateBatch(400); // migrates token ids 1-100
+            newMigrator.migrateBatch(400); // migrates token ids 1-400
 
             // check balances are the same in the old and new traits contracts
             assertEq(oldTraitsContract.balanceOf(tba1), 5);
@@ -695,14 +693,19 @@ contract ChonksMainTest is ChonksBaseTest {
 
         assertEq(newTraitsContract.nextTokenId(), 340647);
 
+        assertEq(newTraitsContract.totalSupply(), 401);
+
         // Get data URI from old contract
-        string memory oldDataUri = IChonkTraitsV1(address(oldTraitsContract)).renderAsDataUri(101);
+        string memory oldDataUri = IChonkTraitsV1(address(oldTraitsContract)).renderAsDataUri(401);
 
         // Get data URI from new contract
-        string memory newDataUri = newTraitsContract.renderAsDataUri(101); // this is only 101 because we preminted 100, not the full 360k and change
+        string memory newDataUri = newTraitsContract.renderAsDataUri(401); // this is only 401 because we preminted 400, not the full 360k and change
 
-        assertFalse(keccak256(bytes(newDataUri)) == keccak256(bytes(oldDataUri)));
+        string memory newDataUri2 = newTraitsContract.renderAsDataUri(tokenId);
+
+        assertTrue(keccak256(bytes(newDataUri)) == keccak256(bytes(oldDataUri)));
         // console.log("newDataUri", newDataUri);
+        // console.log("newDataUri2", newDataUri2); // good
     }
 
     function test_getTraitIndexToMetadataForNewTrait() public {
@@ -746,8 +749,6 @@ contract ChonksMainTest is ChonksBaseTest {
 
         assertEq(keccak256(bytes(blanksvg)), keccak256(bytes("<g id=\"Trait\"></g>")));
         assertTrue(keccak256(bytes(svg)) != keccak256(bytes("<g id=\"Trait\"></g>")));
-
-
 
         // console.log("oldMetadata.dataMinterContract", oldMetadata.dataMinterContract);
         // console.log("newMetadata.dataMinterContract", newMetadata.dataMinterContract);

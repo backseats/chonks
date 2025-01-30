@@ -23,10 +23,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         address sellerTBA;
         // An optional address to restrict the buyer to
         address onlySellTo;
-        // Accompanying Trait IDs
-        uint256[] traitIds; // DEPLOY: remove these
-        // An abi.encoded version of the traitIds
-        bytes encodedTraitIds; // DEPLOY: remove these
     }
 
     struct TraitOffer {
@@ -45,10 +41,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         address bidder;
         // The amount in Wei
         uint256 amountInWei;
-        // Accompanying Trait IDs
-        uint256[] traitIds; // DEPLOY: remove these
-        // An abi.encoded version of the traitIds
-        bytes encodedTraitIds; // DEPLOY: remove these
         // The block number of the bid
         uint256 bidBlockNumber;
     }
@@ -271,18 +263,14 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 priceInWei,
         address seller,
         address sellerTBA,
-        address onlySellTo,
-        uint256[] memory traitIds,
-        bytes memory encodedTraitIds
+        address onlySellTo
     ) {
         ChonkOffer memory offer = chonkOffers[_chonkId];
         return (
             offer.priceInWei,
             offer.seller,
             offer.sellerTBA,
-            offer.onlySellTo,
-            offer.traitIds,
-            offer.encodedTraitIds
+            offer.onlySellTo
         );
     }
 
@@ -301,31 +289,23 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         );
     }
 
-    function getChonkBid(uint256 _chonkId) public view returns (
-        address bidder,
-        uint256 amountInWei,
-        uint256[] memory traitIds,
-        bytes memory encodedTraitIds
-    ) {
+    function getChonkBid(uint256 _chonkId) public view returns (address bidder, uint256 amountInWei, uint256 bidBlockNumber) {
         ChonkBid memory bid = chonkBids[_chonkId];
-        return (
-            bid.bidder,
-            bid.amountInWei,
-            bid.traitIds,
-            bid.encodedTraitIds
-        );
+        return (bid.bidder, bid.amountInWei, bid.bidBlockNumber);
     }
 
     function getTraitBid(uint256 _traitId) public view returns (
         address bidder,
         address bidderTBA,
-        uint256 amountInWei
+        uint256 amountInWei,
+        uint256 bidBlockNumber
     ) {
         TraitBid memory bid = traitBids[_traitId];
         return (
             bid.bidder,
             bid.bidderTBA,
-            bid.amountInWei
+            bid.amountInWei,
+            bid.bidBlockNumber
         );
     }
 
@@ -367,15 +347,11 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     function _offerChonk(uint256 _chonkId, uint256 _priceInWei, address _onlySellTo, address _seller, address _sellerTBA) internal {
         if (_seller != msg.sender) revert NotYourChonk();
 
-        (uint256[] memory traitIds , bytes memory encodedTraitIds) = getTraitIdsAndEncodingForChonk(_chonkId);
-
         chonkOffers[_chonkId] = ChonkOffer({
             priceInWei: _priceInWei,
             seller: _seller,
             sellerTBA: _sellerTBA,
-            onlySellTo: _onlySellTo,
-            traitIds: traitIds,
-            encodedTraitIds: encodedTraitIds
+            onlySellTo: _onlySellTo
         });
     }
 
@@ -446,18 +422,14 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
         ChonkBid memory existingBid = chonkBids[_chonkId];
         if (existingBid.amountInWei > 0) {
-            // Calculate minimum bid as 5% higher than the existing bid
+            // New bid must be 5% higher than the existing bid
             uint256 minBid = (existingBid.amountInWei * 105) / 100;
             if (msg.value < minBid) revert BidIsTooLow();
         }
 
-        (uint256[] memory traitIds , bytes memory encodedTraitIds) = getTraitIdsAndEncodingForChonk(_chonkId);
-
         chonkBids[_chonkId] = ChonkBid(
             msg.sender,
             msg.value,
-            traitIds,
-            encodedTraitIds,
             block.number
         );
 
@@ -484,8 +456,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (bidder == msg.sender) revert CantAcceptYourOwnBid();
         if (bidder != _bidder) revert BidderChanged();
 
-        // Since they bid, your Chonk-owned traits changed. They need to re-bid.
-        (, bytes memory encodedTraitIds) = getTraitIdsAndEncodingForChonk(_chonkId);
 
         delete chonkBids[_chonkId];
 
@@ -655,7 +625,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
         TraitBid memory existingBid = traitBids[_traitId];
         if (existingBid.amountInWei > 0) {
-            // Calculate minimum bid as 5% higher than the existing bid
+            // New bid must be 5% higher than the existing bid
             uint256 minBid = (existingBid.amountInWei * 105) / 100;
             if (msg.value < minBid) revert BidIsTooLow();
         }
@@ -705,12 +675,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     function calculateRoyalty(uint256 _amount) public view returns (uint256) {
         return (_amount * royaltyPercentage) / 10_000;
-    }
-
-    function getTraitIdsAndEncodingForChonk(uint256 _chonkId) public view returns (uint256[] memory traitIds, bytes memory encodedTraitIds) {
-        (, address tbaAddress) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
-        traitIds = CHONK_TRAITS.walletOfOwner(tbaAddress);
-        encodedTraitIds = abi.encode(traitIds);
     }
 
     /// Before Token Transfer

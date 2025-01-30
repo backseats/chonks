@@ -139,7 +139,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             market.offerChonk(chonkId, price);
         vm.stopPrank();
 
-        (uint256 offerPrice, address seller,,,,) = market.getChonkOffer(chonkId);
+        (uint256 offerPrice, address seller,,) = market.getChonkOffer(chonkId);
 
         assertEq(offerPrice, price);
         assertEq(seller, deployer);
@@ -284,9 +284,7 @@ contract ChonksMarketTest is ChonksBaseTest {
                 uint256 offerPrice,
                 address seller,
                 address sellerTBA,
-                address onlySellTo,
-                uint256[] memory traitIds,
-                bytes memory encodedTraitIds
+                address onlySellTo
             ) = market.getChonkOffer(chonkId);
 
             // Verify offer
@@ -294,8 +292,6 @@ contract ChonksMarketTest is ChonksBaseTest {
             assertEq(seller, user);
             assertEq(sellerTBA, main.tokenIdToTBAAccountAddress(chonkId));
             assertEq(onlySellTo, deployer);
-            bytes memory expectedEncoding = abi.encode(traitIds);
-            assertEq(keccak256(encodedTraitIds), keccak256(expectedEncoding));
         vm.stopPrank();
     }
 
@@ -312,7 +308,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             uint256 offerPrice,
             address seller,
             address sellerTBA,
-            address onlySellTo,,
+            address onlySellTo
         ) = market.getChonkOffer(chonkId);
 
         // Verify offer
@@ -328,7 +324,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             offerPrice,
             seller,
             sellerTBA,
-            onlySellTo,,
+            onlySellTo
         ) = market.getChonkOffer(chonkId);
 
         assertEq(offerPrice, 2 ether);
@@ -343,7 +339,7 @@ contract ChonksMarketTest is ChonksBaseTest {
             offerPrice,
             seller,
             sellerTBA,
-            onlySellTo,,
+            onlySellTo
         ) = market.getChonkOffer(chonkId);
 
         assertEq(offerPrice, 3 ether);
@@ -388,17 +384,13 @@ contract ChonksMarketTest is ChonksBaseTest {
             uint256 offerPrice,
             address seller,
             address sellerTBA,
-            address onlySellTo,
-            uint256[] memory traitIds,
-            bytes memory encodedTraitIds
+            address onlySellTo
         ) = market.getChonkOffer(chonkId);
 
         assertEq(offerPrice, price);
         assertEq(seller, user);
         assertEq(sellerTBA, main.tokenIdToTBAAccountAddress(chonkId));
         assertEq(onlySellTo, address(2));
-        bytes memory expectedEncoding = abi.encode(traitIds);
-        assertEq(keccak256(encodedTraitIds), keccak256(expectedEncoding));
 
         vm.prank(user);
         market.cancelOfferChonk(chonkId);
@@ -407,17 +399,13 @@ contract ChonksMarketTest is ChonksBaseTest {
             offerPrice,
             seller,
             sellerTBA,
-            onlySellTo,
-            traitIds,
-            encodedTraitIds
+            onlySellTo
         ) = market.getChonkOffer(chonkId);
 
         assertEq(offerPrice, 0);
         assertEq(seller, address(0));
         assertEq(sellerTBA, address(0));
         assertEq(onlySellTo, address(0));
-        assertEq(traitIds.length, 0);
-        assertEq(keccak256(encodedTraitIds), keccak256(""));
     }
 
     function test_cancelOfferUnauthorized() public {
@@ -458,7 +446,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(main.ownerOf(chonkId), buyer);
 
         // Verify offer was deleted
-        (uint256 offerPrice, address offerSeller,,,,) = market.getChonkOffer(chonkId);
+        (uint256 offerPrice, address offerSeller,,) = market.getChonkOffer(chonkId);
         assertEq(offerPrice, 0);
         assertEq(offerSeller, address(0));
     }
@@ -511,7 +499,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(main.ownerOf(chonkId), intendedBuyer);
 
         // Verify offer was deleted
-        (uint256 offerPrice, address offerSeller,,,,) = market.getChonkOffer(chonkId);
+        (uint256 offerPrice, address offerSeller,,) = market.getChonkOffer(chonkId);
 
         assertEq(offerPrice, 0);
         assertEq(offerSeller, address(0));
@@ -677,7 +665,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         newTraitsContract.transferFrom(tbaForChonk1, tbaForChonk2, traitId);
 
         // validate offer is gone
-        (uint256 offerPrice, address offerSeller,,,,) = market.getChonkOffer(chonkId);
+        (uint256 offerPrice, address offerSeller,,) = market.getChonkOffer(chonkId);
         assertEq(offerPrice, 0);
         assertEq(offerSeller, address(0));
     }
@@ -785,14 +773,14 @@ contract ChonksMarketTest is ChonksBaseTest {
             uint startingBal = buyer.balance;
             // console.log("startingBal", startingBal);
 
-            (address bidder, uint256 amountInWei,,) = market.getChonkBid(chonkId);
+            (address bidder, uint256 amountInWei,) = market.getChonkBid(chonkId);
             assertEq(bidder, address(0));
             market.bidOnChonk{value: 0.5 ether}(chonkId);
             uint endingBal = buyer.balance;
             // console.log("endingBal", endingBal);
             assertLt(endingBal, startingBal);
 
-            (bidder, amountInWei,,) = market.getChonkBid(chonkId);
+            (bidder, amountInWei,) = market.getChonkBid(chonkId);
             assertEq(bidder, buyer);
             assertEq(amountInWei, 0.5 ether);
 
@@ -809,7 +797,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(startingBal - price, buyer.balance);
 
         // expect chonkBids for chonk id to be gone
-        (bidder, amountInWei,,) = market.getChonkBid(chonkId);
+        (bidder, amountInWei,) = market.getChonkBid(chonkId);
         assertEq(bidder, address(0));
         assertEq(amountInWei, 0);
 
@@ -1296,7 +1284,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         market.bidOnChonk{value: 2 ether}(1);
 
         // Verify bid
-        (address bidderAddr, uint256 bidAmount,,) = market.getChonkBid(1);
+        (address bidderAddr, uint256 bidAmount,) = market.getChonkBid(1);
         assertEq(bidderAddr, bidder);
         assertEq(bidAmount, 2 ether);
 
@@ -1310,7 +1298,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(main.ownerOf(1), bidder);
 
         // Verify bid was cleared
-        (bidderAddr, bidAmount,,) = market.getChonkBid(1);
+        (bidderAddr, bidAmount,) = market.getChonkBid(1);
         assertEq(bidderAddr, address(0));
         assertEq(bidAmount, 0);
     }
@@ -1333,7 +1321,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         market.bidOnTrait{value: 2 ether}(traitId, 3); // bid on traitId for chonk 3
 
         // Verify bid
-        (address bidderAddr, address bidderTBA, uint256 bidAmount) = market.getTraitBid(traitId);
+        (address bidderAddr, address bidderTBA, uint256 bidAmount,) = market.getTraitBid(traitId);
         assertEq(bidderAddr, bidder);
         assertEq(bidderTBA, main.tokenIdToTBAAccountAddress(3));
         assertEq(bidAmount, 2 ether);
@@ -1363,7 +1351,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(newTraitsContract.ownerOf(traitId), main.tokenIdToTBAAccountAddress(3));
 
         // Verify bid was cleared
-        (bidderAddr,, bidAmount) = market.getTraitBid(traitId);
+        (bidderAddr,, bidAmount,) = market.getTraitBid(traitId);
         assertEq(bidderAddr, address(0));
         assertEq(bidAmount, 0);
     }
@@ -1391,7 +1379,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Verify bid was withdrawn and ETH returned
         assertEq(balanceAfter - balanceBefore, 1 ether);
-        (address bidderAddr,,,) = market.getChonkBid(1);
+        (address bidderAddr,,) = market.getChonkBid(1);
         assertEq(bidderAddr, address(0));
     }
 
@@ -1418,7 +1406,7 @@ contract ChonksMarketTest is ChonksBaseTest {
 
         // Verify bid was withdrawn and ETH returned
         assertEq(balanceAfter - balanceBefore, 1 ether);
-        (address bidderAddr,,) = market.getTraitBid(traitId);
+        (address bidderAddr,,,) = market.getTraitBid(traitId);
         assertEq(bidderAddr, address(0));
     }
 
@@ -1654,7 +1642,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.prank(bidder);
         market.bidOnChonk{value: 1 ether}(1);
 
-        (address bidderAddr, uint256 amountInWei,,) = market.getChonkBid(1);
+        (address bidderAddr, uint256 amountInWei,) = market.getChonkBid(1);
         assertEq(bidderAddr, bidder);
         assertEq(amountInWei, 1 ether);
 
@@ -1666,7 +1654,7 @@ contract ChonksMarketTest is ChonksBaseTest {
         vm.stopPrank();
 
         // The bid should still be there
-        (bidderAddr, amountInWei,,) = market.getChonkBid(1);
+        (bidderAddr, amountInWei,) = market.getChonkBid(1);
         assertEq(bidderAddr, bidder);
         assertEq(amountInWei, 1 ether);
 
@@ -1723,12 +1711,12 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertGt(bidder.balance, startingBal); // check they got their money back
 
         // Check offer is gone
-        (uint256 price, address seller,,,,) = market.getChonkOffer(1);
+        (uint256 price, address seller,,) = market.getChonkOffer(1);
         assertEq(price, 0);
         assertEq(seller, address(0));
 
         // Check bids are gone
-        (address bidderAddr, uint256 amountInWei,,) = market.getChonkBid(1);
+        (address bidderAddr, uint256 amountInWei,) = market.getChonkBid(1);
         assertEq(bidderAddr, address(0));
         assertEq(amountInWei, 0);
     }
@@ -1778,9 +1766,8 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(seller, address(0));
 
         // verify the bids are gone
-        (address bidderAddr, address bidderTBA, uint256 amountInWei) = market.getTraitBid(1);
+        (address bidderAddr,, uint256 amountInWei,) = market.getTraitBid(1);
         assertEq(bidderAddr, address(0));
-        assertEq(bidderTBA, address(0));
         assertEq(amountInWei, 0);
     }
 
@@ -1833,13 +1820,56 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(seller, address(0));
 
         // verify the bids are gone
-        (address bidderAddr, address bidderTBA, uint256 amountInWei) = market.getTraitBid(1);
+        (address bidderAddr, address bidderTBA, uint256 amountInWei,) = market.getTraitBid(1);
         assertEq(bidderAddr, address(0));
         assertEq(bidderTBA, address(0));
         assertEq(amountInWei, 0);
 
         assertEq(newTraitsContract.isApprovedForAll(tba, address(market)), false);
     }
+
+    function test_chonkBidMustBe5PercentHigherThanExistingBid() public {
+        address bidder = user;
+        address secondBidder = 0x7C00c9F0E7AeD440c0C730a9bD9Ee4F49de20D5C;
+
+        vm.deal(bidder, 1 ether);
+        vm.prank(bidder);
+        market.bidOnChonk{value: 0.5 ether}(1);
+
+        vm.deal(secondBidder, 1 ether);
+        vm.prank(secondBidder);
+        vm.expectRevert(BidIsTooLow.selector);
+        market.bidOnChonk{value: 0.51 ether}(1);
+
+        vm.prank(secondBidder);
+        market.bidOnChonk{value: 0.55 ether}(1);
+    }
+
+    function test_traitBidMustBe5PercentHigherThanExistingBid() public {
+        address bidder = user;
+        address secondBidder = 0x7C00c9F0E7AeD440c0C730a9bD9Ee4F49de20D5C;
+
+        vm.deal(bidder, 1 ether);
+        vm.prank(bidder);
+        market.bidOnTrait{value: 0.5 ether}(1, 3);
+
+        vm.deal(secondBidder, 1 ether);
+        vm.prank(secondBidder);
+        vm.expectRevert(BidIsTooLow.selector);
+        market.bidOnTrait{value: 0.51 ether}(1, 76);
+
+        vm.prank(secondBidder);
+        market.bidOnTrait{value: 0.55 ether}(1, 76);
+    }
+
+    function test_traitBidMustOwnThatChonk() public {
+        vm.deal(user, 1 ether);
+        vm.prank(user);
+        vm.expectRevert(NotYourChonk.selector);
+        market.bidOnTrait{value: 0.5 ether}(1, 76);
+    }
+
+    // function test_
 
 
 //     /*

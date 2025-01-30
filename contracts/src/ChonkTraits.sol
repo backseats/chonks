@@ -166,7 +166,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     function getTraitIndexToMetadata(uint256 _traitIndex) public view returns (TraitMetadata memory) {
         TraitMetadata memory metadata = chonkTraitsV1.getTraitIndexToMetadata(_traitIndex);
 
-        if (metadata.dataMinterContract == address(0)) return metadata;
+        if (metadata.dataMinterContract != address(0)) return metadata;
 
         return traitIndexToMetadata[_traitIndex];
     }
