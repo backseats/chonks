@@ -339,7 +339,7 @@ export default function Home() {
             >
               <h2 className="font-source-code-pro text-[5.175vw] md:text-[3.4vw] leading-[1.4] font-weight-600 mx-[3.3vw] py-[3.3vw]">
                 Chonks is a PFP project, customizable with swappable traits,
-                full onchain on Base.
+                fully onchain on Base.
               </h2>
             </section>
             {/*
