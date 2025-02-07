@@ -120,6 +120,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     error OnlyTraitsContract();
     error Paused();
     error PausabilityRevoked();
+    error SellerMustRelistTrait();
     error TBANeedsToApproveMarketplace();
     error TraitEquipped();
     error TraitIdsChangedSinceBid();
@@ -497,10 +498,14 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (CHONKS_MAIN.checkIfTraitIsEquipped(_chonkId, _traitId))
             revert TraitEquipped();
 
-        address tbaTraitOwner = CHONK_TRAITS.ownerOf(_traitId);
-        (address tokenOwner, ) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(
-            _chonkId
-        );
+        // Remove the Chonk offer if it exists
+        if (chonkOffers[_chonkId].seller != address(0)) {
+            delete chonkOffers[_chonkId];
+            emit ChonkOfferCanceled(_chonkId, msg.sender);
+        }
+
+        address tbaTraitOwner =  CHONK_TRAITS.ownerOf(_traitId);
+        (address tokenOwner, ) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
 
         traitOffers[_traitId] = TraitOffer(
             _priceInWei,
@@ -568,6 +573,9 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (seller == msg.sender) revert CantBuyYourOwnTrait();
         if (offer.onlySellTo != address(0) && offer.onlySellTo != msg.sender)
             revert YouCantBuyThatTrait();
+
+        // This is triggered if the Chonk holding the Trait changed hands. We don't clear the Trait offers for gas reasons when a Chonk sells and its Traits are also for sale (if the TBA holds a ton of Traits, it can get costly gas-wise)
+        if (!traitOfferIsValid(_traitId)) revert SellerMustRelistTrait();
 
         // Ensure correct price
         if (offer.priceInWei != msg.value) revert WrongAmount();
@@ -692,32 +700,20 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         }
     }
 
-    function deleteTraitOffersBeforeTokenTransfer(uint256 _traitId) public {
-        if (msg.sender != address(CHONKS_MAIN) && msg.sender != address(CHONK_TRAITS)) revert CMUnauthorized();
+    // /// @dev This is called by ChonksMain in a loop and was excessive. Unused.
+    function deleteTraitOffersBeforeTokenTransfer(uint256) view public {}
 
-        // Delete the Trait Offer
-        if (traitOffers[_traitId].seller != address(0)) delete traitOffers[_traitId];
-    }
+    function deleteTraitOfferBeforeTokenTransferFromTraits(uint256 _traitId) public {
+        if (msg.sender != address(CHONK_TRAITS)) revert CMUnauthorized();
 
-    /// @dev Loops through all of the TBAs associated with the _toEOA address to see if they bid on the Trait. If so, delete and refund the bidder
-    function deleteTraitBidsBeforeTokenTransfer(uint256 _traitId, address[] memory _toTBAs) public {
-        if (msg.sender != address(CHONKS_MAIN)) revert CMUnauthorized();
-
-        // This handles the case where the bid.bidder owns multiple Chonks
-        // since each Chonk has its own TBA and when you bid, we record the TBA
-        // the transfer would happen to, we need to check the bid's bidderTBA against
-        // the TBA that will receive the trait and then refund the *bidder* if necessary
-        TraitBid memory bid = traitBids[_traitId];
-        if (bid.bidder != address(0)) {
-            for (uint256 i; i < _toTBAs.length; ++i) {
-                address toTBA = _toTBAs[i];
-                if (bid.bidderTBA == toTBA) {
-                    delete traitBids[_traitId];
-                    _refundBid(bid.bidder, bid.amountInWei);
-                }
-            }
+        if (traitOffers[_traitId].seller != address(0)) {
+            console2.log("deleting for token id", _traitId);
+            delete traitOffers[_traitId];
         }
     }
+
+    /// @dev Legacy function. Called from ChonksMain. Unused.
+    function deleteTraitBidsBeforeTokenTransfer(uint256 _traitId, address[] memory _toTBAs) view public {}
 
     function deleteTraitBidsBeforeTokenTransfer(uint256 _traitId, address _toTBA) public {
         if (msg.sender != address(CHONK_TRAITS)) revert CMUnauthorized();
@@ -742,6 +738,15 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         chonkIdToLastTraitTransferBlock[_chonkId] = block.number;
 
         emit ChonkCooldownPeriodExpiresAtBlock(_chonkId, block.number + chonkCooldownPeriod);
+    }
+
+    /// @dev Returns true if the owner of the TBA is the same as the seller
+    /// This allows a Chonk to sell without invalidating the Trait offers in the
+    /// case where the Chonk holds many Traits.
+    function traitOfferIsValid(uint256 _traitId) public view returns (bool) {
+        if (traitOffers[_traitId].seller == address(0)) return false;
+        (,,address owner,) = CHONKS_MAIN.getFullPictureForTrait(_traitId);
+        return owner == traitOffers[_traitId].seller;
     }
 
     /// Withdraw

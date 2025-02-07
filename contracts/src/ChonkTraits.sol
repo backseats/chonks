@@ -475,7 +475,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         address tba = ownerOf(_tokenId);
         uint256 chonkId = chonksMain.tbaAddressToTokenId(tba);
         marketplace.removeChonkOfferOnTraitTransfer(chonkId);
-        marketplace.deleteTraitOffersBeforeTokenTransfer(_tokenId);
+        marketplace.deleteTraitOfferBeforeTokenTransferFromTraits(_tokenId);
         marketplace.deleteTraitBidsBeforeTokenTransfer(_tokenId, _to);
     }
 

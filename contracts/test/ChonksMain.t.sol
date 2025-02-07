@@ -958,6 +958,30 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.stopPrank();
     }
 
+    // ~663440 gas
+    function test_beforeTokenTransferWithWhale() public {
+        address whale = 0xcd0bAafEca2015B2651E46a6782A4a3a51Ec2Ba0;
+        uint tid = 35160;
+        assertEq(main.ownerOf(tid), whale);
+
+        vm.prank(whale); // has 780 chonks
+        main.transferFrom(whale, deployer, tid);
+
+        assertEq(main.ownerOf(tid), deployer);
+    }
+
+    // ~663452 gas
+    function test_beforeTokenTransferWithNormal() public {
+        address normalUser = 0x4E95b99b648a6E8F894B67cbccBdC5DB22bc04D9;
+        uint tid = 3941;
+        assertEq(main.ownerOf(tid), normalUser);
+
+        vm.prank(normalUser);
+        main.transferFrom(normalUser, deployer, tid);
+
+        assertEq(main.ownerOf(tid), deployer);
+    }
+
     // tests for: transferring traits back in, empty tba, new trait owner, function parity, clearing your own approvals, adding new traits (making sure theyre in the new traits contract), single approve
 
 
