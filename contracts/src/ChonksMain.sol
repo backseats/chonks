@@ -33,6 +33,9 @@ import { TraitCategory } from "./TraitCategory.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 import { FirstReleaseDataMinter } from "./FirstReleaseDataMinter.sol";
 
+// NOTE: Console logging here wont really work bc we're testing against the deployed ChonksMain rather than any changes that woudl happen in here
+// import { console } from "forge-std/console.sol";
+
 /*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
