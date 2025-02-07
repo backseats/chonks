@@ -825,7 +825,12 @@ contract ChonksMarketTest is ChonksBaseTest {
         uint256 startingBal = buyer.balance;
 
         vm.startPrank(buyer);
+            // ensure bid is deposited into market
+            uint256 marketBalance = address(market).balance;
+            assertEq(marketBalance, 0);
             market.bidOnTrait{ value: 0.1 ether }(1, 76);
+            marketBalance = address(market).balance;
+            assertEq(marketBalance, 0.1 ether);
 
             assertEq(buyer.balance, startingBal - 0.1 ether);
 
@@ -1248,8 +1253,14 @@ contract ChonksMarketTest is ChonksBaseTest {
             assertEq(newTraitsContract.ownerOf(1), tba);
 
             uint256 cooldownVal = market.chonkIdToLastTraitTransferBlock(1); // 0
+            market.offerTrait(1, 1, 1 ether);
             minter.burnAndMint(1, 1);
         vm.stopPrank();
+
+        // verify trait offer is gone
+        (uint256 price, address offerSeller,,) = market.getTraitOffer(1);
+        assertEq(price, 0);
+        assertEq(offerSeller, address(0));
 
         vm.expectRevert("ERC721: invalid token ID");
         assertEq(newTraitsContract.ownerOf(1), address(0));
@@ -1342,6 +1353,8 @@ contract ChonksMarketTest is ChonksBaseTest {
             burnMinter.burnAndMint(1, 16); // not your chonk
         vm.stopPrank();
     }
+
+    // list and burn chonks and traits
 
     error AddressCantBurn();
 

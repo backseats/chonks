@@ -24,8 +24,6 @@ import { TraitRenderer } from "./renderers/TraitRenderer.sol";
 import { ChonksMain } from "./ChonksMain.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 
-import { console } from "forge-std/console.sol"; // DEPLOY: remove
-
 interface IRenderMinterV1 {
     function explainTrait(
         ITraitStorage.StoredTrait calldata storedTrait,
@@ -213,7 +211,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         _burn(_tokenId);
     }
 
-    function burnBatch(uint256[] memory tokenIds) public {
+    function burnBatch(uint256[] memory tokenIds) public nonReentrant {
         if (!isMinter[msg.sender]) revert AddressCantBurn();
 
         for (uint256 i; i < tokenIds.length; ++i) {

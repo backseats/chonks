@@ -90,10 +90,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     mapping(uint256 chonkId => uint256 lastTraitTransferBlock) public chonkIdToLastTraitTransferBlock;
 
-    // Approvals for TBA
-
-    mapping(uint256 chonkId => address[] operators) public chonkIdToApprovedOperators; // DEPLOY: do i need?
-
     /// Errors
 
     error ApproveTheMarketplace();
@@ -123,7 +119,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     error SellerMustRelistTrait();
     error TBANeedsToApproveMarketplace();
     error TraitEquipped();
-    error TraitIdsChangedSinceBid();
     error WithdrawFailed();
     error WrongAmount();
     error YouCantBuyThatChonk();
@@ -456,7 +451,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (bidder == address(0)) revert NoBidToAccept();
         if (bidder == msg.sender) revert CantAcceptYourOwnBid();
         if (bidder != _bidder) revert BidderChanged();
-
 
         delete chonkBids[_chonkId];
 
