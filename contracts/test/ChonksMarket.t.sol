@@ -2123,6 +2123,30 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(newTraitsContract.isApprovedForAll(tba, address(market)), false);
     }
 
+    function test_simpleTraitOfferAndCancel() public {
+        vm.startPrank(deployer);
+            main.unequipAll(1);
+            main.setApprovalForAll(address(market), true);
+
+            market.offerTrait(1, 1, 1 ether); // shoes
+        vm.stopPrank();
+
+        (uint256 price, address seller,,) = market.getTraitOffer(1);
+        assertEq(price, 1 ether);
+        assertEq(seller, deployer);
+
+        vm.prank(address(1));
+        vm.expectRevert(NotYourTrait.selector);
+        market.cancelOfferTrait(1, 1);
+
+        vm.prank(deployer);
+        market.cancelOfferTrait(1, 1);
+
+        (price, seller,,) = market.getTraitOffer(1);
+        assertEq(price, 0);
+        assertEq(seller, address(0));
+    }
+
     function test_newOwnerWithdrawTraitOffers() public {
         address buyer = 0x7C00c9F0E7AeD440c0C730a9bD9Ee4F49de20D5C; // chonk 76-84
 
