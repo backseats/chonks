@@ -7,8 +7,6 @@ import { IChonkStorage } from "./interfaces/IChonkStorage.sol";
 import { Ownable } from "solady/auth/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-import { console2 } from "forge-std/console2.sol";
-
 contract ChonksMarket is Ownable, ReentrancyGuard {
 
     // Structs
@@ -242,6 +240,23 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         _;
     }
 
+    modifier ensureChonkIsNotInCooldown(uint256 _chonkId) {
+        if (chonkIdToLastTraitTransferBlock[_chonkId] != 0 &&
+            block.number - chonkIdToLastTraitTransferBlock[_chonkId] < chonkCooldownPeriod)
+            revert ChonkInCooldown();
+
+        _;
+    }
+
+    // Ensures that the msg.sender owns the Chonk which owns the TBA that owns the Trait
+    modifier onlyTraitOwner(uint256 _traitId, uint256 _chonkId) { // TODO: move
+        address traitOwnerTBA = CHONK_TRAITS.ownerOf(_traitId);
+        (address chonkOwner, address tbaForChonkId) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
+
+        if (traitOwnerTBA != tbaForChonkId || chonkOwner != msg.sender) revert NotYourTrait();
+        _;
+    }
+
     /// Constructor
 
     constructor(address _chonkTraits, uint8 _royaltyPercentage, address _teamWallet) {
@@ -340,7 +355,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit ChonkOfferedToAddress(_chonkId, _priceInWei, owner, tbaAddress, _onlySellTo);
     }
 
-    function _offerChonk(uint256 _chonkId, uint256 _priceInWei, address _onlySellTo, address _seller, address _sellerTBA) internal {
+    function _offerChonk(uint256 _chonkId, uint256 _priceInWei, address _onlySellTo, address _seller, address _sellerTBA) internal ensureChonkIsNotInCooldown(_chonkId) {
         if (_seller != msg.sender) revert NotYourChonk();
 
         chonkOffers[_chonkId] = ChonkOffer({
@@ -351,7 +366,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         });
     }
 
-    function buyChonk(uint256 _chonkId) public payable notPaused nonReentrant {
+    function buyChonk(uint256 _chonkId) public payable notPaused nonReentrant ensureChonkIsNotInCooldown(_chonkId) {
         ChonkOffer memory offer = chonkOffers[_chonkId];
 
         // Ensure Offer
@@ -360,9 +375,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (seller == msg.sender) revert CantBuyYourOwnChonk();
         if (offer.onlySellTo != address(0) && offer.onlySellTo != msg.sender)
             revert YouCantBuyThatChonk();
-
-        if (chonkIdToLastTraitTransferBlock[_chonkId] != 0 && block.number - chonkIdToLastTraitTransferBlock[_chonkId] < chonkCooldownPeriod)
-            revert ChonkInCooldown();
 
         // Ensure correct price
         if (offer.priceInWei != msg.value) revert WrongAmount();
@@ -401,7 +413,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (bid.bidder == address(0)) revert NoBidToWithdraw();
         if (bid.bidder != msg.sender) revert NotYourBid();
 
-        if (block.number < bid.bidBlockNumber + 50) revert MustWaitToWithdrawBid();
+        if (block.number < bid.bidBlockNumber + chonkCooldownPeriod) revert MustWaitToWithdrawBid();
 
         // Delete from mapping
         delete chonkBids[_chonkId];
@@ -436,15 +448,12 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit ChonkBidEntered(_chonkId, msg.sender, msg.value);
     }
 
-    function acceptBidForChonk(uint256 _chonkId, address _bidder) public notPaused nonReentrant {
+    function acceptBidForChonk(uint256 _chonkId, address _bidder) public notPaused nonReentrant ensureChonkIsNotInCooldown(_chonkId) {
         address owner = CHONKS_MAIN.ownerOf(_chonkId);
         if (!CHONKS_MAIN.isApprovedForAll(owner, address(this)) && CHONKS_MAIN.getApproved(_chonkId) != address(this))
             revert ApproveTheMarketplace();
 
         if (owner != msg.sender) revert NotYourChonk();
-
-        if (chonkIdToLastTraitTransferBlock[_chonkId] != 0 && block.number - chonkIdToLastTraitTransferBlock[_chonkId] < chonkCooldownPeriod)
-            revert ChonkInCooldown();
 
         ChonkBid memory bid = chonkBids[_chonkId];
         address bidder = bid.bidder;
@@ -468,12 +477,11 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
     Withdraw Bid, Bid, Accept Bid
     */
 
-    function cancelOfferTrait(uint256 _traitId, uint256 _chonkId) public {
-        if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
-
+    function cancelOfferTrait(uint256 _traitId, uint256 _chonkId) public onlyTraitOwner(_traitId, _chonkId) {
         address seller = traitOffers[_traitId].seller;
         if (seller == address(0)) revert NoOfferToCancel();
-        if (seller != msg.sender) revert NotYourOffer();
+        // Allows for the seller to cancel
+        if (seller != msg.sender && msg.sender != CHONKS_MAIN.ownerOf(_chonkId)) revert NotYourOffer();
 
         delete traitOffers[_traitId];
 
@@ -485,9 +493,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 _traitId,
         uint256 _chonkId,
         uint256 _priceInWei
-    ) public notPaused ensurePriceIsNotZero(_priceInWei) {
-        if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
-
+    ) public notPaused ensurePriceIsNotZero(_priceInWei) onlyTraitOwner(_traitId, _chonkId) {
         // Please unequip the trait if you want to sell it
         if (CHONKS_MAIN.checkIfTraitIsEquipped(_chonkId, _traitId))
             revert TraitEquipped();
@@ -521,9 +527,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 _chonkId,
         uint256 _priceInWei,
         address _onlySellTo
-    ) public notPaused ensurePriceIsNotZero(_priceInWei) {
-        if (!ensureTraitOwner(_traitId, _chonkId)) revert NotYourTrait();
-
+    ) public notPaused ensurePriceIsNotZero(_priceInWei) onlyTraitOwner(_traitId, _chonkId) {
         if (CHONKS_MAIN.tbaAddressToTokenId(_onlySellTo) != 0) revert OnlySellToEOAs();
 
         // Please unequip the trait if you want to sell it
@@ -605,7 +609,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         TraitBid memory bid = traitBids[_traitId];
         if (bid.bidder != msg.sender) revert NotYourBid();
 
-        if (block.number < bid.bidBlockNumber + 50) revert MustWaitToWithdrawBid();
+        if (block.number < bid.bidBlockNumber + chonkCooldownPeriod) revert MustWaitToWithdrawBid();
 
         // Delete from mapping
         delete traitBids[_traitId];
@@ -667,14 +671,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     /// Helper Functions
 
-    // Ensures that the msg.sender owns the Chonk which owns the TBA that owns the Trait
-    function ensureTraitOwner(uint256 _traitId, uint256 _chonkId) public view returns (bool) {
-        address traitOwnerTBA = CHONK_TRAITS.ownerOf(_traitId);
-        (address chonkOwner, address tbaForChonkId) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
-
-        return (traitOwnerTBA == tbaForChonkId) && (chonkOwner == msg.sender);
-    }
-
     function calculateRoyalty(uint256 _amount) public view returns (uint256) {
         return (_amount * royaltyPercentage) / 10_000;
     }
@@ -701,7 +697,6 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         if (msg.sender != address(CHONK_TRAITS)) revert CMUnauthorized();
 
         if (traitOffers[_traitId].seller != address(0)) {
-            console2.log("deleting for token id", _traitId);
             delete traitOffers[_traitId];
         }
     }

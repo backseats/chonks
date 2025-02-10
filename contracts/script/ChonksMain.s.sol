@@ -24,78 +24,78 @@ import { IAccountProxy } from "../src/interfaces/TBABoilerplate/IAccountProxy.so
 // forge script --rpc-url $BASE_SEPOLIA_RPC_URL script/ChonksMain.s.sol:ChonksMainScript --private-key $BASE_SEPOLIA_PRIVATE_KEY --chain-id 83542 --etherscan-api-key 'G38JWKVU4XD6VSWJ1RIHTX79A1QM8QJID9' --broadcast --verify (not working, trying to verify)
 
 // forge script --rpc-url $BASE_MAINNET_RPC_URL script/ChonksMain.s.sol:ChonksEquipHelperScript --private-key $BASE_PRIVATE_KEY --chain-id 8453 --etherscan-api-key 'M93JKMNHAPRHH93VYNNJMD2HFEC9ZSMCIA' --broadcast --verify
-contract ChonksEquipHelperScript is Script {
-    ChonkEquipHelper public chonkEquipHelper;
+// contract ChonksEquipHelperScript is Script {
+//     ChonkEquipHelper public chonkEquipHelper;
 
-    function run() external {
-        vm.startBroadcast();
-        ChonksMain main = ChonksMain(0x07152bfde079b5319e5308C43fB1Dbc9C76cb4F9);
-        chonkEquipHelper = new ChonkEquipHelper(0x07152bfde079b5319e5308C43fB1Dbc9C76cb4F9, 0x6B8f34E0559aa9A5507e74aD93374D9745CdbF09);
-        main.setChonkEquipHelper(address(chonkEquipHelper));
-        vm.stopBroadcast();
-    }
-}
+//     function run() external {
+//         vm.startBroadcast();
+//         ChonksMain main = ChonksMain(0x07152bfde079b5319e5308C43fB1Dbc9C76cb4F9);
+//         chonkEquipHelper = new ChonkEquipHelper(0x07152bfde079b5319e5308C43fB1Dbc9C76cb4F9, 0x6B8f34E0559aa9A5507e74aD93374D9745CdbF09, TODO: new marketplace contract);
+//         main.setChonkEquipHelper(address(chonkEquipHelper));
+//         vm.stopBroadcast();
+//     }
+// }
 
-contract ChonksMainScript is Script {
+// contract ChonksMainScript is Script {
 
-    ChonksMain public main;
-    // BodyRenderer public bodyRenderer;
-    ChonkTraits public traits;
-    FirstReleaseDataMinter public firstReleaseDataMinter;
-    MainRenderer2D public mainRenderer2D;
-    MainRenderer3D public mainRenderer3D;
-    ChonkEquipHelper public chonkEquipHelper;
+//     ChonksMain public main;
+//     // BodyRenderer public bodyRenderer;
+//     ChonkTraits public traits;
+//     FirstReleaseDataMinter public firstReleaseDataMinter;
+//     MainRenderer2D public mainRenderer2D;
+//     MainRenderer3D public mainRenderer3D;
+//     ChonkEquipHelper public chonkEquipHelper;
 
-    bool constant localDeploy = false;
+//     bool constant localDeploy = false;
 
-    // NOTE: This is the main deploy script, it deploys ChonksMain and all associated contracts
-    // @dev before you run, make sure localDeploy is set to `false` in both contracts
-    function run() external {
-        // The value below is any private key you grab from your terminal after running `anvil`
-        vm.startBroadcast();
+//     // NOTE: This is the main deploy script, it deploys ChonksMain and all associated contracts
+//     // @dev before you run, make sure localDeploy is set to `false` in both contracts
+//     function run() external {
+//         // The value below is any private key you grab from your terminal after running `anvil`
+//         vm.startBroadcast();
 
-        // main = new ChonksMain(localDeploy);
-        main = new ChonksMain();
-        console.log("ChonksMain Address:", address(main));
-        console.log('https://testnets.opensea.io/assets/base-sepolia/', address(main));
+//         // main = new ChonksMain(localDeploy);
+//         main = new ChonksMain();
+//         console.log("ChonksMain Address:", address(main));
+//         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(main));
 
-        mainRenderer2D = new MainRenderer2D();
-        main.setMainRenderer2D(address(mainRenderer2D));
+//         mainRenderer2D = new MainRenderer2D();
+//         main.setMainRenderer2D(address(mainRenderer2D));
 
-        mainRenderer3D = new MainRenderer3D();
-        main.setMainRenderer3D(address(mainRenderer3D));
+//         mainRenderer3D = new MainRenderer3D();
+//         main.setMainRenderer3D(address(mainRenderer3D));
 
-        // local deploy: false
-        traits = new ChonkTraits();
-        console.log("ChonkTraits Address:", address(traits));
-        console.log('https://testnets.opensea.io/assets/base-sepolia/', address(traits));
-        main.setTraitsContract(traits);
+//         // local deploy: false
+//         traits = new ChonkTraits();
+//         console.log("ChonkTraits Address:", address(traits));
+//         console.log('https://testnets.opensea.io/assets/base-sepolia/', address(traits));
+//         main.setTraitsContract(traits);
 
-        chonkEquipHelper = new ChonkEquipHelper(address(main), address(traits));
-        main.setChonkEquipHelper(address(chonkEquipHelper));
+//         chonkEquipHelper = new ChonkEquipHelper(address(main), address(traits));
+//         main.setChonkEquipHelper(address(chonkEquipHelper));
 
-        // Set the body renderer on both contracts
-        // bodyRenderer = new BodyRenderer();
-        // main.setBodyRenderer(bodyRenderer);
-        // traits.setBodyRenderer(bodyRenderer);
+//         // Set the body renderer on both contracts
+//         // bodyRenderer = new BodyRenderer();
+//         // main.setBodyRenderer(bodyRenderer);
+//         // traits.setBodyRenderer(bodyRenderer);
 
-        // Attach the data contract to ChonkTraits
-        firstReleaseDataMinter = new FirstReleaseDataMinter(address(main), address(traits));
-        main.setFirstReleaseDataMinter(address(firstReleaseDataMinter));
-        // Allows traits to be added
-        traits.addMinter(address(firstReleaseDataMinter));
+//         // Attach the data contract to ChonkTraits
+//         firstReleaseDataMinter = new FirstReleaseDataMinter(address(main), address(traits));
+//         main.setFirstReleaseDataMinter(address(firstReleaseDataMinter));
+//         // Allows traits to be added
+//         traits.addMinter(address(firstReleaseDataMinter));
 
-        console.log('setup done. minting...');
+//         console.log('setup done. minting...');
 
-        // mint 2 bodies (this will also mint )
-        // main.mint();
-        // main.mint();
+//         // mint 2 bodies (this will also mint )
+//         // main.mint();
+//         // main.mint();
 
-        // @dev you might want to advance some blocks
-        vm.stopBroadcast();
-    }
+//         // @dev you might want to advance some blocks
+//         vm.stopBroadcast();
+//     }
 
-}
+// }
 
 
 contract ChonksMainBodyAndRenderderScript is Script {

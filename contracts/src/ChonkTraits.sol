@@ -115,7 +115,7 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     uint256 constant LEGACY_CONTRACT_TRAIT_COUNT = 340_646;
 
     // The transient Chonk ID, used in _beforeTokenTransfer and _afterTokenTransfer
-    uint256 internal _transientChonkId;
+    // uint256 internal _transientChonkId;
 
     // The description parts
     string[2] descriptionParts;
@@ -472,6 +472,8 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         // Delete the Offer on Chonk ID before the transfer
         address tba = ownerOf(_tokenId);
         uint256 chonkId = chonksMain.tbaAddressToTokenId(tba);
+
+        marketplace.setChonkCooldownPeriod(chonkId);
         marketplace.removeChonkOfferOnTraitTransfer(chonkId);
         marketplace.deleteTraitOfferBeforeTokenTransferFromTraits(_tokenId);
         marketplace.deleteTraitBidsBeforeTokenTransfer(_tokenId, _to);
@@ -479,63 +481,20 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     // Override functions for marketplace compatibility
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
-        if (from == address(0)) {
-            super._beforeTokenTransfer(from, to, tokenId);
-            return;
-        }
+        super._beforeTokenTransfer(from, to, tokenId);
 
-        // If burning
-        if (to == address(0)) {
-            _cleanUpMarketplaceOffersAndBids(tokenId, to);
-
-            // If burning, store the owning Chonk ID for Marketplace cleanup later
-            address tba = ownerOf(tokenId);
-            _transientChonkId = chonksMain.tbaAddressToTokenId(tba);
-
-            super._beforeTokenTransfer(from, to, tokenId);
-            return;
-        }
+        // If minting
+        if (from == address(0)) return;
 
         // Ensure the `to` address is a TBA
-        if (chonksMain.tbaAddressToTokenId(to) == 0) revert NotATBA();
+        if (to != address(0) && chonksMain.tbaAddressToTokenId(to) == 0)
+            revert NotATBA();
 
         // Check if the Trait is equipped on the Chonk, revert if so
         (,,, bool isEquipped) = chonksMain.getFullPictureForTrait(tokenId);
         if (isEquipped) revert CantTransferEquipped();
 
-        (, address seller,,) = marketplace.traitOffers(tokenId);
-        // If there's an Offer on the Trait, seller is not 0
-        if (seller != address(0)) {
-            if (msg.sender != address(marketplace)) revert CantTransfer();
-        }
-
         _cleanUpMarketplaceOffersAndBids(tokenId, to);
-
-        super._beforeTokenTransfer(from, to, tokenId);
-    }
-
-    // Remove an active ChonkOffer because owned Traits changed
-    function _afterTokenTransfer(address _from , address _to, uint256 _traitTokenId) internal override(ERC721) {
-        if (address(chonksMain)  == address(0)) revert SetChonksMainAddress();
-        if (address(marketplace) == address(0)) revert SetMarketplaceAddress();
-
-        // Ignore if minting
-        if (_from == address(0)) return;
-
-        // If burning
-        if (_to == address(0)) {
-            uint256 id = _transientChonkId;
-            _transientChonkId = 0;
-            marketplace.removeChonkOfferOnTraitTransfer(id);
-
-            marketplace.setChonkCooldownPeriod(id);
-            return;
-        }
-
-        // After the transfer, set the cooldown period for the Chonk
-        address tba = ownerOf(_traitTokenId);
-        uint256 chonkId = chonksMain.tbaAddressToTokenId(tba);
-        marketplace.setChonkCooldownPeriod(chonkId);
     }
 
     // Approvals

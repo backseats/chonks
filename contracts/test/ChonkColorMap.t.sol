@@ -8,6 +8,7 @@ import {FirstReleaseTokenMigrator} from "../src/FirstReleaseTokenMigrator.sol";
 import {ChonksMarket} from "../src/ChonksMarket.sol";
 import {Test, console} from "forge-std/Test.sol";
 
+// Run w/ forge test --match-path test/ChonkColorMap.t.sol -vvvv --fork-url https://mainnet.base.org
 contract ChonkColorMapTest is Test {
 
     address deployer = 0xA1454995CcCC837FaC7Ef1D91A1544730c79B306;
@@ -29,7 +30,7 @@ contract ChonkColorMapTest is Test {
 
         colorMap = new ChonkColorMap(address(newTraitsContract));
 
-        main.setTraitsContract(newTraitsContract);
+        main.setTraitsContract(newTraitsContract); // why is it failing here?
         newTraitsContract.setMarketplace(address(newMarketplace));
 
         newMigrator.updateEpochOnce();

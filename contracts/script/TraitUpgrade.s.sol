@@ -22,11 +22,11 @@ contract TraitUpgradeDeployScript is Script {
         ChonkTraits newTraitsContract = new ChonkTraits();
         console.log("New ChonkTraits deployed to:", address(newTraitsContract));
 
-        ChonkEquipHelper newEquipHelper = new ChonkEquipHelper(address(chonksMain), address(newTraitsContract));
-        console.log("New ChonkEquipHelper deployed to:", address(newEquipHelper));
-
         ChonksMarket newMarketplace = new ChonksMarket(address(newTraitsContract), 250, TREASURY);
         console.log("New ChonksMarket deployed to:", address(newMarketplace));
+
+        ChonkEquipHelper newEquipHelper = new ChonkEquipHelper(address(chonksMain), address(newTraitsContract), address(newMarketplace));
+        console.log("New ChonkEquipHelper deployed to:", address(newEquipHelper));
 
         newMigrator = new FirstReleaseTokenMigrator(address(newTraitsContract));
         console.log("New FirstReleaseTokenMigrator deployed to:", address(newMigrator));

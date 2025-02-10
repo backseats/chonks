@@ -63,9 +63,9 @@ contract ChonksMainTest is ChonksBaseTest {
         vm.startPrank(deployer);
             oldTraitsContract = ERC721(address(traits));
             newTraitsContract = new ChonkTraits();
-            ChonkEquipHelper newChonkEquipHelper = new ChonkEquipHelper(address(main), address(newTraitsContract));
-
             ChonksMarket newMarketplace = new ChonksMarket(address(newTraitsContract), 250, TREASURY);
+
+            ChonkEquipHelper newChonkEquipHelper = new ChonkEquipHelper(address(main), address(newTraitsContract), address(newMarketplace));
 
             FirstReleaseDataMinter newDataContract = new FirstReleaseDataMinter(address(main), address(newTraitsContract));
 
@@ -896,7 +896,7 @@ contract ChonksMainTest is ChonksBaseTest {
     function test_equippingNewTraitContractTraits() public {
         setupTraitsMirror();
 
-        ChonkEquipHelper chonkEquipHelper = new ChonkEquipHelper(address(main), address(newTraitsContract));
+        ChonkEquipHelper chonkEquipHelper = new ChonkEquipHelper(address(main), address(newTraitsContract), address(market));
         vm.prank(deployer);
         main.setChonkEquipHelper(address(chonkEquipHelper));
 
