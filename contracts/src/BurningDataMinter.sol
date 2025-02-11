@@ -24,8 +24,6 @@ import "forge-std/console.sol";
 contract BurningDataMinter { // TODO: ownable, ITraitStorage
     uint256[] public accessory = [0]; // let's just have the torch as a 1/1
 
-    bool _localDeploy; // DEPLOY: remove
-
     ChonksMain public chonksMain;
 
     ChonkTraits public chonkTraits;
@@ -39,14 +37,14 @@ contract BurningDataMinter { // TODO: ownable, ITraitStorage
         _;
     }
 
-    constructor(address _ChonksMain, address _chonkTraits, bool localDeploy_) {
+    constructor(address _ChonksMain, address _chonkTraits) {
         chonksMain = ChonksMain(_ChonksMain);
         chonkTraits = ChonkTraits(_chonkTraits);
-        _localDeploy = localDeploy_;
+    }
 
-        if (_localDeploy) {
-            addNewTrait(28, "Torch by JBZ", TraitCategory.Name.Accessory, "", hex"180bef4015170cef4015170def4015160eef4015170ef2a02e150fef4015160ff2a02e170ff2e82e180fef40151510ef40151610f2a02e1710f2a02e1810ef401515110000001611ef40151711ef401515120000001413000000141400000013150000001316000000", "180b06ef4015170c06ef4015170d06ef4015160e06ef4015170e06f2a02e150f06ef4015160f06f2a02e170f06f2e82e180f06ef4015151006ef4015161006f2a02e171006f2a02e181006ef4015151106000000161106ef4015171106ef4015151206000000141306000000141406000000131506000000131606000000", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "jb" );
-        }
+    function debug_addNewTrait() public {
+        addNewTrait(28, "Torch by JBZ", TraitCategory.Name.Accessory, "", hex"180bef4015170cef4015170def4015160eef4015170ef2a02e150fef4015160ff2a02e170ff2e82e180fef40151510ef40151610f2a02e1710f2a02e1810ef401515110000001611ef40151711ef401515120000001413000000141400000013150000001316000000", "180b06ef4015170c06ef4015170d06ef4015160e06ef4015170e06f2a02e150f06ef4015160f06f2a02e170f06f2e82e180f06ef4015151006ef4015161006f2a02e171006f2a02e181006ef4015151106000000161106ef4015171106ef4015151206000000141306000000141406000000131506000000131606000000", 0x9786FFC0A87DA06BD0a71b50a21cc239b4e8EF1D, "jb" );
+
     }
 
     function burnAndMint(uint256 _chonkId, uint256 _burnTraitId) public onlyChonkOwner(_chonkId) {
@@ -133,13 +131,12 @@ contract BurningDataMinter { // TODO: ownable, ITraitStorage
     }
 
     function explainTrait(
-        bool localDeploy,
         ITraitStorage.StoredTrait memory storedTrait,
         uint128 randomness
     ) pure public returns (ITraitStorage.StoredTrait memory) {
         storedTrait.seed = uint256(keccak256(abi.encodePacked(randomness, storedTrait.seed))) % type(uint256).max;
 
-        storedTrait.isRevealed = localDeploy == true ? true : randomness > 0; // if randomness is > 0, epoch & hence Chonk is revealed
+        storedTrait.isRevealed = true;
 
         storedTrait.traitIndex = 28; // Torch by JBZ
 

@@ -20,21 +20,22 @@ export default function OwnershipSection(props: Props) {
 
   const router = useRouter();
 
-  const [copied, setCopied] = useState(false);
+  const [tbaCopied, setTbaCopied] = useState(false);
 
-  const handleCopy = () => {
+  const handleCopyTBA = () => {
     navigator.clipboard.writeText(tbaAddress);
-    setCopied(true);
+
+    setTbaCopied(true);
     setTimeout(() => {
-      setCopied(false);
+      setTbaCopied(false);
     }, 1500);
   };
 
   const goToOwnerProfile = () => {
     if (isYours) {
-      router.push(`/profile`)
+      router.push(`/profile`);
     } else if (owner) {
-      router.push(`/profile/${owner}`)
+      router.push(`/profile/${owner}`);
     }
   };
 
@@ -46,22 +47,27 @@ export default function OwnershipSection(props: Props) {
       {owner && (
         <div className="w-full flex justify-center mb-4 font-bold">
           <div className="flex flex-col sm:flex-row items-center">
-            <div className={`text-lg underline cursor-pointer sm:mt-4 mt-4 mb-2 sm:mb-0`} onClick={goToOwnerProfile}>
-              {isYours ? "Owned by You" : `Owned By ${truncateEthAddress(owner)}`}
+            <div
+              className={`text-lg underline cursor-pointer sm:mt-4 mt-4 mb-2 sm:mb-0`}
+              onClick={goToOwnerProfile}
+            >
+              {isYours
+                ? "Owned by You"
+                : `Owned By ${truncateEthAddress(owner)}`}
             </div>
 
             <span
-              onClick={handleCopy}
+              onClick={handleCopyTBA}
               className="text-gray-500 text-sm sm:ml-2 sm:mt-4 cursor-pointer transition-opacity duration-200"
             >
-              (Backpack address: <u>{copied ? "Copied!" : truncateEthAddress(tbaAddress)}</u>)
+              (Backpack address:{" "}
+              <u>{tbaCopied ? "Copied!" : truncateEthAddress(tbaAddress)}</u>)
             </span>
           </div>
         </div>
       )}
 
       {/* {isYours && <Approvals address={address} tbaAddress={tbaAddress} />} */}
-
     </>
   );
 }

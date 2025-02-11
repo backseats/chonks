@@ -33,6 +33,9 @@ import { TraitCategory } from "./TraitCategory.sol";
 import { ChonksMarket } from "./ChonksMarket.sol";
 import { FirstReleaseDataMinter } from "./FirstReleaseDataMinter.sol";
 
+// NOTE: Console logging here wont really work bc we're testing against the deployed ChonksMain rather than any changes that woudl happen in here
+// import { console } from "forge-std/console.sol";
+
 /*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -173,86 +176,87 @@ contract ChonksMain is IChonkStorage, IERC165, ERC721Enumerable, Ownable, IERC49
         deploymentTime = block.timestamp;
     }
 
-    function teamReserve() public onlyOwner {
-        if (totalSupply() > 2) revert CanOnlyReserveFirstTwo();
-        _mintInternal(msg.sender, 2, 7);
-    }
+    // Don't need these anymore post-mint
+    // function teamReserve() public onlyOwner {
+    //     if (totalSupply() > 2) revert CanOnlyReserveFirstTwo();
+    //     _mintInternal(msg.sender, 2, 7);
+    // }
 
-    function teamMint(address _to, uint256 _amount, uint8 _traitCount) public onlyOwner {
-        if (_traitCount < 4 || _traitCount > 7) revert InvalidTraitCount();
-        if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
-        if (block.timestamp > initialMintStartTime + 26 hours) revert MintEnded();
+    // function teamMint(address _to, uint256 _amount, uint8 _traitCount) public onlyOwner {
+    //     if (_traitCount < 4 || _traitCount > 7) revert InvalidTraitCount();
+    //     if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
+    //     if (block.timestamp > initialMintStartTime + 26 hours) revert MintEnded();
 
-        _mintInternal(_to, _amount, _traitCount);
-    }
+    //     _mintInternal(_to, _amount, _traitCount);
+    // }
 
-    function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {
-        if (address(firstReleaseDataMinter) == address(0)) revert FirstReleaseDataMinterNotSet();
+    // function mint(uint256 _amount, bytes32[] memory _merkleProof) public payable {
+    //     if (address(firstReleaseDataMinter) == address(0)) revert FirstReleaseDataMinterNotSet();
 
-        if (_amount == 0 || _amount > MAX_MINT_AMOUNT) revert InvalidMintAmount();
-        if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
-        if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded();
-        if (msg.value != price * _amount) revert InsufficientFunds();
+    //     if (_amount == 0 || _amount > MAX_MINT_AMOUNT) revert InvalidMintAmount();
+    //     if (initialMintStartTime == 0 || block.timestamp < initialMintStartTime) revert MintNotStarted();
+    //     if (block.timestamp > initialMintStartTime + 24 hours) revert MintEnded();
+    //     if (msg.value != price * _amount) revert InsufficientFunds();
 
-        uint8 traitCount = 4;
-        bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
-        if (MerkleProofLib.verify(_merkleProof, collectionsMerkle, leaf)) {
-            if (!collectionsAddressDidUse[msg.sender]) {
-                traitCount = 5;
-                collectionsAddressDidUse[msg.sender] = true;
-            }
-        } else if (MerkleProofLib.verify(_merkleProof, friendsMerkle, leaf)) {
-            if (!friendsAddressDidUse[msg.sender]) {
-                traitCount = 6;
-                friendsAddressDidUse[msg.sender] = true;
-            }
-        } else if (MerkleProofLib.verify(_merkleProof, creatorsMerkle, leaf)) {
-            if (!creatorsAddressDidUse[msg.sender]) {
-                traitCount = 7;
-                creatorsAddressDidUse[msg.sender] = true;
-            }
-        }
+    //     uint8 traitCount = 4;
+    //     bytes32 leaf = keccak256(abi.encodePacked(msg.sender));
+    //     if (MerkleProofLib.verify(_merkleProof, collectionsMerkle, leaf)) {
+    //         if (!collectionsAddressDidUse[msg.sender]) {
+    //             traitCount = 5;
+    //             collectionsAddressDidUse[msg.sender] = true;
+    //         }
+    //     } else if (MerkleProofLib.verify(_merkleProof, friendsMerkle, leaf)) {
+    //         if (!friendsAddressDidUse[msg.sender]) {
+    //             traitCount = 6;
+    //             friendsAddressDidUse[msg.sender] = true;
+    //         }
+    //     } else if (MerkleProofLib.verify(_merkleProof, creatorsMerkle, leaf)) {
+    //         if (!creatorsAddressDidUse[msg.sender]) {
+    //             traitCount = 7;
+    //             creatorsAddressDidUse[msg.sender] = true;
+    //         }
+    //     }
 
-        _mintInternal(msg.sender, _amount, traitCount);
-    }
+    //     _mintInternal(msg.sender, _amount, traitCount);
+    // }
 
-    function _mintInternal(address _to, uint256 _amount, uint8 _traitCount) internal {
-        for (uint i; i < _amount; ++i) {
-            uint256 tokenId = ++nextTokenId;
-            _mint(_to, tokenId);
+    // function _mintInternal(address _to, uint256 _amount, uint8 _traitCount) internal {
+    //     for (uint i; i < _amount; ++i) {
+    //         uint256 tokenId = ++nextTokenId;
+    //         _mint(_to, tokenId);
 
-            address tokenBoundAccountAddress = REGISTRY.createAccount(
-                ACCOUNT_PROXY, // implementation address
-                0, // salt
-                8453, // chainId
-                address(this), // tokenContract
-                tokenId // tokenId
-            );
+    //         address tokenBoundAccountAddress = REGISTRY.createAccount(
+    //             ACCOUNT_PROXY, // implementation address
+    //             0, // salt
+    //             8453, // chainId
+    //             address(this), // tokenContract
+    //             tokenId // tokenId
+    //         );
 
-            // Set the cross-reference between tokenId and TBA account address
-            tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
-            tbaAddressToTokenId[tokenBoundAccountAddress] = tokenId;
+    //         // Set the cross-reference between tokenId and TBA account address
+    //         tokenIdToTBAAccountAddress[tokenId] = tokenBoundAccountAddress;
+    //         tbaAddressToTokenId[tokenBoundAccountAddress] = tokenId;
 
-            // Initialize the TBA
-            IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
+    //         // Initialize the TBA
+    //         IAccountProxy(payable(tokenBoundAccountAddress)).initialize(address(ACCOUNT_IMPLEMENTATION));
 
-            // Mint Traits to equip below
-            uint256[] memory traitsIds = firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
+    //         // Mint Traits to equip below
+    //         uint256[] memory traitsIds = firstReleaseDataMinter.safeMintMany(tokenBoundAccountAddress, _traitCount);
 
-            // Initialize the Chonk
-            StoredChonk storage chonk = chonkTokens[tokenId];
-            chonk.tokenId = tokenId;
-            // This randomly picks your Chonk skin color but you can change it any time.
-            chonk.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 5); // even chance for 5 different bodies
-            // Set the default background color
-            chonk.backgroundColor = "0D6E9D";
+    //         // Initialize the Chonk
+    //         StoredChonk storage chonk = chonkTokens[tokenId];
+    //         chonk.tokenId = tokenId;
+    //         // This randomly picks your Chonk skin color but you can change it any time.
+    //         chonk.bodyIndex = uint8(uint256(keccak256(abi.encodePacked(tokenId))) % 5); // even chance for 5 different bodies
+    //         // Set the default background color
+    //         chonk.backgroundColor = "0D6E9D";
 
-            chonk.shoesId = traitsIds[0];
-            chonk.bottomId = traitsIds[1];
-            chonk.topId = traitsIds[2];
-            chonk.hairId = traitsIds[3];
-        }
-    }
+    //         chonk.shoesId = traitsIds[0];
+    //         chonk.bottomId = traitsIds[1];
+    //         chonk.topId = traitsIds[2];
+    //         chonk.hairId = traitsIds[3];
+    //     }
+    // }
 
     function getOwnerAndTBAAddressForChonkId(uint256 _chonkId) public view returns (address owner, address tbaAddress) {
         owner = ownerOf(_chonkId);
