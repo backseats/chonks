@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
-
 import "forge-std/Script.sol";
 import { ChonksMain } from "../src/ChonksMain.sol";
 import { ChonkTraits } from "../src/ChonkTraits.sol";
@@ -15,7 +14,7 @@ contract TraitUpgradeDeployScript is Script {
     ChonksMain chonksMain = ChonksMain(0x07152bfde079b5319e5308C43fB1Dbc9C76cb4F9);
     address public constant TREASURY = address(0xE5c8893e69907e7d90a0f012C477CA30Ec61c3B9);
 
-    FirstReleaseTokenMigrator newMigrator; // TODO: fill in with actual address
+    FirstReleaseTokenMigrator newMigrator; // TODO: fill in with actual address after deploy
 
     function run() external {
         vm.startBroadcast(vm.envUint("BASE_PRIVATE_KEY"));
@@ -42,6 +41,9 @@ contract TraitUpgradeDeployScript is Script {
         newTraitsContract.addMinter(address(newMigrator));
 
         newMigrator.updateEpochOnce();
+
+        newMigrator.migrateBatch(400);
+        console.log("New Traits Contract totalSupply:", newTraitsContract.totalSupply());
 
         vm.stopBroadcast();
     }

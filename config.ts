@@ -1,28 +1,21 @@
 import { http, createConfig } from "wagmi";
 import { base } from "wagmi/chains";
-import { coinbaseWallet, injected } from "wagmi/connectors";
+import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 // import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-
-// Only for local dev
-// export const publicClient = createPublicClient({
-//   chain: {
-//     ...baseSepolia,
-//     id: 1, // Use 1 for local development
-//   },
-//   transport: http('http://localhost:8545'),
-// });
 
 export const config = createConfig({
   chains: [base],
   connectors: [
-    coinbaseWallet({ appName: 'Chonks', preference: 'all' })
+    coinbaseWallet({ appName: 'Chonks', preference: 'all' }),
+    walletConnect({
+      projectId: "6637dd8a880463f857799d3d1011b7a2",
+    }),
     // injected()
   ],
   transports: {
     [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`),
   },
 });
-
 
 // export const config = getDefaultConfig({
 //   appName: 'Chonks',
