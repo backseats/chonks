@@ -2548,8 +2548,48 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(offerSeller, buyer);
     }
 
-    // function test_traitApprovalsRemovedAfterChonkSale() public {
+    function test_attemptToBuyTraitAfterChonkIsBoughtWithTraitOffer() public {
+        //write a test where the buyer tries to buy the trait after the chonk is bought with a trait also offered, traitofferisvalid is false
 
-    // }
+        vm.startPrank(deployer);
+            main.unequipAll(1);
+            main.setApprovalForAll(address(market), true);
+        vm.stopPrank();
+
+        address tba = main.tokenIdToTBAAccountAddress(1);
+        vm.prank(tba);
+        newTraitsContract.setApprovalForAll(address(market), true);
+
+        vm.startPrank(deployer);
+            market.offerTrait(1, 1, 1 ether);
+            market.offerTrait(3, 1, 1 ether);
+            market.offerTrait(4, 1, 1 ether);
+            market.offerChonk(1, 1 ether);
+        vm.stopPrank();
+
+        assertEq(market.traitOfferIsValid(1), true);
+
+        address buyer = address(2);
+        vm.deal(buyer, 10 ether);
+        vm.prank(buyer);
+        market.buyChonk{value: 1 ether}(1);
+
+        // test offer should be there still for the trait, but invalid
+        // test offer for trait but after the chonk sale (false)
+        (uint256 price, address seller,, address onlySellTo) = market.getTraitOffer(1);
+        assertEq(price, 1 ether);
+        assertEq(seller, deployer);
+        assertEq(onlySellTo, address(0));
+        assertEq(market.traitOfferIsValid(1), false);
+
+        vm.prank(tba);
+        newTraitsContract.setApprovalForAll(address(market), true);
+
+        buyer = 0x7C00c9F0E7AeD440c0C730a9bD9Ee4F49de20D5C; // chonk 76-84
+        vm.deal(buyer, 10 ether);
+        vm.prank(buyer);
+        vm.expectRevert(SellerMustRelistTrait.selector);
+        market.buyTrait{value: 1 ether}(3, 76); // buy trait 3 for chonk 76
+    }
 
 }
