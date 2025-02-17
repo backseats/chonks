@@ -47,7 +47,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     const { data: walletClient } = useWalletClient();
     const tokenboundClient = new TokenboundClient({
         walletClient,
-        chainId,
+        chainId: 8453,
     });
 
     const [tokenData, setTokenData] = useState<Chonk | null>(null);
@@ -413,8 +413,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                                     /> */}
 
                                     <div className="relative w-full pt-[100%]">
-                                        <iframe 
-                                            className="absolute top-0 left-0 w-full h-full" 
+                                        <iframe
+                                            className="absolute top-0 left-0 w-full h-full"
                                             src={tokenData.animation_url}
                                         ></iframe>
                                     </div>
