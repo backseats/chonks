@@ -195,7 +195,7 @@ export default function PriceAndActionsSection({
                                             className="w-full bg-chonk-orange text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
                                             onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
                                         >
-                                            Accept Bid for {formatEther(chonkBid.amountInWei)} ETH
+                                            Accept Offer of {formatEther(chonkBid.amountInWei)} ETH
                                         </button>
                                     )}
                                 </div>
@@ -280,7 +280,7 @@ export default function PriceAndActionsSection({
                                                     className="w-full bg-chonk-orange text-white py-2 px-4 hover:bg-chonk-orange hover:text-black transition-colors"
                                                     onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
                                                 >
-                                                    Accept Bid for {formatEther(chonkBid.amountInWei)} ETH
+                                                    Accept Offer of {formatEther(chonkBid.amountInWei)} ETH
                                                 </button>
                                             )}
                                         </>

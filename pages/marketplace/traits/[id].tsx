@@ -14,7 +14,7 @@ import {
 } from "@/contract_data";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from '@/components/marketplace/TraitsSection';
-import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
+// import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
 import PriceAndActionsSection from '@/components/marketplace/traits/PriceAndActionsSection';
 import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
@@ -350,7 +350,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                                         isEquipped={isEquipped}
                                     />
 
-                                    <ActivityAndOffersSection
+                                    {/* <ActivityAndOffersSection
                                         isActivityOpen={isActivityOpen}
                                         setIsActivityOpen={setIsActivityOpen}
                                         isOffersOpen={isOffersOpen}
@@ -358,7 +358,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                                         type="trait"
                                         tokenId={id}
                                         address={address}
-                                    />
+                                    /> */}
 
                                 </div>
                             </section>

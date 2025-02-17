@@ -490,20 +490,38 @@ const hasActiveOffer = useMemo(() => {
 
   // cancel offer chonk
   // const { writeContract: cancelOfferChonk } = useWriteContract();
-  const { writeContract: withdrawBidOnChonkChonk, isPending: isWithdrawBidOnChonkkPending, data: hashWithdrawBidOnChonk } = useWriteContract();
+  const { writeContract: withdrawBidOnChonk, isPending: isWithdrawBidOnChonkPending, data: hashWithdrawBidOnChonk } = useWriteContract();
   const { isLoading: isWithdrawBidOnChonkLoading, isSuccess: isWithdrawBidOnChonkSuccess, isError : isWithdrawBidOnChonkErrror, data: receiptWithdrawBidOnChonk } = useWaitForTransactionReceipt({
-    hash: hashCancelOfferChonk,
+    hash: hashWithdrawBidOnChonk,
   });
 
   const handleWithdrawBidOnChonk = () => {
     if (!address || !chonkId) return;
-    cancelOfferChonk({
+    withdrawBidOnChonk({
       address: marketplaceContract,
       abi: marketplaceABI,
       functionName: 'withdrawBidOnChonk',
       args: [BigInt(chonkId)],
+    }, {
+      onError: (error) => {
+        console.log('Withdrawal transaction rejected:', error);
+      },
     });
   };
+
+
+  // listChonk({
+  //   address: marketplaceContract,
+  //   abi: marketplaceABI,
+  //   functionName: 'offerChonk',
+  //   args: [BigInt(chonkId), priceInWei],
+  // }, {
+  //   onError: (error) => {
+  //     console.log('Listing transaction rejected:', error);
+  //     setIsListingRejected(true);
+  //     setPendingListPrice(null); // Clear pending price on error
+  //   },
+  // });
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  Cancel Offer Trait  /////////////////////////////////
@@ -647,6 +665,6 @@ const hasActiveOffer = useMemo(() => {
     handleBidOnChonk,
     handleAcceptBidForChonk,
     handleWithdrawBidOnChonk,
-    
+
   };
 }
