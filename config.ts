@@ -3,19 +3,50 @@ import { base } from "wagmi/chains";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
 // import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 
+const localChain = {
+  id: 6969,
+  name: 'Local Network',
+  network: 'localhost',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Ethereum',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: { http: ['http://localhost:8545'] },
+    public: { http: ['http://localhost:8545'] },
+  },
+} as const;
+
 export const config = createConfig({
-  chains: [base],
+  chains: [localChain],
   connectors: [
     coinbaseWallet({ appName: 'Chonks', preference: 'all' }),
     walletConnect({
       projectId: "6637dd8a880463f857799d3d1011b7a2",
     }),
-    // injected()
+    injected()
   ],
   transports: {
-    [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`),
+    [localChain.id]: http('http://localhost:8545'),
   },
 });
+
+// export const config = createConfig({
+//   chains: [base],
+//   connectors: [
+//     coinbaseWallet({ appName: 'Chonks', preference: 'all' }),
+//     walletConnect({
+//       projectId: "6637dd8a880463f857799d3d1011b7a2",
+//     }),
+//     // injected()
+//   ],
+//   transports: {
+//     [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`),
+//   },
+// });
+
+// -- idk what this is below
 
 // export const config = getDefaultConfig({
 //   appName: 'Chonks',

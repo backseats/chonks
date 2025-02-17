@@ -14,6 +14,7 @@ export const marketplaceABI = marketplaceAbiImport.abi;
 export const simpleHashKey = "makingmemark_sk_ab7284sr3v5o19g3iaublzep6sffynfu"; // TODO: env var
 
 export const chainId = base.id;
+// export const chainId = 6969;
 
 export const MINT_PRICE = 0.01;
 
