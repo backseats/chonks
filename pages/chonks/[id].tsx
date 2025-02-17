@@ -40,6 +40,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { SendHorizontal } from "lucide-react";
+import { base } from "viem/chains";
 
 export default function ChonkDetail({ id }: { id: string }) {
   const TOKEN_URI = "tokenURI";
@@ -49,7 +50,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const { data: walletClient } = useWalletClient();
   const tokenboundClient = new TokenboundClient({
     walletClient,
-    chainId,
+    chainId: base.id,
   });
 
   const [tokenData, setTokenData] = useState<Chonk | null>(null);

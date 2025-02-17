@@ -2,13 +2,14 @@ import { mainABI, marketplaceContract, traitsContract, chainId} from "@/contract
 import { Address, encodeFunctionData } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { useWalletClient } from "wagmi";
+import { base } from "viem/chains";
 
 export function useTBAApprovalWrite(tbaAddress: Address) {
 
   const { data: walletClient } = useWalletClient();
   const tokenboundClient = new TokenboundClient({
       walletClient,
-      chainId,
+      chainId: base.id,
   });
 
   const encodedData = (value: boolean) => {
