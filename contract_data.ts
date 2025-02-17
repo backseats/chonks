@@ -1,6 +1,12 @@
 import mainAbiImport from './contracts/out/ChonksMain.sol/ChonksMain.json'
 import traitsAbiImport from './contracts/out/ChonkTraits.sol/ChonkTraits.json'
 import marketplaceAbiImport from './contracts/out/ChonksMarket.sol/ChonksMarket.json'
+// import mainAbiImport from './contracts/out/ChonksMain.sol/ChonksMain.json'
+// import traitsAbiImport from './contracts/out/ChonkTraits.sol/ChonkTraits.json'
+// import marketplaceAbiImport from './contracts/out/ChonksMarket.sol/ChonksMarket.json'
+import { chonksMainABI } from './abis/chonksMainABI'
+import { chonkTraitsABI } from './abis/chonkTraitsABI'
+import { chonksMarketABI } from './abis/chonksMarketABI'
 import { base } from "viem/chains";
 
 export const mainContract = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
@@ -10,6 +16,9 @@ export const marketplaceContract = "0xf127467f1e94593b1606bf0da3d08e3c15b2b291";
 export const mainABI = mainAbiImport.abi;
 export const traitsABI = traitsAbiImport.abi;
 export const marketplaceABI = marketplaceAbiImport.abi;
+export const mainABI = chonksMainABI;
+export const traitsABI = chonkTraitsABI;
+export const marketplaceABI = chonksMarketABI;
 
 export const simpleHashKey = "makingmemark_sk_ab7284sr3v5o19g3iaublzep6sffynfu"; // TODO: env var
 
