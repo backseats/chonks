@@ -1,6 +1,8 @@
 # Local Deploy Runbook
 
-0. Set up your metamask with a new network to following:
+0. `anvil --fork-url $BASE_MAINNET_RPC_URL --balance 100000 --chain-id 6969`
+
+1. Set up your metamask with a new network to following:
 
 Network Name: Anvil | Base
 RPC URL: http://localhost:8545
@@ -9,9 +11,7 @@ Currency Symbol: ETH
 
 In `config.ts`, ensure you're using the `localChain` config
 
-1. `cd /contracts`
-
-2. `anvil --fork-url $BASE_MAINNET_RPC_URL --balance 100000 --chain-id 6969`
+2. `cd /contracts`
 
 3. `forge script script/TraitUpgrade.s.sol --rpc-url http://localhost:8545 --broadcast`
 
