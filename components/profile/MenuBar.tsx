@@ -1,18 +1,14 @@
 import React from "react";
 import { ConnectKitButton } from "connectkit";
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
-interface Props {
-
-}
+interface Props {}
 
 export default function MenuBar(props: Props) {
-
   return (
     <nav id="top" className="w-full flex justify-between px-4 py-4 bg-white">
-      <div >
-
+      <div>
         <Link href="/" className="hover:opacity-70 transition-opacity">
           <h1 className="text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
             <Image
@@ -27,7 +23,6 @@ export default function MenuBar(props: Props) {
       </div>
 
       <div className="hidden md:flex gap-8 items-center font-source-code-pro text-sm font-weight-600">
-
         <Link href="/" className="hover:opacity-70 transition-opacity">
           Home
         </Link>
@@ -42,16 +37,12 @@ export default function MenuBar(props: Props) {
 
         <div> | </div>
 
-        <Link href="/profile" className="hover:opacity-70 transition-opacity underline">
+        <Link
+          href="/profile"
+          className="hover:opacity-70 transition-opacity underline"
+        >
           Your Chonks
         </Link>
-
-        {/* <div> | </div>
-
-        <Link href="/mint" className="hover:opacity-70 transition-opacity ">
-          Mint
-        </Link> */}
-
       </div>
 
       <ConnectKitButton
@@ -78,8 +69,6 @@ export default function MenuBar(props: Props) {
       >
           Mint Soon
       </button> */}
-
-
     </nav>
   );
 }

@@ -24,6 +24,7 @@ import PriceAndActionsSection from "@/components/marketplace/chonks/PriceAndActi
 // import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { CurrentChonk } from "@/types/CurrentChonk";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
+import Loading from "@/components/marketplace/Loading";
 
 // type ChonkOffer = {
 //     priceInWei: bigint;
@@ -439,11 +440,11 @@ export default function ChonkDetail({ id }: { id: string }) {
                     <iframe
                       className="absolute top-0 left-0 w-full h-full"
                       src={tokenData.animation_url}
+                      // TODO: use the colormap data rather than the animation_url which might be in 3d
                     ></iframe>
                   </div>
 
                   <TraitsSection
-                    id={id}
                     tokenData={tokenData}
                     equippedTraits={currentChonk}
                     isOpen={isTraitsOpen}
@@ -488,9 +489,7 @@ export default function ChonkDetail({ id }: { id: string }) {
               </section>
             </div>
           ) : (
-            <section className="flex pt-[1.725vw] px-[3.45vw]">
-              <span className="text-[1.2vw]">Loading...</span>
-            </section>
+            <Loading />
           )}
         </main>
       </div>

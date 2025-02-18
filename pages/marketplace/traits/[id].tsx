@@ -19,6 +19,7 @@ import PriceAndActionsSection from "@/components/marketplace/traits/PriceAndActi
 import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
+import Loading from "@/components/marketplace/Loading";
 
 type TraitOffer = {
   priceInWei: bigint;
@@ -346,7 +347,6 @@ export default function ChonkDetail({ id }: { id: string }) {
                   />
 
                   {/* <TraitsSection
-                                        id={id}
                                         tokenData={tokenData}
                                         equippedTraits={null}
                                         isOpen={isTraitsOpen}
@@ -393,9 +393,7 @@ export default function ChonkDetail({ id }: { id: string }) {
               </section>
             </div>
           ) : (
-            <section className="flex pt-[1.725vw] px-[3.45vw]">
-              <span className="text-[1.2vw]">Loading...</span>
-            </section>
+            <Loading />
           )}
         </main>
       </div>
