@@ -1168,6 +1168,37 @@ contract ChonksMarketTest is ChonksBaseTest {
         assertEq(newTraitsContract.isApprovedForAll(tba, address(5)), false);
     }
 
+    function test_buyChonkTraitApprovalsRevoke() public {
+        address seller = deployer;
+        address buyer = 0x7C00c9F0E7AeD440c0C730a9bD9Ee4F49de20D5C; // chonk 76-84
+
+        vm.deal(seller, 1 ether);
+        vm.startPrank(seller);
+            main.unequipAll(1);
+            main.setApprovalForAll(address(market), true);
+        vm.stopPrank();
+
+        uint chonkId = 1;
+        address tba = main.tokenIdToTBAAccountAddress(chonkId);
+        vm.startPrank(tba);
+            newTraitsContract.setApprovalForAll(address(market), true);
+        vm.stopPrank();
+
+        vm.prank(seller);
+        market.offerTrait(1, 1, 1 ether);
+
+        assertEq(newTraitsContract.isApprovedForAll(tba, address(market)), true);
+
+        // revoke
+        vm.prank(tba);
+        newTraitsContract.setApprovalForAll(address(market), false);
+
+        vm.deal(buyer, 2 ether);
+        vm.prank(buyer);
+        vm.expectRevert(TBANeedsToApproveMarketplace.selector);
+        market.buyTrait{value: 1 ether}(1, 76); // this should revert
+    }
+
     function test_buyTraitAndTestApprovalsCleared() public {
         address buyer = 0x7C00c9F0E7AeD440c0C730a9bD9Ee4F49de20D5C; // chonk 76-84
 
