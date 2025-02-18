@@ -245,6 +245,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     if (!storedChonk) return;
 
     console.log("storedChonk", storedChonk);
+    if (!allTraitTokenIds) return;
 
     const hatIdIndex =
       // @ts-ignore
