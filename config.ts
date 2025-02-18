@@ -1,6 +1,7 @@
 import { http, createConfig } from "wagmi";
 import { base } from "wagmi/chains";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
+import { defineChain } from 'viem'
 // import { getDefaultConfig } from '@rainbow-me/rainbowkit';
 
 const localChain = {
@@ -18,8 +19,23 @@ const localChain = {
   },
 } as const;
 
+export const localDefineChain = defineChain({
+  id: 6969,
+  name: 'Local Network',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'Ether',
+    symbol: 'ETH',
+  },
+  rpcUrls: {
+    default: { http: ['http://localhost:8545'] },
+    public: { http: ['http://localhost:8545'] },
+  }
+})
+
 export const config = createConfig({
-  chains: [localChain],
+  // chains: [localChain],
+  chains: [localDefineChain],
   connectors: [
     coinbaseWallet({ appName: 'Chonks', preference: 'all' }),
     // walletConnect({
@@ -28,7 +44,8 @@ export const config = createConfig({
     injected()
   ],
   transports: {
-    [localChain.id]: http('http://localhost:8545'),
+    // [localChain.id]: http('http://localhost:8545'),
+    [localDefineChain.id]: http('http://localhost:8545')
   },
 });
 

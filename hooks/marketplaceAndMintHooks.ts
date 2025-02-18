@@ -236,12 +236,22 @@ export function useMarketplaceActions(chonkId: number) {
   // const { writeContract: approveMarketplace } = useWriteContract();
   const handleApproveMarketplace = () => {
     if (!address) return;
-    approveMarketplace({
-      address: mainContract,
-      abi: mainABI,
-      functionName: 'setApprovalForAll',
-      args: [marketplaceContract, true],
-    });
+    try{
+      approveMarketplace({
+        address: mainContract,
+        abi: mainABI,
+        functionName: 'setApprovalForAll',
+        args: [marketplaceContract, true],
+      }, {
+        onError: (error) => {
+          console.log('Approval transaction rejected:', error);
+          alert('Error approving marketplace: ' + error);
+        },
+      });
+    } catch (error) {
+      console.error('Error approving marketplace:', error);
+      alert('Error approving marketplace: ' + error);
+    }
   };
 
   useEffect(() => {
@@ -275,10 +285,6 @@ export function useMarketplaceActions(chonkId: number) {
   const hasActiveBid = useMemo(() => {
     return Boolean(chonkBid);
   }, [chonkBid]);
-
-
-
-
 
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,8 +334,6 @@ export function useMarketplaceActions(chonkId: number) {
       console.log("Price in Wei before formatting:", chonkOffer.priceInWei);
       return parseFloat(formatEther(chonkOffer.priceInWei));
   }, [chonkOffer]);
-
-
 
   const isOfferSpecific = useMemo(() => {
       if (!chonkOffer?.onlySellTo) return false;
@@ -416,12 +420,14 @@ const hasActiveOffer = useMemo(() => {
       }, {
         onError: (error) => {
           console.log('Listing transaction rejected:', error);
+          alert('Error listing chonk: ' + error.message);
           setIsListingRejected(true);
           setPendingListPrice(null); // Clear pending price on error
         },
       });
     } catch (error) {
       console.error('Error listing chonk:', error);
+      alert('Error listing chonk: ' + error);
       setPendingListPrice(null); // Clear pending price on error
     }
   };
@@ -456,9 +462,15 @@ const hasActiveOffer = useMemo(() => {
         abi: marketplaceABI,
         functionName: 'offerChonkToAddress',
         args: [BigInt(chonkId), priceInWei, address],
+      }, {
+        onError: (error) => {
+          console.log('Listing transaction rejected:', error);
+          alert('Error listing chonk to address: ' + error.message);
+        },
       });
     } catch (error) {
       console.error('Error listing chonk:', error);
+      alert('Error listing chonk to address: ' + error);
     }
   };
 
@@ -486,12 +498,13 @@ const hasActiveOffer = useMemo(() => {
       }, {
         onError: (error) => {
           console.log('Cancel Offer Chonk transaction rejected:', error);
+          alert(error.message);
           // TODO: probably need to notify user of error
         },
       });
     } catch (error) {
       console.error('Error canceling offer chonk:', error);
-      // TODO: probably need to notify user of error
+      alert('Error cancelling offer: ' + error);
     }
   };
 
@@ -508,16 +521,23 @@ const hasActiveOffer = useMemo(() => {
 
   const handleWithdrawBidOnChonk = () => {
     if (!address || !chonkId) return;
-    withdrawBidOnChonk({
-      address: marketplaceContract,
-      abi: marketplaceABI,
+    try{
+      withdrawBidOnChonk({
+        address: marketplaceContract,
+        abi: marketplaceABI,
       functionName: 'withdrawBidOnChonk',
       args: [BigInt(chonkId)],
     }, {
       onError: (error) => {
         console.log('Withdrawal transaction rejected:', error);
+        alert(error.message.includes('MustWaitToWithdrawBid') ? 'You must wait 100 seconds before cancelling your offer' : 'Error cancelling offer: ' + error.message);
+        // alert(error.message);
       },
     });
+    } catch (error) {
+      console.error('Error withdrawing bid:', error);
+      alert('Error withdrawing bid: ' + error);
+    }
   };
 
 
@@ -547,12 +567,22 @@ const hasActiveOffer = useMemo(() => {
 
   const handleCancelOfferTrait = (traitId: number, chonkId: number) => {
     if (!address || !chonkId) return;
-    cancelOfferTrait({
-      address: marketplaceContract,
-      abi: marketplaceABI,
+    try{
+      cancelOfferTrait({
+        address: marketplaceContract,
+        abi: marketplaceABI,
       functionName: 'cancelOfferTrait',
       args: [BigInt(traitId), BigInt(chonkId)],
-    });
+    }, {
+      onError: (error) => {
+        console.log('Cancel Offer Trait transaction rejected:', error);
+        alert('Error cancelling offer trait: ' + error);
+      },
+      });
+    } catch (error) {
+      console.error('Error cancelling offer trait:', error);
+      alert('Error cancelling offer trait: ' + error);
+    }
   };
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -586,10 +616,14 @@ const hasActiveOffer = useMemo(() => {
         value: priceInWei
       }, {
         onSuccess: (data) => console.log('Transaction submitted:', data),
-        onError: (error) => console.error('Transaction failed:', error)
+        onError: (error) => {
+          console.error('Transaction failed:', error);
+          alert('Error buying chonk: ' + error);
+        }
       });
     } catch (error) {
       console.error('Error in handleBuyChonk:', error);
+      alert('Error buying chonk: ' + error);
     }
   };
 
@@ -614,9 +648,15 @@ const hasActiveOffer = useMemo(() => {
             functionName: 'bidOnChonk',
             args: [BigInt(chonkId)],
             value: amountInWei
+        }, {
+          onError: (error) => {
+            console.error('Error placing bid:', error);
+            alert('Error placing bid: ' + error);
+          }
         });
     } catch (error) {
         console.error('Error placing bid:', error);
+        alert('Error placing bid: ' + error);
     }
   };
 
@@ -640,9 +680,15 @@ const hasActiveOffer = useMemo(() => {
         abi: marketplaceABI,
         functionName: 'acceptBidForChonk',
         args: [BigInt(chonkId), bidder],
+      }, {
+        onError: (error) => {
+          console.error('Error accepting bid:', error);
+          alert('Error accepting bid: ' + error);
+        }
       });
     } catch (error) {
       console.error('Error accepting bid:', error);
+      alert('Error accepting bid: ' + error);
     }
   };
 
