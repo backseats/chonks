@@ -293,7 +293,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         {tokenData && <meta property="og:image" content={tokenData.image} />}
         <meta
           property="og:url"
-          content={`https://chonks.xyz/marketplace/chonks/${id}`}
+          content={`https://chonks.xyz/marketplace/traits/${id}`}
         />
         <meta property="og:type" content="website" />
         <meta
