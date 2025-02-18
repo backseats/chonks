@@ -54,6 +54,7 @@ export default function PriceAndActionsSection({
         isListChonkError,
         isListChonkLoading,
         isListChonkSuccess,
+        isCancelOfferChonkSuccess,
         price,
         handleApproveMarketplace,
         handleListChonk,
@@ -142,13 +143,15 @@ export default function PriceAndActionsSection({
     // Add this constant near the top of the component
     const MIN_LISTING_PRICE = 0.000001; // 1 millionth of an ETH
 
-    console.log('hasActiveOffer:', hasActiveOffer);
-    console.log('isListChonkSuccess:', isListChonkSuccess);
+    // console.log('hasActiveOffer:', hasActiveOffer);
+    // console.log('isListChonkSuccess:', isListChonkSuccess);
 
     return (
         <>
             <div className="border border-black p-[1.725vw] mb-[1.725vw]">
-                {hasActiveOffer || isListChonkSuccess ? (
+
+                {/* Has Offer, or just been Listed */}
+                { (hasActiveOffer || isListChonkSuccess) && !isCancelOfferChonkSuccess ? (
                     <>
                         <div className="flex flex-col mb-4">
                             <div className="flex items-baseline gap-2">
@@ -233,6 +236,8 @@ export default function PriceAndActionsSection({
                     </>
                 ) : (
                     <>
+                        {/* Not Listed, or just been Cancelled */}
+
                         <div className="text-[1vw] text-gray-500 mb-[1.725vw]">Not Listed
                             {hasActiveBid && chonkBid && (
                                 <span className="text-gray-500"> | Current Bid: {formatEther(chonkBid.amountInWei)} ETH</span>
@@ -260,7 +265,7 @@ export default function PriceAndActionsSection({
                                         }}
                                     />
                                 ) :
-                                    isOwner ? (
+                                    isOwner || isCancelOfferChonkSuccess ? (
                                         <>
                                             <button
                                                 className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"

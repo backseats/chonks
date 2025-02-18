@@ -213,7 +213,6 @@ export function useMarketplaceActions(chonkId: number) {
 
   const [isListingRejected, setIsListingRejected] = useState(false);
   const [isListingSuccess, setIsListingSuccess] = useState(false);
-
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  Approve Marketplace  ////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -393,7 +392,7 @@ const hasActiveOffer = useMemo(() => {
   });
 
   const displayPrice = useMemo(() => {
-    console.log('isListChonkSuccess:', isListChonkSuccess);
+    // console.log('isListChonkSuccess:', isListChonkSuccess);
     if (isListChonkSuccess && pendingListPrice) {
       return parseFloat(pendingListPrice);
     }
@@ -427,10 +426,10 @@ const hasActiveOffer = useMemo(() => {
     }
   };
 
+  // ML: 18.02.2025 - is setIsListingSuccess/isListChonkSuccess needed? i don't think so
   useEffect(() => {
-
+    console.log('isListChonkSuccess useEffect:', isListChonkSuccess);
     if (isListChonkSuccess) {
-      console.log('isListChonkSuccess:', isListChonkSuccess);
       setIsListingSuccess(true);
     }
   }, [isListChonkSuccess]);
@@ -463,6 +462,7 @@ const hasActiveOffer = useMemo(() => {
     }
   };
 
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  Cancel Offer Chonk  /////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -476,12 +476,23 @@ const hasActiveOffer = useMemo(() => {
 
   const handleCancelOfferChonk = () => {
     if (!address || !chonkId) return;
-    cancelOfferChonk({
-      address: marketplaceContract,
-      abi: marketplaceABI,
-      functionName: 'cancelOfferChonk',
-      args: [BigInt(chonkId)],
-    });
+
+    try{
+      cancelOfferChonk({
+        address: marketplaceContract,
+        abi: marketplaceABI,
+        functionName: 'cancelOfferChonk',
+        args: [BigInt(chonkId)],
+      }, {
+        onError: (error) => {
+          console.log('Cancel Offer Chonk transaction rejected:', error);
+          // TODO: probably need to notify user of error
+        },
+      });
+    } catch (error) {
+      console.error('Error canceling offer chonk:', error);
+      // TODO: probably need to notify user of error
+    }
   };
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -654,6 +665,7 @@ const hasActiveOffer = useMemo(() => {
     hashListChonk,
     isListChonkError,
     isListChonkSuccess,
+    isCancelOfferChonkSuccess,
     price: displayPrice,
     // priceUSD,
     handleApproveMarketplace,
