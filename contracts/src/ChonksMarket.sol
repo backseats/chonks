@@ -248,6 +248,12 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         _;
     }
 
+    modifier ensureMarketplaceIsApproved(uint256 _chonkId) {
+        if (!CHONKS_MAIN.isApprovedForAll(msg.sender, address(this)) && CHONKS_MAIN.getApproved(_chonkId) != address(this))
+            revert ApproveTheMarketplace();
+        _;
+    }
+
     // Ensures that the msg.sender owns the Chonk which owns the TBA that owns the Trait
     modifier onlyTraitOwner(uint256 _traitId, uint256 _chonkId) { // TODO: move
         address traitOwnerTBA = CHONK_TRAITS.ownerOf(_traitId);
@@ -335,7 +341,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         emit ChonkOfferCanceled(_chonkId, msg.sender);
     }
 
-    function offerChonk(uint256 _chonkId, uint256 _priceInWei) public notPaused ensurePriceIsNotZero(_priceInWei) {
+    function offerChonk(uint256 _chonkId, uint256 _priceInWei) public notPaused ensurePriceIsNotZero(_priceInWei) ensureMarketplaceIsApproved(_chonkId) {
         (address owner, address tbaAddress) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
 
         _offerChonk(_chonkId, _priceInWei, address(0), owner, tbaAddress);
@@ -347,7 +353,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         uint256 _chonkId,
         uint256 _priceInWei,
         address _onlySellTo
-    ) public notPaused ensurePriceIsNotZero(_priceInWei) {
+    ) public notPaused ensurePriceIsNotZero(_priceInWei) ensureMarketplaceIsApproved(_chonkId) {
         (address owner, address tbaAddress) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
 
         _offerChonk(_chonkId, _priceInWei, _onlySellTo, owner, tbaAddress);
@@ -507,6 +513,10 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
         address tbaTraitOwner =  CHONK_TRAITS.ownerOf(_traitId);
         (address tokenOwner, ) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
 
+        // Ensure the marketplace is approved for Chonk Traits
+        if (!CHONK_TRAITS.isApprovedForAll(tbaTraitOwner, address(this)) && CHONK_TRAITS.getApproved(_traitId) != address(this))
+            revert ApproveTheMarketplace();
+
         traitOffers[_traitId] = TraitOffer(
             _priceInWei,
             tokenOwner,
@@ -536,6 +546,9 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
         address tbaTraitOwner = CHONK_TRAITS.ownerOf(_traitId);
         (address tokenOwner, ) = CHONKS_MAIN.getOwnerAndTBAAddressForChonkId(_chonkId);
+
+        if (!CHONK_TRAITS.isApprovedForAll(tbaTraitOwner, address(this)) && CHONK_TRAITS.getApproved(_traitId) != address(this))
+            revert ApproveTheMarketplace();
 
         traitOffers[_traitId] = TraitOffer(
             _priceInWei,
