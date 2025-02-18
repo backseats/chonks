@@ -24,6 +24,8 @@ contract TraitUpgradeDeployScript is Script {
         ChonksMarket newMarketplace = new ChonksMarket(address(newTraitsContract), 250, TREASURY);
         console.log("New ChonksMarket deployed to:", address(newMarketplace));
 
+        console.log("");
+
         ChonkEquipHelper newEquipHelper = new ChonkEquipHelper(address(chonksMain), address(newTraitsContract), address(newMarketplace));
         console.log("New ChonkEquipHelper deployed to:", address(newEquipHelper));
 
@@ -32,6 +34,8 @@ contract TraitUpgradeDeployScript is Script {
 
         ChonkColorMap newColorMap = new ChonkColorMap(address(newTraitsContract));
         console.log("New ChonkColorMap deployed to:", address(newColorMap));
+
+        console.log("");
 
         chonksMain.setChonkEquipHelper(address(newEquipHelper));
         chonksMain.setTraitsContract(newTraitsContract);

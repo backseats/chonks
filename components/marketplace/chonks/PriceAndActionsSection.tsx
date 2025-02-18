@@ -151,7 +151,8 @@ export default function PriceAndActionsSection(
         !isCancelOfferChonkSuccess ? (
           <>
             <div className="flex flex-col mb-4">
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 mb-4">
+                <div className="text-xl">Buy this Chonk for</div>
                 <span className="text-2xl font-bold">{price} ETH</span>
                 {/* <span className="text-gray-500">(${priceUSD.toLocaleString()})</span> */}
               </div>

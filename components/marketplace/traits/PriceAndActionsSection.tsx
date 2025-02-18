@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useMarketplaceActions } from "@/hooks/marketplace/traits/marketplaceAndMintHooks";
 import { useBalance, useAccount, useEnsAddress } from "wagmi";
 import { parseEther, isAddress, formatEther } from "viem";
-import { mainnet } from "wagmi/chains";
+import { mainnet } from "wagmi/chains"; // mainnet for ens lookup
 import { useOwnedChonks } from "@/hooks/useOwnedChonks";
 
 type PriceAndActionsSectionProps = {
@@ -112,11 +112,12 @@ export default function PriceAndActionsSection(
         {hasActiveOffer ? (
           <>
             <div className="flex flex-col mb-4">
-              <div className="flex items-baseline gap-2">
+              <div className="flex items-baseline gap-2 mb-4">
+                <div className="text-xl">Buy this Trait for</div>
                 <span className="text-2xl font-bold">{price} ETH</span>
-                <span className="text-gray-500">
-                  (${priceUSD.toLocaleString()})
-                </span>
+                {/* <span className="text-gray-500"> */}
+                {/* (${priceUSD.toLocaleString()})
+                </span> */}
               </div>
               {isOfferSpecific && (
                 <span className="text-sm text-gray-500">Private Listing</span>
@@ -350,7 +351,7 @@ export default function PriceAndActionsSection(
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg max-w-md w-full mx-4">
             <h2 className="text-2xl font-bold mb-4">
-              Make an Offer for Chonk #{traitId}
+              Make an Offer for Trait #{traitId}
             </h2>
 
             <div className="mb-4">
