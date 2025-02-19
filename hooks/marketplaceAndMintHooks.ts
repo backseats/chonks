@@ -3,16 +3,12 @@ import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 
 import { useAccount, useBalance } from "wagmi";
 import { parseEther } from 'viem';
 import { formatEther } from "viem";
-
 import {
   mainContract,
   mainABI,
-  traitsContract,
   marketplaceContract,
-  traitsABI,
   marketplaceABI,
   chainId,
-  MINT_PRICE,
 } from "@/contract_data";
 import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
@@ -26,184 +22,11 @@ type ChonkOffer = {
   encodedTraitIds: string;
 }
 
-// Temporarily here because /chonks/[id] is hidden in vercelignore
-function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
-  const base64String = data.split(",")[1];
-  const jsonString = atob(base64String);
-  const jsonData = JSON.parse(jsonString) as Chonk;
-
-  setData(jsonData);
-}
-
 export const categoryList = Object.values(Category);
-
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  MINT Chonk  ////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-export function useMintFunction() {
-  const { writeContract, isPending, data: hashMinting } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess: isMintingSuccess, isError: isMintingError, data: receipt } = useWaitForTransactionReceipt({
-    hash: hashMinting,
-  });
-  const [isMintRejected, setIsMintRejected] = useState(false);
-  const [mainContractTokens, setMainContractTokens] = useState<number[]>();
-  const [traitTokens, setTraitTokens] = useState<number[]>();
-
-  const { address } = useAccount();
-  // New hook to check user's balance on Base
-  const { data: userBalance } = useBalance({
-    address,
-    chainId,
-  });
-
-  // console.log('userBalance', userBalance);
-
-  const { data: totalSupply } = useReadContract({
-    address: mainContract,
-    abi: mainABI,
-    functionName: 'totalSupply',
-  });
-
-  const mint = async (amount: number = 1, proof: string[] | null = null) => {
-    if (amount < 1) throw new Error("Amount must be greater than 0");
-    if (proof === null) proof = [];
-    setIsMintRejected(false);
-
-    try {
-      const priceMap = {
-        1: '0.01',
-        2: '0.02',
-        3: '0.03',
-        4: '0.04',
-        5: '0.05',
-        6: '0.06',
-        7: '0.07',
-        8: '0.08',
-        9: '0.09',
-        10: '0.1'
-      };
-      const priceInWei = parseEther(priceMap[amount as keyof typeof priceMap]);
-      const tx = await writeContract({
-        address: mainContract,
-        abi: mainABI,
-        functionName: 'mint',
-        args: [amount, proof],
-        value: priceInWei,
-        chainId,
-      }, {
-        onError: (error) => {
-          console.log('Transaction rejected:', error);
-          setIsMintRejected(true);
-        },
-      });
-      return tx;
-    } catch (error: any) {
-      console.log('Mint error:', error);
-      throw error;
-    }
-  };
-
-  // Add effect to log receipt and parse minted token IDs
-  useEffect(() => {
-    if (isMintingSuccess && receipt) {
-      console.log('Transaction Receipt:', receipt);
-
-      console.log('mainContract', mainContract);
-      console.log('traitsContract', traitsContract);
-
-      const transferEventSignature = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-
-      // Parse the logs to find Transfer events
-      const mintedTokenIds = receipt.logs
-        .filter(log => {
-          // Filter for Transfer events (you'll need to match the event signature)
-          // The event signature for Transfer is: Transfer(address,address,uint256)
-          return log.topics[0] === '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef';
-        })
-        .map(log => {
-          if (!log.topics[3]) return 0; // Handle undefined case
-          const tokenId = BigInt(log.topics[3]);
-          return Number(tokenId);
-        });
-
-      console.log('Minted Token IDs:', mintedTokenIds);
-
-
-      const mainContractTokens = receipt.logs
-        .filter(log => log.address.toLowerCase() === mainContract.toLowerCase() && log.topics[0] === transferEventSignature)
-        .map(log => {
-          if (!log.topics[3]) return 0;
-          return Number(BigInt(log.topics[3]));
-        });
-
-      const traitTokens = receipt.logs
-        .filter(log => log.address.toLowerCase() === traitsContract.toLowerCase() && log.topics[0] === transferEventSignature)
-        .map(log => {
-          if (!log.topics[3]) return 0;
-          return Number(BigInt(log.topics[3]));
-        });
-
-      console.log('Minted Main Contract Token IDs:', mainContractTokens );
-      console.log('Minted Trait Token IDs:', traitTokens);
-
-      setMainContractTokens(mainContractTokens);
-      setTraitTokens(traitTokens);
-    }
-  }, [isMintingSuccess, receipt]);
-
-  useEffect(() => {
-    if (isMintingError) {
-      console.log('Transaction Error:', isMintingError);
-    }
-  }, [isMintingError]);
-
-  // Add new hook to check mint start time
-  const { data: mintStartTime } = useReadContract({
-    address: mainContract,
-    abi: mainABI,
-    functionName: 'initialMintStartTime',
-  });
-
-  // Calculate if mint is open and time remaining
-  const mintStatus = useMemo(() => {
-
-    // return { isOpen: false, timeRemaining: 0 }; // for testing
-
-    if (!mintStartTime) return { isOpen: false, timeRemaining: 0 };
-
-    const startTimeNum = Number(mintStartTime);
-    if (startTimeNum === 0) return { isOpen: false, timeRemaining: 0 };
-
-    const now = Math.floor(Date.now() / 1000);
-    const endTime = startTimeNum + (24 * 60 * 60); // 24 hours in seconds
-    const timeRemaining = endTime - now;
-
-    console.log('timeRemaining', timeRemaining);
-
-    return {
-      isOpen: timeRemaining > 0,
-      timeRemaining: timeRemaining //Math.max(0, timeRemaining)
-    };
-  }, [mintStartTime]);
-
-  return {
-    mint,
-    isPending,
-    isConfirming,
-    isMintingSuccess,
-    isMintingError,
-    isMintRejected,
-    hashMinting,
-    receipt,
-    mainContractTokens,
-    traitTokens,
-    totalSupply: totalSupply ? Number(totalSupply) : undefined,
-    mintStatus,
-    userBalance
-  };
-}
 
 export function useMarketplaceActions(chonkId: number) {
   const { address } = useAccount();
@@ -723,6 +546,5 @@ const hasActiveOffer = useMemo(() => {
     handleBidOnChonk,
     handleAcceptBidForChonk,
     handleWithdrawBidOnChonk,
-
   };
 }

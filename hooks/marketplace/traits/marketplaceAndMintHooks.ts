@@ -12,40 +12,9 @@ import {
   marketplaceABI,
   chainId,
 } from "@/contract_data";
-import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
 
-// Temporarily here because /chonks/[id] is hidden in vercelignore
-function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
-  const base64String = data.split(",")[1];
-  const jsonString = atob(base64String);
-  const jsonData = JSON.parse(jsonString) as Chonk;
-
-  setData(jsonData);
-}
-
 export const categoryList = Object.values(Category);
-
-export function useMintFunction() {
-  const { writeContract, isPending, data: hash } = useWriteContract();
-
-  const mint = async (amount: number = 1) => {
-    try {
-      writeContract({
-        address: mainContract,
-        abi: mainABI,
-        functionName: 'mint',
-        args: [amount],
-        chainId,
-      });
-    } catch (error) {
-      console.error("Error minting:", error);
-      throw error;
-    }
-  };
-
-  return { mint, isPending, hash };
-}
 
 export function useMarketplaceActions(traitId: number) {
   const { address } = useAccount();
