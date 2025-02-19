@@ -26,6 +26,7 @@ import { CurrentChonk } from "@/types/CurrentChonk";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import Loading from "@/components/marketplace/Loading";
 import { localDefineChain } from "@/config";
+import { base } from "viem/chains";
 
 // type ChonkOffer = {
 //     priceInWei: bigint;
@@ -224,6 +225,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const account = tokenboundClient.getAccount({
     tokenContract: mainContract,
     tokenId: id.toString(),
+    chainId: base.id,
   });
 
   // if (address) {

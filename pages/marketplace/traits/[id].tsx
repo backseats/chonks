@@ -27,6 +27,7 @@ import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
 import Loading from "@/components/marketplace/Loading";
 import { TokenboundClient } from "@tokenbound/sdk";
+import { base } from "viem/chains";
 
 type TraitOffer = {
   priceInWei: bigint;
@@ -66,6 +67,7 @@ export default function TraitDetail({ id }: { id: string }) {
   const tbaAddress = tokenboundClient.getAccount({
     tokenContract: mainContract,
     tokenId: id.toString(),
+    chainId: base.id,
   });
 
   console.log("tbaAddress", tbaAddress);
@@ -235,6 +237,7 @@ export default function TraitDetail({ id }: { id: string }) {
   // const account = tokenboundClient.getAccount({
   //     tokenContract: mainContract,
   //     tokenId: id.toString(),
+  //     chainId: base.id
   // });
 
   // console.log(" ===== account (this is the TBA of the main token id, not trait)", account);
