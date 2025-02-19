@@ -1,9 +1,10 @@
-import { traitsContract, traitsABI, chainId } from '@/contract_data';
+import { traitsContract, traitsABI, chainId, localDefineChain } from '@/config';
 import { createPublicClient, http } from 'viem';
-import { baseSepolia } from 'viem/chains'; // TODO: Base
+import { base } from 'viem/chains';
 
+// TODO: fix this page
 const client = createPublicClient({
-    chain: baseSepolia,
+    chain: base,
     transport: http()
 });
 

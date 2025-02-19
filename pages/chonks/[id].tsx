@@ -15,7 +15,6 @@ import {
   traitsContract,
   traitsABI,
   chainId,
-  renderAsDataUriABI,
 } from "@/contract_data";
 import { StoredChonk } from "@/types/StoredChonk";
 import EquipmentContainer from "@/components/chonk_explorer/EquipmentContainer";
@@ -42,6 +41,47 @@ import Link from "next/link";
 import { SendHorizontal } from "lucide-react";
 import { base } from "viem/chains";
 import { localDefineChain } from "@/config";
+
+const renderAsDataUriABI = [
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "renderAsDataUri2D",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "renderAsDataUri3D",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+];
 
 export default function ChonkDetail({ id }: { id: string }) {
   const TOKEN_URI = "tokenURI";
