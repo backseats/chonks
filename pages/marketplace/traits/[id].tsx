@@ -16,13 +16,14 @@ import {
   marketplaceContract,
   marketplaceABI,
   traitsContract,
+  chain,
   chainId,
-} from "@/contract_data";
+} from "@/config";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from "@/components/marketplace/TraitsSection";
 // import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
 import PriceAndActionsSection from "@/components/marketplace/traits/PriceAndActionsSection";
-import { formatEther } from "viem";
+import { formatEther, Chain } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
 import Loading from "@/components/marketplace/Loading";
@@ -61,7 +62,7 @@ export default function TraitDetail({ id }: { id: string }) {
   const tokenboundClient = new TokenboundClient({
     walletClient,
     // chainId: base.id,
-    chain: localDefineChain,
+    chain,
   });
 
   const tbaAddress = tokenboundClient.getAccount({

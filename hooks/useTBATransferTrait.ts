@@ -1,4 +1,4 @@
-import { traitsABI, traitsContract, chainId} from "@/contract_data";
+import { traitsABI, traitsContract, chainId } from "@/config";
 import { Address, encodeFunctionData } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 

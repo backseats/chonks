@@ -1,11 +1,6 @@
 import { http, createConfig } from "wagmi";
-import { base } from "wagmi/chains";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
-import { defineChain } from 'viem'
-
-import { chonksMainABI } from './abis/chonksMainABI'
-import { chonkTraitsABI } from './abis/chonkTraitsABI'
-import { chonksMarketABI } from './abis/chonksMarketABI'
+import { defineChain, Chain } from 'viem'
 
 import { chonksMainABI } from './abis/chonksMainABI'
 import { chonkTraitsABI } from './abis/chonkTraitsABI'
@@ -25,9 +20,6 @@ export const marketplaceABI = chonksMarketABI;
 
 export const simpleHashKey = "makingmemark_sk_ab7284sr3v5o19g3iaublzep6sffynfu"; // TODO: env var
 
-// export const chainId = base.id;
-export const chainId = 6969;
-
 export const localDefineChain = defineChain({
   id: 6969,
   name: 'anvil',
@@ -41,6 +33,8 @@ export const localDefineChain = defineChain({
     public: { http: ['http://127.0.0.1:8545'] },
   }
 })
+
+// NOTE: Toggle the config you want for development
 
 export const config = createConfig({
   chains: [localDefineChain],
@@ -66,3 +60,6 @@ export const config = createConfig({
 //     [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`),
 //   },
 // });
+
+export const chain: Chain = config.chains[0];
+export const chainId = chain.id;

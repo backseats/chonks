@@ -2,7 +2,7 @@ import { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Address } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
-import { mainContract } from "@/contract_data";
+import { mainContract } from "@/config";
 import { useOwnedChonks } from "@/hooks/useOwnedChonks";
 import { base } from "viem/chains";
 

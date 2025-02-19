@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useReadContract } from "wagmi";
-import { mainContract, mainABI } from "@/contract_data";
+import { mainContract, mainABI } from "@/config";
 import { Address } from 'viem';
+
 interface OwnedChonk {
     id: string;
 }

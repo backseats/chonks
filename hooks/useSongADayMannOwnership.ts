@@ -1,7 +1,9 @@
 import { useReadContract } from 'wagmi';
 import { Address } from 'viem';
-import { chainId } from "@/contract_data";
 import { useQuery } from '@tanstack/react-query';
+import { base } from "viem/chains";
+
+const chainId = base.id
 
 // abis
 

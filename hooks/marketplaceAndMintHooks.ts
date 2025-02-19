@@ -9,8 +9,7 @@ import {
   marketplaceContract,
   marketplaceABI,
   chainId,
-} from "@/contract_data";
-import { Chonk } from "@/types/Chonk";
+} from "@/config";
 import { Category } from "@/types/Category";
 
 

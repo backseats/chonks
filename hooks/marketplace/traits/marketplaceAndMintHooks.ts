@@ -11,7 +11,7 @@ import {
   traitsABI,
   marketplaceABI,
   chainId,
-} from "@/contract_data";
+} from "@/config";
 import { Category } from "@/types/Category";
 
 export const categoryList = Object.values(Category);

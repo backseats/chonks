@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { usePublicClient } from 'wagmi';
-import { marketplaceContract, marketplaceABI } from "@/contract_data";
+import { marketplaceContract, marketplaceABI } from "@/config";
 import { formatEther } from 'viem';
 
 interface MarketplaceOffer {

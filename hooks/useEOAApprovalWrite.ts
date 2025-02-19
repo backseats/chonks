@@ -1,5 +1,5 @@
 import { useWriteContract } from "wagmi";
-import { mainContract, mainABI, marketplaceContract, chainId } from "@/contract_data";
+import { mainContract, mainABI, marketplaceContract, chainId } from "@/config";
 
 export function useEOAApprovalWrite() {
   const { writeContract } = useWriteContract();

@@ -1,11 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
-import { useReadContract, useWriteContract } from "wagmi";
-
+import { useCallback } from "react";
+import { useWriteContract } from "wagmi";
 import {
   mainContract,
   mainABI,
   chainId
-} from "@/contract_data";
+} from "@/config";
 
 export function useSetBodyIndexFunction() {
   const { writeContract } = useWriteContract();

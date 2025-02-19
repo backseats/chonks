@@ -1,5 +1,5 @@
 import { useReadContract } from "wagmi";
-import { mainContract, mainABI, marketplaceContract, traitsContract, traitsABI, chainId } from "@/contract_data";
+import { mainContract, mainABI, marketplaceContract, traitsContract, traitsABI, chainId } from "@/config";
 import { Address } from "viem";
 
 export function useReadEOAApproval(address: Address | undefined) {

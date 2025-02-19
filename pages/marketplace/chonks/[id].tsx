@@ -13,7 +13,7 @@ import {
   traitsContract,
   traitsABI,
   chainId,
-} from "@/contract_data";
+} from "@/config";
 import { StoredChonk } from "@/types/StoredChonk";
 import { Category } from "@/types/Category";
 import OwnershipSection from "@/components/marketplace/chonks/OwnershipSection";

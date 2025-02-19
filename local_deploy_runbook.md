@@ -15,7 +15,7 @@ In `config.ts`, ensure you're using the `localChain` config
 
 3. `forge script script/TraitUpgrade.s.sol --rpc-url http://localhost:8545 --broadcast`
 
-4. Update the contract addresses and ABIs in `contract_data.ts`
+4. Update the contract addresses and ABIs in `config.ts`
 
 5. In the root director, `yarn dev -p 3005`
 
