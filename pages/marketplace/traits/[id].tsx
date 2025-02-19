@@ -2,7 +2,13 @@ import Head from "next/head";
 import MenuBar from "@/components/marketplace/MenuBar";
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
-import { useReadContract, useAccount } from "wagmi";
+import {
+  useReadContract,
+  useWalletClient,
+  useAccount,
+  useWriteContract,
+} from "wagmi";
+import { localDefineChain } from "@/config";
 import { Trait } from "@/types/Trait";
 import {
   mainABI,
@@ -20,6 +26,7 @@ import { formatEther } from "viem";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
 import Loading from "@/components/marketplace/Loading";
+import { TokenboundClient } from "@tokenbound/sdk";
 
 type TraitOffer = {
   priceInWei: bigint;
@@ -38,7 +45,7 @@ export function decodeAndSetData(data: string, setData: (data: Trait) => void) {
   setData(jsonData);
 }
 
-export default function ChonkDetail({ id }: { id: string }) {
+export default function TraitDetail({ id }: { id: string }) {
   // const router = useRouter()
   // const { id } = router.query
   const [isActivityOpen, setIsActivityOpen] = useState(true);
@@ -48,6 +55,20 @@ export default function ChonkDetail({ id }: { id: string }) {
   const TOKEN_URI = "tokenURI";
 
   const { address } = useAccount();
+
+  const { data: walletClient } = useWalletClient();
+  const tokenboundClient = new TokenboundClient({
+    walletClient,
+    // chainId: base.id,
+    chain: localDefineChain,
+  });
+
+  const tbaAddress = tokenboundClient.getAccount({
+    tokenContract: mainContract,
+    tokenId: id.toString(),
+  });
+
+  console.log("tbaAddress", tbaAddress);
 
   const [tokenData, setTokenData] = useState<Trait | null>(null);
   const [filteredTraitTokenIds, setFilteredTraitTokenIds] = useState<BigInt[]>(
@@ -378,6 +399,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                     chonkBid={chonkBid}
                     tbaOwner={ownerOfTraitOwner}
                     isEquipped={isEquipped}
+                    tbaAddress={tbaAddress}
                   />
 
                   {/* <ActivityAndOffersSection

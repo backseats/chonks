@@ -15,6 +15,7 @@ export function useReadEOAApproval(address: Address | undefined) {
 }
 
 export function useReadTBAApproval(tbaAddress: Address) {
+  console.log("tbaAddress::useReadTBAApproval", tbaAddress);
   const { data: TBAIsApproved } = useReadContract({
     address: traitsContract,
     abi: traitsABI,

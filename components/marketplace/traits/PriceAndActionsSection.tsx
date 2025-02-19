@@ -5,6 +5,9 @@ import { parseEther, isAddress, formatEther } from "viem";
 import { mainnet } from "wagmi/chains"; // mainnet for ens lookup
 import { useOwnedChonks } from "@/hooks/useOwnedChonks";
 
+import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
+import { useReadEOAApproval, useReadTBAApproval } from "@/hooks/useApprovalRead";
+
 type PriceAndActionsSectionProps = {
   traitId: number;
   tokenIdOfTBA: string | null;
@@ -23,6 +26,7 @@ type PriceAndActionsSectionProps = {
   } | null;
   tbaOwner: string | null;
   isEquipped: boolean | undefined;
+  tbaAddress: string | null;
 };
 
 export default function PriceAndActionsSection(
@@ -41,7 +45,9 @@ export default function PriceAndActionsSection(
     chonkBid,
     tbaOwner,
     isEquipped,
+    tbaAddress,
   } = props;
+
 
   const { address } = useAccount();
   const { data: balance } = useBalance({ address });
@@ -59,6 +65,16 @@ export default function PriceAndActionsSection(
     handleBidOnChonk,
     handleAcceptBidForChonk,
   } = useMarketplaceActions(traitId);
+
+  console.log("tbaAddress::PriceAndActionsSection", tbaAddress);
+
+  const { TBAIsApproved } = useReadTBAApproval(tbaAddress as `0x${string}`);
+
+  const { approveTBAForMarketplace } = useTBAApprovalWrite(
+    tbaAddress as `0x${string}`
+  );
+
+
   const [isPrivateListingExpanded, setIsPrivateListingExpanded] =
     useState(false);
   const [recipientAddress, setRecipientAddress] = useState("");
@@ -203,14 +219,14 @@ export default function PriceAndActionsSection(
                     <button
                       className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
                       onClick={() => {
-                        if (!isApproved) {
-                          handleApproveMarketplace();
+                        if (!TBAIsApproved) {
+                          approveTBAForMarketplace();
                         } else {
                           setIsModalOpen(true);
                         }
                       }}
                     >
-                      {isApproved
+                      {TBAIsApproved
                         ? "List Your Trait"
                         : "Approve Marketplace to List Trait"}
                     </button>

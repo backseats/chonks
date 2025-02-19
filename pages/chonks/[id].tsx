@@ -52,7 +52,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const tokenboundClient = new TokenboundClient({
     walletClient,
     // chainId: base.id,
-    chainId: localDefineChain.id,
+    chain: localDefineChain,
   });
 
   const [tokenData, setTokenData] = useState<Chonk | null>(null);
