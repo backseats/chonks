@@ -37,7 +37,7 @@ export default function OwnershipSection(props: Props) {
         <div className="flex flex-row items-baseline gap-2">
           <h1 className="text-3xl font-bold">Trait #{id}</h1>
           <p className="text-sm text-gray-600 pb-7">
-            ({isEquipped ? "Equipped" : ""})
+            {isEquipped ? "(Equipped)" : ""}
           </p>
         </div>
 
