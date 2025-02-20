@@ -1,4 +1,4 @@
-import { mainContract, mainABI } from '@/config';
+import { mainContract, mainABI, chainId } from '@/config';
 import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 

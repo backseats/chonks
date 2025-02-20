@@ -1,5 +1,5 @@
-import { traitsContract, traitsABI, config } from '@/config';
-import { createPublicClient, http, Chain } from 'viem';
+import { traitsContract, traitsABI } from '@/config';
+import { createPublicClient, http } from 'viem';
 import { base } from 'viem/chains';
 
 // TODO: fix this page

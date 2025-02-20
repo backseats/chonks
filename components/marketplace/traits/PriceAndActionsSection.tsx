@@ -162,8 +162,8 @@ export default function PriceAndActionsSection(
                   >
                     <option value="">Select a Chonk</option>
                     {ownedChonks?.map((chonk) => (
-                      <option key={chonk.id} value={chonk.id}>
-                        Chonk #{chonk.id}
+                      <option key={chonk} value={chonk}>
+                        Chonk #{chonk}
                       </option>
                     ))}
                   </select>

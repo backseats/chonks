@@ -25,7 +25,6 @@ import PriceAndActionsSection from "@/components/marketplace/chonks/PriceAndActi
 import { CurrentChonk } from "@/types/CurrentChonk";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import Loading from "@/components/marketplace/Loading";
-import { base } from "viem/chains";
 
 // type ChonkOffer = {
 //     priceInWei: bigint;
@@ -49,7 +48,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const { data: walletClient } = useWalletClient();
   const tokenboundClient = new TokenboundClient({
     walletClient,
-    chainId: base.id,
+    chainId,
   });
 
   const [tokenData, setTokenData] = useState<Chonk | null>(null);
@@ -223,7 +222,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const account = tokenboundClient.getAccount({
     tokenContract: mainContract,
     tokenId: id.toString(),
-    chainId: base.id,
+    chainId,
   });
 
   // if (address) {

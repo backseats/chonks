@@ -39,7 +39,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { SendHorizontal } from "lucide-react";
-import { base } from "viem/chains";
 
 const renderAsDataUriABI = [
   {
@@ -90,7 +89,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const { data: walletClient } = useWalletClient();
   const tokenboundClient = new TokenboundClient({
     walletClient,
-    chainId: base.id,
+    chainId,
   });
 
   const [tokenData, setTokenData] = useState<Chonk | null>(null);
@@ -259,7 +258,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const tbaAddress = tokenboundClient.getAccount({
     tokenContract: mainContract,
     tokenId: id.toString(),
-    chainId: base.id, // NOTE: This always needs to be on Base because this is where the TBA address is derived from
+    chainId, // NOTE: This always needs to be on Base because this is where the TBA address is derived from
   });
 
   const basePaintOwnership = useBasePaintOwnership(tbaAddress);
