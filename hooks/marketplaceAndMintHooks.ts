@@ -61,6 +61,9 @@ export function useMarketplaceActions(chonkId: number) {
         functionName: 'setApprovalForAll',
         args: [marketplaceContract, true],
       }, {
+        onSuccess: (data) => {
+          console.log('Approval transaction submitted:', data);
+        },
         onError: (error) => {
           console.log('Approval transaction rejected:', error);
           alert('Error approving marketplace: ' + error);

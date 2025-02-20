@@ -24,5 +24,7 @@ export function useReadTBAApproval(tbaAddress: Address) {
     chainId,
   }) as { data: boolean };
 
+  console.log("TBAIsApproved::useReadTBAApproval", TBAIsApproved);
+
   return { TBAIsApproved };
 }
