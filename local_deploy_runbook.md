@@ -6,7 +6,7 @@
 
 Network Name: Anvil | Base
 RPC URL: http://localhost:8545
-Chain ID: 6969
+Chain ID: 8453
 Currency Symbol: ETH
 
 In `config.ts`, ensure you're using the `localChain` config
