@@ -1,16 +1,15 @@
-import { mainABI, traitsABI, marketplaceContract, traitsContract, chain } from "@/config";
+import { traitsABI, marketplaceContract, traitsContract, chain } from "@/config";
 import { Address, encodeFunctionData } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { useWalletClient } from "wagmi";
+import { base } from "viem/chains";
 
 export function useTBAApprovalWrite(tbaAddress: Address) {
 
-  console.log("tbaAddress :: useTBAApprovalWrite", tbaAddress);
-
   const { data: walletClient } = useWalletClient();
   const tokenboundClient = new TokenboundClient({
-    walletClient,
-    chain,
+      walletClient,
+      chainId: base.id,
   });
 
   const encodedData = (value: boolean) => {
@@ -22,18 +21,15 @@ export function useTBAApprovalWrite(tbaAddress: Address) {
   };
 
   const approveTBAForMarketplace = async () => {
-    console.log("approveTBAForMarketplace :: useTBAApprovalWrite", tbaAddress);
-    console.log("chain.id", chain.id);
-
     try {
       const tx = await tokenboundClient.execute({
         account: tbaAddress,
         to: traitsContract,
         value: 0n,
         data: encodedData(true),
-        chainId: chain.id,
       });
-      console.log("Success: TBA approval transaction", tx);
+
+      // console.log("Success: TBA approval transaction", tx);
       return tx;
     } catch (error) {
       console.error("errror: approveTBAForMarketplace :: useTBAApprovalWrite", error);
@@ -41,14 +37,16 @@ export function useTBAApprovalWrite(tbaAddress: Address) {
     }
   }
 
-  const disconnectTBA = () => {
-    tokenboundClient.execute({
+  const disconnectTBA = async () => {
+    const tx = await tokenboundClient.execute({
       account: tbaAddress,
       to: traitsContract,
       value: 0n,
       data: encodedData(false),
-      chainId: chain.id,
+      chainId: base.id,
     });
+
+    return tx
   }
 
   return { approveTBAForMarketplace, disconnectTBA };

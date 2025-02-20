@@ -6,7 +6,10 @@ import { mainnet } from "wagmi/chains"; // mainnet for ens lookup
 import { useOwnedChonks } from "@/hooks/useOwnedChonks";
 
 import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
-import { useReadEOAApproval, useReadTBAApproval } from "@/hooks/useApprovalRead";
+import {
+  useReadEOAApproval,
+  useReadTBAApproval,
+} from "@/hooks/useApprovalRead";
 
 type PriceAndActionsSectionProps = {
   traitId: number;
@@ -48,7 +51,6 @@ export default function PriceAndActionsSection(
     tbaAddress,
   } = props;
 
-
   const { address } = useAccount();
   const { data: balance } = useBalance({ address });
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -66,14 +68,11 @@ export default function PriceAndActionsSection(
     handleAcceptBidForChonk,
   } = useMarketplaceActions(traitId);
 
-  console.log("tbaAddress::PriceAndActionsSection", tbaAddress);
-
   const { TBAIsApproved } = useReadTBAApproval(tbaAddress as `0x${string}`);
 
   const { approveTBAForMarketplace } = useTBAApprovalWrite(
     tbaAddress as `0x${string}`
   );
-
 
   const [isPrivateListingExpanded, setIsPrivateListingExpanded] =
     useState(false);

@@ -8,7 +8,6 @@ import {
   useAccount,
   useWriteContract,
 } from "wagmi";
-import { localDefineChain } from "@/config";
 import { Trait } from "@/types/Trait";
 import {
   mainABI,
@@ -61,8 +60,7 @@ export default function TraitDetail({ id }: { id: string }) {
   const { data: walletClient } = useWalletClient();
   const tokenboundClient = new TokenboundClient({
     walletClient,
-    // chainId: base.id,
-    chain,
+    chainId: base.id,
   });
 
   const tbaAddress = tokenboundClient.getAccount({

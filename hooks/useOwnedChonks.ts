@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useReadContract } from "wagmi";
-import { mainContract, mainABI } from "@/config";
+import { mainContract, mainABI, chainId } from "@/config";
 import { Address } from 'viem';
 
 interface OwnedChonk {
@@ -20,6 +20,7 @@ export function useOwnedChonks(address: Address | undefined) {
         abi: mainABI,
         functionName: 'walletOfOwner',
         args: [address],
+        chainId,
     });
 
     useEffect(() => {
