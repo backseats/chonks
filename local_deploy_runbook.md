@@ -9,7 +9,7 @@ RPC URL: http://localhost:8545
 Chain ID: 8453
 Currency Symbol: ETH
 
-In `config.ts`, ensure you're using the `localChain` config
+In `config.ts`, ensure you're using the `localhost` transport in `config`
 
 2. `cd /contracts`
 
