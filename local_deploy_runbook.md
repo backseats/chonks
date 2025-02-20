@@ -1,6 +1,6 @@
 # Local Deploy Runbook
 
-0. `anvil --fork-url $BASE_MAINNET_RPC_URL --balance 100000 --chain-id 6969`
+0. `anvil --fork-url $BASE_MAINNET_RPC_URL --balance 100000`
 
 1. Set up your metamask with a new network to following:
 
@@ -20,5 +20,3 @@ In `config.ts`, ensure you're using the `localChain` config
 5. In the root director, `yarn dev -p 3005`
 
 6. In your browser, go to `http://localhost:3005/`
-
-I think thats right. gonna get some food and try it out
