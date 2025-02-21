@@ -61,14 +61,6 @@ export default function TraitDetail({ id }: { id: string }) {
     chainId,
   });
 
-  const tbaAddress = tokenboundClient.getAccount({
-    tokenContract: mainContract,
-    tokenId: id.toString(),
-    chainId,
-  });
-
-  console.log("tbaAddress", tbaAddress);
-
   const [tokenData, setTokenData] = useState<Trait | null>(null);
   const [filteredTraitTokenIds, setFilteredTraitTokenIds] = useState<BigInt[]>(
     []
@@ -80,7 +72,6 @@ export default function TraitDetail({ id }: { id: string }) {
 
   //get Trait Offers - accessing the offers directly from mapping
   // but we now have : getTraitOffer
-  const { data: traitOfferArray } = useReadContract({
     address: marketplaceContract,
     abi: marketplaceABI,
     functionName: "traitOffers",
@@ -203,6 +194,16 @@ export default function TraitDetail({ id }: { id: string }) {
   console.log("chonkTokenId", tokenIdOfTBA?.toString());
   console.log("chonkOwner", ownerOfTraitOwner);
 
+  const chonkId = tokenIdOfTBA?.toString() ?? null;
+
+  const tbaAddress = chonkId
+    ? tokenboundClient.getAccount({
+        tokenContract: mainContract,
+        tokenId: tokenIdOfTBA?.toString(),
+        chainId,
+      })
+    : null;
+
   // function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
   //     IChonkStorage.StoredChonk memory storedChonk = getChonk(_chonkId);
   //     return storedChonk.headId == _traitId ||
@@ -239,7 +240,7 @@ export default function TraitDetail({ id }: { id: string }) {
 
   // console.log(" ===== account (this is the TBA of the main token id, not trait)", account);
 
-  // // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
+  // // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   // const { data: allTraitTokenIds } = useReadContract({
   //     address: traitsContract,
   //     abi: traitsABI,
