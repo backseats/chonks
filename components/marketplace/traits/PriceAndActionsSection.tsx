@@ -85,6 +85,7 @@ export default function PriceAndActionsSection(
   const { ownedChonks } = useOwnedChonks(address); // This hook should fetch owned Chonks
 
   console.log("ownedChonks", ownedChonks, address);
+  // console.log(ownedChonks?.map((chonk) => parseInt(chonk)));
 
   // Add ENS resolution
   const { data: ensAddress } = useEnsAddress({
@@ -162,8 +163,8 @@ export default function PriceAndActionsSection(
                   >
                     <option value="">Select a Chonk</option>
                     {ownedChonks?.map((chonk) => (
-                      <option key={chonk} value={chonk}>
-                        Chonk #{chonk}
+                      <option key={parseInt(chonk)} value={parseInt(chonk)}>
+                        Chonk #{parseInt(chonk)}
                       </option>
                     ))}
                   </select>

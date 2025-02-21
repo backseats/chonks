@@ -3,6 +3,8 @@ import { Address, encodeFunctionData } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { useWalletClient } from "wagmi";
 
+// HELP!
+
 export function useTBAApprovalWrite(tbaAddress: Address) {
 
   const { data: walletClient } = useWalletClient();

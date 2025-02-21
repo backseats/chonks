@@ -115,13 +115,21 @@ export default function ChonkDetail({ id }: { id: string }) {
   // });
 
   // Get main body tokenURI
-  const { data: tokenURIData } = useReadContract({
+  const { data: tokenURIData, error: tokenURIError } = useReadContract({
     address: mainContract,
     abi: mainABI,
     functionName: TOKEN_URI,
     args: [BigInt(id)],
     chainId,
-  }) as { data: string };
+  }) as { data: string; error: Error };
+
+  useEffect(() => {
+    if (tokenURIError) {
+      console.error("Error fetching tokenURI:", tokenURIError);
+    }
+  }, [tokenURIError]);
+
+  console.log("tokenURIData", tokenURIData);
 
   const { data: owner } = useReadContract({
     address: mainContract,
@@ -412,6 +420,8 @@ export default function ChonkDetail({ id }: { id: string }) {
       console.error("Error sending Chonk:", error);
     }
   };
+
+
 
   return (
     <>

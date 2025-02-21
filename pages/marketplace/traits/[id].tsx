@@ -72,6 +72,7 @@ export default function TraitDetail({ id }: { id: string }) {
 
   //get Trait Offers - accessing the offers directly from mapping
   // but we now have : getTraitOffer
+  const { data: traitOfferArray } = useReadContract({
     address: marketplaceContract,
     abi: marketplaceABI,
     functionName: "traitOffers",

@@ -40,10 +40,14 @@ export default function TransferTraitModal({
     onTransfer(tbaAddress);
   };
 
+
   // Filter out the current chonk from available chonks and map to required format
   const availableChonks = ownedChonks
-    .filter((chonk) => chonk !== chonkId)
+    .filter((chonk) => chonk.toString() !== chonkId)
     .sort((a, b) => Number(a) - Number(b));
+
+    console.log("ownedChonks", ownedChonks);
+    console.log("availableChonks", availableChonks);
 
   return (
     <div
