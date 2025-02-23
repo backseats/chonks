@@ -22,24 +22,24 @@ import TraitsSection from "@/components/marketplace/TraitsSection";
 // import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
 import PriceAndActionsSection from "@/components/marketplace/traits/PriceAndActionsSection";
 import { formatEther, Chain } from "viem";
-import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
+import { useMarketplaceActions } from "@/hooks/marketplace/traits/marketplaceAndMintHooks";
 import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
 import Loading from "@/components/marketplace/Loading";
 import { TokenboundClient } from "@tokenbound/sdk";
 
-type TraitOffer = {
-  priceInWei: bigint;
-  seller: string;
-  sellerTBA: string;
-  onlySellTo: string;
-};
+// type TraitOffer = {
+//   priceInWei: bigint;
+//   seller: string;
+//   sellerTBA: string;
+//   onlySellTo: string;
+// };
 
 export function decodeAndSetData(data: string, setData: (data: Trait) => void) {
   const base64String = data.split(",")[1];
   const jsonString = atob(base64String);
   const jsonData = JSON.parse(jsonString) as Trait;
 
-  console.log(jsonData);
+  // console.log(jsonData);
 
   setData(jsonData);
 }
@@ -68,7 +68,7 @@ export default function TraitDetail({ id }: { id: string }) {
 
   // const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
 
-  const { hasActiveBid, chonkBid } = useMarketplaceActions(parseInt(id));
+  const { hasActiveBid, traitBid } = useMarketplaceActions(parseInt(id));
 
   //get Trait Offers - accessing the offers directly from mapping
   // but we now have : getTraitOffer
@@ -81,48 +81,48 @@ export default function TraitDetail({ id }: { id: string }) {
   }) as { data: [bigint, string, string, string, string] };
 
   // Convert array to object
-  const traitOffer: TraitOffer | null = useMemo(() => {
-    if (!traitOfferArray) return null;
-    return {
-      priceInWei: traitOfferArray[0],
-      seller: traitOfferArray[1],
-      sellerTBA: traitOfferArray[2],
-      onlySellTo: traitOfferArray[3],
-    };
-  }, [traitOfferArray]);
+  // const traitOffer: TraitOffer | null = useMemo(() => {
+  //   if (!traitOfferArray) return null;
+  //   return {
+  //     priceInWei: traitOfferArray[0],
+  //     seller: traitOfferArray[1],
+  //     sellerTBA: traitOfferArray[2],
+  //     onlySellTo: traitOfferArray[3],
+  //   };
+  // }, [traitOfferArray]);
 
-  // Add this console log to see the raw response
-  useEffect(() => {
-    console.group("Raw Response");
-    console.log("Raw traitOffer:", traitOffer);
-    if (Array.isArray(traitOffer)) {
-      console.log("Is array, length:", traitOffer.length);
-      traitOffer.forEach((item, index) => {
-        console.log(`Item ${index}:`, item);
-      });
-    } else {
-      console.log("Is not array, type:", typeof traitOffer);
-    }
-    console.groupEnd();
-  }, [traitOffer]);
+  // // Add this console log to see the raw response
+  // useEffect(() => {
+  //   console.group("Raw Response");
+  //   console.log("Raw traitOffer:", traitOffer);
+  //   if (Array.isArray(traitOffer)) {
+  //     console.log("Is array, length:", traitOffer.length);
+  //     traitOffer.forEach((item, index) => {
+  //       console.log(`Item ${index}:`, item);
+  //     });
+  //   } else {
+  //     console.log("Is not array, type:", typeof traitOffer);
+  //   }
+  //   console.groupEnd();
+  // }, [traitOffer]);
 
-  const formattedPrice = useMemo(() => {
-    if (!traitOffer?.priceInWei) return null;
-    console.log("Price in Wei before formatting:", traitOffer.priceInWei);
-    return parseFloat(formatEther(traitOffer.priceInWei));
-  }, [traitOffer]);
+  // const formattedPrice = useMemo(() => {
+  //   if (!traitOffer?.priceInWei) return null;
+  //   console.log("Price in Wei before formatting:", traitOffer.priceInWei);
+  //   return parseFloat(formatEther(traitOffer.priceInWei));
+  // }, [traitOffer]);
 
-  const isOfferSpecific = useMemo(() => {
-    if (!traitOffer?.onlySellTo) return false;
-    return (
-      traitOffer.onlySellTo !== "0x0000000000000000000000000000000000000000"
-    );
-  }, [traitOffer]);
+  // const isOfferSpecific = useMemo(() => {
+  //   if (!traitOffer?.onlySellTo) return false;
+  //   return (
+  //     traitOffer.onlySellTo !== "0x0000000000000000000000000000000000000000"
+  //   );
+  // }, [traitOffer]);
 
-  const canAcceptOffer = useMemo(() => {
-    if (!traitOffer?.onlySellTo || !address || !isOfferSpecific) return false;
-    return traitOffer.onlySellTo.toLowerCase() === address.toLowerCase();
-  }, [traitOffer, address, isOfferSpecific]);
+  // const canAcceptOffer = useMemo(() => {
+  //   if (!traitOffer?.onlySellTo || !address || !isOfferSpecific) return false;
+  //   return traitOffer.onlySellTo.toLowerCase() === address.toLowerCase();
+  // }, [traitOffer, address, isOfferSpecific]);
 
   // Get main body tokenURI
   const { data: tokenURIData } = useReadContract({
@@ -191,9 +191,9 @@ export default function TraitDetail({ id }: { id: string }) {
   const [owner, tokenIdOfTBA, ownerOfTraitOwner, isEquipped] =
     fullPictureForTrait || [];
 
-  console.log("traitOwnerTBA", owner);
-  console.log("chonkTokenId", tokenIdOfTBA?.toString());
-  console.log("chonkOwner", ownerOfTraitOwner);
+  // console.log("traitOwnerTBA", owner);
+  // console.log("chonkTokenId", tokenIdOfTBA?.toString());
+  // console.log("chonkOwner", ownerOfTraitOwner);
 
   const chonkId = tokenIdOfTBA?.toString() ?? null;
 
@@ -253,50 +253,45 @@ export default function TraitDetail({ id }: { id: string }) {
   // console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
 
   // Add these console logs
-  useEffect(() => {
-    console.log("Raw contract response:", traitOffer);
-    if (traitOffer) {
-      try {
-        // Log each property individually
-        console.group("Chonk Offer Details");
-        if (traitOffer.priceInWei) {
-          console.log("Price in Wei:", traitOffer.priceInWei.toString());
-        } else {
-          console.log("Price in Wei: undefined");
-        }
-        console.log("Seller:", traitOffer.seller || "undefined");
-        console.log("Seller TBA:", traitOffer.sellerTBA || "undefined");
-        console.log("Only sell to:", traitOffer.onlySellTo || "undefined");
-        console.groupEnd();
+  // useEffect(() => {
+  //   console.log("Raw contract response:", traitOffer);
+  //   if (traitOffer) {
+  //     try {
+  //       // Log each property individually
+  //       console.group("Trait Offer Details");
+  //       if (traitOffer.priceInWei) {
+  //         console.log("Price in Wei:", traitOffer.priceInWei.toString());
+  //       } else {
+  //         console.log("Price in Wei: undefined");
+  //       }
+  //       console.log("Seller:", traitOffer.seller || "undefined");
+  //       console.log("Seller TBA:", traitOffer.sellerTBA || "undefined");
+  //       console.log("Only sell to:", traitOffer.onlySellTo || "undefined");
+  //       console.groupEnd();
 
-        if (address) {
-          console.group("Wallet Info");
-          console.log("Connected wallet:", address);
-          console.log(
-            "Can accept offer:",
-            traitOffer.onlySellTo?.toLowerCase() === address.toLowerCase()
-          );
-          console.groupEnd();
-        }
-      } catch (error) {
-        console.error("Error accessing traitOffer properties:", error);
-        console.log("traitOffer type:", typeof traitOffer);
-        console.log("traitOffer keys:", Object.keys(traitOffer));
-      }
-    } else {
-      console.log("No offer found for this Chonk");
-    }
-  }, [traitOffer, address]);
+  //       if (address) {
+  //         console.group("Wallet Info");
+  //         console.log("Connected wallet:", address);
+  //         console.log(
+  //           "Can accept offer:",
+  //           traitOffer.onlySellTo?.toLowerCase() === address.toLowerCase()
+  //         );
+  //         console.groupEnd();
+  //       }
+  //     } catch (error) {
+  //       console.error("Error accessing traitOffer properties:", error);
+  //       console.log("traitOffer type:", typeof traitOffer);
+  //       console.log("traitOffer keys:", Object.keys(traitOffer));
+  //     }
+  //   } else {
+  //     console.log("No offer found for this Trait");
+  //   }
+  // }, [traitOffer, address]);
 
   const isOwner = useMemo(() => {
     if (!owner || !address) return false;
     return owner.toLowerCase() === address.toLowerCase();
   }, [owner, address]);
-
-  const hasActiveOffer = useMemo(
-    () => Boolean(traitOffer && traitOffer.priceInWei > 0n),
-    [traitOffer]
-  );
 
   return (
     <>
@@ -389,19 +384,21 @@ export default function TraitDetail({ id }: { id: string }) {
                   />
 
                   <PriceAndActionsSection
+                    isOwner={isOwner}
                     traitId={parseInt(id)}
                     tokenIdOfTBA={tokenIdOfTBA?.toString()}
-                    price={formattedPrice}
-                    priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
-                    isOfferSpecific={isOfferSpecific}
-                    canAcceptOffer={canAcceptOffer}
-                    isOwner={isOwner}
-                    hasActiveOffer={hasActiveOffer}
-                    hasActiveBid={hasActiveBid}
-                    chonkBid={chonkBid}
                     tbaOwner={ownerOfTraitOwner}
                     isEquipped={isEquipped}
                     tbaAddress={tbaAddress}
+                    // price={formattedPrice}
+                    // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
+                    // isOfferSpecific={isOfferSpecific}
+                    // canAcceptOffer={canAcceptOffer}
+                    //
+                    // hasActiveOffer={hasActiveOffer}
+                    // hasActiveBid={hasActiveBid}
+                    // traitBid={traitBid}
+
                   />
 
                   {/* <ActivityAndOffersSection

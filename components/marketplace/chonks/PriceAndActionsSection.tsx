@@ -152,14 +152,19 @@ export default function PriceAndActionsSection(
           <>
             <div className="flex flex-col mb-4">
               <div className="flex items-baseline gap-2 mb-4">
-                <div className="text-xl">Buy this Chonk for</div>
+                {isOwner ? (
+                  <div className="text-xl">Chonk is Listed for</div>
+                ) : (
+                  <div className="text-xl">Buy this Chonk for</div>
+                )}
+
                 <span className="text-2xl font-bold">{price} ETH</span>
                 {/* <span className="text-gray-500">(${priceUSD.toLocaleString()})</span> */}
               </div>
               {isOfferSpecific && (
                 <span className="text-sm text-gray-500">Private Listing</span>
               )}
-            </div>
+          </div>
 
             {!address ? (
               <ConnectKitButton
@@ -183,7 +188,7 @@ export default function PriceAndActionsSection(
             ) : isOwner ? (
               <div className="flex flex-col gap-2">
                 <button
-                  className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
+                  className="w-full bg-red-500 text-white py-2 px-4 hover:bg-red-600 transition-colors"
                   onClick={handleCancelOfferChonk}
                 >
                   Cancel Listing
@@ -191,49 +196,71 @@ export default function PriceAndActionsSection(
 
                 {hasActiveBid && chonkBid && (
                   <button
-                    className="w-full bg-chonk-orange text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
+                    className="w-full bg-chonk-orange text-white py-2 px-4 hover:bg-chonk-orange hover:text-black transition-colors"
                     onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
                   >
                     Accept Offer of {formatEther(chonkBid.amountInWei)} ETH
                   </button>
                 )}
+
+
               </div>
             ) : (
               <>
-                <button
-                  className={`w-full py-2 px-4 rounded transition-colors ${
-                    (!isOfferSpecific || canAcceptOffer) &&
-                    !hasInsufficientBalance
-                      ? "bg-blue-500 text-white hover:bg-blue-600"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                  disabled={Boolean(
-                    (isOfferSpecific && !canAcceptOffer) ||
-                      hasInsufficientBalance
+                <div className="flex flex-col gap-2">
+                  <button
+                    className={`w-full py-2 px-4 transition-colors ${
+                      (!isOfferSpecific || canAcceptOffer) &&
+                      !hasInsufficientBalance
+                        ? "bg-blue-500 text-white hover:bg-blue-600"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                    disabled={Boolean(
+                      (isOfferSpecific && !canAcceptOffer) ||
+                        hasInsufficientBalance
+                    )}
+                    onClick={() => {
+                      console.log("Buy Now clicked, price:", price);
+                      if (price) {
+                        console.log("Calling handleBuyChonk with price:", price);
+                        handleBuyChonk(price);
+                      } else {
+                        console.log("Price is null or undefined");
+                      }
+                    }}
+                  >
+                    {isOfferSpecific
+                      ? canAcceptOffer
+                        ? "Accept Private Offer"
+                        : "Private Offer - Not For You"
+                      : "Buy Now"}
+                  </button>
+                  {hasInsufficientBalance && (
+                    <p className="text-red-500 text-sm mt-2">
+                      Insufficient balance. You need at least{" "}
+                      {price && (price + estimatedGasInEth).toFixed(4)} ETH
+                      (including gas)
+                    </p>
                   )}
-                  onClick={() => {
-                    console.log("Buy Now clicked, price:", price);
-                    if (price) {
-                      console.log("Calling handleBuyChonk with price:", price);
-                      handleBuyChonk(price);
-                    } else {
-                      console.log("Price is null or undefined");
-                    }
-                  }}
-                >
-                  {isOfferSpecific
-                    ? canAcceptOffer
-                      ? "Accept Private Offer"
-                      : "Private Offer - Not For You"
-                    : "Buy Now"}
-                </button>
-                {hasInsufficientBalance && (
-                  <p className="text-red-500 text-sm mt-2">
-                    Insufficient balance. You need at least{" "}
-                    {price && (price + estimatedGasInEth).toFixed(4)} ETH
-                    (including gas)
-                  </p>
-                )}
+
+                  {/* need to clean up the code, this is repeated below */}
+                  {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
+                      <button
+                        className="w-full bg-red-500 text-white py-2 px-4  hover:bg-red-600 transition-colors"
+                        onClick={() => handleWithdrawBidOnChonk()}
+                      >
+                        Cancel Your Offer
+                      </button>
+                    ) : (
+                      <button
+                        className="w-full bg-chonk-blue text-white py-2 px-4  hover:bg-chonk-orange hover:text-black transition-colors"
+                        onClick={() => setIsOfferModalOpen(true)}
+                      >
+                        Make an Offer
+                      </button>
+                    )
+                  }
+                </div>
               </>
             )}
           </>
@@ -273,7 +300,7 @@ export default function PriceAndActionsSection(
               ) : isOwner || isCancelOfferChonkSuccess ? (
                 <>
                   <button
-                    className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
+                    className="w-full bg-chonk-blue text-white py-2 px-4  hover:bg-chonk-orange hover:text-black transition-colors"
                     onClick={() => {
                       if (!finalIsApproved) {
                         handleApproveMarketplace();
@@ -301,14 +328,14 @@ export default function PriceAndActionsSection(
                   <>
                     {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
                       <button
-                        className="w-full bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600 transition-colors"
+                        className="w-full bg-red-500 text-white py-2 px-4  hover:bg-red-600 transition-colors"
                         onClick={() => handleWithdrawBidOnChonk()}
                       >
                         Cancel Your Offer
                       </button>
                     ) : (
                       <button
-                        className="w-full bg-chonk-blue text-white py-2 px-4 rounded hover:bg-chonk-orange hover:text-black transition-colors"
+                        className="w-full bg-chonk-blue text-white py-2 px-4  hover:bg-chonk-orange hover:text-black transition-colors"
                         onClick={() => setIsOfferModalOpen(true)}
                       >
                         Make an Offer
@@ -422,7 +449,7 @@ export default function PriceAndActionsSection(
                     min="0.000001"
                     value={listingPrice}
                     onChange={(e) => setListingPrice(e.target.value)}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border "
                     placeholder="0.00"
                   />
                 </div>
@@ -449,7 +476,7 @@ export default function PriceAndActionsSection(
                           setRecipientAddress(e.target.value);
                           setAddressError("");
                         }}
-                        className={`w-full p-2 border rounded ${
+                        className={`w-full p-2 border  ${
                           addressError ? "border-red-500" : ""
                         }`}
                         placeholder="0x... or name.eth"
@@ -554,7 +581,7 @@ export default function PriceAndActionsSection(
                     step="0.000001"
                     value={offerAmount}
                     onChange={(e) => setOfferAmount(e.target.value)}
-                    className="w-full p-2 border rounded"
+                    className="w-full p-2 border "
                     placeholder="0.00"
                   />
                 </>

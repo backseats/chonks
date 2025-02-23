@@ -18,7 +18,7 @@ type ChonkOffer = {
   seller: string;
   sellerTBA: string;
   onlySellTo: string;
-  encodedTraitIds: string;
+  // encodedTraitIds: string;
 }
 
 export const categoryList = Object.values(Category);
@@ -31,6 +31,8 @@ export function useMarketplaceActions(chonkId: number) {
 
   const [isListingRejected, setIsListingRejected] = useState(false);
   const [isListingSuccess, setIsListingSuccess] = useState(false);
+
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  Approve Marketplace  ////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,14 +49,14 @@ export function useMarketplaceActions(chonkId: number) {
 
   // Approve marketplace contract
   const { writeContract: approveMarketplace, isPending: isApprovalPending, data: hashApproval } = useWriteContract();
-  const { isLoading: isApprovalLoading, isSuccess: isApprovalSuccess, isError : isApprovalErrror, data: receiptApproval } = useWaitForTransactionReceipt({
+  const { isLoading: isApprovalLoading, isSuccess: isApprovalSuccess, isError: isApprovalErrror, data: receiptApproval } = useWaitForTransactionReceipt({
     hash: hashApproval,
   });
 
   // const { writeContract: approveMarketplace } = useWriteContract();
   const handleApproveMarketplace = () => {
     if (!address) return;
-    try{
+    try {
       approveMarketplace({
         address: mainContract,
         abi: mainABI,
@@ -82,6 +84,11 @@ export function useMarketplaceActions(chonkId: number) {
     }
   }, [isApprovalSuccess, receiptApproval]);
 
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////  Get Chonk Bid  ////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
   // Add this new hook to get the current bid
   const { data: chonkBidData } = useReadContract({
     address: marketplaceContract,
@@ -99,7 +106,7 @@ export function useMarketplaceActions(chonkId: number) {
       bidder: chonkBidData[0],
       amountInWei: chonkBidData[1],
       traitIds: chonkBidData[2],
-      encodedTraitIds: chonkBidData[3],
+      // encodedTraitIds: chonkBidData[3],
     };
   }, [chonkBidData]);
 
@@ -113,97 +120,97 @@ export function useMarketplaceActions(chonkId: number) {
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-  //get Chonk Offers - accessing the offers directly from mapping
-    // but we now have : getChonkOffer
+  // get Chonk Offers - accessing the offers directly from mapping
+  // but we now have : getChonkOffer so probably should update to that TODO
   const { data: chonkOfferArray } = useReadContract({
-      address: marketplaceContract,
-      abi: marketplaceABI,
-      functionName: "chonkOffers",
-      args: [BigInt(chonkId)],
-      chainId,
+    address: marketplaceContract,
+    abi: marketplaceABI,
+    functionName: "chonkOffers",
+    args: [BigInt(chonkId)],
+    chainId,
   }) as { data: [bigint, string, string, string, string] };
 
   // Convert array to object
   const chonkOffer: ChonkOffer | null = useMemo(() => {
-      if (!chonkOfferArray) return null;
-      return {
-          priceInWei: chonkOfferArray[0],
-          seller: chonkOfferArray[1],
-          sellerTBA: chonkOfferArray[2],
-          onlySellTo: chonkOfferArray[3],
-          encodedTraitIds: chonkOfferArray[4],
-      };
+    if (!chonkOfferArray) return null;
+    return {
+      priceInWei: chonkOfferArray[0],
+      seller: chonkOfferArray[1],
+      sellerTBA: chonkOfferArray[2],
+      onlySellTo: chonkOfferArray[3],
+      // encodedTraitIds: chonkOfferArray[4],
+    };
   }, [chonkOfferArray]);
 
   // Add this console log to see the raw response
   useEffect(() => {
-      console.group("Raw Response");
-      console.log("Raw chonkOffer:", chonkOffer);
-      if (Array.isArray(chonkOffer)) {
-          console.log("Is array, length:", chonkOffer.length);
-          chonkOffer.forEach((item, index) => {
-              console.log(`Item ${index}:`, item);
-          });
-      } else {
-          console.log("Is not array, type:", typeof chonkOffer);
-      }
-      console.groupEnd();
+    console.group("Raw Response");
+    console.log("Raw chonkOffer:", chonkOffer);
+    if (Array.isArray(chonkOffer)) {
+      console.log("Is array, length:", chonkOffer.length);
+      chonkOffer.forEach((item, index) => {
+        console.log(`Item ${index}:`, item);
+      });
+    } else {
+      console.log("Is not array, type:", typeof chonkOffer);
+    }
+    console.groupEnd();
   }, [chonkOffer]);
 
   const formattedPrice = useMemo(() => {
-      if (!chonkOffer?.priceInWei) return null;
-      console.log("Price in Wei before formatting:", chonkOffer.priceInWei);
-      return parseFloat(formatEther(chonkOffer.priceInWei));
+    if (!chonkOffer?.priceInWei) return null;
+    console.log("Price in Wei before formatting:", chonkOffer.priceInWei);
+    return parseFloat(formatEther(chonkOffer.priceInWei));
   }, [chonkOffer]);
 
   const isOfferSpecific = useMemo(() => {
-      if (!chonkOffer?.onlySellTo) return false;
-      return chonkOffer.onlySellTo !== "0x0000000000000000000000000000000000000000";
+    if (!chonkOffer?.onlySellTo) return false;
+    return chonkOffer.onlySellTo !== "0x0000000000000000000000000000000000000000";
   }, [chonkOffer]);
 
   const canAcceptOffer = useMemo(() => {
-      if (!chonkOffer?.onlySellTo || !address || !isOfferSpecific) return false;
-      return chonkOffer.onlySellTo.toLowerCase() === address.toLowerCase();
+    if (!chonkOffer?.onlySellTo || !address || !isOfferSpecific) return false;
+    return chonkOffer.onlySellTo.toLowerCase() === address.toLowerCase();
   }, [chonkOffer, address, isOfferSpecific]);
 
   // Add these console logs
   useEffect(() => {
     console.log("Raw contract response:", chonkOffer);
     if (chonkOffer) {
-        try {
-            // Log each property individually
-            console.group("Chonk Offer Details");
-            if (chonkOffer.priceInWei) {
-                console.log("Price in Wei:", chonkOffer.priceInWei.toString());
-            } else {
-                console.log("Price in Wei: undefined");
-            }
-            console.log("Seller:", chonkOffer.seller || "undefined");
-            console.log("Seller TBA:", chonkOffer.sellerTBA || "undefined");
-            console.log("Only sell to:", chonkOffer.onlySellTo || "undefined");
-            console.log("Encoded trait IDs:", chonkOffer.encodedTraitIds || "undefined");
-            console.groupEnd();
-
-            if (address) {
-                console.group("Wallet Info");
-                console.log("Connected wallet:", address);
-                console.log("Can accept offer:", chonkOffer.onlySellTo?.toLowerCase() === address.toLowerCase());
-                console.groupEnd();
-            }
-        } catch (error) {
-            console.error("Error accessing chonkOffer properties:", error);
-            console.log("chonkOffer type:", typeof chonkOffer);
-            console.log("chonkOffer keys:", Object.keys(chonkOffer));
+      try {
+        // Log each property individually
+        console.group("Chonk Offer Details");
+        if (chonkOffer.priceInWei) {
+          console.log("Price in Wei:", chonkOffer.priceInWei.toString());
+        } else {
+          console.log("Price in Wei: undefined");
         }
+        console.log("Seller:", chonkOffer.seller || "undefined");
+        console.log("Seller TBA:", chonkOffer.sellerTBA || "undefined");
+        console.log("Only sell to:", chonkOffer.onlySellTo || "undefined");
+        // console.log("Encoded trait IDs:", chonkOffer.encodedTraitIds || "undefined");
+        console.groupEnd();
+
+        if (address) {
+          console.group("Wallet Info");
+          console.log("Connected wallet:", address);
+          console.log("Can accept offer:", chonkOffer.onlySellTo?.toLowerCase() === address.toLowerCase());
+          console.groupEnd();
+        }
+      } catch (error) {
+        console.error("Error accessing chonkOffer properties:", error);
+        console.log("chonkOffer type:", typeof chonkOffer);
+        console.log("chonkOffer keys:", Object.keys(chonkOffer));
+      }
     } else {
-        console.log("No offer found for this Chonk");
+      console.log("No offer found for this Chonk");
     }
-}, [chonkOffer, address]);
+  }, [chonkOffer, address]);
 
 
-const hasActiveOffer = useMemo(() => {
-  return Boolean(chonkOffer && chonkOffer.priceInWei > 0n);
-}, [chonkOffer]);
+  const hasActiveOffer = useMemo(() => {
+    return Boolean(chonkOffer && chonkOffer.priceInWei > 0n);
+  }, [chonkOffer]);
 
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -212,7 +219,7 @@ const hasActiveOffer = useMemo(() => {
 
   // const { writeContract: listChonk } = useWriteContract();
   const { writeContract: listChonk, isPending: isListChonkPending, data: hashListChonk } = useWriteContract();
-  const { isLoading: isListChonkLoading, isSuccess: isListChonkSuccess, isError : isListChonkError, data: receiptListChonk } = useWaitForTransactionReceipt({
+  const { isLoading: isListChonkLoading, isSuccess: isListChonkSuccess, isError: isListChonkError, data: receiptListChonk } = useWaitForTransactionReceipt({
     hash: hashListChonk,
   });
 
@@ -269,7 +276,7 @@ const hasActiveOffer = useMemo(() => {
   // List chonk to specific address
   // const { writeContract: listChonkToAddress } = useWriteContract();
   const { writeContract: listChonkToAddress, isPending: isListChonkToAddressPending, data: hashListChonkToAddress } = useWriteContract();
-  const { isLoading: isListChonkToAddressLoading, isSuccess: isListChonkToAddressSuccess, isError : isListChonkToAddressErrror, data: receiptListChonkToAddress } = useWaitForTransactionReceipt({
+  const { isLoading: isListChonkToAddressLoading, isSuccess: isListChonkToAddressSuccess, isError: isListChonkToAddressErrror, data: receiptListChonkToAddress } = useWaitForTransactionReceipt({
     hash: hashListChonkToAddress,
   });
 
@@ -303,14 +310,14 @@ const hasActiveOffer = useMemo(() => {
   // cancel offer chonk
   // const { writeContract: cancelOfferChonk } = useWriteContract();
   const { writeContract: cancelOfferChonk, isPending: isCancelOfferChonkPending, data: hashCancelOfferChonk } = useWriteContract();
-  const { isLoading: isCancelOfferChonkLoading, isSuccess: isCancelOfferChonkSuccess, isError : isCancelOfferChonkErrror, data: receiptCancelOfferChonk } = useWaitForTransactionReceipt({
+  const { isLoading: isCancelOfferChonkLoading, isSuccess: isCancelOfferChonkSuccess, isError: isCancelOfferChonkErrror, data: receiptCancelOfferChonk } = useWaitForTransactionReceipt({
     hash: hashCancelOfferChonk,
   });
 
   const handleCancelOfferChonk = () => {
     if (!address || !chonkId) return;
 
-    try{
+    try {
       cancelOfferChonk({
         address: marketplaceContract,
         abi: marketplaceABI,
@@ -336,44 +343,30 @@ const hasActiveOffer = useMemo(() => {
   // cancel offer chonk
   // const { writeContract: cancelOfferChonk } = useWriteContract();
   const { writeContract: withdrawBidOnChonk, isPending: isWithdrawBidOnChonkPending, data: hashWithdrawBidOnChonk } = useWriteContract();
-  const { isLoading: isWithdrawBidOnChonkLoading, isSuccess: isWithdrawBidOnChonkSuccess, isError : isWithdrawBidOnChonkErrror, data: receiptWithdrawBidOnChonk } = useWaitForTransactionReceipt({
+  const { isLoading: isWithdrawBidOnChonkLoading, isSuccess: isWithdrawBidOnChonkSuccess, isError: isWithdrawBidOnChonkErrror, data: receiptWithdrawBidOnChonk } = useWaitForTransactionReceipt({
     hash: hashWithdrawBidOnChonk,
   });
 
   const handleWithdrawBidOnChonk = () => {
     if (!address || !chonkId) return;
-    try{
+    try {
       withdrawBidOnChonk({
         address: marketplaceContract,
         abi: marketplaceABI,
-      functionName: 'withdrawBidOnChonk',
-      args: [BigInt(chonkId)],
-    }, {
-      onError: (error) => {
-        console.log('Withdrawal transaction rejected:', error);
-        alert(error.message.includes('MustWaitToWithdrawBid') ? 'You must wait 100 seconds before cancelling your offer' : 'Error cancelling offer: ' + error.message);
-        // alert(error.message);
-      },
-    });
+        functionName: 'withdrawBidOnChonk',
+        args: [BigInt(chonkId)],
+      }, {
+        onError: (error) => {
+          console.log('Withdrawal transaction rejected:', error);
+          alert(error.message.includes('MustWaitToWithdrawBid') ? 'You must wait 100 seconds before cancelling your offer' : 'Error cancelling offer: ' + error.message);
+          // alert(error.message);
+        },
+      });
     } catch (error) {
       console.error('Error withdrawing bid:', error);
       alert('Error withdrawing bid: ' + error);
     }
   };
-
-
-  // listChonk({
-  //   address: marketplaceContract,
-  //   abi: marketplaceABI,
-  //   functionName: 'offerChonk',
-  //   args: [BigInt(chonkId), priceInWei],
-  // }, {
-  //   onError: (error) => {
-  //     console.log('Listing transaction rejected:', error);
-  //     setIsListingRejected(true);
-  //     setPendingListPrice(null); // Clear pending price on error
-  //   },
-  // });
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  Cancel Offer Trait  /////////////////////////////////
@@ -382,23 +375,23 @@ const hasActiveOffer = useMemo(() => {
   // cancel offer trait
   // const { writeContract: cancelOfferTrait } = useWriteContract();
   const { writeContract: cancelOfferTrait, isPending: isCancelOfferTraitPending, data: hashCancelOfferTrait } = useWriteContract();
-  const { isLoading: isCancelOfferTraitLoading, isSuccess: isCancelOfferTraitSuccess, isError : isCancelOfferTraitErrror, data: receiptCancelOfferTrait } = useWaitForTransactionReceipt({
+  const { isLoading: isCancelOfferTraitLoading, isSuccess: isCancelOfferTraitSuccess, isError: isCancelOfferTraitErrror, data: receiptCancelOfferTrait } = useWaitForTransactionReceipt({
     hash: hashCancelOfferTrait,
   });
 
   const handleCancelOfferTrait = (traitId: number, chonkId: number) => {
     if (!address || !chonkId) return;
-    try{
+    try {
       cancelOfferTrait({
         address: marketplaceContract,
         abi: marketplaceABI,
-      functionName: 'cancelOfferTrait',
-      args: [BigInt(traitId), BigInt(chonkId)],
-    }, {
-      onError: (error) => {
-        console.log('Cancel Offer Trait transaction rejected:', error);
-        alert('Error cancelling offer trait: ' + error);
-      },
+        functionName: 'cancelOfferTrait',
+        args: [BigInt(traitId), BigInt(chonkId)],
+      }, {
+        onError: (error) => {
+          console.log('Cancel Offer Trait transaction rejected:', error);
+          alert('Error cancelling offer trait: ' + error);
+        },
       });
     } catch (error) {
       console.error('Error cancelling offer trait:', error);
@@ -414,7 +407,7 @@ const hasActiveOffer = useMemo(() => {
   // Buy chonk
   // const { writeContract: buyChonk } = useWriteContract();
   const { writeContract: buyChonk, isPending: isBuyChonkPending, data: hashBuyChonk } = useWriteContract();
-  const { isLoading: isBuyChonkLoading, isSuccess: isBuyChonkSuccess, isError : isBuyChonkErrror, data: receiptBuyChonk } = useWaitForTransactionReceipt({
+  const { isLoading: isBuyChonkLoading, isSuccess: isBuyChonkSuccess, isError: isBuyChonkErrror, data: receiptBuyChonk } = useWaitForTransactionReceipt({
     hash: hashBuyChonk,
   });
 
@@ -454,7 +447,7 @@ const hasActiveOffer = useMemo(() => {
 
   // const { writeContract: bidOnChonk } = useWriteContract();
   const { writeContract: bidOnChonk, isPending: isBidOnChonkPending, data: hashBidOnChonk } = useWriteContract();
-  const { isLoading: isBidOnChonkLoading, isSuccess: isBidOnChonkSuccess, isError : isBidOnChonkErrror, data: receiptBidOnChonk } = useWaitForTransactionReceipt({
+  const { isLoading: isBidOnChonkLoading, isSuccess: isBidOnChonkSuccess, isError: isBidOnChonkErrror, data: receiptBidOnChonk } = useWaitForTransactionReceipt({
     hash: hashBidOnChonk,
   });
 
@@ -462,22 +455,22 @@ const hasActiveOffer = useMemo(() => {
     if (!address || !chonkId) return;
 
     try {
-        const amountInWei = parseEther(offerInEth);
-        bidOnChonk({
-            address: marketplaceContract,
-            abi: marketplaceABI,
-            functionName: 'bidOnChonk',
-            args: [BigInt(chonkId)],
-            value: amountInWei
-        }, {
-          onError: (error) => {
-            console.error('Error placing bid:', error);
-            alert('Error placing bid: ' + error);
-          }
-        });
+      const amountInWei = parseEther(offerInEth);
+      bidOnChonk({
+        address: marketplaceContract,
+        abi: marketplaceABI,
+        functionName: 'bidOnChonk',
+        args: [BigInt(chonkId)],
+        value: amountInWei
+      }, {
+        onError: (error) => {
+          console.error('Error placing bid:', error);
+          alert('Error placing bid: ' + error);
+        }
+      });
     } catch (error) {
-        console.error('Error placing bid:', error);
-        alert('Error placing bid: ' + error);
+      console.error('Error placing bid:', error);
+      alert('Error placing bid: ' + error);
     }
   };
 
@@ -488,7 +481,7 @@ const hasActiveOffer = useMemo(() => {
   // Add new hook for accepting bids
   // const { writeContract: acceptBid } = useWriteContract();
   const { writeContract: acceptBid, isPending: isAcceptBidPending, data: hashAcceptBid } = useWriteContract();
-  const { isLoading: isAcceptBidLoading, isSuccess: isAcceptBidSuccess, isError : isAcceptBidErrror, data: receiptAcceptBid } = useWaitForTransactionReceipt({
+  const { isLoading: isAcceptBidLoading, isSuccess: isAcceptBidSuccess, isError: isAcceptBidErrror, data: receiptAcceptBid } = useWaitForTransactionReceipt({
     hash: hashAcceptBid,
   });
 

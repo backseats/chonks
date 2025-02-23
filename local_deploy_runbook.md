@@ -22,6 +22,8 @@ In `config.ts`, ensure you're using the `localhost` transport in `config`
 6. In your browser, go to `http://localhost:3005/`
 
 
-Cast Calls
+# Cast Calls
 
 cast send --rpc-url http://localhost:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 DESTINATION_ADDRESS --value 100ether
+
+cast rpc anvil_mine 50
