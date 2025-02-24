@@ -38,7 +38,6 @@ export default function Profile(props: Props) {
     console.log("possibleAddress", possibleAddress);
     console.log("address", address);
     console.log("_address", _address);
-    debugger
 
     if (!mounted) {
         return null;

@@ -37,6 +37,15 @@ export default function MenuBar(props: Props) {
         <Link href="/studio" className="hover:opacity-70 transition-opacity">
           Studio
         </Link>
+
+        <div> | </div>
+
+        <Link
+          href="/profile"
+          className="hover:opacity-70 transition-opacity"
+        >
+          Your Chonks
+        </Link>
       </div>
 
       <ConnectKitButton

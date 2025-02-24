@@ -67,6 +67,10 @@ export default function PriceAndActionsSection(
   const [localListingRejected, setLocalListingRejected] = useState(false);
   const [localListingPending, setLocalListingPending] = useState(false);
 
+  const OFFER_PRICE_DECIMAL_PRECISION = 4;
+  const MIN_LISTING_PRICE  = `0.${'0'.repeat(OFFER_PRICE_DECIMAL_PRECISION-1)}1`;
+  const STEP_SIZE = MIN_LISTING_PRICE;
+
   useEffect(() => {
     if (isListingRejected) {
       setLocalListingRejected(true); // neeeded because we want to clear the rejection here
@@ -79,12 +83,30 @@ export default function PriceAndActionsSection(
     }
   }, [isListChonkLoading]);
 
-  // let's initiall set offerAmount to the current bid amount
-  useEffect(() => {
+  // Calculate minimum offer (5% higher than current bid)
+  const minimumOffer = useMemo(() => {
     if (hasActiveBid && chonkBid) {
-      setOfferAmount(formatEther(chonkBid.amountInWei));
+      const currentBidEth = Number(formatEther(chonkBid.amountInWei));
+      const fivePercentIncrease = currentBidEth * 0.05;
+
+      // If 5% increase is smaller than our minimum precision step, use the step size instead
+      if (fivePercentIncrease < Number(STEP_SIZE)) {
+        return (currentBidEth + Number(STEP_SIZE)).toFixed(OFFER_PRICE_DECIMAL_PRECISION);
+      }
+
+      const minOffer = (currentBidEth * 1.05).toFixed(OFFER_PRICE_DECIMAL_PRECISION);
+      return Number(minOffer).toString(); // Convert to number and back to string to remove trailing zeros
+    } else {
+      return MIN_LISTING_PRICE;
     }
   }, [hasActiveBid, chonkBid]);
+
+  // let's initially set offerAmount to the minimum offer
+  useEffect(() => {
+    if (hasActiveBid && chonkBid && minimumOffer) {
+      setOfferAmount(minimumOffer);
+    }
+  }, [hasActiveBid, chonkBid, minimumOffer]);
 
   // useEffect(() => {
   //     if (isListChonkSuccess) {
@@ -137,8 +159,8 @@ export default function PriceAndActionsSection(
     balance &&
     balance.value < parseEther((price + estimatedGasInEth).toString());
 
-  // Add this constant near the top of the component
-  const MIN_LISTING_PRICE = 0.000001; // 1 millionth of an ETH
+
+
 
   // console.log('hasActiveOffer:', hasActiveOffer);
   // console.log('isListChonkSuccess:', isListChonkSuccess);
@@ -243,7 +265,7 @@ export default function PriceAndActionsSection(
                     </p>
                   )}
 
-                  {/* need to clean up the code, this is repeated below */}
+
                   {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
                       <button
                         className="w-full bg-red-500 text-white py-2 px-4  hover:bg-red-600 transition-colors"
@@ -445,8 +467,8 @@ export default function PriceAndActionsSection(
                   <label className="block mb-2">Price (ETH)</label>
                   <input
                     type="number"
-                    step="0.000001"
-                    min="0.000001"
+                    step={STEP_SIZE}
+                    min={MIN_LISTING_PRICE}
                     value={listingPrice}
                     onChange={(e) => setListingPrice(e.target.value)}
                     className="w-full p-2 border "
@@ -520,7 +542,7 @@ export default function PriceAndActionsSection(
                     className="px-4 py-2 bg-black text-white hover:bg-gray-800"
                     onClick={() => {
                       const listingPriceNum = Number(listingPrice);
-                      if (listingPriceNum < MIN_LISTING_PRICE) {
+                      if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
                         setPriceError(
                           `Minimum listing price is ${MIN_LISTING_PRICE} ETH`
                         );
@@ -573,12 +595,14 @@ export default function PriceAndActionsSection(
                   {hasActiveBid && chonkBid && (
                     <div className="text-red-500 text-[1vw] mb-2">
                       Current Bid: {formatEther(chonkBid.amountInWei)} ETH
+                      <br />
+                      Minimum Offer: {minimumOffer} ETH
                     </div>
                   )}
                   <label className="block mb-2">Offer Amount (ETH)</label>
                   <input
                     type="number"
-                    step="0.000001"
+                    step={STEP_SIZE}
                     value={offerAmount}
                     onChange={(e) => setOfferAmount(e.target.value)}
                     className="w-full p-2 border "
@@ -601,23 +625,23 @@ export default function PriceAndActionsSection(
               <button
                 className="px-4 py-2 bg-black text-white hover:bg-gray-800"
                 onClick={() => {
-                  // Check if there's an active bid and if the new offer amount is greater than the current bid
-                  if (
-                    hasActiveBid &&
-                    chonkBid &&
-                    Number(offerAmount) <=
-                      Number(formatEther(chonkBid.amountInWei))
-                  ) {
-                    alert(
-                      `Your offer must be greater than the current bid of ${formatEther(
-                        chonkBid.amountInWei
-                      )} ETH.`
-                    );
-                    return;
+                  // Check if there's an active bid and if the new offer amount is at least 5% higher than the current bid
+                  console.log('minimumOffer', minimumOffer);
+                  console.log('offerAmount', offerAmount);
+                  if (hasActiveBid && chonkBid && minimumOffer) {
+                    if (Number(offerAmount) < Number(minimumOffer)) {
+                      alert(
+                        `Your offer must be at least 5% higher than the current bid. Minimum offer: ${minimumOffer} ETH`
+                      );
+                      return;
+                    }
                   }
 
                   if (offerAmount) {
                     handleBidOnChonk(chonkId, offerAmount);
+                  } else {
+                    alert('Please enter an amount, minimum offer: ' + minimumOffer + ' ETH');
+                    return;
                   }
                   setIsOfferModalOpen(false);
                   setOfferAmount("");
