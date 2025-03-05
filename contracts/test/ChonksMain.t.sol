@@ -34,6 +34,7 @@ import {Utils} from "../src/common/Utils.sol";
 
 import {console} from "forge-std/console.sol";
 import { CommitReveal } from "../src/common/CommitReveal.sol";
+import { BulkTraitTransfer } from "../src/BulkTraitTransfer.sol";
 
 interface IChonkTraitsV1 {
     function getTrait(uint256 _tokenId) external view returns (ITraitStorage.StoredTrait memory);
@@ -982,9 +983,256 @@ contract ChonksMainTest is ChonksBaseTest {
         assertEq(main.ownerOf(tid), deployer);
     }
 
+    // bulk transfer tests
+
+    function test_transferAllTraits() public {
+        vm.startPrank(deployer);
+            BulkTraitTransfer bulkTraitTransfer = new BulkTraitTransfer(address(newTraitsContract));
+            main.unequipAll(1);
+
+            newMigrator.updateEpochOnce();
+            newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 400);
+        vm.stopPrank();
+
+        address sourceTBA = main.tokenIdToTBAAccountAddress(1);
+        vm.prank(sourceTBA);
+        newTraitsContract.setApprovalForAll(address(bulkTraitTransfer), true);
+
+        address destinationTBA = main.tokenIdToTBAAccountAddress(2);
+        // Transfer all of Chonk 1's traits to Chonk 2
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+
+        vm.prank(deployer);
+        bulkTraitTransfer.transferAllTraits(1, 2);
+        // 1,2,3,4,6
+
+        assertEq(newTraitsContract.ownerOf(1), destinationTBA);
+        assertEq(newTraitsContract.ownerOf(2), destinationTBA);
+        assertEq(newTraitsContract.ownerOf(3), destinationTBA);
+        assertEq(newTraitsContract.ownerOf(4), destinationTBA);
+        assertEq(newTraitsContract.ownerOf(6), destinationTBA);
+    }
+
+    function test_transferAllTraitsFail() public {
+        vm.startPrank(deployer);
+            BulkTraitTransfer bulkTraitTransfer = new BulkTraitTransfer(address(newTraitsContract));
+            main.unequipAll(1);
+
+            newMigrator.updateEpochOnce();
+            newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 400);
+        vm.stopPrank();
+
+        address sourceTBA = main.tokenIdToTBAAccountAddress(1);
+        // Transfer all of Chonk 1's traits to Chonk 2
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+
+        vm.prank(deployer);
+        vm.expectRevert("ERC721: caller is not token owner nor approved");
+        bulkTraitTransfer.transferAllTraits(1, 2);
+
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(3), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(4), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(6), sourceTBA);
+    }
+
+    function test_transferSomeTraits() public {
+        vm.startPrank(deployer);
+            BulkTraitTransfer bulkTraitTransfer = new BulkTraitTransfer(address(newTraitsContract));
+            main.unequipAll(1);
+
+            newMigrator.updateEpochOnce();
+            newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 400);
+        vm.stopPrank();
+
+        address sourceTBA = main.tokenIdToTBAAccountAddress(1);
+        vm.prank(sourceTBA);
+        newTraitsContract.setApprovalForAll(address(bulkTraitTransfer), true);
+
+        address destinationTBA = main.tokenIdToTBAAccountAddress(2);
+        // Transfer all of Chonk 1's traits to Chonk 2
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+
+        uint256[] memory traitIds = new uint256[](3);
+        traitIds[0] = 1;
+        traitIds[1] = 2;
+        traitIds[2] = 3;
+
+        vm.prank(deployer);
+        bulkTraitTransfer.transferSelectedTraits(1, 2, traitIds);
+
+        assertEq(newTraitsContract.ownerOf(1), destinationTBA);
+        assertEq(newTraitsContract.ownerOf(2), destinationTBA);
+        assertEq(newTraitsContract.ownerOf(3), destinationTBA);
+        assertEq(newTraitsContract.ownerOf(4), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(6), sourceTBA);
+    }
+
+    function test_bulkTransferWithoutApproval() public {
+        vm.startPrank(deployer);
+            BulkTraitTransfer bulkTraitTransfer = new BulkTraitTransfer(address(newTraitsContract));
+            main.unequipAll(1);
+
+            newMigrator.updateEpochOnce();
+            newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 400);
+        vm.stopPrank();
+
+        address sourceTBA = main.tokenIdToTBAAccountAddress(1);
+
+        // Transfer all of Chonk 1's traits to Chonk 2
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+
+        uint256[] memory traitIds = new uint256[](3);
+        traitIds[0] = 1;
+        traitIds[1] = 2;
+        traitIds[2] = 3;
+
+        vm.prank(deployer);
+        vm.expectRevert("ERC721: caller is not token owner nor approved");
+        bulkTraitTransfer.transferSelectedTraits(1, 2, traitIds);
+
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(3), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(4), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(6), sourceTBA);
+    }
+
+    function test_bulkTransferBadOwner() public {
+        vm.startPrank(deployer);
+            BulkTraitTransfer bulkTraitTransfer = new BulkTraitTransfer(address(newTraitsContract));
+            main.unequipAll(1);
+
+            newMigrator.updateEpochOnce();
+            newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 400);
+        vm.stopPrank();
+
+        address sourceTBA = main.tokenIdToTBAAccountAddress(1);
+
+        // Transfer all of Chonk 1's traits to Chonk 2
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+
+        uint256[] memory traitIds = new uint256[](3);
+        traitIds[0] = 1;
+        traitIds[1] = 2;
+        traitIds[2] = 3;
+
+        vm.prank(address(9));
+        vm.expectRevert(BulkTraitTransfer.NotChonkOwner.selector);
+        bulkTraitTransfer.transferSelectedTraits(1, 2, traitIds);
+
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(3), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(4), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(6), sourceTBA);
+    }
+
+    function test_transferSomeTraitsFail() public {
+        vm.startPrank(deployer);
+            BulkTraitTransfer bulkTraitTransfer = new BulkTraitTransfer(address(newTraitsContract));
+            main.unequipAll(1);
+            main.unequipAll(2);
+
+            newMigrator.updateEpochOnce();
+            newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 400);
+        vm.stopPrank();
+
+        address sourceTBA = main.tokenIdToTBAAccountAddress(1);
+        vm.prank(sourceTBA);
+        newTraitsContract.setApprovalForAll(address(bulkTraitTransfer), true);
+
+        // Transfer all of Chonk 1's traits to Chonk 2
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+
+        uint256[] memory traitIds = new uint256[](4);
+        traitIds[0] = 1;
+        traitIds[1] = 2;
+        traitIds[2] = 3;
+        traitIds[3] = 10;
+
+        vm.prank(deployer);
+        vm.expectRevert("ERC721: caller is not token owner nor approved");
+        bulkTraitTransfer.transferSelectedTraits(1, 2, traitIds);
+
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(3), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(4), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(6), sourceTBA);
+    }
+
+    function test_transferSomeTraitsFailWrongId() public {
+        vm.startPrank(deployer);
+            BulkTraitTransfer bulkTraitTransfer = new BulkTraitTransfer(address(newTraitsContract));
+            main.unequipAll(1);
+            main.unequipAll(2);
+
+            newMigrator.updateEpochOnce();
+            newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 400);
+        vm.stopPrank();
+
+        address sourceTBA = main.tokenIdToTBAAccountAddress(1);
+        vm.prank(sourceTBA);
+        newTraitsContract.setApprovalForAll(address(bulkTraitTransfer), true);
+
+        // Transfer all of Chonk 1's traits to Chonk 2
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+
+        uint256[] memory traitIds = new uint256[](4);
+        traitIds[0] = 1;
+        traitIds[1] = 2;
+        traitIds[2] = 3;
+        traitIds[3] = 5;
+
+        vm.prank(deployer);
+        vm.expectRevert("ERC721: caller is not token owner nor approved");
+        bulkTraitTransfer.transferSelectedTraits(1, 2, traitIds);
+    }
+
+    function test_transferSomeTraitsSameChonk() public {
+        vm.startPrank(deployer);
+            BulkTraitTransfer bulkTraitTransfer = new BulkTraitTransfer(address(newTraitsContract));
+            main.unequipAll(1);
+            main.unequipAll(2);
+
+            newMigrator.updateEpochOnce();
+            newMigrator.migrateBatch(400);
+            assertEq(newTraitsContract.totalSupply(), 400);
+        vm.stopPrank();
+
+        address sourceTBA = main.tokenIdToTBAAccountAddress(1);
+        vm.prank(sourceTBA);
+        newTraitsContract.setApprovalForAll(address(bulkTraitTransfer), true);
+
+        // Transfer all of Chonk 1's traits to Chonk 2
+        assertEq(newTraitsContract.ownerOf(1), sourceTBA);
+        assertEq(newTraitsContract.ownerOf(2), sourceTBA);
+
+        uint256[] memory traitIds = new uint256[](2);
+        traitIds[0] = 1;
+        traitIds[1] = 2;
+
+        vm.prank(deployer);
+        bulkTraitTransfer.transferSelectedTraits(1, 1, traitIds);
+    }
+
     // tests for: transferring traits back in, empty tba, new trait owner, function parity, clearing your own approvals, adding new traits (making sure theyre in the new traits contract), single approve
-
-
 
 
 
