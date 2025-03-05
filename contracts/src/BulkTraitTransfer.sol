@@ -72,4 +72,5 @@ contract BulkTraitTransfer {
         sourceTBA = chonksMain.tokenIdToTBAAccountAddress(_sourceChonkId);
         destinationTBA = chonksMain.tokenIdToTBAAccountAddress(_destinationChonkId);
     }
+
 }
