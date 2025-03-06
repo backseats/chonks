@@ -248,8 +248,8 @@ export function useMarketplaceActions(chonkId: number) {
       }, {
         onError: (error) => {
           console.log('Listing transaction rejected:', error);
-          alert('Error listing chonk: ' + error.message);
-          setIsListingRejected(true);
+          // alert('Error listing chonk: ' + error.message); // deploy: remove
+          setIsListingRejected(true); // may need to check if "rejected" is the correct state, just assuming it for now
           setPendingListPrice(null); // Clear pending price on error
         },
       });
@@ -294,6 +294,7 @@ export function useMarketplaceActions(chonkId: number) {
         onError: (error) => {
           console.log('Listing transaction rejected:', error);
           alert('Error listing chonk to address: ' + error.message);
+
         },
       });
     } catch (error) {
@@ -520,6 +521,7 @@ export function useMarketplaceActions(chonkId: number) {
     isOfferSpecific,
     canAcceptOffer,
     chonkBid,
+    isListChonkPending,
     isListChonkLoading,
     isListingRejected,
     hashListChonk,

@@ -216,6 +216,7 @@ export default function PriceAndActionsSection(
                   >
                     Accept Offer of {formatEther(traitBid.amountInWei)} ETH
                   </button>
+
                 )}
               </div>
             ) : (

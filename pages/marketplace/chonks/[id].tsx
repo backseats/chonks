@@ -479,14 +479,14 @@ export default function ChonkDetail({ id }: { id: string }) {
                   />
 
                   {/* <ActivityAndOffersSection
-                                        isActivityOpen={isActivityOpen}
-                                        setIsActivityOpen={setIsActivityOpen}
-                                        isOffersOpen={isOffersOpen}
-                                        setIsOffersOpen={setIsOffersOpen}
-                                        type="chonk"
-                                        tokenId={id}
-                                        address={address}
-                                    /> */}
+                          isActivityOpen={isActivityOpen}
+                          setIsActivityOpen={setIsActivityOpen}
+                          isOffersOpen={isOffersOpen}
+                          setIsOffersOpen={setIsOffersOpen}
+                          type="chonk"
+                          tokenId={id}
+                          address={address}
+                      /> */}
                 </div>
               </section>
             </div>
