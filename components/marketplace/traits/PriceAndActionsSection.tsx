@@ -60,7 +60,9 @@ export default function PriceAndActionsSection(
   const [listingPrice, setListingPrice] = useState("");
 
   const OFFER_PRICE_DECIMAL_PRECISION = 4;
-  const MIN_LISTING_PRICE  = `0.${'0'.repeat(OFFER_PRICE_DECIMAL_PRECISION-1)}1`;
+  const MIN_LISTING_PRICE = `0.${"0".repeat(
+    OFFER_PRICE_DECIMAL_PRECISION - 1
+  )}1`;
   const STEP_SIZE = MIN_LISTING_PRICE;
 
   const {
@@ -76,7 +78,7 @@ export default function PriceAndActionsSection(
     handleCancelOfferTrait,
     handleBidOnTrait,
     handleWithdrawBidOnTrait,
-    handleAcceptBidForTrait
+    handleAcceptBidForTrait,
   } = useMarketplaceActions(traitId);
 
   const { TBAIsApproved } = useReadTBAApproval(tbaAddress as `0x${string}`);
@@ -89,6 +91,7 @@ export default function PriceAndActionsSection(
     useState(false);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [addressError, setAddressError] = useState("");
+  const [priceError, setPriceError] = useState("");
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [offerAmount, setOfferAmount] = useState("");
 
@@ -103,10 +106,14 @@ export default function PriceAndActionsSection(
 
       // If 5% increase is smaller than our minimum precision step, use the step size instead
       if (fivePercentIncrease < Number(STEP_SIZE)) {
-        return (currentBidEth + Number(STEP_SIZE)).toFixed(OFFER_PRICE_DECIMAL_PRECISION);
+        return (currentBidEth + Number(STEP_SIZE)).toFixed(
+          OFFER_PRICE_DECIMAL_PRECISION
+        );
       }
 
-      const minOffer = (currentBidEth * 1.05).toFixed(OFFER_PRICE_DECIMAL_PRECISION);
+      const minOffer = (currentBidEth * 1.05).toFixed(
+        OFFER_PRICE_DECIMAL_PRECISION
+      );
       return Number(minOffer).toString(); // Convert to number and back to string to remove trailing zeros
     } else {
       return MIN_LISTING_PRICE;
@@ -148,7 +155,7 @@ export default function PriceAndActionsSection(
   // Get final address for contract call
   const resolvedAddress = useMemo(() => {
     if (recipientAddress.endsWith(".eth")) return ensAddress;
-    return isValidAddress ? recipientAddress : undefined;
+    return isValidAddress ? recipientAddress : "";
   }, [recipientAddress, ensAddress, isValidAddress]);
 
   // Calculate if balance is sufficient (price + estimated gas)
@@ -161,18 +168,22 @@ export default function PriceAndActionsSection(
   return (
     <>
       <div className="border border-black p-4 mb-4">
-
-
-        {(!ownedChonks || ownedChonks.length === 0) ? (
+        {ownedChonks && ownedChonks.length === 0 ? (
           <>
             <div className="flex flex-col mb-4">
               <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-2xl font-bold">{price} ETH</span>
+                <span className="text-2xl font-bold">{price} ETH</span>
               </div>
               <p className="text-red-500 text-[1.25vw]">
                 You need to own a Chonk to buy or make an offer on this trait
                 <br />
-                <Link className="text-chonk-blue underline" href="/marketplace/chonks" rel="noopener noreferrer">Go buy one here</Link>
+                <Link
+                  className="text-chonk-blue underline"
+                  href="/marketplace/chonks"
+                  rel="noopener noreferrer"
+                >
+                  Go buy one here
+                </Link>
               </p>
             </div>
           </>
@@ -180,14 +191,11 @@ export default function PriceAndActionsSection(
           <>
             <div className="flex flex-col mb-4">
               <div className="flex items-baseline gap-2 mb-4">
-                {isOwner && (
-                  <div className="text-xl">Buy this Trait for</div>
-                )}
+                {isOwner && <div className="text-xl">Buy this Trait for</div>}
                 {tbaOwner === address && (
                   <div className="text-xl">Trait is Listed for</div>
                 )}
                 <span className="text-2xl font-bold">{price} ETH</span>
-
 
                 {/* <span className="text-gray-500"> */}
                 {/* (${priceUSD.toLocaleString()})
@@ -199,7 +207,7 @@ export default function PriceAndActionsSection(
             </div>
 
             {isOwner || tbaOwner === address ? (
-               <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2">
                 <button
                   className="w-full bg-red-500 text-white py-2 px-4 hover:bg-red-600 transition-colors"
                   onClick={() =>
@@ -216,7 +224,6 @@ export default function PriceAndActionsSection(
                   >
                     Accept Offer of {formatEther(traitBid.amountInWei)} ETH
                   </button>
-
                 )}
               </div>
             ) : (
@@ -261,7 +268,7 @@ export default function PriceAndActionsSection(
                         //   // handleBuyTrait(price, parseInt(tokenIdOfTBA ?? "0"));
                         //   handleBuyTrait(price, parseInt(selectedChonkId));
                         // } else {
-                          handleBuyTrait(price, parseInt(selectedChonkId));
+                        handleBuyTrait(price, parseInt(selectedChonkId));
                         // }
                       }
                     }}
@@ -282,21 +289,21 @@ export default function PriceAndActionsSection(
 
                   {/* need to clean up the code, this is repeated below */}
                   {hasActiveBid && traitBid && traitBid.bidder === address ? (
+                    <button
+                      className="w-full bg-red-500 text-white py-2 px-4  hover:bg-red-600 transition-colors"
+                      onClick={() => handleWithdrawBidOnTrait()}
+                    >
+                      Cancel Your Offer
+                    </button>
+                  ) : (
+                    <>
                       <button
-                        className="w-full bg-red-500 text-white py-2 px-4  hover:bg-red-600 transition-colors"
-                        onClick={() => handleWithdrawBidOnTrait()}
+                        className="w-full bg-chonk-blue text-white py-2 px-4  hover:bg-chonk-orange hover:text-black transition-colors"
+                        onClick={() => setIsOfferModalOpen(true)}
                       >
-                        Cancel Your Offer
+                        Make an Offer
                       </button>
-                    ) : (
-                      <>
-                        <button
-                          className="w-full bg-chonk-blue text-white py-2 px-4  hover:bg-chonk-orange hover:text-black transition-colors"
-                          onClick={() => setIsOfferModalOpen(true)}
-                        >
-                          Make an Offer
-                        </button>
-                      </>
+                    </>
                   )}
                 </div>
               </>
@@ -304,15 +311,15 @@ export default function PriceAndActionsSection(
           </>
         ) : (
           <>
-            <div className="text-lg text-gray-500 mb-4">
-              Not Listed
-              {hasActiveBid && traitBid && (
+            {hasActiveBid && traitBid && (
+              <div className="text-lg text-gray-500 mb-4">
                 <span className="text-gray-500">
                   {" "}
                   | Current Bid: {formatEther(traitBid.amountInWei)} ETH
                 </span>
-              )}
-            </div>
+              </div>
+            )}
+
             <div className="flex flex-col gap-2">
               {isOwner ||
                 (tbaOwner === address && (
@@ -335,9 +342,7 @@ export default function PriceAndActionsSection(
                     {hasActiveBid && traitBid && (
                       <button
                         className="w-full bg-chonk-orange text-white py-2 px-4  hover:bg-chonk-orange hover:text-black transition-colors"
-                        onClick={() =>
-                          handleAcceptBidForTrait(traitBid.bidder)
-                        }
+                        onClick={() => handleAcceptBidForTrait(traitBid.bidder)}
                       >
                         Accept Offer of {formatEther(traitBid.amountInWei)} ETH
                       </button>
@@ -345,10 +350,9 @@ export default function PriceAndActionsSection(
                   </>
                 ))}
               {/* {!isOwner && tbaOwner !== address && ( */}
-              {!isOwner && tbaOwner !== address &&  (
-
-              <>
-                {hasActiveBid && traitBid && traitBid.bidder === address ? (
+              {!isOwner && tbaOwner !== address && (
+                <>
+                  {hasActiveBid && traitBid && traitBid.bidder === address ? (
                     <button
                       className="w-full bg-red-500 text-white py-2 px-4  hover:bg-red-600 transition-colors"
                       onClick={() => handleWithdrawBidOnTrait()}
@@ -357,13 +361,19 @@ export default function PriceAndActionsSection(
                     </button>
                   ) : (
                     <>
-                      {(!ownedChonks || ownedChonks.length === 0) ? (
-
+                      {!ownedChonks || ownedChonks.length === 0 ? (
                         <p className="text-red-500 text-[1.25vw]">
                           You need to own a Chonk to make an offer on this trait
-                          <br /> <a className="text-chonk-blue underline" href="https://chonk.xyz/marketplace" rel="noopener noreferrer"> Go buy one here</a>
+                          <br />{" "}
+                          <a
+                            className="text-chonk-blue underline"
+                            href="https://chonk.xyz/marketplace"
+                            rel="noopener noreferrer"
+                          >
+                            {" "}
+                            Go buy one here
+                          </a>
                         </p>
-
                       ) : (
                         <button
                           className="w-full bg-chonk-blue text-white py-2 px-4  hover:bg-chonk-orange hover:text-black transition-colors"
@@ -374,7 +384,7 @@ export default function PriceAndActionsSection(
                       )}
                     </>
                   )}
-              </>
+                </>
               )}
             </div>
           </>
@@ -387,7 +397,7 @@ export default function PriceAndActionsSection(
           <div className="bg-white p-8 max-w-md w-full mx-4">
             <h2 className="text-2xl font-bold mb-4">List Trait #{traitId}</h2>
 
-            <div className="mb-4">
+            <div>
               <label className="block mb-2">Price (ETH)</label>
               <input
                 type="number"
@@ -400,8 +410,12 @@ export default function PriceAndActionsSection(
               />
             </div>
 
+            {priceError && (
+              <p className="text-red-500 text-sm mt-1">{priceError}</p>
+            )}
+
             {/* New Private Listing Section */}
-            <div className="mb-4">
+            <div className="mb-4 mt-4">
               <button
                 className="flex items-center gap-2 text-left w-full"
                 onClick={() =>
@@ -427,9 +441,11 @@ export default function PriceAndActionsSection(
                     }`}
                     placeholder="0x... or name.eth"
                   />
+
                   {addressError && (
                     <p className="text-red-500 text-sm mt-1">{addressError}</p>
                   )}
+
                   {recipientAddress.endsWith(".eth") && (
                     <p className="text-gray-500 text-sm mt-1">
                       {!ensAddress
@@ -449,6 +465,8 @@ export default function PriceAndActionsSection(
                   setListingPrice("");
                   setRecipientAddress("");
                   setAddressError("");
+                  setIsPrivateListingExpanded(false);
+                  setPriceError("");
                 }}
               >
                 Cancel
@@ -456,6 +474,14 @@ export default function PriceAndActionsSection(
               <button
                 className="px-4 py-2 bg-black text-white hover:bg-gray-800"
                 onClick={() => {
+                  const listingPriceNum = Number(listingPrice);
+                  if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
+                    setPriceError(
+                      `Minimum listing price is ${MIN_LISTING_PRICE} ETH`
+                    );
+                    return;
+                  }
+
                   if (isPrivateListingExpanded && !resolvedAddress) {
                     setAddressError("Please enter a valid address or ENS name");
                     return;
@@ -478,6 +504,7 @@ export default function PriceAndActionsSection(
                   setListingPrice("");
                   setRecipientAddress("");
                   setAddressError("");
+                  setPriceError("");
                 }}
               >
                 {isPrivateListingExpanded && resolvedAddress
@@ -506,22 +533,23 @@ export default function PriceAndActionsSection(
             )}
 
             <div className="mb-4  text-[1vw]">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select your chonk that the trait will transfer to if the offer is accepted
-                </label>
-                <select
-                  value={selectedChonkId}
-                  onChange={(e) => setSelectedChonkId(e.target.value)}
-                  className="w-full text-sm font-medium  p-2 border  bg-white"
-                >
-                  <option value="">Select a Chonk</option>
-                  {ownedChonks?.map((chonk) => (
-                    <option key={parseInt(chonk)} value={parseInt(chonk)}>
-                      Chonk #{parseInt(chonk)}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select your chonk that the trait will transfer to if the offer
+                is accepted
+              </label>
+              <select
+                value={selectedChonkId}
+                onChange={(e) => setSelectedChonkId(e.target.value)}
+                className="w-full text-sm font-medium  p-2 border  bg-white"
+              >
+                <option value="">Select a Chonk</option>
+                {ownedChonks?.map((chonk) => (
+                  <option key={parseInt(chonk)} value={parseInt(chonk)}>
+                    Chonk #{parseInt(chonk)}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <div className="mb-4   text-[1vw]">
               <label className="block mb-2">Offer Amount (ETH)</label>
@@ -546,11 +574,12 @@ export default function PriceAndActionsSection(
               >
                 Cancel
               </button>
+
               <button
                 className="px-4 py-2 bg-black text-white hover:bg-gray-800"
                 onClick={() => {
-                  console.log('minimumOffer', minimumOffer);
-                  console.log('offerAmount', offerAmount);
+                  console.log("minimumOffer", minimumOffer);
+                  console.log("offerAmount", offerAmount);
                   if (hasActiveBid && traitBid && minimumOffer) {
                     if (Number(offerAmount) < Number(minimumOffer)) {
                       alert(
@@ -560,15 +589,23 @@ export default function PriceAndActionsSection(
                     }
                   }
 
-                  if(selectedChonkId === "") {
-                    alert('Please select a chonk');
+                  if (selectedChonkId === "") {
+                    alert("Please select a chonk");
                     return;
                   }
 
                   if (offerAmount) {
-                    handleBidOnTrait(traitId, parseInt(selectedChonkId), offerAmount);
+                    handleBidOnTrait(
+                      traitId,
+                      parseInt(selectedChonkId),
+                      offerAmount
+                    );
                   } else {
-                    alert('Please enter an amount, minimum offer: ' + minimumOffer + ' ETH');
+                    alert(
+                      "Please enter an amount, minimum offer: " +
+                        minimumOffer +
+                        " ETH"
+                    );
                     return;
                   }
                   setIsOfferModalOpen(false);

@@ -6,6 +6,7 @@ import { useEnsName, useEnsAvatar } from "wagmi";
 import { normalize } from "viem/ens";
 import RefreshAndShare from "../RefreshAndShare";
 import Link from "next/link";
+import { mainnet } from "wagmi/chains";
 
 interface Props {
   id: string;
@@ -25,6 +26,7 @@ export default function OwnershipSection(props: Props) {
   // Add ENS resolution
   const { data: ensName } = useEnsName({
     address: owner as Address,
+    chainId: mainnet.id,
   });
 
   // const { data, isError, isLoading } = useEnsAvatar({
@@ -55,7 +57,7 @@ export default function OwnershipSection(props: Props) {
           {/* {data && <img src={data} alt="ENS Avatar" className="w-full h-full object-cover" />} */}
           {/* </div> */}
           <div>
-            <div className="text-[1vw] text-gray-600">In the Backpack of</div>
+            <div className="text-sm text-gray-600">In the Backpack of</div>
             <div className="text-lg">
               <Link href={`/chonks/${tokenIdOfTBA}`} className="underline">
                 Chonk #{tokenIdOfTBA?.toString() ?? "N/A"} (Owned by:{" "}
