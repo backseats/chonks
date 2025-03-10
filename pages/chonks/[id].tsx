@@ -29,7 +29,10 @@ import BodySwitcher from "@/components/chonk_explorer/BodySwitcher";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import BGColorSwitcher from "@/components/chonk_explorer/BGColorSwitcher";
 import Head from "next/head";
-import { useBasePaintOwnership } from "@/hooks/useBasepaintOwnership";
+import {
+  useBasePaintOwnership485,
+  useBasePaintOwnership577,
+} from "@/hooks/useBasepaintOwnership";
 import {
   useSongDaymannOwnership,
   useFarWestOwnership,
@@ -220,7 +223,8 @@ export default function ChonkDetail({ id }: { id: string }) {
     tokenId: id.toString(),
   });
 
-  const basePaintOwnership = useBasePaintOwnership(tbaAddress);
+  const basePaintOwnership485 = useBasePaintOwnership485(tbaAddress);
+  const basePaintOwnership577 = useBasePaintOwnership577(tbaAddress);
   const songDaymannOwnership = useSongDaymannOwnership(tbaAddress);
   const farWestOwnership = useFarWestOwnership(tbaAddress); // TODO: generalize this
   const oneBitChonksOwnership = useOneBitChonksOwnership(tbaAddress);
@@ -519,7 +523,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                   </div>
                 )}
 
-                {(basePaintOwnership ||
+                {(basePaintOwnership485 ||
+                  basePaintOwnership577 ||
                   songDaymannOwnership ||
                   farWestOwnership ||
                   oneBitChonksOwnership.hasAssets ||
@@ -531,7 +536,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                     </div>
 
                     <div className="flex flex-row gap-4 justify-center items-center my-6">
-                      {basePaintOwnership && (
+                      {basePaintOwnership485 && (
                         <Link
                           href="https://basepaint.xyz/canvas/485"
                           target="_blank"
@@ -539,7 +544,22 @@ export default function ChonkDetail({ id }: { id: string }) {
                         >
                           <Image
                             src="/basepaint485.png"
-                            alt="Base Paint"
+                            alt="BasePaint #485"
+                            width={300}
+                            height={300}
+                          />
+                        </Link>
+                      )}
+
+                      {basePaintOwnership577 && (
+                        <Link
+                          href="https://basepaint.xyz/canvas/577"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Image
+                            src="/basepaint577.png"
+                            alt="BasePaint #577"
                             width={300}
                             height={300}
                           />
