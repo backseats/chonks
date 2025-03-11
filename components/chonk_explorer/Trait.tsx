@@ -79,26 +79,34 @@ export default function Trait(props: Props) {
     }
   };
 
-  const buttonClass = "absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2"
+  const buttonClass =
+    "absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2";
 
   return traitData ? (
     <>
-      <div className="relative w-full h-full text-lg sm:text-[15px]" data-token-id={traitTokenId}>
+      <div
+        className="relative w-full h-full text-lg sm:text-[15px]"
+        data-token-id={traitTokenId}
+      >
+        {!isEquipped && isYours && (
+          <button
+            className="absolute top-0 right-0 bg-black bg-opacity-50 text-white py-1 px-2 text-sm"
+            onClick={() => setIsTransferModalOpen(true)}
+          >
+            Transfer Trait
+          </button>
+        )}
 
-        { !isEquipped && isYours && <button
-          className="absolute top-0 right-0 bg-black bg-opacity-50 text-white py-1 px-2 text-sm"
-          onClick={() => setIsTransferModalOpen(true)}
-        >
-          Transfer Trait
-        </button> }
-
-        { !isEquipped && isYours && <button
-          className="absolute top-0 left-0 bg-black opacity-50 bg-opacity-50 text-white py-1 px-2 text-sm"
-          onClick={() => {}}
-          disabled={true}
-        >
-          Sell Trait
-        </button> }
+        {!isEquipped && isYours && (
+          <button
+            className="absolute top-0 left-0 bg-black  bg-opacity-50 text-white py-1 px-2 text-sm"
+            onClick={() =>
+              (window.location.href = `/marketplace/traits/${traitTokenId}`)
+            }
+          >
+            Sell Trait
+          </button>
+        )}
 
         <img
           src={isRevealed ? traitData.image : "/unrevealed.svg"}
@@ -109,19 +117,32 @@ export default function Trait(props: Props) {
         {isYours ? (
           <button
             className={buttonClass}
-            onClick={isRevealed ? (isEquipped ? unequip : equip) : () => { }}
+            onClick={isRevealed ? (isEquipped ? unequip : equip) : () => {}}
             disabled={!isRevealed || (isEquipped && traitName == "")}
           >
-            <span className={isEquipped && traitName == "" || !isRevealed ? "opacity-50" : ""}>
-              {isRevealed ? (isEquipped ? `Unequip ${traitName}` : `Equip ${traitName}`) : "Revealing Soon"}
+            <span
+              className={
+                (isEquipped && traitName == "") || !isRevealed
+                  ? "opacity-50"
+                  : ""
+              }
+            >
+              {isRevealed
+                ? isEquipped
+                  ? `Unequip ${traitName}`
+                  : `Equip ${traitName}`
+                : "Revealing Soon"}
             </span>
           </button>
         ) : (
-          <button
-            className={buttonClass}
-            onClick={() => { }}
-          >
-            <span className={isEquipped && traitName == "" || !isRevealed ? "opacity-50" : ""}>
+          <button className={buttonClass} onClick={() => {}}>
+            <span
+              className={
+                (isEquipped && traitName == "") || !isRevealed
+                  ? "opacity-50"
+                  : ""
+              }
+            >
               {isRevealed ? traitName : "Revealing Soon"}
             </span>
           </button>
