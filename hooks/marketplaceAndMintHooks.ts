@@ -15,36 +15,6 @@ export function useMarketplaceActions(chonkId: number) {
   const { address } = useAccount();
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////  Widthdraw Bid Chonk  /////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // cancel offer chonk
-  // const { writeContract: cancelOfferChonk } = useWriteContract();
-  const { writeContract: withdrawBidOnChonk, isPending: isWithdrawBidOnChonkPending } = useWriteContract();
-
-
-  const handleWithdrawBidOnChonk = () => {
-    if (!address || !chonkId) return;
-    try {
-      withdrawBidOnChonk({
-        address: marketplaceContract,
-        abi: marketplaceABI,
-        functionName: 'withdrawBidOnChonk',
-        args: [BigInt(chonkId)],
-      }, {
-        onError: (error) => {
-          console.log('Withdrawal transaction rejected:', error);
-          alert(error.message.includes('MustWaitToWithdrawBid') ? 'You must wait 100 seconds before cancelling your offer' : 'Error cancelling offer: ' + error.message);
-          // alert(error.message);
-        },
-      });
-    } catch (error) {
-      console.error('Error withdrawing bid:', error);
-      alert('Error withdrawing bid: ' + error);
-    }
-  };
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  Buy Chonk  ////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -122,7 +92,5 @@ export function useMarketplaceActions(chonkId: number) {
   return {
     handleAcceptBidForChonk,
     handleBuyChonk,
-    handleBidOnChonk,
-    handleWithdrawBidOnChonk,
   };
 }

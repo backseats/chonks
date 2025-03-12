@@ -20,6 +20,7 @@ import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
 import useGetChonkBid from "@/hooks/marketplace/chonks/useGetChonkBid";
 import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
 import useBidOnChonk from "@/hooks/marketplace/chonks/useBidOnChonk";
+import useWithdrawChonkBid from "@/hooks/marketplace/chonks/useWithdrawChonkBid";
 
 export default function PriceAndActionsSection({
   chonkId,
@@ -38,7 +39,6 @@ export default function PriceAndActionsSection({
     handleAcceptBidForChonk, // seller side
 
     handleBuyChonk, // buyer side
-    handleWithdrawBidOnChonk, // buyer side
   } = useMarketplaceActions(chonkId);
 
   const {
@@ -75,6 +75,14 @@ export default function PriceAndActionsSection({
   } = useBidOnChonk(chonkId);
 
   const { chonkBid, hasActiveBid, refetchChonkBid } = useGetChonkBid(chonkId);
+
+  const {
+    handleWithdrawBidOnChonk,
+    isWithdrawBidOnChonkPending,
+    isWithdrawBidOnChonkSuccess,
+    isWithdrawBidOnChonkError,
+    withdrawBidOnChonkError,
+  } = useWithdrawChonkBid(chonkId);
 
   ////////////////////////////////////////////////////////////
 
@@ -154,8 +162,10 @@ export default function PriceAndActionsSection({
 
     if (isBidOnChonkSuccess) {
       setLocalBidOnChonkPending(false);
-      refetchChonkBid();
       handleBidModalClose();
+      setOfferAmount("");
+
+      setTimeout(() => refetchChonkBid(), 3000);
       return;
     }
 
@@ -264,7 +274,6 @@ export default function PriceAndActionsSection({
     setOfferAmount("");
     setIsOfferModalOpen(false);
     setLocalBidOnChonkPending(false);
-    setLocalBidOnChonkSuccess(false);
     setLocalBidOnChonkError(false);
   };
 
@@ -356,10 +365,25 @@ export default function PriceAndActionsSection({
           : "Buy Now"}
       </ActionButton>
 
-      {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
-        <ActionButton variant="danger" onClick={handleWithdrawBidOnChonk}>
-          Cancel Your Offer
-        </ActionButton>
+      {hasActiveBid &&
+      chonkBid &&
+      chonkBid.bidder === address &&
+      !isWithdrawBidOnChonkSuccess ? (
+        <>
+          <ActionButton
+            variant="danger"
+            onClick={handleWithdrawBidOnChonk}
+            disabled={isWithdrawBidOnChonkPending}
+          >
+            Cancel Your Offer
+          </ActionButton>
+
+          {withdrawBidOnChonkError && !isWithdrawBidOnChonkPending && (
+            <div className="text-red-500 text-sm">
+              {withdrawBidOnChonkError}
+            </div>
+          )}
+        </>
       ) : (
         <ActionButton
           variant="secondary"
@@ -397,7 +421,7 @@ export default function PriceAndActionsSection({
                 </span>
               )}
 
-              {hasActiveBid && chonkBid && (
+              {hasActiveBid && chonkBid && !isWithdrawBidOnChonkSuccess && (
                 <div className="text-xl">
                   Your Offer: {formatEther(chonkBid.amountInWei)} ETH
                 </div>
