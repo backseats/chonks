@@ -843,6 +843,7 @@ export default function PriceAndActionsSection(
           selectedChonkId={selectedChonkId}
           setSelectedChonkId={setSelectedChonkId}
           priceError={priceError}
+          isBidPending={false} // TODO
         />
       </ModalWrapper>
     </>
