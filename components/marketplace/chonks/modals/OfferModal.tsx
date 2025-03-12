@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import { MARKETPLACE_CONSTANTS } from "@/constants/marketplace";
 
 interface OfferModalProps {
@@ -18,6 +18,7 @@ interface OfferModalProps {
   selectedChonkId?: string;
   setSelectedChonkId?: (chonkId: string) => void;
   priceError: string | null;
+  isBidPending: boolean;
 }
 
 export const OfferModal = ({
@@ -34,6 +35,7 @@ export const OfferModal = ({
   ownedChonks,
   selectedChonkId,
   setSelectedChonkId,
+  isBidPending,
 }: OfferModalProps) => {
   const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9.]/g, "");
@@ -104,17 +106,23 @@ export const OfferModal = ({
       )}
 
       <div className="flex gap-2 mt-4 text-[16px]">
+        {!isBidPending && (
+          <button
+            className="flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300"
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+        )}
+
         <button
-          className="flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300"
-          onClick={onClose}
-        >
-          Cancel
-        </button>
-        <button
-          className="flex-1 bg-chonk-blue text-white py-2 px-4 hover:brightness-110"
+          className={`flex-1 bg-chonk-blue text-white py-2 px-4 hover:brightness-110 ${
+            isBidPending ? "opacity-50" : ""
+          }`}
           onClick={onSubmit}
+          disabled={isBidPending}
         >
-          Make Offer
+          {isBidPending ? "Confirm with your wallet" : "Make Offer"}
         </button>
       </div>
     </div>

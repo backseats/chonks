@@ -17,8 +17,9 @@ import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
 import useApproval from "@/hooks/marketplace/chonks/useApproval";
 import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
-import useChonkBid from "@/hooks/marketplace/chonks/useChonkBid";
+import useGetChonkBid from "@/hooks/marketplace/chonks/useGetChonkBid";
 import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
+import useBidOnChonk from "@/hooks/marketplace/chonks/useBidOnChonk";
 
 type PriceAndActionsSectionProps = {
   chonkId: number;
@@ -54,7 +55,6 @@ export default function PriceAndActionsSection(
     handleAcceptBidForChonk, // seller side
 
     handleBuyChonk, // buyer side
-    handleBidOnChonk, // buyer side
     handleWithdrawBidOnChonk, // buyer side
   } = useMarketplaceActions(chonkId);
 
@@ -84,7 +84,14 @@ export default function PriceAndActionsSection(
     isCancelOfferChonkRejected,
   } = useCancelOffer(address, chonkId);
 
-  const { chonkBid, hasActiveBid, refetchChonkBid } = useChonkBid(chonkId);
+  const {
+    handleBidOnChonk,
+    isBidOnChonkPending,
+    isBidOnChonkSuccess,
+    isBidOnChonkError,
+  } = useBidOnChonk(chonkId);
+
+  const { chonkBid, hasActiveBid, refetchChonkBid } = useGetChonkBid(chonkId);
 
   ////////////////////////////////////////////////////////////
 
@@ -105,6 +112,10 @@ export default function PriceAndActionsSection(
   const [localCancelOfferChonkSuccess, setLocalCancelOfferChonkSuccess] =
     useState(false);
 
+  const [localBidOnChonkPending, setLocalBidOnChonkPending] = useState(false);
+  const [localBidOnChonkSuccess, setLocalBidOnChonkSuccess] = useState(false);
+  const [localBidOnChonkError, setLocalBidOnChonkError] = useState(false);
+
   const OFFER_PRICE_DECIMAL_PRECISION = 4;
   const MIN_LISTING_PRICE = `0.${"0".repeat(
     OFFER_PRICE_DECIMAL_PRECISION - 1
@@ -114,13 +125,13 @@ export default function PriceAndActionsSection(
   useEffect(() => {
     if (isListChonkSuccess) {
       setLocalListingSuccess(true);
-      setLocalCancelOfferChonkSuccess(false); // if it's successfully listed, we don't want to show the cancel offer button... can probably do this with some other effects below too
+      setLocalCancelOfferChonkSuccess(false);
     }
   }, [isListChonkSuccess]);
 
   useEffect(() => {
     if (isListingRejected) {
-      setLocalListingRejected(true); // neeeded because we want to clear the rejection here
+      setLocalListingRejected(true); // needed because we want to clear the rejection here
     }
   }, [isListingRejected]);
 
@@ -152,6 +163,28 @@ export default function PriceAndActionsSection(
       setIsOfferModalOpen(false);
     }
   }, [isOfferModalOpen, hasActiveBid]);
+
+  useEffect(() => {
+    if (isBidOnChonkPending) {
+      setLocalBidOnChonkPending(true);
+      return;
+    }
+
+    if (isBidOnChonkSuccess) {
+      setLocalBidOnChonkPending(false);
+      setLocalBidOnChonkSuccess(true);
+      refetchChonkBid();
+      handleBidModalClose();
+      return;
+    }
+
+    if (isBidOnChonkError) {
+      setLocalBidOnChonkPending(false);
+      setLocalBidOnChonkSuccess(false);
+      setLocalBidOnChonkError(true);
+      return;
+    }
+  }, [isBidOnChonkPending, isBidOnChonkSuccess, isBidOnChonkError]);
 
   // Calculate minimum offer (5% higher than current bid)
   const minimumOffer = useMemo(() => {
@@ -246,6 +279,15 @@ export default function PriceAndActionsSection(
     setIsPrivateListingExpanded(false);
   };
 
+  const handleBidModalClose = () => {
+    setPriceError("");
+    setOfferAmount("");
+    setIsOfferModalOpen(false);
+    setLocalBidOnChonkPending(false);
+    setLocalBidOnChonkSuccess(false);
+    setLocalBidOnChonkError(false);
+  };
+
   const handleListingSubmit = () => {
     const listingPriceNum = Number(listingPrice);
     if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
@@ -285,9 +327,7 @@ export default function PriceAndActionsSection(
     }
 
     if (offerAmount) {
-      handleBidOnChonk(chonkId, offerAmount, () => {
-        refetchChonkBid();
-      });
+      handleBidOnChonk(offerAmount);
     } else {
       setPriceError("Enter a minimum offer of " + minimumOffer + " ETH");
       return;
@@ -476,7 +516,7 @@ export default function PriceAndActionsSection(
           setOfferAmount("");
           setIsOfferModalOpen(false);
         }}
-        localListingPending={localListingPending}
+        localListingPending={localBidOnChonkPending}
       >
         <OfferModal
           chonkId={chonkId}
@@ -487,12 +527,9 @@ export default function PriceAndActionsSection(
           hasActiveBid={hasActiveBid}
           currentBid={chonkBid}
           onSubmit={handleOfferSubmit}
-          onClose={() => {
-            setPriceError("");
-            setOfferAmount("");
-            setIsOfferModalOpen(false);
-          }}
+          onClose={handleBidModalClose}
           ownedChonks={[]}
+          isBidPending={localBidOnChonkPending}
         />
       </ModalWrapper>
     </>

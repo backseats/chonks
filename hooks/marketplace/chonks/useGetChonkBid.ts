@@ -3,7 +3,7 @@ import { useReadContract } from "wagmi";
 import { marketplaceContract, marketplaceABI } from "@/config";
 import { zeroAddress } from "viem";
 
-export default function useChonkBid(chonkId: number) {
+export default function useGetChonkBid(chonkId: number) {
 
   const { data: chonkBidData, refetch: refetchChonkBid } = useReadContract({
     address: marketplaceContract,
