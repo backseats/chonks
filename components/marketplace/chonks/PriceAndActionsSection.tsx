@@ -484,7 +484,7 @@ export default function PriceAndActionsSection({
 
                   {finalIsApproved && hasActiveBid && chonkBid && (
                     <AcceptOfferButton
-                      amountInWei={chonkBid.amountInWei}
+                      amountInWei={formatEther(chonkBid.amountInWei)}
                       bidder={chonkBid.bidder}
                       handleAcceptBidForChonk={handleAcceptBidForChonk}
                       isPending={isAcceptBidPending}

@@ -1,7 +1,5 @@
-import { formatEther } from "viem";
-
 interface Props {
-  amountInWei: bigint;
+  amountInWei: string;
   bidder: string;
   isPending: boolean;
   handleAcceptBidForChonk: (bidder: string) => void;
@@ -22,7 +20,7 @@ export default function AcceptOfferButton({
     >
       {isPending
         ? "Confirm with your wallet"
-        : `Accept Offer of ${formatEther(amountInWei)} ETH`}
+        : `Accept Offer of ${amountInWei} ETH`}
     </button>
   );
 }
