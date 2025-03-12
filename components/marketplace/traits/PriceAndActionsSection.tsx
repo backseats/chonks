@@ -718,7 +718,6 @@ export default function PriceAndActionsSection(
             isRejected: localListingRejected,
             isPending: localListingPending,
             isSuccess: localListingSuccess,
-            hash: hashListTrait,
           }}
         />
       </ModalWrapper>
@@ -843,6 +842,7 @@ export default function PriceAndActionsSection(
           ownedChonks={ownedChonks}
           selectedChonkId={selectedChonkId}
           setSelectedChonkId={setSelectedChonkId}
+          priceError={priceError}
         />
       </ModalWrapper>
     </>
