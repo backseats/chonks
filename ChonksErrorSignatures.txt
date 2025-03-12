@@ -1,0 +1,90 @@
+// Error Selectors for ChonksMain.sol errors
+// Format: bytes4(keccak256("ErrorName()"))
+
+// CanOnlyReserveFirstTwo()                - 0x0c9a3d92
+// CantTransferDuringMint()                - 0x6861d0c9
+// CantTransferToTBAs()                    - 0x9e80c3f4
+// ChonkDoesntExist()                      - 0x7c1f8eca
+// FirstReleaseDataMinterNotSet()          - 0x1c5c8ac5
+// IncorrectChonkOwner()                   - 0x6c51ae02
+// IncorrectTBAOwner()                     - 0x9e2dbd9f
+// IncorrectTraitType()                    - 0x5c6a7d21
+// InsufficientFunds()                     - 0x61868086
+// InvalidBodyIndex()                      - 0x2c5b646c
+// InvalidColor()                          - 0x8f5fe0fc
+// InvalidTraitCount()                     - 0x5a9a3a25
+// InvalidTraitCategory()                  - 0x1e6c3250
+// InvalidMintAmount()                     - 0x43953519
+// MintEnded()                             - 0x35678c12
+// MintNotStarted()                        - 0x19cb3aa7
+// NotAuthorized()                         - 0x4a0bfec1
+// NotYourChonk()                          - 0x7e273289
+// NotYourTrait()                          - 0x7d157a02
+// OwnerCantCallAfterOneYear()             - 0x5cd83192
+// TraitLengthsMustMatch()                 - 0x6b3e8788
+// TraitNotFound()                         - 0x63b43792
+// UseUnequip()                            - 0x7e9f1420
+
+// Error Selectors for ChonkTraits.sol errors
+// Format: bytes4(keccak256("ErrorName()"))
+
+// AddressCantBurn()                       - 0x9f6df5e7
+// CantTransferEquipped()                  - 0x9e2a5a2d
+// NotATBA()                               - 0x3c6b2dd1
+// NotAValidMinterContract()               - 0x7a7e0d92
+// NotYourTrait()                          - 0x7d157a02
+// ReplaceMintPermissionsRevoked()         - 0x0a7c3f3e
+// TraitAlreadyExists()                    - 0x1f0a6e47
+// TraitNotFound(uint256)                  - 0x63b43792
+// TraitTokenDoesntExist()                 - 0x1c4e04e0
+
+// Error Selectors for ChonkTraitsLegacy.sol errors
+// Format: bytes4(keccak256("ErrorName()"))
+
+// AddressCantBurn()                       - 0x9f6df5e7
+// CantTransfer()                          - 0x3e3f8f73
+// CantTransferDuringMint()                - 0x6861d0c9
+// CantTransferEquipped()                  - 0x9e2a5a2d
+// MintStartTimeAlreadySet()               - 0x7c1a7d5b
+// NotATBA()                               - 0x3c6b2dd1
+// NotAValidMinterContract()               - 0x7a7e0d92
+// NotYourTrait()                          - 0x7d157a02
+// SetChonksMainAddress()                  - 0x0e32d883
+// SetMarketplaceAddress()                 - 0x2e2d6a3c
+// TraitNotFound(uint256)                  - 0x63b43792
+// TraitTokenDoesntExist()                 - 0x1c4e04e0
+
+// Error Selectors for ChonksMarket.sol errors
+// Format: bytes4(keccak256("ErrorName()"))
+
+// ApproveTheMarketplace()      - 0x49986e73
+// BidderChanged()              - 0x8c13a4a8
+// BidIsTooLow()                - 0x5a9bf4f8
+// CantAcceptYourOwnBid()       - 0x8c6e5d71
+// CantBeZero()                 - 0x20e3a5b2
+// CantBidOnYourOwnChonk()      - 0x0c3d0c67
+// CantBidOnYourOwnTrait()      - 0x9b3a2a15
+// CantBuyYourOwnChonk()        - 0x5e0bf8c3
+// CantBuyYourOwnTrait()        - 0x1c0c6e0a
+// ChonkInCooldown()            - 0x3e54c547
+// CMUnauthorized()             - 0x3ca5a5f5
+// MustWaitToWithdrawBid()      - 0x1a7e3468
+// NoBidToAccept()              - 0x8e8d5453
+// NoBidToWithdraw()            - 0x7e4b224a
+// NoOfferToCancel()            - 0x7d336237
+// NotYourBid()                 - 0x11046047
+// NotYourChonk()               - 0x14b70f41
+// NotYourOffer()               - 0x6c1f8e5a
+// NotYourTrait()               - 0x0e2c5580
+// OfferDoesNotExist()          - 0x9add30b5
+// OnlySellToEOAs()             - 0x9c52a7d1
+// OnlyTraitsContract()         - 0x0c8d1c6d
+// Paused()                     - 0x8a5f0c37
+// PausabilityRevoked()         - 0x0a0a0c65
+// SellerMustRelistTrait()      - 0x7c1f8e5b
+// TBANeedsToApproveMarketplace() - 0x4a3f6a3e
+// TraitEquipped()              - 0x5e8c9f3d
+// WithdrawFailed()             - 0x750b219c
+// WrongAmount()                - 0xf7760f25
+// YouCantBuyThatChonk()        - 0x2c5a5f4a
+// YouCantBuyThatTrait()        - 0x1d5e8c9f
