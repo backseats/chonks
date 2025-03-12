@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useBalance, useAccount, useEnsAddress, useFeeData } from "wagmi";
-import { parseEther, isAddress, formatEther } from "viem";
+import { parseEther, isAddress, formatEther, getAddress } from "viem";
 import { mainnet } from "wagmi/chains";
 import { ModalWrapper } from "./modals/ModalWrapper";
 import { ListingModal } from "./modals/ListingModal";
@@ -14,13 +14,14 @@ import MakeCancelOfferButton from "../common/MakeCancelOfferButton";
 import ListOrApproveButton from "../common/ListOrApproveButton";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 
-import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
+import useAcceptChonkBid from "@/hooks/marketplace/chonks/useAcceptChonkBid";
 import useApproval from "@/hooks/marketplace/chonks/useApproval";
 import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
 import useGetChonkBid from "@/hooks/marketplace/chonks/useGetChonkBid";
 import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
 import useBidOnChonk from "@/hooks/marketplace/chonks/useBidOnChonk";
 import useWithdrawChonkBid from "@/hooks/marketplace/chonks/useWithdrawChonkBid";
+import useBuyChonk from "@/hooks/marketplace/chonks/useBuyChonk";
 
 export default function PriceAndActionsSection({
   chonkId,
@@ -34,12 +35,6 @@ export default function PriceAndActionsSection({
   const { data: balance } = useBalance({ address });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [listingPrice, setListingPrice] = useState("");
-
-  const {
-    handleAcceptBidForChonk, // seller side
-
-    handleBuyChonk, // buyer side
-  } = useMarketplaceActions(chonkId);
 
   const {
     canAcceptOffer,
@@ -83,6 +78,23 @@ export default function PriceAndActionsSection({
     isWithdrawBidOnChonkError,
     withdrawBidOnChonkError,
   } = useWithdrawChonkBid(chonkId);
+
+  const {
+    handleBuyChonk,
+    isBuyChonkPending,
+    isBuyChonkSuccess,
+    isBuyChonkError,
+    buyChonkError,
+  } = useBuyChonk(chonkId);
+
+  // TODO
+  const {
+    handleAcceptBidForChonk,
+    isAcceptBidPending,
+    isAcceptBidSuccess,
+    isAcceptBidError,
+    acceptBidError,
+  } = useAcceptChonkBid(chonkId);
 
   ////////////////////////////////////////////////////////////
 
@@ -175,6 +187,10 @@ export default function PriceAndActionsSection({
       return;
     }
   }, [isBidOnChonkPending, isBidOnChonkSuccess, isBidOnChonkError]);
+
+  useEffect(() => {
+    if (isBuyChonkSuccess) window.location.reload();
+  }, [isBuyChonkSuccess]);
 
   // Calculate minimum offer (5% higher than current bid)
   const minimumOffer = useMemo(() => {
@@ -354,7 +370,9 @@ export default function PriceAndActionsSection({
       <ActionButton
         variant="primary"
         disabled={Boolean(
-          (isOfferSpecific && !canAcceptOffer) || hasInsufficientBalance
+          (isOfferSpecific && !canAcceptOffer) ||
+            hasInsufficientBalance ||
+            isBuyChonkPending
         )}
         onClick={() => price && handleBuyChonk(price)}
       >
@@ -364,6 +382,10 @@ export default function PriceAndActionsSection({
             : "This Offer is Private"
           : "Buy Now"}
       </ActionButton>
+
+      {buyChonkError && !isBuyChonkPending && (
+        <div className="text-red-500 text-sm">{buyChonkError}</div>
+      )}
 
       {hasActiveBid &&
       chonkBid &&
@@ -417,7 +439,12 @@ export default function PriceAndActionsSection({
 
               {isOfferSpecific && (
                 <span className="text-sm text-gray-500 mb-4 mt-1">
-                  Private Listing to {truncateEthAddress(onlySellToAddress)}
+                  Private Listing for{" "}
+                  {onlySellToAddress &&
+                  address &&
+                  getAddress(onlySellToAddress) === getAddress(address)
+                    ? "You"
+                    : truncateEthAddress(onlySellToAddress)}
                 </span>
               )}
 

@@ -76,6 +76,7 @@ export const ListingModal = ({
         <button
           className="text-left text-sm text-gray-600 underline"
           onClick={() => setIsPrivateListingExpanded(!isPrivateListingExpanded)}
+          disabled={status.isPending || status.isSuccess}
         >
           Make it a {isPrivateListingExpanded ? "public" : "private"} listing
         </button>
@@ -99,7 +100,9 @@ export const ListingModal = ({
 
       <div className="flex gap-2 mt-4">
         <button
-          className="flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300"
+          className={`flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300 ${
+            status.isPending ? "opacity-50" : ""
+          }`}
           onClick={onClose}
           disabled={status.isPending && !status.isSuccess && !status.isRejected}
         >
