@@ -113,7 +113,6 @@ export default function PriceAndActionsSection(
     useState(false);
 
   const [localBidOnChonkPending, setLocalBidOnChonkPending] = useState(false);
-  const [localBidOnChonkSuccess, setLocalBidOnChonkSuccess] = useState(false);
   const [localBidOnChonkError, setLocalBidOnChonkError] = useState(false);
 
   const OFFER_PRICE_DECIMAL_PRECISION = 4;
@@ -172,7 +171,6 @@ export default function PriceAndActionsSection(
 
     if (isBidOnChonkSuccess) {
       setLocalBidOnChonkPending(false);
-      setLocalBidOnChonkSuccess(true);
       refetchChonkBid();
       handleBidModalClose();
       return;
@@ -180,7 +178,6 @@ export default function PriceAndActionsSection(
 
     if (isBidOnChonkError) {
       setLocalBidOnChonkPending(false);
-      setLocalBidOnChonkSuccess(false);
       setLocalBidOnChonkError(true);
       return;
     }
