@@ -87,40 +87,6 @@ export function useMarketplaceActions(chonkId: number) {
   };
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////  Bid on Chonk  /////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  // const { writeContract: bidOnChonk } = useWriteContract();
-  const { writeContract: bidOnChonk, isPending: isBidOnChonkPending, data: hashBidOnChonk } = useWriteContract();
-  const { isLoading: isBidOnChonkLoading, isSuccess: isBidOnChonkSuccess, isError: isBidOnChonkErrror, data: receiptBidOnChonk } = useWaitForTransactionReceipt({
-    hash: hashBidOnChonk,
-  });
-
-  const handleBidOnChonk = (chonkId: number, offerInEth: string, onSuccess: () => void) => {
-    if (!address || !chonkId) return;
-
-    try {
-      const amountInWei = parseEther(offerInEth);
-      bidOnChonk({
-        address: marketplaceContract,
-        abi: marketplaceABI,
-        functionName: 'bidOnChonk',
-        args: [BigInt(chonkId)],
-        value: amountInWei
-      }, {
-        onError: (error) => {
-          console.error('Error placing bid:', error);
-          alert('Error placing bid: ' + error);
-        },
-        onSuccess: onSuccess,
-      });
-    } catch (error) {
-      console.error('Error placing bid:', error);
-      alert('Error placing bid: ' + error);
-    }
-  };
-
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////  Accept Bid  ////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -155,7 +121,6 @@ export function useMarketplaceActions(chonkId: number) {
 
   return {
     handleAcceptBidForChonk,
-
     handleBuyChonk,
     handleBidOnChonk,
     handleWithdrawBidOnChonk,

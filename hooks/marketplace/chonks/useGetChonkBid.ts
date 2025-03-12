@@ -30,4 +30,5 @@ export default function useGetChonkBid(chonkId: number) {
     hasActiveBid,
     refetchChonkBid,
   }
+
 }

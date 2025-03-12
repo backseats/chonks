@@ -21,30 +21,13 @@ import useGetChonkBid from "@/hooks/marketplace/chonks/useGetChonkBid";
 import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
 import useBidOnChonk from "@/hooks/marketplace/chonks/useBidOnChonk";
 
-type PriceAndActionsSectionProps = {
+export default function PriceAndActionsSection({
+  chonkId,
+  isOwner,
+}: {
   chonkId: number;
   isOwner: boolean;
-  // price: number | null;
-  // priceUSD: number;
-  // isOfferSpecific: boolean;
-  // canAcceptOffer: boolean;
-
-  // hasActiveOffer: boolean;
-  // hasActiveBid: boolean;
-  // onListingSuccess?: () => void;
-  // Bid?: {
-  //     bidder: string;
-  //     amountInWei: bigint;
-  //     traitIds: bigint[];
-  //     encodedTraitIds: string;
-  // } | null;
-};
-
-export default function PriceAndActionsSection(
-  props: PriceAndActionsSectionProps
-) {
-  const { chonkId, isOwner } = props;
-
+}) {
   const [dots, setDots] = useState("");
   const { address } = useAccount();
   const { data: balance } = useBalance({ address });
