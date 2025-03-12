@@ -3,15 +3,15 @@ import { formatEther } from "viem";
 interface Props {
   amountInWei: bigint;
   bidder: string;
-  handleAcceptBidForChonk: (bidder: string) => void;
   isPending: boolean;
+  handleAcceptBidForChonk: (bidder: string) => void;
 }
 
 export default function AcceptOfferButton({
   amountInWei,
   bidder,
-  handleAcceptBidForChonk,
   isPending,
+  handleAcceptBidForChonk,
 }: Props) {
   return (
     <button
