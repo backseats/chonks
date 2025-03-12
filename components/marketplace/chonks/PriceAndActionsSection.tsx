@@ -1,14 +1,24 @@
 import { useState, useMemo, useEffect } from "react";
-import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
-import { useBalance, useAccount, useEnsAddress } from "wagmi";
+import { useBalance, useAccount, useEnsAddress, useFeeData } from "wagmi";
 import { parseEther, isAddress, formatEther } from "viem";
 import { mainnet } from "wagmi/chains";
-import { ConnectKitButton } from "connectkit";
 import { ModalWrapper } from "./modals/ModalWrapper";
 import { ListingModal } from "./modals/ListingModal";
 import { OfferModal } from "./modals/OfferModal";
 import { ActionButton } from "./buttons/ActionButton";
 import { MARKETPLACE_CONSTANTS } from "@/constants/marketplace";
+import MarketplaceConnectKitButton from "../common/MarketplaceConnectKitButton";
+import CurrentBid from "../common/CurrentBid";
+import AcceptOfferButton from "../common/AcceptOfferButton";
+import MakeCancelOfferButton from "../common/MakeCancelOfferButton";
+import ListOrApproveButton from "../common/ListOrApproveButton";
+import { truncateEthAddress } from "@/utils/truncateEthAddress";
+
+import { useMarketplaceActions } from "@/hooks/marketplaceAndMintHooks";
+import useApproval from "@/hooks/marketplace/chonks/useApproval";
+import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
+import useChonkBid from "@/hooks/marketplace/chonks/useChonkBid";
+import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
 
 type PriceAndActionsSectionProps = {
   chonkId: number;
@@ -21,7 +31,7 @@ type PriceAndActionsSectionProps = {
   // hasActiveOffer: boolean;
   // hasActiveBid: boolean;
   // onListingSuccess?: () => void;
-  // chonkBid?: {
+  // Bid?: {
   //     bidder: string;
   //     amountInWei: bigint;
   //     traitIds: bigint[];
@@ -39,30 +49,44 @@ export default function PriceAndActionsSection(
   const { data: balance } = useBalance({ address });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [listingPrice, setListingPrice] = useState("");
+
+  const {
+    handleAcceptBidForChonk, // seller side
+
+    handleBuyChonk, // buyer side
+    handleBidOnChonk, // buyer side
+    handleWithdrawBidOnChonk, // buyer side
+  } = useMarketplaceActions(chonkId);
+
+  const {
+    canAcceptOffer,
+    handleListChonk,
+    hasActiveOffer,
+    isListChonkPending,
+    isListChonkSuccess,
+    isListingRejected,
+    isOfferSpecific,
+    onlySellToAddress,
+    price,
+  } = useListChonk(address, chonkId);
+
   const {
     finalIsApproved,
-    isListingRejected,
-    hashListChonk,
-    hasActiveBid,
-    chonkBid,
-    hasActiveOffer,
-    isOfferSpecific,
-    canAcceptOffer,
-    isListChonkPending,
-    isListChonkError,
-    isListChonkLoading,
-    isListChonkSuccess,
-    isCancelOfferChonkSuccess,
-    price,
     handleApproveMarketplace,
-    handleListChonk,
-    handleListChonkToAddress,
-    handleBuyChonk,
+    isApprovalPending,
+    approvalError,
+  } = useApproval(address);
+
+  const {
     handleCancelOfferChonk,
-    handleBidOnChonk,
-    handleAcceptBidForChonk,
-    handleWithdrawBidOnChonk,
-  } = useMarketplaceActions(chonkId);
+    isCancelOfferChonkPending,
+    isCancelOfferChonkSuccess,
+    isCancelOfferChonkRejected,
+  } = useCancelOffer(address, chonkId);
+
+  const { chonkBid, hasActiveBid, refetchChonkBid } = useChonkBid(chonkId);
+
+  ////////////////////////////////////////////////////////////
 
   const [isPrivateListingExpanded, setIsPrivateListingExpanded] =
     useState(false);
@@ -75,7 +99,9 @@ export default function PriceAndActionsSection(
   const [localListingSuccess, setLocalListingSuccess] = useState(false);
   const [localListingRejected, setLocalListingRejected] = useState(false);
   const [localListingPending, setLocalListingPending] = useState(false);
-  const [localHashListChonk, setLocalHashListChonk] = useState(false);
+
+  const [localCancelOfferChonkPending, setLocalCancelOfferChonkPending] =
+    useState(false);
   const [localCancelOfferChonkSuccess, setLocalCancelOfferChonkSuccess] =
     useState(false);
 
@@ -93,29 +119,39 @@ export default function PriceAndActionsSection(
   }, [isListChonkSuccess]);
 
   useEffect(() => {
-    if (hashListChonk) {
-      setLocalHashListChonk(true);
-    }
-  }, [hashListChonk]);
-
-  useEffect(() => {
     if (isListingRejected) {
       setLocalListingRejected(true); // neeeded because we want to clear the rejection here
     }
   }, [isListingRejected]);
 
   useEffect(() => {
-    if (isListChonkLoading) {
-      setLocalListingPending(true); // neeeded because we want to clear the rejection here
+    if (isCancelOfferChonkRejected) {
+      setLocalCancelOfferChonkPending(false);
+      setLocalCancelOfferChonkSuccess(false);
+      return;
     }
-  }, [isListChonkLoading]);
 
-  //isCancelOfferChonkSuccess
-  useEffect(() => {
-    if (isCancelOfferChonkSuccess) {
-      setLocalCancelOfferChonkSuccess(true);
+    if (isCancelOfferChonkPending) {
+      setLocalCancelOfferChonkPending(true);
+      return;
     }
-  }, [isCancelOfferChonkSuccess]);
+
+    if (isCancelOfferChonkSuccess) {
+      setLocalCancelOfferChonkPending(false);
+      setLocalCancelOfferChonkSuccess(true);
+      return;
+    }
+  }, [
+    isCancelOfferChonkPending,
+    isCancelOfferChonkSuccess,
+    isCancelOfferChonkRejected,
+  ]);
+
+  useEffect(() => {
+    if (isOfferModalOpen && hasActiveBid) {
+      setIsOfferModalOpen(false);
+    }
+  }, [isOfferModalOpen, hasActiveBid]);
 
   // Calculate minimum offer (5% higher than current bid)
   const minimumOffer = useMemo(() => {
@@ -206,7 +242,6 @@ export default function PriceAndActionsSection(
     setAddressError("");
     setLocalListingRejected(false);
     setLocalListingPending(false);
-    setLocalHashListChonk(false);
     setLocalListingSuccess(false);
     setIsPrivateListingExpanded(false);
   };
@@ -226,15 +261,20 @@ export default function PriceAndActionsSection(
     }
 
     if (isPrivateListingExpanded && resolvedAddress) {
-      handleListChonkToAddress(listingPrice, resolvedAddress);
+      handleListChonk(listingPrice, resolvedAddress);
     } else {
-      handleListChonk(listingPrice);
+      handleListChonk(listingPrice, null);
     }
 
     setLocalListingPending(true);
   };
 
   const handleOfferSubmit = () => {
+    // const clear = () => {
+    //   setIsOfferModalOpen(false);
+    //   setOfferAmount("");
+    // };
+
     if (hasActiveBid && chonkBid && minimumOffer) {
       if (Number(offerAmount) < Number(minimumOffer)) {
         alert(
@@ -245,19 +285,27 @@ export default function PriceAndActionsSection(
     }
 
     if (offerAmount) {
-      handleBidOnChonk(chonkId, offerAmount);
+      handleBidOnChonk(chonkId, offerAmount, () => {
+        refetchChonkBid();
+      });
     } else {
-      alert("Please enter an amount, minimum offer: " + minimumOffer + " ETH");
+      setPriceError("Enter a minimum offer of " + minimumOffer + " ETH");
       return;
     }
-    setIsOfferModalOpen(false);
-    setOfferAmount("");
+
+    // clear();
   };
 
   const renderOwnerActions = () => (
     <div className="flex flex-col gap-2">
-      <ActionButton variant="danger" onClick={handleCancelOfferChonk}>
-        Cancel Listing
+      <ActionButton
+        variant="danger"
+        onClick={handleCancelOfferChonk}
+        disabled={localCancelOfferChonkPending && !isCancelOfferChonkSuccess}
+      >
+        {localCancelOfferChonkPending && !isCancelOfferChonkSuccess
+          ? "Confirm with your wallet"
+          : "Cancel Listing"}
       </ActionButton>
 
       {hasActiveBid && chonkBid && (
@@ -265,7 +313,8 @@ export default function PriceAndActionsSection(
           variant="primary"
           onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
         >
-          Accept Offer of {formatEther(chonkBid.amountInWei)} ETH
+          Accept Offer of {formatEther(chonkBid.amountInWei)} ETH{" "}
+          {/* not used */}
         </ActionButton>
       )}
     </div>
@@ -282,8 +331,8 @@ export default function PriceAndActionsSection(
       >
         {isOfferSpecific
           ? canAcceptOffer
-            ? "Accept Private Offer"
-            : "Private Offer - Not For You"
+            ? "Buy Now"
+            : "This Offer is Private"
           : "Buy Now"}
       </ActionButton>
 
@@ -294,7 +343,10 @@ export default function PriceAndActionsSection(
       ) : (
         <ActionButton
           variant="secondary"
-          onClick={() => setIsOfferModalOpen(true)}
+          onClick={() => {
+            setPriceError("");
+            setIsOfferModalOpen(true);
+          }}
         >
           Make an Offer
         </ActionButton>
@@ -310,40 +362,30 @@ export default function PriceAndActionsSection(
         !localCancelOfferChonkSuccess ? (
           <>
             <div className="flex flex-col mb-4">
-              <div className="flex items-baseline gap-2 mb-4">
-                {isOwner ? (
-                  <div className="text-xl">Chonk is Listed for</div>
-                ) : (
-                  <div className="text-xl">Buy this Chonk for</div>
-                )}
+              <div className="flex items-baseline gap-2">
+                <div className="text-xl">
+                  {isOwner ? `Listed for` : `Buy Chonk #${chonkId} now for`}
+                </div>
 
                 <span className="text-2xl font-bold">{price} ETH</span>
                 {/* <span className="text-gray-500">(${priceUSD.toLocaleString()})</span> */}
               </div>
+
               {isOfferSpecific && (
-                <span className="text-sm text-gray-500">Private Listing</span>
+                <span className="text-sm text-gray-500 mb-4 mt-1">
+                  Private Listing to {truncateEthAddress(onlySellToAddress)}
+                </span>
+              )}
+
+              {hasActiveBid && chonkBid && (
+                <div className="text-xl">
+                  Your Offer: {formatEther(chonkBid.amountInWei)} ETH
+                </div>
               )}
             </div>
 
             {!address ? (
-              <ConnectKitButton
-                // theme="web"
-                customTheme={{
-                  "--ck-font-family": "'Source Code Pro', monospace",
-                  "--ck-primary-button-background": "#2F7BA7",
-                  "--ck-primary-button-hover-background": "#FFFFFF",
-                  "--ck-primary-button-hover-color": "#2F7BA7",
-                  "--ck-primary-button-border-radius": "0px",
-                  "--ck-primary-button-font-weight": "600",
-                  "--ck-connectbutton-background": "#2F7BA7",
-                  "--ck-connectbutton-hover-background": "#111111",
-                  "--ck-connectbutton-hover-color": "#FFFFFF",
-                  "--ck-connectbutton-border-radius": "0px",
-                  "--ck-connectbutton-color": "#FFFFFF",
-                  "--ck-connectbutton-font-weight": "600",
-                  "--ck-connectbutton-font-size": "21px",
-                }}
-              />
+              <MarketplaceConnectKitButton />
             ) : isOwner ? (
               renderOwnerActions()
             ) : (
@@ -352,83 +394,49 @@ export default function PriceAndActionsSection(
           </>
         ) : (
           <>
-            {/* Not Listed, or just been Cancelled */}
-
-            {/* Not Listed */}
             {hasActiveBid && chonkBid && (
-              <div className="text-[1vw] text-gray-500 mb-[1.725vw]">
-                <span className="text-gray-500">
-                  {" "}
-                  | Current Bid: {formatEther(chonkBid.amountInWei)} ETH
-                </span>
-              </div>
+              <CurrentBid
+                amountInWei={chonkBid.amountInWei}
+                bidder={chonkBid.bidder}
+              />
             )}
 
             <div className="flex flex-col gap-2">
               {!address ? (
-                <ConnectKitButton
-                  // theme="web"
-                  customTheme={{
-                    "--ck-font-family": "'Source Code Pro', monospace",
-                    "--ck-primary-button-background": "#2F7BA7",
-                    "--ck-primary-button-hover-background": "#FFFFFF",
-                    "--ck-primary-button-hover-color": "#2F7BA7",
-                    "--ck-primary-button-border-radius": "0px",
-                    "--ck-primary-button-font-weight": "600",
-                    "--ck-connectbutton-background": "#2F7BA7",
-                    "--ck-connectbutton-hover-background": "#111111",
-                    "--ck-connectbutton-hover-color": "#FFFFFF",
-                    "--ck-connectbutton-border-radius": "0px",
-                    "--ck-connectbutton-color": "#FFFFFF",
-                    "--ck-connectbutton-font-weight": "600",
-                    "--ck-connectbutton-font-size": "21px",
-                  }}
-                />
-              ) : isOwner || isCancelOfferChonkSuccess ? (
+                <MarketplaceConnectKitButton />
+              ) : isOwner ||
+                isCancelOfferChonkSuccess ||
+                localCancelOfferChonkSuccess ? (
                 <>
-                  <button
-                    className="w-full bg-chonk-blue text-white py-2 px-4 hover:brightness-110 transition-colors"
-                    onClick={() => {
-                      if (!finalIsApproved) {
-                        handleApproveMarketplace();
-                      } else {
-                        setIsModalOpen(true);
-                      }
-                    }}
-                  >
-                    {finalIsApproved
-                      ? "List Your Chonk"
-                      : "Approve Marketplace to Trade"}
-                  </button>
+                  <ListOrApproveButton
+                    isApprovalPending={isApprovalPending}
+                    finalIsApproved={finalIsApproved}
+                    handleApproveMarketplace={handleApproveMarketplace}
+                    setIsModalOpen={setIsModalOpen}
+                    approvalError={approvalError}
+                  />
 
                   {finalIsApproved && hasActiveBid && chonkBid && (
-                    <button
-                      className="w-full bg-chonk-orange text-white py-2 px-4 hover:brightness-110 transition-colors"
-                      onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
-                    >
-                      Accept Offer of {formatEther(chonkBid.amountInWei)} ETH
-                    </button>
+                    <AcceptOfferButton
+                      amountInWei={chonkBid.amountInWei}
+                      bidder={chonkBid.bidder}
+                      action={handleAcceptBidForChonk}
+                    />
                   )}
                 </>
               ) : (
                 !isOwner && (
-                  <>
-                    {hasActiveBid && chonkBid && chonkBid.bidder === address ? (
-                      <button
-                        className="w-full bg-red-500 text-white py-2 px-4  hover:bg-red-600 transition-colors"
-                        onClick={() => handleWithdrawBidOnChonk()}
-                      >
-                        Cancel Your Offer
-                      </button>
-                    ) : (
-                      <button
-                        className="w-full bg-chonk-blue text-white py-2 px-4  hover:bg-chonk-orange hover:text-black transition-colors"
-                        onClick={() => setIsOfferModalOpen(true)}
-                      >
-                        Make an Offer
-                      </button>
+                  <MakeCancelOfferButton
+                    chonkId={chonkId}
+                    hasOffer={Boolean(
+                      hasActiveBid && chonkBid && chonkBid.bidder === address
                     )}
-                  </>
+                    onMakeOffer={() => setIsOfferModalOpen(true)}
+                    onSuccess={() => {
+                      refetchChonkBid();
+                      setOfferAmount("");
+                    }}
+                  />
                 )
               )}
             </div>
@@ -436,7 +444,11 @@ export default function PriceAndActionsSection(
         )}
       </div>
 
-      <ModalWrapper isOpen={isModalOpen} onClose={handleModalClose}>
+      <ModalWrapper
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        localListingPending={localListingPending}
+      >
         <ListingModal
           chonkId={chonkId}
           listingPrice={listingPrice}
@@ -453,24 +465,34 @@ export default function PriceAndActionsSection(
             isRejected: localListingRejected,
             isPending: localListingPending,
             isSuccess: localListingSuccess,
-            hash: hashListChonk,
           }}
         />
       </ModalWrapper>
 
       <ModalWrapper
         isOpen={isOfferModalOpen}
-        onClose={() => setIsOfferModalOpen(false)}
+        onClose={() => {
+          setPriceError("");
+          setOfferAmount("");
+          setIsOfferModalOpen(false);
+        }}
+        localListingPending={localListingPending}
       >
         <OfferModal
           chonkId={chonkId}
           offerAmount={offerAmount}
           setOfferAmount={setOfferAmount}
           minimumOffer={minimumOffer}
+          priceError={priceError}
           hasActiveBid={hasActiveBid}
           currentBid={chonkBid}
           onSubmit={handleOfferSubmit}
-          onClose={() => setIsOfferModalOpen(false)}
+          onClose={() => {
+            setPriceError("");
+            setOfferAmount("");
+            setIsOfferModalOpen(false);
+          }}
+          ownedChonks={[]}
         />
       </ModalWrapper>
     </>

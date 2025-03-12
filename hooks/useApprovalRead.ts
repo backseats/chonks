@@ -15,7 +15,6 @@ export function useReadEOAApproval(address: Address | undefined) {
 }
 
 export function useReadTBAApproval(tbaAddress: Address) {
-  // console.log("tbaAddress::useReadTBAApproval", tbaAddress);
   const { data: TBAIsApproved } = useReadContract({
     address: traitsContract,
     abi: traitsABI,
@@ -23,8 +22,6 @@ export function useReadTBAApproval(tbaAddress: Address) {
     args: [tbaAddress, marketplaceContract],
     chainId,
   }) as { data: boolean };
-
-  // console.log("TBAIsApproved::useReadTBAApproval", TBAIsApproved);
 
   return { TBAIsApproved };
 }

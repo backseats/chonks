@@ -385,6 +385,7 @@ export default function TraitDetail({ id }: { id: string }) {
 
                   <PriceAndActionsSection
                     isOwner={isOwner}
+                    chonkId={Number(chonkId)}
                     traitId={parseInt(id)}
                     tokenIdOfTBA={tokenIdOfTBA?.toString()}
                     tbaOwner={ownerOfTraitOwner}
@@ -394,11 +395,9 @@ export default function TraitDetail({ id }: { id: string }) {
                     // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
                     // isOfferSpecific={isOfferSpecific}
                     // canAcceptOffer={canAcceptOffer}
-                    //
                     // hasActiveOffer={hasActiveOffer}
                     // hasActiveBid={hasActiveBid}
                     // traitBid={traitBid}
-
                   />
 
                   {/* <ActivityAndOffersSection

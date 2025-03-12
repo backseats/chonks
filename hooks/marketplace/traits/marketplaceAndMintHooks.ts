@@ -2,27 +2,19 @@ import { useState, useEffect, useMemo } from "react";
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { useAccount } from "wagmi";
 import { formatEther, parseEther } from 'viem';
-
 import {
-  mainContract,
-  mainABI,
-  traitsContract,
   marketplaceContract,
-  traitsABI,
   marketplaceABI,
   chainId,
 } from "@/config";
 import { Category } from "@/types/Category";
-
 
 type TraitOffer = {
   priceInWei: bigint;
   seller: string;
   sellerTBA: string;
   onlySellTo: string;
-  // encodedTraitIds: string;
 }
-
 
 export const categoryList = Object.values(Category);
 
@@ -201,12 +193,16 @@ export function useMarketplaceActions(traitId: number) {
   }, [formattedPrice, isListTraitSuccess, pendingListPrice]);
 
   const handleListTrait = (priceInEth: string, chonkId: number) => {
-    console.log('handleListTrait', { priceInEth, traitId, address, chonkId });
-
+    setIsListingRejected(false);
     if (!address || !traitId || chonkId === 0) return;
+
+    console.log('handleListTrait', { priceInEth, traitId, address, chonkId });
 
     try {
       const priceInWei = parseEther(priceInEth);
+      // Store the pending price
+      setPendingListPrice(priceInEth);
+
       listTrait({
         address: marketplaceContract,
         abi: marketplaceABI,
@@ -215,6 +211,7 @@ export function useMarketplaceActions(traitId: number) {
         chainId,
       }, {
         onError: (error) => {
+          debugger
           console.error('Contract revert:', error);
           // You can parse the error message to handle specific revert reasons
           const errorMessage = (error as Error).message;
@@ -224,6 +221,9 @@ export function useMarketplaceActions(traitId: number) {
             alert('Please unequip the trait before selling');
             console.error('Please unequip the trait before selling');
           }
+
+          setIsListingRejected(true);
+          setPendingListPrice(null);
         },
         onSuccess: (data) => {
           console.log('Transaction submitted:', data);
@@ -231,16 +231,21 @@ export function useMarketplaceActions(traitId: number) {
       });
     } catch (error) {
       console.error('Error listing trait:', error);
+      alert('Error listing trait: ' + error);
+      setPendingListPrice(null); // Clear pending price on error
     }
   };
 
   // List trait to specific address
   const { writeContract: listTraitToAddress } = useWriteContract();
   const handleListTraitToAddress = (priceInEth: string,  chonkId: number, address: string) => {
+    setIsListingRejected(false);
     if (!address || !traitId) return;
 
     try {
       const priceInWei = parseEther(priceInEth);
+      setPendingListPrice(priceInEth);
+
       listTraitToAddress({
         address: marketplaceContract,
         abi: marketplaceABI,
@@ -258,6 +263,8 @@ export function useMarketplaceActions(traitId: number) {
             alert('Please unequip the trait before selling');
             console.error('Please unequip the trait before selling');
           }
+          setIsListingRejected(true);
+          setPendingListPrice(null); // Clear pending price on error
         },
         onSuccess: (data) => {
           console.log('Transaction submitted:', data);
@@ -265,6 +272,7 @@ export function useMarketplaceActions(traitId: number) {
       });
     } catch (error) {
       console.error('Error listing trait:', error);
+      setPendingListPrice(null);
     }
   };
 
@@ -473,6 +481,12 @@ export function useMarketplaceActions(traitId: number) {
     traitBid,
     price: displayPrice,
     hasActiveOffer,
+    hashListTrait,
+    isListTraitPending,
+    isListTraitLoading,
+    isListTraitSuccess,
+    isListTraitError,
+    isListingRejected,
     isOfferSpecific,
     canAcceptOffer,
     handleListTrait,

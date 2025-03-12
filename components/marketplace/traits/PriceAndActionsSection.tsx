@@ -1,7 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { useMarketplaceActions } from "@/hooks/marketplace/traits/marketplaceAndMintHooks";
-import { useBalance, useAccount, useEnsAddress } from "wagmi";
-import { parseEther, isAddress, formatEther } from "viem";
+import {
+  useBalance,
+  useAccount,
+  useEnsAddress,
+  useWriteContract,
+  useReadContract,
+} from "wagmi";
+import { parseEther, isAddress, formatEther, getAddress } from "viem";
 import { mainnet } from "wagmi/chains"; // mainnet for ens lookup
 import { useOwnedChonks } from "@/hooks/useOwnedChonks";
 import Link from "next/link";
@@ -10,9 +16,17 @@ import {
   useReadEOAApproval,
   useReadTBAApproval,
 } from "@/hooks/useApprovalRead";
+import { OfferModal } from "@/components/marketplace/chonks/modals/OfferModal";
+import { ModalWrapper } from "@/components/marketplace/chonks/modals/ModalWrapper";
+import { ListingModal } from "@/components/marketplace/chonks/modals/ListingModal";
+import { traitsContract, traitsABI, chainId } from "@/config";
+import { useUnequipTrait } from "@/hooks/useUnequipTrait";
+import { truncateEthAddress } from "@/utils/truncateEthAddress";
+import { ConnectKitButton } from "connectkit";
 
 type PriceAndActionsSectionProps = {
   isOwner: boolean;
+  chonkId: number;
   traitId: number;
   tokenIdOfTBA: string | null;
   // price: number | null;
@@ -29,8 +43,17 @@ type PriceAndActionsSectionProps = {
   //   encodedTraitIds: string;
   // } | null;
   tbaOwner: string | null;
-  isEquipped: boolean | undefined;
+  isEquipped: boolean;
   tbaAddress: string | null;
+};
+
+type StoredTrait = {
+  traitType: number;
+  epoch: number;
+  isRevealed: boolean;
+  seed: number;
+  dataMinterContract: string;
+  traitIndex: number;
 };
 
 export default function PriceAndActionsSection(
@@ -38,6 +61,7 @@ export default function PriceAndActionsSection(
 ) {
   const {
     isOwner,
+    chonkId,
     traitId,
     tokenIdOfTBA,
     // price,
@@ -79,6 +103,12 @@ export default function PriceAndActionsSection(
     handleBidOnTrait,
     handleWithdrawBidOnTrait,
     handleAcceptBidForTrait,
+    hashListTrait,
+    isListTraitLoading,
+    isListingRejected,
+    isListTraitPending,
+    isListTraitSuccess,
+    isListTraitError,
   } = useMarketplaceActions(traitId);
 
   const { TBAIsApproved } = useReadTBAApproval(tbaAddress as `0x${string}`);
@@ -94,8 +124,12 @@ export default function PriceAndActionsSection(
   const [priceError, setPriceError] = useState("");
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [offerAmount, setOfferAmount] = useState("");
-
+  const [localListingSuccess, setLocalListingSuccess] = useState(false);
+  const [localListingRejected, setLocalListingRejected] = useState(false);
+  const [localListingPending, setLocalListingPending] = useState(false);
+  const [localHashListTrait, setLocalHashListTrait] = useState(false);
   const [selectedChonkId, setSelectedChonkId] = useState<string>("");
+
   const { ownedChonks } = useOwnedChonks(address); // This hook should fetch owned Chonks
 
   // Calculate minimum offer (5% higher than current bid)
@@ -165,13 +199,153 @@ export default function PriceAndActionsSection(
     balance &&
     balance.value < parseEther((price + estimatedGasInEth).toString());
 
+  useEffect(() => {
+    if (hashListTrait) {
+      setLocalHashListTrait(true);
+    }
+  }, [hashListTrait]);
+
+  useEffect(() => {
+    if (isListingRejected) {
+      setLocalListingRejected(true);
+    }
+  }, [isListingRejected]);
+
+  useEffect(() => {
+    if (isListTraitLoading) {
+      setLocalListingPending(true);
+    }
+  }, [isListTraitLoading]);
+
+  //isCancelOfferChonkSuccess
+  // useEffect(() => { // TODO
+  //   if (isCancelOfferChonkSuccess) {
+  //     setLocalCancelOfferChonkSuccess(true);
+  //   }
+  // }, [isCancelOfferChonkSuccess]);
+
+  const { data: storedTrait } = useReadContract({
+    address: traitsContract,
+    abi: traitsABI,
+    functionName: "getTrait",
+    args: [traitId],
+    chainId,
+  }) as { data: StoredTrait | undefined };
+
+  const traitTypeId = storedTrait?.traitType;
+
+  const { handleUnequipTrait, isUnequipTraitPending, hashUnequipTrait } =
+    useUnequipTrait();
+
+  function handleOfferSubmit() {
+    console.log("minimumOffer", minimumOffer);
+    console.log("offerAmount", offerAmount);
+
+    if (hasActiveBid && traitBid && minimumOffer) {
+      if (Number(offerAmount) < Number(minimumOffer)) {
+        alert(
+          `Your offer must be at least 5% higher than the current bid. Minimum offer: ${minimumOffer} ETH`
+        );
+        return;
+      }
+    }
+
+    if (selectedChonkId === "") {
+      alert("Please select a Chonk");
+      return;
+    }
+
+    if (offerAmount) {
+      handleBidOnTrait(traitId, parseInt(selectedChonkId), offerAmount);
+    } else {
+      alert("Please enter an amount, minimum offer: " + minimumOffer + " ETH");
+      return;
+    }
+
+    setIsOfferModalOpen(false);
+    setOfferAmount("");
+    setIsPrivateListingExpanded(false);
+    setAddressError("");
+    setPriceError("");
+  }
+
+  function handleModalClose() {
+    resetForm();
+  }
+
+  function handleListingSubmit() {
+    const listingPriceNum = Number(listingPrice);
+    if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
+      setPriceError(`Minimum listing price is ${MIN_LISTING_PRICE} ETH`);
+      return;
+    }
+
+    if (isPrivateListingExpanded && !resolvedAddress) {
+      setAddressError("Please enter a valid address or ENS name");
+      return;
+    }
+
+    if (isPrivateListingExpanded && resolvedAddress) {
+      handleListTraitToAddress(
+        listingPrice,
+        parseInt(tokenIdOfTBA ?? "0"),
+        resolvedAddress
+      );
+    } else {
+      handleListTrait(listingPrice, parseInt(tokenIdOfTBA ?? "0"));
+    }
+
+    resetForm();
+  }
+
+  function resetForm() {
+    setIsModalOpen(false);
+    setListingPrice("");
+    setOfferAmount("");
+    setRecipientAddress("");
+    setAddressError("");
+    setPriceError("");
+    setIsPrivateListingExpanded(false);
+  }
+
+  const renderOwnerActions = () => {};
+
   return (
     <>
       <div className="border border-black p-4 mb-4">
+        {!address ? (
+          <ConnectKitButton
+            // theme="web"
+            customTheme={{
+              "--ck-font-family": "'Source Code Pro', monospace",
+              "--ck-primary-button-background": "#2F7BA7",
+              "--ck-primary-button-hover-background": "#FFFFFF",
+              "--ck-primary-button-hover-color": "#2F7BA7",
+              "--ck-primary-button-border-radius": "0px",
+              "--ck-primary-button-font-weight": "600",
+              "--ck-connectbutton-background": "#2F7BA7",
+              "--ck-connectbutton-hover-background": "#111111",
+              "--ck-connectbutton-hover-color": "#FFFFFF",
+              "--ck-connectbutton-border-radius": "0px",
+              "--ck-connectbutton-color": "#FFFFFF",
+              "--ck-connectbutton-font-weight": "600",
+              "--ck-connectbutton-font-size": "21px",
+            }}
+          />
+        ) : isOwner ? (
+          // renderOwnerActions()
+          <p>Owner Actions</p>
+        ) : (
+          <>
+            <p>Buyer Actions</p>
+          </>
+          // <>{renderBuyerActions()}</>
+        )}
+
         {ownedChonks && ownedChonks.length === 0 ? (
           <>
-            <div className="flex flex-col mb-4">
-              <div className="flex items-baseline gap-2 mb-4">
+            <div className="flex flex-col">
+              {/* <div className="flex items-baseline gap-2 mb-4">
                 <span className="text-2xl font-bold">{price} ETH</span>
               </div>
               <p className="text-red-500 text-[1.25vw]">
@@ -184,7 +358,7 @@ export default function PriceAndActionsSection(
                 >
                   Go buy one here
                 </Link>
-              </p>
+              </p> */}
             </div>
           </>
         ) : hasActiveOffer ? (
@@ -314,8 +488,11 @@ export default function PriceAndActionsSection(
             {hasActiveBid && traitBid && (
               <div className="text-lg text-gray-500 mb-4">
                 <span className="text-gray-500">
-                  {" "}
-                  | Current Bid: {formatEther(traitBid.amountInWei)} ETH
+                  Current Bid: {formatEther(traitBid.amountInWei)} ETH by{" "}
+                  {address &&
+                  getAddress(traitBid.bidder) === getAddress(address)
+                    ? "You"
+                    : truncateEthAddress(traitBid.bidder)}
                 </span>
               </div>
             )}
@@ -330,12 +507,18 @@ export default function PriceAndActionsSection(
                         if (!TBAIsApproved) {
                           approveTBAForMarketplace();
                         } else {
-                          setIsModalOpen(true);
+                          if (isEquipped) {
+                            handleUnequipTrait(chonkId, traitTypeId);
+                          } else {
+                            setIsModalOpen(true);
+                          }
                         }
                       }}
                     >
                       {TBAIsApproved
-                        ? "List Your Trait"
+                        ? isEquipped
+                          ? "Unequip Trait to List"
+                          : "List Your Trait"
                         : "Approve Marketplace to List Trait"}
                     </button>
 
@@ -349,6 +532,7 @@ export default function PriceAndActionsSection(
                     )}
                   </>
                 ))}
+
               {/* {!isOwner && tbaOwner !== address && ( */}
               {!isOwner && tbaOwner !== address && (
                 <>
@@ -392,7 +576,7 @@ export default function PriceAndActionsSection(
       </div>
 
       {/* Listing Modal */}
-      {isModalOpen && (
+      {/* {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 max-w-md w-full mx-4">
             <h2 className="text-2xl font-bold mb-4">List Trait #{traitId}</h2>
@@ -412,10 +596,10 @@ export default function PriceAndActionsSection(
 
             {priceError && (
               <p className="text-red-500 text-sm mt-1">{priceError}</p>
-            )}
+            )} */}
 
-            {/* New Private Listing Section */}
-            <div className="mb-4 mt-4">
+      {/* New Private Listing Section */}
+      {/* <div className="mb-4 mt-4">
               <button
                 className="flex items-center gap-2 text-left w-full"
                 onClick={() =>
@@ -424,9 +608,9 @@ export default function PriceAndActionsSection(
               >
                 <span>{isPrivateListingExpanded ? "▼" : "▶"}</span>
                 Private Listing
-              </button>
+              </button> */}
 
-              {isPrivateListingExpanded && (
+      {/* {isPrivateListingExpanded && (
                 <div className="mt-2">
                   <label className="block mb-2">Recipient Address</label>
                   <input
@@ -470,8 +654,8 @@ export default function PriceAndActionsSection(
                 }}
               >
                 Cancel
-              </button>
-              <button
+              </button> */}
+      {/* <button
                 className="px-4 py-2 bg-black text-white hover:bg-gray-800"
                 onClick={() => {
                   const listingPriceNum = Number(listingPrice);
@@ -513,11 +697,34 @@ export default function PriceAndActionsSection(
               </button>
             </div>
           </div>
-        </div>
-      )}
+        </div> */}
+      {/* )} */}
+
+      <ModalWrapper isOpen={isModalOpen} onClose={handleModalClose}>
+        <ListingModal
+          chonkId={chonkId}
+          traitId={traitId}
+          listingPrice={listingPrice}
+          setListingPrice={setListingPrice}
+          isPrivateListingExpanded={isPrivateListingExpanded}
+          setIsPrivateListingExpanded={setIsPrivateListingExpanded}
+          recipientAddress={recipientAddress}
+          setRecipientAddress={setRecipientAddress}
+          addressError={addressError}
+          priceError={priceError}
+          onSubmit={handleListingSubmit}
+          onClose={handleModalClose}
+          status={{
+            isRejected: localListingRejected,
+            isPending: localListingPending,
+            isSuccess: localListingSuccess,
+            hash: hashListTrait,
+          }}
+        />
+      </ModalWrapper>
 
       {/* Offer Modal */}
-      {isOfferModalOpen && (
+      {/* {isOfferModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8  max-w-md w-full mx-4">
             <h2 className="text-2xl font-bold mb-4">
@@ -617,7 +824,27 @@ export default function PriceAndActionsSection(
             </div>
           </div>
         </div>
-      )}
+      )} */}
+
+      <ModalWrapper
+        isOpen={isOfferModalOpen}
+        onClose={() => setIsOfferModalOpen(false)}
+      >
+        <OfferModal
+          chonkId={chonkId}
+          traitId={traitId}
+          offerAmount={offerAmount}
+          setOfferAmount={setOfferAmount}
+          minimumOffer={minimumOffer}
+          hasActiveBid={hasActiveBid}
+          currentBid={traitBid}
+          onSubmit={handleOfferSubmit}
+          onClose={() => setIsOfferModalOpen(false)}
+          ownedChonks={ownedChonks}
+          selectedChonkId={selectedChonkId}
+          setSelectedChonkId={setSelectedChonkId}
+        />
+      </ModalWrapper>
     </>
   );
 }
