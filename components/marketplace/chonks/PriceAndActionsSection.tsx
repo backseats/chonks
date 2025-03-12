@@ -6,7 +6,6 @@ import { ModalWrapper } from "./modals/ModalWrapper";
 import { ListingModal } from "./modals/ListingModal";
 import { OfferModal } from "./modals/OfferModal";
 import { ActionButton } from "./buttons/ActionButton";
-import { MARKETPLACE_CONSTANTS } from "@/constants/marketplace";
 import MarketplaceConnectKitButton from "../common/MarketplaceConnectKitButton";
 import CurrentBid from "../common/CurrentBid";
 import AcceptOfferButton from "../common/AcceptOfferButton";
@@ -35,6 +34,8 @@ export default function PriceAndActionsSection({
   const { data: balance } = useBalance({ address });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [listingPrice, setListingPrice] = useState("");
+
+  //// Hooks ////
 
   const {
     canAcceptOffer,
@@ -87,7 +88,6 @@ export default function PriceAndActionsSection({
     buyChonkError,
   } = useBuyChonk(chonkId);
 
-  // TODO
   const {
     handleAcceptBidForChonk,
     isAcceptBidPending,
@@ -188,9 +188,15 @@ export default function PriceAndActionsSection({
     }
   }, [isBidOnChonkPending, isBidOnChonkSuccess, isBidOnChonkError]);
 
+  // Reload after a buy
   useEffect(() => {
     if (isBuyChonkSuccess) window.location.reload();
   }, [isBuyChonkSuccess]);
+
+  // Reload after an accept/buy
+  useEffect(() => {
+    if (isAcceptBidSuccess) window.location.reload();
+  }, [isAcceptBidSuccess]);
 
   // Calculate minimum offer (5% higher than current bid)
   const minimumOffer = useMemo(() => {
@@ -269,9 +275,6 @@ export default function PriceAndActionsSection({
     price &&
     balance &&
     balance.value < parseEther((price + estimatedGasInEth).toString());
-
-  // console.log('hasActiveOffer:', hasActiveOffer);
-  // console.log('isListChonkSuccess:', isListChonkSuccess);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -352,16 +355,6 @@ export default function PriceAndActionsSection({
           ? "Confirm with your wallet"
           : "Cancel Listing"}
       </ActionButton>
-
-      {hasActiveBid && chonkBid && (
-        <ActionButton
-          variant="primary"
-          onClick={() => handleAcceptBidForChonk(chonkBid.bidder)}
-        >
-          Accept Offer of {formatEther(chonkBid.amountInWei)} ETH{" "}
-          {/* not used */}
-        </ActionButton>
-      )}
     </div>
   );
 
@@ -469,6 +462,7 @@ export default function PriceAndActionsSection({
               <CurrentBid
                 amountInWei={chonkBid.amountInWei}
                 bidder={chonkBid.bidder}
+                address={address}
               />
             )}
 
@@ -485,6 +479,7 @@ export default function PriceAndActionsSection({
                     handleApproveMarketplace={handleApproveMarketplace}
                     setIsModalOpen={setIsModalOpen}
                     approvalError={approvalError}
+                    hasActiveBid={hasActiveBid}
                   />
 
                   {finalIsApproved && hasActiveBid && chonkBid && (
@@ -492,6 +487,7 @@ export default function PriceAndActionsSection({
                       amountInWei={chonkBid.amountInWei}
                       bidder={chonkBid.bidder}
                       action={handleAcceptBidForChonk}
+                      isPending={isAcceptBidPending}
                     />
                   )}
                 </>
