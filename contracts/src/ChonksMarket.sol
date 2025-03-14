@@ -61,7 +61,7 @@ contract ChonksMarket is Ownable, ReentrancyGuard {
 
     address public teamWallet;
 
-    bool public paused;
+    bool public paused = true;
     bool public pausabilityRevoked;
 
     uint256 public royaltyPercentage; // starts at 250 (for 2.5%)
