@@ -8,9 +8,11 @@ import { chonksMarketABI } from './abis/chonksMarketABI'
 
 export const mainContract = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
 
-// Legacy traits contract "0x6b8f34e0559aa9a5507e74ad93374d9745cdbf09";
+// 0x6b8f34e0559aa9a5507e74ad93374d9745cdbf09 old traits contract
 export const traitsContract = "0x74D8725A65C21251A83f6647aa23140Bd80504b1";
-export const marketplaceContract = ""; // "0xf127467f1e94593b1606bf0da3d08e3c15b2b291"; // TODO: fill in
+
+// 0xf127467f1e94593b1606bf0da3d08e3c15b2b291 old marketplace contract
+export const marketplaceContract = "";
 
 export const mainABI = chonksMainABI;
 export const traitsABI = chonkTraitsABI;
@@ -31,6 +33,6 @@ export const config = createConfig({
   ],
   transports: {
     [base.id]: http(`${process.env.NEXT_PUBLIC_ALCHEMY_BASE_MAINNET_RPC_URL}`), // toggle for prod
-//     [base.id]: http('http://localhost:8545') // toggle for dev
+    // [base.id]: http('http://localhost:8545') // toggle for dev
   },
 });

@@ -1,14 +1,15 @@
+import { useState } from "react";
 import { useWriteContract } from "wagmi";
 import { mainContract, mainABI, chainId } from "@/config";
 
 export function useUnequipTrait() {
+  const [unequipTraitError, setUnequipTraitError] = useState<string | null>(null);
+
   const {
     writeContract,
-    isPending,
-    data: hash,
-    isSuccess,
-    isError,
-    error
+    isPending: isUnequipTraitPending,
+    isSuccess: isUnequipTraitSuccess,
+    isError: isUnequipTraitError,
   } = useWriteContract();
 
   const handleUnequipTrait = (chonkId: number, traitTypeId: number | undefined) => {
@@ -20,15 +21,18 @@ export function useUnequipTrait() {
       functionName: "unequip",
       args: [BigInt(chonkId), traitTypeId],
       chainId,
+    }, {
+      onError: (error) => {
+        setUnequipTraitError(error.message);
+      }
     });
   };
 
   return {
     handleUnequipTrait,
-    isUnequipTraitPending: isPending,
-    hashUnequipTrait: hash,
-    isUnequipTraitSuccess: isSuccess,
-    isUnequipTraitError: isError,
-    unequipTraitError: error
+    isUnequipTraitPending,
+    isUnequipTraitSuccess,
+    isUnequipTraitError,
+    unequipTraitError
   };
 }

@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
 import { mainContract, mainABI, marketplaceContract } from "@/config"
 import { Address } from "viem";
 
 // This should be roughly the same for traits, just using the traits contract
 export default function useApproval(address: Address | undefined) {
 
+  // localApproved is for when the user has approved the marketplace.
   const [localApproved, setLocalApproved] = useState(false);
   const [approvalError, setApprovalError] = useState<string | null>(null);
 
@@ -18,15 +19,11 @@ export default function useApproval(address: Address | undefined) {
 
   const finalIsApproved = isApproved || localApproved;
 
-  const { writeContract: approveMarketplace, isPending: isApprovalPending, isError: isApprovalError, data: hashApproval } = useWriteContract();
-
-  const { isSuccess: isApprovalSuccess, isError: isApprovalTransactionError, error: transactionError } = useWaitForTransactionReceipt({
-    hash: hashApproval,
-  });
+  const { writeContract: approveMarketplace, isPending: isApprovalPending, isError: isApprovalError, isSuccess: isApprovalSuccess } = useWriteContract();
 
   const handleApproveMarketplace = () => {
     if (!address) return;
-    setApprovalError(null); // Reset error state before new attempt
+    setApprovalError(null);
 
     try {
       approveMarketplace({
@@ -51,13 +48,6 @@ export default function useApproval(address: Address | undefined) {
     }
   };
 
-  // Update error state if transaction fails
-  useEffect(() => {
-    if (isApprovalTransactionError && transactionError) {
-      setApprovalError("Marketplace approval transaction failed");
-    }
-  }, [isApprovalTransactionError, transactionError]);
-
   useEffect(() => {
     if (isApprovalSuccess) setLocalApproved(true);
   }, [isApprovalSuccess]);
@@ -68,8 +58,7 @@ export default function useApproval(address: Address | undefined) {
     isApprovalError,
     isApprovalPending,
     isApprovalSuccess,
-    approvalError,
-    resetApprovalError: () => setApprovalError(null),
+    approvalError
   }
 
 }

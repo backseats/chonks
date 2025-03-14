@@ -114,9 +114,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     uint256 constant LEGACY_CONTRACT_TRAIT_COUNT = 340_646;
 
-    // The transient Chonk ID, used in _beforeTokenTransfer and _afterTokenTransfer
-    // uint256 internal _transientChonkId;
-
     // The description parts
     string[2] descriptionParts;
 

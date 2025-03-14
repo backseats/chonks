@@ -1,5 +1,3 @@
-import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
-import Approvals from "./Approvals";
 import { Chonk } from "@/types/Chonk";
 import { Address } from "viem";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
@@ -66,8 +64,6 @@ export default function OwnershipSection(props: Props) {
           </div>
         </div>
       )}
-
-      {/* {isYours && <Approvals address={address} tbaAddress={tbaAddress} />} */}
     </>
   );
 }

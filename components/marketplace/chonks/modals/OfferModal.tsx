@@ -19,6 +19,7 @@ interface OfferModalProps {
   setSelectedChonkId?: (chonkId: string) => void;
   priceError: string | null;
   isBidPending: boolean;
+  chonkSelectError: string;
 }
 
 export const OfferModal = ({
@@ -36,6 +37,7 @@ export const OfferModal = ({
   selectedChonkId,
   setSelectedChonkId,
   isBidPending,
+  chonkSelectError,
 }: OfferModalProps) => {
   const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9.]/g, "");
@@ -73,7 +75,7 @@ export const OfferModal = ({
 
       {traitId && ownedChonks.length === 0 && (
         <p className="text-red-500 text-[16px]">
-          You need to own a Chonk to make an offer on this Trait.{" "}
+          You need to own a Chonk to make an Offer on this Trait.{" "}
           <a
             className="text-chonk-blue underline"
             href="https://chonk.xyz/marketplace"
@@ -87,7 +89,7 @@ export const OfferModal = ({
       {traitId && ownedChonks.length > 0 && (
         <div className="flex flex-col gap-2">
           <label className="text-sm font-[16px]">
-            Select your Chonk that the Trait will transfer to if the offer is
+            Select your Chonk that the Trait will transfer to if the Offer is
             accepted
           </label>
           <select
@@ -102,6 +104,9 @@ export const OfferModal = ({
               </option>
             ))}
           </select>
+          {chonkSelectError.length > 0 && (
+            <div className="text-red-500 text-sm">{chonkSelectError}</div>
+          )}
         </div>
       )}
 
