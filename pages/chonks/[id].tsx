@@ -15,8 +15,7 @@ import {
   traitsContract,
   traitsABI,
   chainId,
-  renderAsDataUriABI,
-} from "@/contract_data";
+} from "@/config";
 import { StoredChonk } from "@/types/StoredChonk";
 import EquipmentContainer from "@/components/chonk_explorer/EquipmentContainer";
 import { Category } from "@/types/Category";
@@ -43,6 +42,47 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { SendHorizontal } from "lucide-react";
+
+const renderAsDataUriABI = [
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "renderAsDataUri2D",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_tokenId",
+        type: "uint256",
+      },
+    ],
+    name: "renderAsDataUri3D",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+];
 
 export default function ChonkDetail({ id }: { id: string }) {
   const TOKEN_URI = "tokenURI";
@@ -78,13 +118,21 @@ export default function ChonkDetail({ id }: { id: string }) {
   // });
 
   // Get main body tokenURI
-  const { data: tokenURIData } = useReadContract({
+  const { data: tokenURIData, error: tokenURIError } = useReadContract({
     address: mainContract,
     abi: mainABI,
     functionName: TOKEN_URI,
     args: [BigInt(id)],
     chainId,
-  }) as { data: string };
+  }) as { data: string; error: Error };
+
+  useEffect(() => {
+    if (tokenURIError) {
+      console.error("Error fetching tokenURI:", tokenURIError);
+    }
+  }, [tokenURIError]);
+
+  console.log("tokenURIData", tokenURIData);
 
   const { data: owner } = useReadContract({
     address: mainContract,
@@ -221,6 +269,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const tbaAddress = tokenboundClient.getAccount({
     tokenContract: mainContract,
     tokenId: id.toString(),
+    chainId, // NOTE: This always needs to be on Base because this is where the TBA address is derived from
   });
 
   const basePaintOwnership485 = useBasePaintOwnership485(tbaAddress);
@@ -375,6 +424,8 @@ export default function ChonkDetail({ id }: { id: string }) {
       console.error("Error sending Chonk:", error);
     }
   };
+
+
 
   return (
     <>

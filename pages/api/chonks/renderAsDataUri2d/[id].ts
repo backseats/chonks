@@ -1,6 +1,6 @@
-import { mainContract, mainABI } from '@/contract_data';
+import { mainContract, mainABI, chainId } from '@/config';
 import { createPublicClient, http } from 'viem';
-import { baseSepolia, base } from 'viem/chains';
+import { base } from 'viem/chains';
 
 const client = createPublicClient({
     chain: base,
@@ -31,4 +31,4 @@ export default async function handler(req: any, res: any) {
         console.error('Error fetching renderAsDataUri2D:', error);
         res.status(500).json({ error: 'Failed to fetch token renderAsDataUri2D' });
     }
-} 
+}

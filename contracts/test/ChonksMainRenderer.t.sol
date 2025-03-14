@@ -62,7 +62,6 @@ contract ChonksMainRendererTest is AbstractTest {
         console.log('FirstReleaseDataMinter address', address(dataContract));
 
         market = new ChonksMarket(
-            address(main),
             address(traits),
             250, // fee basis points
             address(deployer)
@@ -72,7 +71,7 @@ contract ChonksMainRendererTest is AbstractTest {
 
         main.setMarketplace(address(market));
         traits.setMarketplace(address(market));
-        traits.setChonksMain(address(main));
+        // traits.setChonksMain(address(main));
 
         traits.addMinter(address(dataContract));
 

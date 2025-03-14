@@ -7,7 +7,7 @@ import {
   traitsContract,
   traitsABI,
   chainId
-} from "@/contract_data";
+} from "@/config";
 import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
 

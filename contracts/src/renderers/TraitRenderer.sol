@@ -77,12 +77,6 @@ contract TraitRenderer {
         return string.concat("data:application/json;base64,", Utils.encode(bytes(json)));
     }
 
-    // Add a getter function since the constant is private
-    // TODO: needed? not used anywhere
-    function getSvgStart() public pure returns (string memory) {
-        return SVG_START;
-    }
-
     // Update any functions that need the SVG_START, for example:
     function wrapWithSvgTag(string memory content) public pure returns (string memory) {
         return string.concat(SVG_START, content, '</svg>');

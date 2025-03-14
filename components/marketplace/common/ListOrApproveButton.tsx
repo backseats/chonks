@@ -1,0 +1,64 @@
+interface Props {
+  traitId?: number | null;
+  isApprovalPending: boolean;
+  finalIsApproved: boolean;
+  handleApproveMarketplace: () => void;
+  setIsModalOpen: (open: boolean) => void;
+  approvalError: string | null;
+  hasActiveBid: boolean;
+}
+
+export default function ListOrApproveButton({
+  traitId,
+  isApprovalPending,
+  finalIsApproved,
+  handleApproveMarketplace,
+  setIsModalOpen,
+  approvalError,
+  hasActiveBid,
+}: Props) {
+  return (
+    <>
+      <button
+        className={`w-full bg-chonk-blue text-white py-2 px-4 hover:brightness-110 transition-colors ${
+          isApprovalPending ? "opacity-50" : ""
+        }`}
+        onClick={() => {
+          if (!finalIsApproved) {
+            try {
+              handleApproveMarketplace();
+            } catch (error) {
+              console.error("Error approving marketplace:", error);
+            }
+          } else {
+            setIsModalOpen(true);
+          }
+        }}
+      >
+        {isApprovalPending
+          ? "Sign with your wallet"
+          : finalIsApproved
+          ? `List Your ${traitId ? `Trait` : "Chonk"}`
+          : `Approve the Marketplace to list ${
+              hasActiveBid ? "or accept bid" : ""
+            }`}
+      </button>
+
+      <div className="flex flex-row justify-between">
+        <div className="text-red-500 text-sm text-center">{approvalError}</div>
+
+        {!traitId && !finalIsApproved && (
+          <div className="relative group">
+            <div className="text-xs cursor-pointer text-right text-gray-500 hover:text-gray-700">
+              Why do I need to do this again?
+            </div>
+            <div className="absolute bottom-full right-0 mb-2 w-64 bg-black text-white text-xs p-2 rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+              We were a bit overzealous with our security and we clear approvals
+              when a Chonk changes hands. This does not apply to Traits.
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

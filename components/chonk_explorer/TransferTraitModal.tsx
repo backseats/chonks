@@ -2,7 +2,7 @@ import { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Address } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
-import { mainContract } from "@/contract_data";
+import { mainContract, chainId } from "@/config";
 import { useOwnedChonks } from "@/hooks/useOwnedChonks";
 
 interface Props {
@@ -24,7 +24,6 @@ export default function TransferTraitModal({
   onTransfer,
   traitName,
 }: Props) {
-
   const { ownedChonks } = useOwnedChonks(address);
 
   const [selectedChonkId, setSelectedChonkId] = useState<string | null>(null);
@@ -35,18 +34,22 @@ export default function TransferTraitModal({
     const tbaAddress = tokenboundClient.getAccount({
       tokenContract: mainContract,
       tokenId: selectedChonkId,
+      chainId,
     }) as Address;
 
     onTransfer(tbaAddress);
   };
 
+
   // Filter out the current chonk from available chonks and map to required format
   const availableChonks = ownedChonks
-    .filter(chonk => chonk.id !== chonkId)
-    .map(chonk => chonk.id)
+    .filter((chonk) => chonk.toString() !== chonkId)
     .sort((a, b) => Number(a) - Number(b));
 
-return (
+    console.log("ownedChonks", ownedChonks);
+    console.log("availableChonks", availableChonks);
+
+  return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       onClick={handleModalBackgroundClick}

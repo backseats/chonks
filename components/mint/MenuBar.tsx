@@ -1,19 +1,15 @@
 import React from "react";
 import { ConnectKitButton } from "connectkit";
-import Image from 'next/image';
-import Link from 'next/link';
+import Image from "next/image";
+import Link from "next/link";
 
-interface Props {
-
-}
+interface Props {}
 
 export default function MenuBar(props: Props) {
-
   return (
     <nav id="top" className="w-full flex justify-between px-4 py-4 bg-white">
-      <div >
-
-        <Link href="/" className="hover:opacity-70 transition-opacity " >
+      <div>
+        <Link href="/" className="hover:opacity-70 transition-opacity ">
           <h1 className=" text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
             <Image
               src="/chonks-logo.svg"
@@ -22,17 +18,14 @@ export default function MenuBar(props: Props) {
               height={48}
               className="h-12 md:h-12 w-auto"
             />
-
           </h1>
         </Link>
       </div>
 
       <div className="hidden md:flex gap-8 items-center font-source-code-pro text-sm font-weight-600">
-
         <Link href="/" className="hover:opacity-70 transition-opacity">
           Home
         </Link>
-
 
         {/* <Link href="/marketplace" className="hover:opacity-70 transition-opacity">
           Marketplace
@@ -47,13 +40,6 @@ export default function MenuBar(props: Props) {
         <Link href="/profile" className="hover:opacity-70 transition-opacity">
           Your Chonks
         </Link>
-
-        <div> | </div>
-
-        <Link href="/mint" className="hover:opacity-70 transition-opacity underline">
-          Mint
-        </Link>
-
       </div>
 
       {/* <button
@@ -79,10 +65,6 @@ export default function MenuBar(props: Props) {
           "--ck-connectbutton-font-weight": "600",
         }}
       />
-
-
-
-
     </nav>
   );
 }

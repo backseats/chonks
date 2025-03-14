@@ -31,6 +31,23 @@ interface IRenderMinterV1 {
     ) external view returns (ITraitStorage.StoredTrait memory);
 }
 
+interface IChonkTraitsV1 {
+    function getTrait(uint256 _tokenId) external view returns (ITraitStorage.StoredTrait memory);
+    function getTraitMetadata(uint256 _tokenId) external view returns (ITraitStorage.TraitMetadata memory);
+    function getStoredTraitForTokenId(uint256 _tokenId) external view returns (ITraitStorage.StoredTrait memory);
+    function getTraitIndexToMetadata(uint256 _traitIndex) external view returns (ITraitStorage.TraitMetadata memory);
+    function getTraitImageSvg(uint256 index) external view returns (string memory svg);
+    function renderAsDataUri(uint256 _tokenId) external view returns (string memory);
+    function getZMapForTokenId(uint256 _tokenId) external view returns (string memory);
+    function getGhostSvg() external view returns (string memory);
+    function getEpochData(uint256 index) external view returns (CommitReveal.Epoch memory);
+    function getSvgAndMetadataTrait(ITraitStorage.StoredTrait memory _trait, uint256 _traitId) external view returns (string memory traitSvg, string memory traitAttributes);
+    function getSVGZmapAndMetadataTrait(ITraitStorage.StoredTrait memory _trait, uint256 _traitId) external view returns (string memory traitSvg, bytes memory traitZmap, string memory traitAttributes);
+    function callGetSvgAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes) external view returns (string memory traitsSvg, string memory traitsAttributes);
+    function callGetSVGZmapAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes, bytes memory _traitZMaps) external view returns (string memory traitsSvg, string memory traitsAttributes, bytes memory traitZMaps);
+    function totalSupply() external view returns (uint256);
+}
+
 /*
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -75,10 +92,13 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     Traits public traitTokens;
 
     // The renderer contract for the Traits
-    TraitRenderer public traitRenderer;
+    TraitRenderer public traitRenderer = TraitRenderer(0x785AfED7Ce24E76Ac1d603be09C1fD20e0E1E6b7);
 
     // The ChonksMain contract
-    ChonksMain public chonksMain;
+    ChonksMain public constant chonksMain = ChonksMain(0x07152bfde079b5319e5308C43fB1Dbc9C76cb4F9);
+
+    // The old Traits contract
+    IChonkTraitsV1 public constant chonkTraitsV1 = IChonkTraitsV1(0x6B8f34E0559aa9A5507e74aD93374D9745CdbF09);
 
     // The ChonksMarket contract
     ChonksMarket public marketplace;
@@ -86,43 +106,44 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     // Metadata for each Trait by index
     mapping(uint256 => TraitMetadata) public traitIndexToMetadata;
 
-    // Approved operators for each Trait
-    mapping(uint256 traitId => address[] operators) public traitIdToApprovedOperators;
-
     // Contract addresses that are approved to create Traits
     mapping (address => bool) public isMinter;
 
-    // These are Chonks-related contracts that are approved to invalidate operator approvals
-    mapping (address => bool) public approvedInvalidators;
-
     // The next token ID to be minted
-    uint256 public nextTokenId;
+    uint256 public nextTokenId = 340_646; // Begins where the original contract left off
+
+    uint256 constant LEGACY_CONTRACT_TRAIT_COUNT = 340_646;
 
     // The transient Chonk ID, used in _beforeTokenTransfer and _afterTokenTransfer
-    uint256 internal _transientChonkId;
-
-    // When the initial mint started
-    uint256 public initialMintStartTime;
+    // uint256 internal _transientChonkId;
 
     // The description parts
     string[2] descriptionParts;
+
+    // If the replaceMint permissions have been revoked
+    bool public replaceMintPermisssionsRevoked;
+
+    // Mapping from TBA to Owner to operator approvals. Pulled this mapping from ERC721.sol and added an additional mapping
+    // Thanks to Nix.eth for the inspiration for this
+    mapping(address => mapping(address => mapping(address => bool))) private _operatorApprovals;
 
     /// Errors
 
     error AddressCantBurn();
     error CantTransfer();
-    error CantTransferDuringMint();
     error CantTransferEquipped();
-    error MintStartTimeAlreadySet();
     error NotATBA();
     error NotAValidMinterContract();
     error NotYourTrait();
+    error ReplaceMintPermissionsRevoked();
     error SetChonksMainAddress();
     error SetMarketplaceAddress();
+    error TraitAlreadyExists();
+    error TraitIDTooLow();
     error TraitNotFound(uint256 _tokenId);
     error TraitTokenDoesntExist();
 
-    /// Modifiers
+    /// Modifier
 
     modifier onlyMinter(address _address) {
         // Add DataMinter contract first via `AddMinter`.
@@ -130,22 +151,36 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         _;
     }
 
+    /// Event
+
+    event TBAApprovalForAll(address indexed tba, address indexed owner, address indexed operator, bool approved);
+
+    /// Constructor
+
     constructor() ERC721("Chonk Traits", "CHONK TRAITS") {
         _initializeOwner(msg.sender);
-        traitRenderer = new TraitRenderer();
     }
 
     function getTraitIndexToMetadata(uint256 _traitIndex) public view returns (TraitMetadata memory) {
+        TraitMetadata memory metadata = chonkTraitsV1.getTraitIndexToMetadata(_traitIndex);
+
+        if (metadata.dataMinterContract != address(0)) return metadata;
+
         return traitIndexToMetadata[_traitIndex];
     }
 
     // Called by DataMinter contracts to set the trait for a tokenId
     function setTraitForTokenId(uint256 _tokenId, ITraitStorage.StoredTrait memory _trait) public onlyMinter(msg.sender) {
+        if (_tokenId <= LEGACY_CONTRACT_TRAIT_COUNT) revert TraitIDTooLow();
+
         traitTokens.all[_tokenId] = _trait;
     }
 
     /// @dev Called in DataMinter contracts to add Traits
     function setTraitIndexToMetadata(uint256 _traitIndex, TraitMetadata memory _metadata) public onlyMinter(msg.sender) {
+        TraitMetadata memory oldMetadata = chonkTraitsV1.getTraitIndexToMetadata(_traitIndex);
+        if (oldMetadata.dataMinterContract != address(0)) revert TraitAlreadyExists();
+
         traitIndexToMetadata[_traitIndex] = _metadata;
     }
 
@@ -159,13 +194,24 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         return tokenId;
     }
 
+    function updateEpochOnce() public onlyMinter(msg.sender) {
+        if (traitTokens.epoch == 0) traitTokens.epoch = 778;
+    }
+
+    /// @dev Used to replace Traits from old Traits contract
+    function replaceMint(address _to, uint256 _tokenId) public onlyMinter(msg.sender) {
+        if (replaceMintPermisssionsRevoked) revert ReplaceMintPermissionsRevoked();
+
+        _safeMint(_to, _tokenId);
+    }
+
     function burn(uint256 _tokenId) public override {
         if (!isMinter[msg.sender]) revert AddressCantBurn();
 
         _burn(_tokenId);
     }
 
-    function burnBatch(uint256[] memory tokenIds) public {
+    function burnBatch(uint256[] memory tokenIds) public nonReentrant {
         if (!isMinter[msg.sender]) revert AddressCantBurn();
 
         for (uint256 i; i < tokenIds.length; ++i) {
@@ -215,15 +261,12 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         }
     }
 
-    /// @notice The identifier of the current epoch
-    function getEpoch() view public returns(uint256) {
-        return traitTokens.epoch;
-    }
-
     /// @notice Get the data for a given epoch
-    /// @param index The identifier of the epoch to fetch
-    function getEpochData(uint256 index) view public returns(CommitReveal.Epoch memory) {
-        return traitTokens.epochs[index];
+    /// @param _index The identifier of the epoch to fetch
+    function getEpochData(uint256 _index) view public returns(CommitReveal.Epoch memory) {
+        if (_index <= 777) return chonkTraitsV1.getEpochData(_index);
+
+        return traitTokens.epochs[_index];
     }
 
     function tokenURI(uint256 _tokenId) public view override returns (string memory) {
@@ -233,6 +276,8 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     function getTrait(uint256 _tokenId) public view returns (ITraitStorage.StoredTrait memory) {
+        if (_tokenId <= LEGACY_CONTRACT_TRAIT_COUNT) return chonkTraitsV1.getTrait(_tokenId);
+
         ITraitStorage.StoredTrait memory storedTrait = traitTokens.all[_tokenId];
         uint128 randomness = traitTokens.epochs[storedTrait.epoch].randomness;
         IRenderMinterV1 dataContract = IRenderMinterV1(storedTrait.dataMinterContract);
@@ -245,22 +290,28 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     /// @notice Lets you easily go from the Trait token id to the Trait Metadata, as explained by the DataMinter contract the Trait was minted with
     function getTraitMetadata(uint256 _tokenId) public view returns (TraitMetadata memory) {
+        if (_tokenId <= LEGACY_CONTRACT_TRAIT_COUNT) return chonkTraitsV1.getTraitMetadata(_tokenId);
+
         StoredTrait memory trait = getTrait(_tokenId);
         return traitIndexToMetadata[trait.traitIndex];
     }
 
     function getStoredTraitForTokenId(uint256 _tokenId) public view returns (ITraitStorage.StoredTrait memory) {
+        if (_tokenId <= LEGACY_CONTRACT_TRAIT_COUNT) return chonkTraitsV1.getStoredTraitForTokenId(_tokenId);
+
         return traitTokens.all[_tokenId];
     }
 
+    /// @notice The identifier of the current epoch
     function getCurrentEpoch() public view returns (uint256) {
         return traitTokens.epoch;
     }
 
     function renderAsDataUri(uint256 _tokenId) public view returns (string memory) {
+        if (_tokenId <= LEGACY_CONTRACT_TRAIT_COUNT) return chonkTraitsV1.renderAsDataUri(_tokenId);
+
         StoredTrait memory trait = getTrait(_tokenId);
         string memory traitSvg = trait.isRevealed ? getTraitImageSvg(trait.traitIndex) : '<svg></svg>';
-
 
         return traitRenderer.renderAsDataUri(
             _tokenId,
@@ -273,7 +324,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     function getSvgForTokenId(uint256 _tokenId) public view returns (string memory traitSvg) {
-        // don't get the ghost here for now
         StoredTrait memory trait = getTrait(_tokenId);
 
         if (trait.isRevealed) {
@@ -284,15 +334,26 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     function getZMapForTokenId(uint256 _tokenId) public view returns (string memory) {
+        if (_tokenId <= LEGACY_CONTRACT_TRAIT_COUNT) return chonkTraitsV1.getZMapForTokenId(_tokenId);
+
         StoredTrait memory trait = getTrait(_tokenId);
         return string(traitIndexToMetadata[trait.traitIndex].zMap);
     }
 
-    function getTraitImageSvg(uint256 index) public view returns (string memory svg) {
-        return traitRenderer.getTraitImageSvg(traitIndexToMetadata[index].colorMap);
+    function getColorMapForTokenId(uint256 _tokenId) public view returns (bytes memory) {
+        return getTraitMetadata(_tokenId).colorMap;
     }
 
-    function getGhostSvg() public view returns (string memory svg) {
+    function getTraitImageSvg(uint256 _index) public view returns (string memory svg) {
+        svg = chonkTraitsV1.getTraitImageSvg(_index);
+        if (bytes(svg).length > 0 && keccak256(bytes(svg)) != keccak256(bytes("<g id=\"Trait\"></g>")))
+            return svg;
+
+        bytes memory colorMap = traitIndexToMetadata[_index].colorMap;
+        svg = traitRenderer.getTraitImageSvg(colorMap);
+    }
+
+    function getGhostSvg() public view returns (string memory) {
         return traitRenderer.getGhostSvg();
     }
 
@@ -300,31 +361,37 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         return traitRenderer.createSvgFromPixels(_pixels);
     }
 
-    function getSvgAndMetadataTrait(StoredTrait memory trait, uint256 traitId) public view returns (string memory traitSvg, string memory traitAttributes ) {
+    function getSvgAndMetadataTrait(StoredTrait memory _trait, uint256 _traitId) public view returns (string memory traitSvg, string memory traitAttributes) {
+        if (_traitId <= LEGACY_CONTRACT_TRAIT_COUNT) return chonkTraitsV1.getSvgAndMetadataTrait(_trait, _traitId);
+
         return traitRenderer.getSvgAndMetadataTrait(
-            trait,
-            traitId,
-            traitIndexToMetadata[trait.traitIndex]
+            _trait,
+            _traitId,
+            traitIndexToMetadata[_trait.traitIndex]
         );
     }
 
-    function getSVGZmapAndMetadataTrait(StoredTrait memory trait, uint256 traitId) public view returns(string memory traitSvg, bytes memory traitZmap, string memory traitAttributes ) {
-         return traitRenderer.getSVGZmapAndMetadataTrait(
-            trait,
-            traitId,
-            traitIndexToMetadata[trait.traitIndex]
+    function getSVGZmapAndMetadataTrait(StoredTrait memory _trait, uint256 _traitId) public view returns(string memory traitSvg, bytes memory traitZmap, string memory traitAttributes) {
+        if (_traitId <= LEGACY_CONTRACT_TRAIT_COUNT) return chonkTraitsV1.getSVGZmapAndMetadataTrait(_trait, _traitId);
+
+        return traitRenderer.getSVGZmapAndMetadataTrait(
+            _trait,
+            _traitId,
+            traitIndexToMetadata[_trait.traitIndex]
         );
     }
 
-    function getSvgAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory traitsSvg, string memory traitsAttributes) {
-        return traitRenderer.getSvgAndMetadata(storedChonk, this.callGetSvgAndMetadataTrait);
+    function getSvgAndMetadata(IChonkStorage.StoredChonk memory _storedChonk) public view returns (string memory traitsSvg, string memory traitsAttributes) {
+        return traitRenderer.getSvgAndMetadata(_storedChonk, this.callGetSvgAndMetadataTrait);
     }
 
-    function getSvgZmapsAndMetadata(IChonkStorage.StoredChonk memory storedChonk) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
-        return traitRenderer.getSvgZmapsAndMetadata(storedChonk, this.callGetSVGZmapAndMetadataTrait);
+    function getSvgZmapsAndMetadata(IChonkStorage.StoredChonk memory _storedChonk) public view returns (string memory traitsSvg, bytes memory traitZMaps, string memory traitsAttributes) {
+        return traitRenderer.getSvgZmapsAndMetadata(_storedChonk, this.callGetSVGZmapAndMetadataTrait);
     }
 
-    function callGetSvgAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes ) public view returns (string memory traitsSvg, string memory traitsAttributes) {
+    function callGetSvgAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes) public view returns (string memory traitsSvg, string memory traitsAttributes) {
+        if (_traitId <= LEGACY_CONTRACT_TRAIT_COUNT) return chonkTraitsV1.callGetSvgAndMetadataTrait(_traitId, _traitsSvg, _traitsAttributes);
+
         StoredTrait memory storedTrait = getTrait(_traitId);
         return traitRenderer.callGetSvgAndMetadataTrait(
             _traitId,
@@ -335,7 +402,14 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         );
     }
 
-    function callGetSVGZmapAndMetadataTrait(uint256 _traitId, string memory _traitsSvg, string memory _traitsAttributes, bytes memory _traitZMaps) public view returns (string memory traitsSvg, string memory traitsAttributes, bytes memory traitZMaps) {
+    function callGetSVGZmapAndMetadataTrait(
+        uint256 _traitId,
+        string memory _traitsSvg,
+        string memory _traitsAttributes,
+        bytes memory _traitZMaps
+    ) public view returns (string memory traitsSvg, string memory traitsAttributes, bytes memory traitZMaps) {
+        if (_traitId <= LEGACY_CONTRACT_TRAIT_COUNT) return chonkTraitsV1.callGetSVGZmapAndMetadataTrait(_traitId, _traitsSvg, _traitsAttributes, _traitZMaps);
+
         StoredTrait memory storedTrait = getTrait(_traitId);
         return traitRenderer.callGetSVGZmapAndMetadataTrait(
             _traitId,
@@ -360,10 +434,6 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
 
     /// Setters/OnlyOwner
 
-    function setChonksMain(address _ChonksMain) public onlyOwner {
-        chonksMain = ChonksMain(_ChonksMain);
-    }
-
     function setMarketplace(address _marketplace) public onlyOwner {
         marketplace = ChonksMarket(_marketplace);
     }
@@ -381,26 +451,15 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
     }
 
     function setGhostMaps(bytes memory _colorMap, bytes memory _zMap) public onlyOwner {
-        // ghost.colorMap = _colorMap;
-        // ghost.zMap = _zMap;
         traitRenderer.setGhostMaps(_colorMap, _zMap);
-    }
-
-    function addApprovedInvalidator(address _invalidator) public onlyOwner {
-        approvedInvalidators[_invalidator] = true;
-    }
-
-    function removeApprovedInvalidator(address _invalidator) public onlyOwner {
-        approvedInvalidators[_invalidator] = false;
-    }
-
-    function setMintStartTime(uint256 _initialMintStartTime) public onlyOwner {
-        if (initialMintStartTime != 0) revert MintStartTimeAlreadySet();
-        initialMintStartTime = _initialMintStartTime;
     }
 
     function setDescriptionParts(string[2] memory _descriptionParts) public onlyOwner {
         descriptionParts = _descriptionParts;
+    }
+
+    function revokeReplaceMintPermissions() public onlyOwner {
+        replaceMintPermisssionsRevoked = true;
     }
 
     /// Boilerplate
@@ -413,182 +472,65 @@ contract ChonkTraits is IERC165, ERC721Enumerable, ERC721Burnable, ITraitStorage
         // Delete the Offer on Chonk ID before the transfer
         address tba = ownerOf(_tokenId);
         uint256 chonkId = chonksMain.tbaAddressToTokenId(tba);
-        marketplace.removeChonkOfferOnTraitTransfer(chonkId);
 
-        marketplace.deleteTraitOffersBeforeTokenTransfer(_tokenId);
+        marketplace.setChonkCooldownPeriod(chonkId);
+        marketplace.removeChonkOfferOnTraitTransfer(chonkId);
+        marketplace.deleteTraitOfferBeforeTokenTransferFromTraits(_tokenId);
         marketplace.deleteTraitBidsBeforeTokenTransfer(_tokenId, _to);
     }
 
     // Override functions for marketplace compatibility
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override(ERC721, ERC721Enumerable) {
-        if (from == address(0)) {
-            super._beforeTokenTransfer(from, to, tokenId);
-            return;
-        }
+        super._beforeTokenTransfer(from, to, tokenId);
 
-        if (block.timestamp < initialMintStartTime + 24 hours) revert CantTransferDuringMint();
+        // If minting
+        if (from == address(0)) return;
+
+        // Ensure the `to` address is a TBA
+        if (to != address(0) && chonksMain.tbaAddressToTokenId(to) == 0)
+            revert NotATBA();
 
         // Check if the Trait is equipped on the Chonk, revert if so
         (,,, bool isEquipped) = chonksMain.getFullPictureForTrait(tokenId);
         if (isEquipped) revert CantTransferEquipped();
 
-        (, address seller,,) = marketplace.traitOffers(tokenId);
-        // If there's an Offer on the Trait, seller is not 0
-        if (seller != address(0)) {
-            if (msg.sender != address(marketplace)) revert CantTransfer();
-        }
-
-        // If burning
-        if (to == address(0)) {
-            _cleanUpMarketplaceOffersAndBids(tokenId, to);
-
-            // If burning, store the owning Chonk ID for Marketplace cleanup later
-            address tba = ownerOf(tokenId);
-            _transientChonkId = chonksMain.tbaAddressToTokenId(tba);
-
-            super._beforeTokenTransfer(from, to, tokenId);
-            return;
-        }
-
-        // Ensure the `to` address is a TBA
-        if (chonksMain.tbaAddressToTokenId(to) == 0) revert NotATBA();
-
         _cleanUpMarketplaceOffersAndBids(tokenId, to);
-
-        super._beforeTokenTransfer(from, to, tokenId);
-    }
-
-    // Remove an active ChonkOffer because owned Traits changed
-    function _afterTokenTransfer(address _from , address _to, uint256 _traitTokenId) internal override(ERC721) {
-        if (address(chonksMain)  == address(0)) revert SetChonksMainAddress();
-        if (address(marketplace) == address(0)) revert SetMarketplaceAddress();
-
-        // Ignore if minting
-        if (_from == address(0)) return;
-
-        // If burning
-        if (_to == address(0)) {
-            uint256 id = _transientChonkId;
-            _transientChonkId = 0;
-            marketplace.removeChonkOfferOnTraitTransfer(id);
-            return;
-        }
-
-        // Delete the Offer on Chonk ID after the transfer
-        address tba = ownerOf(_traitTokenId);
-        uint256 chonkId = chonksMain.tbaAddressToTokenId(tba);
-        marketplace.removeChonkOfferOnTraitTransfer(chonkId);
-
-        emit BatchMetadataUpdate(0, type(uint256).max);
     }
 
     // Approvals
-
-    /// @notice Override approve to track individual token approvals
-    function approve(address _operator, uint256 _tokenId) public override(ERC721, IERC721) {
-        if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
-        if (ownerOf(_tokenId) != msg.sender) revert NotYourTrait();
-
-        // if removing approval
-        if (_operator == address(0)) {
-            // Remove the operator from the array
-            address[] storage operators = traitIdToApprovedOperators[_tokenId];
-            for (uint256 i; i < operators.length; ++i) {
-                if (operators[i] == _operator) {
-                    // Replace with last element and pop
-                    operators[i] = operators[operators.length - 1];
-                    operators.pop();
-                    break;
-                }
-            }
-        } else {
-            // Add operator if not already present
-            address[] storage operators = traitIdToApprovedOperators[_tokenId];
-            bool exists = false;
-            for (uint256 i; i < operators.length; ++i) {
-                if (operators[i] == _operator) {
-                    exists = true;
-                    break;
-                }
-            }
-            if (!exists) {
-                operators.push(_operator);
-            }
-        }
-
-        super.approve(_operator, _tokenId);
-    }
 
     /// @notice Override setApprovalForAll to track operator approvals
     function setApprovalForAll(address _operator, bool _approved) public override(ERC721, IERC721) {
         // Cannot approve self as operator
         require(_operator != msg.sender, "ERC721: approve to caller");
 
-        // For setApprovalForAll, we need to update approvals for all tokens owned by msg.sender
-        uint256 balance = balanceOf(msg.sender);
-        for (uint256 i; i < balance; ++i) {
-            uint256 tokenId = tokenOfOwnerByIndex(msg.sender, i);
+        uint256 chonkId = chonksMain.getChonkIdForTBAAddress(msg.sender);
 
-            if (_approved) {
-                // Add operator if not already present
-                address[] storage operators = traitIdToApprovedOperators[tokenId];
-                bool exists = false;
-                for (uint256 j; j < operators.length; ++j) {
-                    if (operators[j] == _operator) {
-                        exists = true;
-                        break;
-                    }
-                }
-                if (!exists) {
-                    operators.push(_operator);
-                }
-            } else {
-                // Remove the operator
-                address[] storage operators = traitIdToApprovedOperators[tokenId];
-                for (uint256 j; j < operators.length; ++j) {
-                    if (operators[j] == _operator) {
-                        // Replace with last element and pop
-                        operators[j] = operators[operators.length - 1];
-                        operators.pop();
-                        break;
-                    }
-                }
-            }
-        }
+        // This will revert if owner is address(0)
+        address owner = chonksMain.ownerOf(chonkId);
 
-        super.setApprovalForAll(_operator, _approved);
+        _operatorApprovals[msg.sender][owner][_operator] = _approved;
+
+        emit TBAApprovalForAll(msg.sender, owner, _operator, _approved);
+    }
+
+    function isApprovedForAll(address _tba, address _operator) public view override(ERC721, IERC721) returns (bool) {
+        uint256 chonkId = chonksMain.getChonkIdForTBAAddress(_tba);
+        address owner = chonksMain.ownerOf(chonkId);
+
+        return _operatorApprovals[_tba][owner][_operator];
     }
 
     /// @notice Invalidates all operator approvals for a specific token
     function invalidateAllOperatorApprovals(uint256 _tokenId) public {
-        if (!_exists(_tokenId)) revert TraitTokenDoesntExist();
+        (,, address owner,) = chonksMain.getFullPictureForTrait(_tokenId);
 
-        // We allow ChonksMain to invalidate all operator approvals for a token
-        if (ownerOf(_tokenId) != msg.sender && msg.sender != address(chonksMain) && !approvedInvalidators[msg.sender])
+        // We allow ChonksMain to invalidate all operator approvals for a token or the tba owner or the owner of the tba
+        if (ownerOf(_tokenId) != msg.sender && owner != msg.sender && msg.sender != address(chonksMain))
             revert NotYourTrait();
-
-        address[] memory operators = traitIdToApprovedOperators[_tokenId];
-        if (operators.length == 0) return;
 
         // Remove individual token approval
         _approve(address(0), _tokenId);
-
-        // Remove all operator approvals for this token
-        for (uint256 i; i < operators.length; ++i) {
-            _setApprovalForAll(ownerOf(_tokenId), operators[i], false);
-        }
-
-        // Clear tracking array
-        delete traitIdToApprovedOperators[_tokenId];
-
-        emit ITraitStorage.AllOperatorApprovalsInvalidated(_tokenId);
-    }
-
-    /// Approval Getters
-
-    // Function to get the entire array of approved operators for a traitId
-    function getApprovedOperators(uint256 traitId) public view returns (address[] memory) {
-        return traitIdToApprovedOperators[traitId];
     }
 
 }

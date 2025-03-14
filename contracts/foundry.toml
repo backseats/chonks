@@ -12,6 +12,7 @@ verbosity = 3
 line_length = 100
 
 [rpc_endpoints]
+base = "${BASE_MAINNET_RPC_URL}"
 base_sepolia = "${BASE_SEPOLIA_RPC_URL}"
 
 [profile.private_keys]

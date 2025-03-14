@@ -1,5 +1,5 @@
 import { useReadContract } from "wagmi";
-import { traitsContract, traitsABI } from "@/contract_data";
+import { traitsContract, traitsABI } from "@/config";
 import { Address } from "viem";
 import { useState, useEffect } from "react";
 

@@ -5,12 +5,12 @@ import {
   mainABI,
   traitsContract,
   traitsABI,
-  chainId
-} from "@/contract_data";
+  chainId,
+} from "@/config";
 import { useRouter } from "next/navigation";
 import { Address } from "viem";
 import Image from "next/image";
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function MenuBar() {
   const router = useRouter();
@@ -58,7 +58,6 @@ export default function MenuBar() {
               />
             </h1>
           </Link>
-
         </div>
 
         <div className="">
@@ -81,7 +80,6 @@ export default function MenuBar() {
 
             <ConnectKitButton />
           </div>
-
         </div>
       </nav>
       <div className="flex w-full h-12 md:hidden">

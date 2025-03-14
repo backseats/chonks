@@ -1,38 +1,34 @@
 import { useEffect, useState } from 'react';
 import { useReadContract } from "wagmi";
-import { mainContract, mainABI } from "@/contract_data";
+import { mainContract, mainABI, chainId } from "@/config";
 import { Address } from 'viem';
-interface OwnedChonk {
-    id: string;
-}
 
 export function useOwnedChonks(address: Address | undefined) {
-    if (!address) {
-        console.log('useOwnedChonks address undefined')
-        return { ownedChonks: [] };
-    }
-
-    const [ownedChonks, setOwnedChonks] = useState<OwnedChonk[]>([]);
+    const [ownedChonks, setOwnedChonks] = useState<string[]>([]);
 
     const { data: tokenIds, error: contractError } = useReadContract({
         address: mainContract,
         abi: mainABI,
         functionName: 'walletOfOwner',
         args: [address],
+        chainId,
     });
 
     useEffect(() => {
+        if (!address) {
+            setOwnedChonks([]);
+            return;
+        }
+
         if (contractError) {
             console.error('Error fetching tokens:', contractError);
+            setOwnedChonks([]);
             return;
         }
 
         try {
             if (tokenIds) {
-                const chonks = (tokenIds as bigint[]).map(id => ({
-                    id: id.toString(),
-                }));
-                setOwnedChonks(chonks);
+                setOwnedChonks(tokenIds as string[]);
             }
         } catch (error) {
             console.error('Error processing token IDs:', error);
