@@ -66,8 +66,6 @@ export default function OwnershipSection(props: Props) {
           </div>
         </div>
       )}
-
-      {/* {isYours && <Approvals address={address} tbaAddress={tbaAddress} />} */}
     </>
   );
 }
