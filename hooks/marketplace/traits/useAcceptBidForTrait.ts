@@ -29,7 +29,11 @@ export default function useAcceptBidForTrait(traitId: number) {
         onSuccess: (data) => console.log('Transaction submitted:', data),
         onError: (error) => {
           console.error('Transaction failed:', error);
-          setAcceptBidError(`Failed to accept bid: ${(error as Error).message}`);
+          if (error.message.includes("User rejected the request")) {
+            setAcceptBidError("Please confirm with your wallet");
+          } else {
+            setAcceptBidError(`Failed to accept bid: ${(error as Error).message}`);
+          }
         }
       });
     } catch (error) {

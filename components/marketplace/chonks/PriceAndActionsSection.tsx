@@ -198,6 +198,13 @@ export default function PriceAndActionsSection({
     if (isAcceptBidSuccess) window.location.reload();
   }, [isAcceptBidSuccess]);
 
+  useEffect(() => {
+    if (isWithdrawBidOnChonkSuccess) {
+      refetchChonkBid();
+      setOfferAmount("");
+    }
+  }, [isWithdrawBidOnChonkSuccess]);
+
   // Calculate minimum offer (5% higher than current bid)
   const minimumOffer = useMemo(() => {
     if (hasActiveBid && chonkBid) {
@@ -478,8 +485,10 @@ export default function PriceAndActionsSection({
                     finalIsApproved={finalIsApproved}
                     handleApproveMarketplace={handleApproveMarketplace}
                     setIsModalOpen={setIsModalOpen}
-                    approvalError={approvalError}
+                    approvalError={approvalError ?? null}
                     hasActiveBid={hasActiveBid}
+                    isEquipped={false}
+                    handleUnequipTrait={() => {}}
                   />
 
                   {finalIsApproved && hasActiveBid && chonkBid && (
@@ -494,15 +503,13 @@ export default function PriceAndActionsSection({
               ) : (
                 !isOwner && (
                   <MakeCancelOfferButton
-                    chonkId={chonkId}
                     hasOffer={Boolean(
                       hasActiveBid && chonkBid && chonkBid.bidder === address
                     )}
-                    onMakeOffer={() => setIsOfferModalOpen(true)}
-                    onSuccess={() => {
-                      refetchChonkBid();
-                      setOfferAmount("");
-                    }}
+                    handleSubmit={() => setIsOfferModalOpen(true)}
+                    handleWithdrawBid={handleWithdrawBidOnChonk}
+                    isWithdrawBidPending={isWithdrawBidOnChonkPending}
+                    isMakeOfferPending={isBidOnChonkPending}
                   />
                 )
               )}
@@ -557,6 +564,7 @@ export default function PriceAndActionsSection({
           onClose={handleBidModalClose}
           ownedChonks={[]}
           isBidPending={localBidOnChonkPending}
+          chonkSelectError={""}
         />
       </ModalWrapper>
     </>

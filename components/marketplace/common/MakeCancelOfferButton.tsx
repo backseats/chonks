@@ -1,37 +1,51 @@
-import { useAccount } from "wagmi";
-import WithdrawBidButton from "./WithdrawBidButton";
-
 interface Props {
-  chonkId: number;
   hasOffer: boolean;
-  onMakeOffer: () => void;
-  onSuccess: () => void;
+  isMakeOfferPending: boolean;
+  isWithdrawBidPending: boolean;
+  handleSubmit: () => void;
+  handleWithdrawBid: () => void;
 }
 
 export default function MakeCancelOfferButton({
-  chonkId,
   hasOffer,
-  onMakeOffer,
-  onSuccess,
+  handleSubmit,
+  isMakeOfferPending,
+  isWithdrawBidPending,
+  handleWithdrawBid,
 }: Props) {
-  const { address } = useAccount();
-
-  // Only used for the "Make an Offer" button
   const baseStyle = "w-full py-2 px-4 transition-colors text-white";
-  const makeOfferStyle = `${baseStyle} bg-chonk-blue hover:bg-chonk-orange hover:text-black`;
+  const makeOfferStyle = `${baseStyle} ${
+    isMakeOfferPending
+      ? "bg-chonk-blue opacity-50"
+      : "bg-chonk-blue hover:bg-chonk-orange hover:text-black"
+  }`;
+
+  const baseCancelStyle =
+    "w-full py-2 px-4 transition-colors text-white bg-red-500";
+  const cancelOfferStyle = `${baseCancelStyle} ${
+    isWithdrawBidPending ? "opacity-50" : "hover:bg-red-600"
+  }`;
 
   if (hasOffer) {
     return (
-      <WithdrawBidButton
-        chonkId={chonkId}
-        address={address}
-        onSuccess={onSuccess}
-      />
+      <button
+        className={cancelOfferStyle}
+        onClick={handleWithdrawBid}
+        disabled={isWithdrawBidPending}
+      >
+        {isWithdrawBidPending
+          ? "Confirm with your wallet"
+          : "Cancel your Offer"}
+      </button>
     );
   }
 
   return (
-    <button className={makeOfferStyle} onClick={onMakeOffer}>
+    <button
+      className={makeOfferStyle}
+      onClick={handleSubmit}
+      disabled={isMakeOfferPending}
+    >
       Make an Offer
     </button>
   );

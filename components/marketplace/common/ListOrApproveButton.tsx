@@ -2,10 +2,13 @@ interface Props {
   traitId?: number | null;
   isApprovalPending: boolean;
   finalIsApproved: boolean;
-  handleApproveMarketplace: () => void;
-  setIsModalOpen: (open: boolean) => void;
   approvalError: string | null;
   hasActiveBid: boolean;
+  isEquipped: boolean;
+  handleApproveMarketplace?: () => void;
+  handleTBAApproveMarketplace?: () => Promise<void>;
+  setIsModalOpen: (open: boolean) => void;
+  handleUnequipTrait?: () => void;
 }
 
 export default function ListOrApproveButton({
@@ -13,9 +16,12 @@ export default function ListOrApproveButton({
   isApprovalPending,
   finalIsApproved,
   handleApproveMarketplace,
+  handleTBAApproveMarketplace,
   setIsModalOpen,
   approvalError,
   hasActiveBid,
+  isEquipped,
+  handleUnequipTrait,
 }: Props) {
   return (
     <>
@@ -23,24 +29,30 @@ export default function ListOrApproveButton({
         className={`w-full bg-chonk-blue text-white py-2 px-4 hover:brightness-110 transition-colors ${
           isApprovalPending ? "opacity-50" : ""
         }`}
-        onClick={() => {
+        onClick={async () => {
           if (!finalIsApproved) {
             try {
-              handleApproveMarketplace();
+              handleTBAApproveMarketplace
+                ? await handleTBAApproveMarketplace()
+                : handleApproveMarketplace?.();
             } catch (error) {
               console.error("Error approving marketplace:", error);
             }
           } else {
-            setIsModalOpen(true);
+            traitId && isEquipped
+              ? handleUnequipTrait?.()
+              : setIsModalOpen(true);
           }
         }}
       >
         {isApprovalPending
-          ? "Sign with your wallet"
+          ? "Confirm with your wallet"
           : finalIsApproved
-          ? `List Your ${traitId ? `Trait` : "Chonk"}`
-          : `Approve the Marketplace to list ${
-              hasActiveBid ? "or accept bid" : ""
+          ? traitId && isEquipped
+            ? "Unequip Trait"
+            : `List Your ${traitId ? `Trait` : "Chonk"}`
+          : `Approve the Marketplace to List ${
+              hasActiveBid ? "or accept Bid" : ""
             }`}
       </button>
 

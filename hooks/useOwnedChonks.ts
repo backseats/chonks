@@ -28,7 +28,10 @@ export function useOwnedChonks(address: Address | undefined) {
 
         try {
             if (tokenIds) {
-                setOwnedChonks(tokenIds as string[]);
+              const sortedTokenIds = [...(tokenIds as bigint[])]
+                .sort((a, b) => a < b ? -1 : a > b ? 1 : 0)
+                .map(id => id.toString());
+              setOwnedChonks(sortedTokenIds);
             }
         } catch (error) {
             console.error('Error processing token IDs:', error);

@@ -2,12 +2,7 @@ import Head from "next/head";
 import MenuBar from "@/components/marketplace/MenuBar";
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
-import {
-  useReadContract,
-  useWalletClient,
-  useAccount,
-  useWriteContract,
-} from "wagmi";
+import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { Trait } from "@/types/Trait";
 import {
   mainABI,
@@ -21,9 +16,7 @@ import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from "@/components/marketplace/TraitsSection";
 // import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
 import PriceAndActionsSection from "@/components/marketplace/traits/PriceAndActionsSection";
-import { formatEther, Chain } from "viem";
-import { useMarketplaceActions } from "@/hooks/marketplace/traits/marketplaceAndMintHooks";
-import { useTBAApprovalWrite } from "@/hooks/useTBAApprovalWrite";
+import { Address } from "viem";
 import Loading from "@/components/marketplace/Loading";
 import { TokenboundClient } from "@tokenbound/sdk";
 
@@ -67,8 +60,6 @@ export default function TraitDetail({ id }: { id: string }) {
   );
 
   // const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
-
-  const { hasActiveBid, traitBid } = useMarketplaceActions(parseInt(id));
 
   //get Trait Offers - accessing the offers directly from mapping
   // but we now have : getTraitOffer
@@ -390,7 +381,7 @@ export default function TraitDetail({ id }: { id: string }) {
                     tokenIdOfTBA={tokenIdOfTBA?.toString()}
                     tbaOwner={ownerOfTraitOwner}
                     isEquipped={isEquipped}
-                    tbaAddress={tbaAddress}
+                    tbaAddress={tbaAddress as Address | null}
                     // price={formattedPrice}
                     // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
                     // isOfferSpecific={isOfferSpecific}

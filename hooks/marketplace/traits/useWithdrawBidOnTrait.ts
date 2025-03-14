@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { marketplaceContract, marketplaceABI, chainId } from "@/config";
+import { BaseError, ContractFunctionRevertedError } from "viem";
 
 export default function useWithdrawBidOnTrait(traitId: number) {
   const [withdrawBidOnTraitError, setWithdrawBidOnTraitError] = useState<string>("");
@@ -26,20 +27,44 @@ export default function useWithdrawBidOnTrait(traitId: number) {
         args: [BigInt(traitId)],
         chainId,
       }, {
-        onSuccess: (data) => console.log('Transaction submitted:', data),
+        // onSuccess: (data) => {
+        //   debugger
+        //   console.log('Transaction submitted:', data),
+        // },
         onError: (error) => {
-          console.error('Transaction failed:', error);
-          const errorMessage = (error as Error).message;
-          if (errorMessage.includes('MustWaitToWithdrawBid')) {
-            setWithdrawBidOnTraitError('You must wait 100 seconds before cancelling your offer');
-          } else {
-            setWithdrawBidOnTraitError(`Failed to withdraw bid: ${errorMessage}`);
-          }
+          debugger
+        //   if (error instanceof BaseError) {
+        //     debugger
+        //     const revertError = error.walk(err => err instanceof ContractFunctionRevertedError)
+        //     if (revertError instanceof ContractFunctionRevertedError) {
+        //       const errorName = revertError.data?.errorName ?? ''
+        //       // do something with `errorName`
+        //     }
+        //   }
+        //   console.error('Transaction failed:', error);
+        //   const errorMessage = (error as Error).message;
+        //   if (errorMessage.includes('MustWaitToWithdrawBid')) {
+        //     setWithdrawBidOnTraitError('You must wait 100 seconds before cancelling your Offer');
+        //   } else if (errorMessage.includes("User rejected the request")) {
+        //     setWithdrawBidOnTraitError('Confirm with your wallet to withdraw your Bid');
+        //   } else {
+        //     setWithdrawBidOnTraitError(`Failed to withdraw bid: ${errorMessage}`);
+        //   }
         }
       });
     } catch (error) {
       console.error('Error withdrawing bid:', error);
-      setWithdrawBidOnTraitError(`Error preparing transaction: ${(error as Error).message}`);
+      debugger
+      // setWithdrawBidOnTraitError(`Error preparing transaction: ${(error as Error).message}`);
+
+      if (error instanceof BaseError) {
+        debugger
+        const revertError = error.walk(err => err instanceof ContractFunctionRevertedError)
+        if (revertError instanceof ContractFunctionRevertedError) {
+          const errorName = revertError.data?.errorName ?? ''
+          // do something with `errorName`
+        }
+      }
     }
   };
 
