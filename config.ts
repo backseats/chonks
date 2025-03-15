@@ -25,11 +25,11 @@ export const chainId = base.id;
 export const config = createConfig({
   chains: [base],
   connectors: [
+    injected(),
+    // walletConnect({
+    //   projectId: "6637dd8a880463f857799d3d1011b7a2",
+    // }),
     coinbaseWallet({ appName: 'Chonks', preference: 'all' }),
-    walletConnect({
-      projectId: "6637dd8a880463f857799d3d1011b7a2",
-    }),
-    injected()
   ],
   transports: {
     [base.id]: http(`${process.env.NEXT_PUBLIC_BASE_MAINNET_RPC_URL}`), // toggle for prod

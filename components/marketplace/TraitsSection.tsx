@@ -76,7 +76,7 @@ export default function TraitsSection({
           </div>
 
           {/* TODO: empty state */}
-          <div className="text-lg mt-4">TODO: show paginated traits</div>
+          {/* <div className="text-lg mt-4">TODO: show paginated traits</div> */}
         </div>
       )}
     </>

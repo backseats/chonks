@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.4",
     "@heroicons/react": "^2.1.5",
     "@next/font": "^14.2.15",
     "@react-three/drei": "^9.114.6",
@@ -23,6 +24,7 @@
     "@uiw/react-color-colorful": "^2.3.0",
     "connectkit": "^1.8.0",
     "file-saver": "^2.0.5",
+    "graphql": "^16.10.0",
     "gsap": "^3.12.5",
     "html2canvas": "^1.4.1",
     "jszip": "^3.10.1",

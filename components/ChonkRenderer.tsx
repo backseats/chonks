@@ -12,6 +12,7 @@ interface ChonkRendererProps {
   bytes?: string;
   backgroundColor?: string;
   backgroundBody?: string;
+  bodyIndex?: number;
 }
 
 const gridSize = 30;
@@ -22,7 +23,10 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
     bytes = "",
     backgroundColor = "#0F6E9D",
     backgroundBody = "ghost.svg",
+    bodyIndex = 0,
   } = props;
+
+  console.log(bodyIndex);
 
   const pixelSize = Math.floor(size / gridSize);
 
@@ -59,11 +63,13 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
 
   // Function to render background body pixels
   const renderBackgroundBody = () => {
-    const bodySVG = bodies.bodies.find(
-      (body) =>
-        body.path ===
-        (backgroundBody === "ghost.svg" ? "skinTone1.svg" : backgroundBody)
-    );
+    const bodySVG = bodyIndex
+      ? bodies.bodies.find((body) => body.id === bodyIndex)
+      : bodies.bodies.find(
+          (body) =>
+            body.path ===
+            (backgroundBody === "ghost.svg" ? "skinTone1.svg" : backgroundBody)
+        );
 
     if (bodySVG && bodySVG.colorMap) {
       const byteArray = bodySVG.colorMap.match(/.{1,2}/g) || [];
@@ -115,7 +121,7 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
           gridTemplateColumns: `repeat(${gridSize}, ${pixelSize}px)`,
           gridTemplateRows: `repeat(${gridSize}, ${pixelSize}px)`,
           gap: 0,
-          opacity: backgroundBody === "ghost.svg" ? 0.5 : 1,
+          // opacity: backgroundBody === "ghost.svg" ? 0.5 : 1,
         }}
       >
         {generateGrid().map((pixel, index) => {

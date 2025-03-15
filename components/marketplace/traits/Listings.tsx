@@ -3,40 +3,35 @@ import { useState, useEffect } from "react";
 import { useReadContract } from "wagmi";
 import { traitsContract, traitsABI, chainId } from "@/config";
 import { Trait } from "@/types/Trait";
+import { TraitListing } from "@/pages/marketplace/traits";
+import { FaEthereum } from "react-icons/fa6";
+import { formatEther } from "viem";
 
 interface ListingsProps {
   isSidebarVisible: boolean;
+  traitListings: TraitListing[];
 }
 
-export default function Listings({ isSidebarVisible }: ListingsProps) {
+export default function Listings({
+  isSidebarVisible,
+  traitListings = [],
+}: ListingsProps) {
   const [traits, setTraits] = useState<
-    Array<{ id: number; data: Trait | null }>
+    Array<{ id: string; data: Trait | null; listing: TraitListing }>
   >([]);
 
-  // Get total supply of tokens
-  const { data: totalSupply } = useReadContract({
-    address: traitsContract,
-    abi: traitsABI,
-    functionName: "totalSupply",
-    chainId,
-  }) as { data: bigint };
-
-  // Fetch token URIs for all tokens
+  // Initialize traits array from traitListings
   useEffect(() => {
-    if (!totalSupply) return;
+    if (!traitListings.length) return;
 
-    const fetchTraits = async () => {
-      const traitsArray = [];
-      // for (let i = 1; i <= Number(totalSupply); i++) {
-      for (let i = 1; i <= Number(4); i++) {
-        // just get 4 for now
-        traitsArray.push({ id: i, data: null });
-      }
-      setTraits(traitsArray);
-    };
+    const traitsArray = traitListings.map((listing) => ({
+      id: listing.id,
+      data: null,
+      listing,
+    }));
 
-    fetchTraits();
-  }, [totalSupply]);
+    setTraits(traitsArray);
+  }, [traitListings]);
 
   // Fetch token URI data for each token
   useEffect(() => {
@@ -72,10 +67,15 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
     </div>
   );
 
+  const handleBuyNow = (e: React.MouseEvent, id: string) => {
+    e.preventDefault();
+    window.location.href = `/marketplace/traits/${id}`;
+  };
+
   return (
     <div className={`${isSidebarVisible ? "w-3/4" : "w-full"} `}>
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
-        {traits.map(({ id, data }) =>
+        {traits.map(({ id, data, listing }) =>
           data === null ? (
             <LoadingCard key={id} />
           ) : (
@@ -91,14 +91,19 @@ export default function Listings({ isSidebarVisible }: ListingsProps) {
               />
               <div className="mt-4 space-y-2 p-4">
                 <h3 className="text-[1.2vw] font-bold">Trait #{id}</h3>
-                <span className="text-[1vw]">[price to go here]</span>
+                <div className="flex flex-row">
+                  <span className="text-[1vw] -mt-1">
+                    {listing && listing.price
+                      ? `${formatEther(BigInt(listing.price))} `
+                      : "Not for sale "}
+                  </span>
+                  <FaEthereum className="ml-1 text-[1vw]" />
+                </div>
                 <button
                   className="w-full text-[1vw] border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
-                  onClick={(e) => {
-                    e.preventDefault();
-                  }}
+                  onClick={(e) => handleBuyNow(e, id)}
                 >
-                  Buy Now (tbd)
+                  View Listing
                 </button>
               </div>
             </Link>

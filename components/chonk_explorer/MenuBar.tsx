@@ -1,5 +1,5 @@
 import { ConnectKitButton } from "connectkit";
-import { useWriteContract } from "wagmi";
+import { useWriteContract, useAccount } from "wagmi";
 import {
   mainContract,
   mainABI,
@@ -14,6 +14,8 @@ import Link from "next/link";
 
 export default function MenuBar() {
   const router = useRouter();
+
+  const { address } = useAccount();
 
   const { writeContract: writeChonkContract, error: writeChonkError } =
     useWriteContract();
@@ -64,12 +66,14 @@ export default function MenuBar() {
           {/* Right */}
 
           <div className="flex flex-row gap-4">
-            <button
-              className="px-4 py-2 bg-black text-white font-source-code-pro text-sm hidden md:flex"
-              onClick={() => router.push("/profile")}
-            >
-              Your Chonks
-            </button>
+            {address && (
+              <button
+                className="px-4 py-2 bg-black text-white font-source-code-pro text-sm hidden md:flex"
+                onClick={() => router.push("/profile")}
+              >
+                Your Chonks
+              </button>
+            )}
 
             {/* <button
               className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white"

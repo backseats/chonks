@@ -1,12 +1,22 @@
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import MenuBar from "@/components/marketplace/MenuBar";
-import { useState } from "react";
-import { VscListFilter, VscSearch } from "react-icons/vsc";
 import Stats from "@/components/marketplace/Stats";
 import Tabs from "@/components/marketplace/Tabs";
 import Sidebar from "@/components/marketplace/Sidebar";
 import Listings from "@/components/marketplace/traits/Listings";
 import Actions from "@/components/marketplace/Actions";
+import { TRAIT_LISTINGS } from "@/lib/graphql/queries";
+import client from "@/lib/apollo-client";
+import { formatEther } from "viem";
+
+export type TraitListing = {
+  id: string;
+  isActive: boolean;
+  price: string;
+  seller: string;
+  sellerTBA: string;
+};
 
 export default function TraitssMarketplace() {
   const [priceMin, setPriceMin] = useState("");
@@ -14,12 +24,107 @@ export default function TraitssMarketplace() {
   const [selectedTraits, setSelectedTraits] = useState<
     Record<string, string[]>
   >({});
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [searchId, setSearchId] = useState("");
   const [sortOrder, setSortOrder] = useState<
     "low-to-high" | "high-to-low" | ""
   >("");
   const [activeTab, setActiveTab] = useState("Traits");
+  const [traitListings, setTraitListings] = useState<TraitListing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    floorPrice: 0,
+    onSale: 0,
+    totalAmount: 0,
+    owners: 0,
+    bestOffer: 0,
+  });
+
+  // Fetch trait listings when component mounts or filters change
+  useEffect(() => {
+    const fetchTraitListings = async () => {
+      setLoading(true);
+
+      try {
+        // Now try the actual query with Apollo
+        const { data } = await client.query({
+          query: TRAIT_LISTINGS,
+        });
+
+        // console.log("Trait listings data:", data);
+
+        if (data && data.traitListings && data.traitListings.items) {
+          // Filter listings based on search, price, etc.
+          let filteredListings = data.traitListings.items as TraitListing[];
+
+          console.log("Filtered listings:", filteredListings);
+          console.log(formatEther(BigInt(filteredListings[0].price)));
+
+          // Filter by search term if provided
+          if (searchId) {
+            filteredListings = filteredListings.filter((listing: any) =>
+              listing.id.toLowerCase().includes(searchId.toLowerCase())
+            );
+          }
+
+          // Filter by price range if provided
+          if (priceMin) {
+            filteredListings = filteredListings.filter(
+              (listing: any) => BigInt(listing.price) >= BigInt(priceMin)
+            );
+          }
+
+          if (priceMax) {
+            filteredListings = filteredListings.filter(
+              (listing: any) => BigInt(listing.price) <= BigInt(priceMax)
+            );
+          }
+
+          // Sort listings based on sortOrder
+          if (sortOrder === "low-to-high") {
+            filteredListings.sort((a: TraitListing, b: TraitListing) =>
+              Number(BigInt(a.price) - BigInt(b.price))
+            );
+          } else if (sortOrder === "high-to-low") {
+            filteredListings.sort((a: TraitListing, b: TraitListing) =>
+              Number(BigInt(b.price) - BigInt(a.price))
+            );
+          }
+
+          setTraitListings(filteredListings);
+
+          // Calculate stats
+          if (filteredListings.length > 0) {
+            const activeListings = filteredListings.filter(
+              (listing: any) => listing.isActive
+            );
+            const prices = activeListings.map((listing: any) =>
+              parseFloat(listing.price)
+            );
+            const floorPrice = prices.length > 0 ? Math.min(...prices) : 0;
+            const uniqueSellers = new Set(
+              activeListings.map((listing: any) => listing.seller)
+            ).size;
+
+            setStats({
+              floorPrice,
+              onSale: activeListings.length,
+              totalAmount: data.traitListings.items.length,
+              owners: uniqueSellers,
+              bestOffer: 0, // This would come from a different query if needed
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error testing or fetching data:", error);
+        // Set default values...
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTraitListings();
+  }, [searchId, priceMin, priceMax, sortOrder]);
 
   return (
     <>
@@ -61,11 +166,11 @@ export default function TraitssMarketplace() {
             {/* EDGES */}
             <Stats
               name="Traits"
-              floorPrice={0.01}
-              onSale={690}
-              totalAmount={34300}
-              owners={8329}
-              bestOffer={0.008}
+              floorPrice={stats.floorPrice}
+              onSale={stats.onSale}
+              totalAmount={stats.totalAmount}
+              owners={stats.owners}
+              bestOffer={stats.bestOffer}
             />
           </div>
 
@@ -94,6 +199,8 @@ export default function TraitssMarketplace() {
               />
               <Listings
                 isSidebarVisible={isSidebarVisible}
+                traitListings={traitListings}
+                // loading={loading}
                 // setSelectedChonk={setSelectedChonk}
                 // setIsModalOpen={setIsModalOpen}
               />

@@ -1,12 +1,24 @@
+import { useState, useEffect } from "react";
 import Head from "next/head";
 import MenuBar from "@/components/marketplace/MenuBar";
-import { useState } from "react";
-import { VscListFilter, VscSearch } from "react-icons/vsc";
 import Stats from "@/components/marketplace/Stats";
 import Tabs from "@/components/marketplace/Tabs";
 import Sidebar from "@/components/marketplace/Sidebar";
 import Listings from "@/components/marketplace/chonks/Listings";
 import Actions from "@/components/marketplace/Actions";
+import { GET_CHONK_LISTINGS } from "@/lib/graphql/queries";
+import client from "@/lib/apollo-client";
+import { formatEther } from "viem";
+
+export type ChonkListing = {
+  id: string;
+  isActive: boolean;
+  listingTime: string;
+  listingTxHash: string;
+  price: string;
+  seller: string;
+  sellerTBA: string;
+};
 
 export default function ChonksMarketplace() {
   const [priceMin, setPriceMin] = useState("");
@@ -14,12 +26,113 @@ export default function ChonksMarketplace() {
   const [selectedTraits, setSelectedTraits] = useState<
     Record<string, string[]>
   >({});
-  const [isSidebarVisible, setIsSidebarVisible] = useState(true);
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [searchId, setSearchId] = useState("");
   const [sortOrder, setSortOrder] = useState<
     "low-to-high" | "high-to-low" | ""
   >("");
   const [activeTab, setActiveTab] = useState("Chonks");
+  const [chonkListings, setChonkListings] = useState<ChonkListing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    floorPrice: 0,
+    onSale: 0,
+    totalAmount: 0,
+    owners: 0,
+    bestOffer: 0,
+  });
+
+  // Fetch chonk listings when component mounts or filters change
+  useEffect(() => {
+    const fetchChonkListings = async () => {
+      setLoading(true);
+
+      try {
+        // Query Apollo client for chonk listings
+        const { data } = await client.query({
+          query: GET_CHONK_LISTINGS,
+        });
+
+        // console.log("Chonk listings data:", data);
+
+        if (
+          data &&
+          data.activeChonkListings &&
+          data.activeChonkListings.items
+        ) {
+          // Filter listings based on search, price, etc.
+          let filteredListings = data.activeChonkListings
+            .items as ChonkListing[];
+
+          // Filter by search term if provided
+          if (searchId) {
+            filteredListings = filteredListings.filter((listing) =>
+              listing.id.toLowerCase().includes(searchId.toLowerCase())
+            );
+          }
+
+          // Filter by price range if provided
+          if (priceMin) {
+            filteredListings = filteredListings.filter(
+              (listing) => BigInt(listing.price) >= BigInt(priceMin)
+            );
+          }
+
+          if (priceMax) {
+            filteredListings = filteredListings.filter(
+              (listing) => BigInt(listing.price) <= BigInt(priceMax)
+            );
+          }
+
+          // Sort listings based on sortOrder
+          if (sortOrder === "low-to-high") {
+            filteredListings.sort((a, b) =>
+              Number(BigInt(a.price) - BigInt(b.price))
+            );
+          } else if (sortOrder === "high-to-low") {
+            filteredListings.sort((a, b) =>
+              Number(BigInt(b.price) - BigInt(a.price))
+            );
+          }
+
+          setChonkListings(filteredListings);
+
+          // Calculate stats
+          if (filteredListings.length > 0) {
+            const activeListings = filteredListings.filter(
+              (listing) => listing.isActive
+            );
+
+            // Convert prices to ETH for display
+            const prices = activeListings.map((listing) =>
+              Number(listing.price)
+            );
+
+            const floorPrice = prices.length > 0 ? Math.min(...prices) : 0;
+            const uniqueSellers = new Set(
+              activeListings.map((listing) => listing.seller)
+            ).size;
+
+            setStats({
+              floorPrice,
+              onSale: activeListings.length,
+              totalAmount: data.activeChonkListings.items.length,
+              owners: uniqueSellers,
+              bestOffer: 0, // This would come from a different query if needed
+            });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching chonk listings:", error);
+        // Set default values in case of error
+        setChonkListings([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChonkListings();
+  }, [searchId, priceMin, priceMax, sortOrder]);
 
   return (
     <>
@@ -61,11 +174,11 @@ export default function ChonksMarketplace() {
             {/* EDGES */}
             <Stats
               name="Chonks"
-              floorPrice={0.68}
-              onSale={420}
-              totalAmount={10400}
-              owners={4329}
-              bestOffer={0.58}
+              floorPrice={stats.floorPrice}
+              onSale={stats.onSale}
+              totalAmount={stats.totalAmount}
+              owners={stats.owners}
+              bestOffer={stats.bestOffer}
             />
           </div>
 
@@ -94,6 +207,7 @@ export default function ChonksMarketplace() {
               />
               <Listings
                 isSidebarVisible={isSidebarVisible}
+                chonkListings={chonkListings}
                 // setSelectedChonk={setSelectedChonk}
                 // setIsModalOpen={setIsModalOpen}
               />
