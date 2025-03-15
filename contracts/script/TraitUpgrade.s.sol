@@ -8,58 +8,87 @@ import { ChonkEquipHelper } from "../src/ChonkEquipHelper.sol";
 import { ChonksMarket } from "../src/ChonksMarket.sol";
 import { FirstReleaseTokenMigrator } from "../src/FirstReleaseTokenMigrator.sol";
 import { ChonkColorMap } from "../src/ChonkColorMap.sol";
+import { BulkTraitTransfer } from "../src/BulkTraitTransfer.sol";
 
 contract TraitUpgradeDeployScript is Script {
 
     ChonksMain chonksMain = ChonksMain(0x07152bfde079b5319e5308C43fB1Dbc9C76cb4F9);
     address public constant TREASURY = address(0xE5c8893e69907e7d90a0f012C477CA30Ec61c3B9);
 
-    FirstReleaseTokenMigrator newMigrator = FirstReleaseTokenMigrator(0xE0cddb62109851688CEA432c83468AD1d516DdAe); // TODO: fill in with actual address after deploy
+    ChonkTraits newTraitsContract = ChonkTraits(0x74D8725A65C21251A83f6647aa23140Bd80504b1);
+    FirstReleaseTokenMigrator newMigrator = FirstReleaseTokenMigrator(0x733cf87C02b15377091D80155F12A3a5f9E7A6fe);
+    ChonksMarket newMarketplace = ChonksMarket(0x6d00a9A2a0C6B5499d56bd4c9005663C88a544a6);
 
-    ChonkTraits newTraitsContract = ChonkTraits(0xc86adB45e13366635902a002C03ef3a748969595); // TODO: fill in
+// New ChonkEquipHelper deployed to: 0x39676cCBceA1BC3102a98Ba87dc78C0E4b6954FE
+// New ChonkColorMap deployed to: 0x92BC112321E1EEd44C7CdB802ED727Ef2a9864Cd
+// New BulkTraitTransfer deployed to: 0xEf6cA22D4e55F0c60ACdB2269463fC261Df95bf3
 
     function run() external {
-        vm.startBroadcast(vm.envUint("BASE_PRIVATE_KEY"));
-        newTraitsContract = new ChonkTraits();
-        console.log("New ChonkTraits deployed to:", address(newTraitsContract));
+    //     vm.startBroadcast(vm.envUint("BASE_PRIVATE_KEY"));
+    //     newTraitsContract = new ChonkTraits();
+    //     console.log("New ChonkTraits deployed to:", address(newTraitsContract));
 
-        ChonksMarket newMarketplace = new ChonksMarket(address(newTraitsContract), 250, TREASURY);
-        console.log("New ChonksMarket deployed to:", address(newMarketplace));
+    //     newMigrator = new FirstReleaseTokenMigrator(address(newTraitsContract));
+    //     console.log("New FirstReleaseTokenMigrator deployed to:", address(newMigrator));
 
-        console.log("");
+    //     chonksMain.setTraitsContract(newTraitsContract);
 
-        ChonkEquipHelper newEquipHelper = new ChonkEquipHelper(address(chonksMain), address(newTraitsContract), address(newMarketplace));
-        console.log("New ChonkEquipHelper deployed to:", address(newEquipHelper));
+    //     newTraitsContract.addMinter(address(newMigrator));
 
-        newMigrator = new FirstReleaseTokenMigrator(address(newTraitsContract));
-        console.log("New FirstReleaseTokenMigrator deployed to:", address(newMigrator));
+    //     console.log("Updating epoch once");
+    //     newMigrator.updateEpochOnce();
 
-        ChonkColorMap newColorMap = new ChonkColorMap(address(newTraitsContract));
-        console.log("New ChonkColorMap deployed to:", address(newColorMap));
+    //     console.log("Migrating batch 0");
+    //     newMigrator.migrateBatch(400);
 
-        console.log("");
+    //     console.log("New Traits Contract totalSupply:", newTraitsContract.totalSupply());
 
-        chonksMain.setChonkEquipHelper(address(newEquipHelper));
-        chonksMain.setTraitsContract(newTraitsContract);
-        chonksMain.setMarketplace(address(newMarketplace));
+    vm.startBroadcast(vm.envUint("BASE_PRIVATE_KEY"));
 
-        newTraitsContract.setMarketplace(address(newMarketplace));
-        newTraitsContract.addMinter(address(newMigrator));
+        // ChonksMarket newMarketplace = new ChonksMarket(address(newTraitsContract), 250, TREASURY);
+        // console.log("New ChonksMarket deployed to:", address(newMarketplace));
 
-        console.log("Updating epoch once");
-        newMigrator.updateEpochOnce();
+        // chonksMain.setMarketplace(address(newMarketplace));
 
-        console.log("Migrating batch 0");
-        newMigrator.migrateBatch(400);
+        // newTraitsContract.setMarketplace(address(newMarketplace));
 
-        // for (uint256 i; i < 10; ++i) { // 850
-        //     console.log("Migrating batch", i);
-        //     newMigrator.migrateBatch(400);
-        // }
+        // ChonkEquipHelper newEquipHelper = new ChonkEquipHelper(address(chonksMain), address(newTraitsContract), address(newMarketplace));
+        // console.log("New ChonkEquipHelper deployed to:", address(newEquipHelper));
 
-        console.log("New Traits Contract totalSupply:", newTraitsContract.totalSupply());
+        // ChonkColorMap newColorMap = new ChonkColorMap(address(newTraitsContract));
+        // console.log("New ChonkColorMap deployed to:", address(newColorMap));
+
+        // console.log("");
+
+        // chonksMain.setChonkEquipHelper(address(newEquipHelper));
+
+        BulkTraitTransfer newBulkTraitTransfer = new BulkTraitTransfer(address(newTraitsContract));
+        console.log("New BulkTraitTransfer deployed to:", address(newBulkTraitTransfer));
+
 
         vm.stopBroadcast();
+    }
+
+    function deployOtherContractsAndConnect() external {
+        // TODO: fill in newTraits and newMigrator
+        // vm.startBroadcast(vm.envUint("BASE_PRIVATE_KEY"));
+
+        // ChonksMarket newMarketplace = new ChonksMarket(address(newTraitsContract), 250, TREASURY);
+        // console.log("New ChonksMarket deployed to:", address(newMarketplace));
+
+        // console.log("");
+
+        // ChonkEquipHelper newEquipHelper = new ChonkEquipHelper(address(chonksMain), address(newTraitsContract), address(newMarketplace));
+        // console.log("New ChonkEquipHelper deployed to:", address(newEquipHelper));
+
+        // ChonkColorMap newColorMap = new ChonkColorMap(address(newTraitsContract));
+        // console.log("New ChonkColorMap deployed to:", address(newColorMap));
+
+        // console.log("");
+
+        // chonksMain.setChonkEquipHelper(address(newEquipHelper));
+
+        // vm.stopBroadcast();
     }
 
     event MigratedBatch(uint256 batchNumber);
