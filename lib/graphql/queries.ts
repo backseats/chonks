@@ -24,7 +24,7 @@ export const TRAIT_LISTINGS = gql`
 
 export const GET_CHONK_LISTINGS = gql`
 query chonkListings {
-  activeChonkListings {
+  activeChonkListings(where: {isActive: true}) {
     items {
       id
       isActive
