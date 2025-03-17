@@ -4,6 +4,7 @@ import {
   useWalletClient,
   useAccount,
   useWriteContract,
+  useEnsAddress,
 } from "wagmi";
 import { getAddress, isAddress } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
@@ -16,6 +17,7 @@ import {
   traitsABI,
   chainId,
 } from "@/config";
+import { mainnet } from "viem/chains";
 import { StoredChonk } from "@/types/StoredChonk";
 import EquipmentContainer from "@/components/chonk_explorer/EquipmentContainer";
 import { Category } from "@/types/Category";
@@ -23,8 +25,6 @@ import MenuBar from "@/components/chonk_explorer/MenuBar";
 import MainChonkImage from "@/components/chonk_explorer/MainChonkImage";
 import OwnershipSection from "@/components/chonk_explorer/OwnershipSection";
 import Trait from "@/components/chonk_explorer/Trait";
-import { useTraitRevealStatus } from "@/hooks/useTraitRevealStatus";
-import BodySwitcher from "@/components/chonk_explorer/BodySwitcher";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import BGColorSwitcher from "@/components/chonk_explorer/BGColorSwitcher";
 import Head from "next/head";
@@ -42,6 +42,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { SendHorizontal } from "lucide-react";
+import { ModalWrapper } from "@/components/marketplace/chonks/modals/ModalWrapper";
+import { ListingModal } from "@/components/marketplace/chonks/modals/ListingModal";
+import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
 
 const renderAsDataUriABI = [
   {
@@ -106,16 +109,20 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
 
-  // const { isRevealed } = useTraitRevealStatus(BigInt(id));
-  // console.log("isRevealed", isRevealed);
-
-  // const { data } = writeContract({
-  //   address: mainContract,
-  //   abi: abi,
-  //   functionName: "mint",
-  //   args: [],
-  //   chainId,
-  // });
+  // Local Marketplace Listing States
+  const [showListModal, setShowListModal] = useState(false);
+  const [localListingPending, setLocalListingPending] = useState(false);
+  const [
+    chonkPrivateListingRecipientAddress,
+    setChonkPrivateListingRecipientAddress,
+  ] = useState("");
+  const [listingPrice, setListingPrice] = useState("");
+  const [isPrivateListingExpanded, setIsPrivateListingExpanded] =
+    useState(false);
+  const [chonkListingAddressError, setChonkListingAddressError] = useState("");
+  const [priceError, setPriceError] = useState("");
+  const [localListingSuccess, setLocalListingSuccess] = useState(false);
+  const [localListingRejected, setLocalListingRejected] = useState(false);
 
   // Get main body tokenURI
   const { data: tokenURIData, error: tokenURIError } = useReadContract({
@@ -186,6 +193,72 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId,
   }) as { data: StoredChonk };
 
+  const {
+    handleListChonk,
+    isListChonkPending,
+    isListChonkSuccess,
+    isListingRejected,
+  } = useListChonk(address, Number(id));
+
+  const handleModalClose = () => {
+    setShowListModal(false);
+    setListingPrice("");
+    setChonkPrivateListingRecipientAddress("");
+    setPriceError("");
+    setChonkListingAddressError("");
+    setLocalListingRejected(false);
+    setLocalListingPending(false);
+    setLocalListingSuccess(false);
+    setIsPrivateListingExpanded(false);
+  };
+
+  const OFFER_PRICE_DECIMAL_PRECISION = 4;
+  const MIN_LISTING_PRICE = `0.${"0".repeat(
+    OFFER_PRICE_DECIMAL_PRECISION - 1
+  )}1`;
+
+  const { data: ensAddress } = useEnsAddress({
+    name: chonkPrivateListingRecipientAddress.endsWith(".eth")
+      ? chonkPrivateListingRecipientAddress.toLowerCase()
+      : "",
+    chainId: mainnet.id,
+  });
+
+  const isValidAddress = useMemo(() => {
+    if (!chonkPrivateListingRecipientAddress) return false;
+    if (chonkPrivateListingRecipientAddress.endsWith(".eth"))
+      return !!ensAddress;
+    return isAddress(chonkPrivateListingRecipientAddress);
+  }, [chonkPrivateListingRecipientAddress, ensAddress]);
+
+  const resolvedAddress = useMemo(() => {
+    if (chonkPrivateListingRecipientAddress.endsWith(".eth")) return ensAddress;
+    return isValidAddress ? chonkPrivateListingRecipientAddress : "";
+  }, [chonkPrivateListingRecipientAddress, ensAddress, isValidAddress]);
+
+  const handleListingSubmit = () => {
+    const listingPriceNum = Number(listingPrice);
+    if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
+      setPriceError(`Minimum listing price is ${MIN_LISTING_PRICE} ETH`);
+      return;
+    }
+
+    if (isPrivateListingExpanded) {
+      if (resolvedAddress !== "" && !resolvedAddress) {
+        setAddressError("Please enter a valid address or ENS name");
+        return;
+      }
+    }
+
+    if (isPrivateListingExpanded && resolvedAddress) {
+      handleListChonk(listingPrice, resolvedAddress);
+    } else {
+      handleListChonk(listingPrice, null);
+    }
+
+    setLocalListingPending(true);
+  };
+
   // useEffect(() => {
   //   if (storedChonk) {
   //     console.log("storedChonk:", storedChonk);
@@ -194,6 +267,12 @@ export default function ChonkDetail({ id }: { id: string }) {
   //   console.log("error getting storedChonk data");
   // }
   // }, [storedChonk]);
+
+  useEffect(() => {
+    if (isListingRejected) {
+      setLocalListingRejected(true); // needed because we want to clear the rejection here
+    }
+  }, [isListingRejected]);
 
   useEffect(() => {
     if (!storedChonk) return;
@@ -425,8 +504,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     }
   };
 
-
-
   return (
     <>
       <Head>
@@ -460,17 +537,51 @@ export default function ChonkDetail({ id }: { id: string }) {
       <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw] pb-12 sm:pb-6">
         <MenuBar />
 
-        <div className="w-full mx-auto ">
-          <div className="flex flex-col items-end">
-            {isOwner && (
-              <button
-                onClick={() => setShowSendModal(true)}
-                className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black"
-              >
-                <SendHorizontal size={24} />
-              </button>
-            )}
+        <div className="w-full mx-auto">
+          <div className="flex flex-row justify-end">
+            <button
+              className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black"
+              onClick={() => setShowListModal(true)}
+            >
+              <div className="pt-[2px]">List Chonk</div>
+            </button>
+
+            <div className="flex flex-col items-end">
+              {isOwner && (
+                <button
+                  onClick={() => setShowSendModal(true)}
+                  className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black"
+                >
+                  <SendHorizontal size={24} />
+                </button>
+              )}
+            </div>
           </div>
+
+          <ModalWrapper
+            isOpen={showListModal}
+            onClose={handleModalClose}
+            localListingPending={localListingPending}
+          >
+            <ListingModal
+              chonkId={Number(id)}
+              listingPrice={listingPrice}
+              setListingPrice={setListingPrice}
+              isPrivateListingExpanded={isPrivateListingExpanded}
+              setIsPrivateListingExpanded={setIsPrivateListingExpanded}
+              recipientAddress={chonkPrivateListingRecipientAddress}
+              setRecipientAddress={setChonkPrivateListingRecipientAddress}
+              addressError={addressError}
+              priceError={priceError}
+              onSubmit={handleListingSubmit}
+              onClose={handleModalClose}
+              status={{
+                isRejected: localListingRejected,
+                isPending: localListingPending,
+                isSuccess: localListingSuccess,
+              }}
+            />
+          </ModalWrapper>
 
           {tokenData ? (
             <div>

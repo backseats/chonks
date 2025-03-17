@@ -9,7 +9,7 @@ import Actions from "@/components/marketplace/Actions";
 import { TRAIT_LISTINGS } from "@/lib/graphql/queries";
 import client from "@/lib/apollo-client";
 import { formatEther } from "viem";
-
+import { useTraitsTotalSupply } from "@/hooks/useTotalSupply";
 export type TraitListing = {
   id: string;
   isActive: boolean;
@@ -39,6 +39,8 @@ export default function TraitssMarketplace() {
     owners: 0,
     bestOffer: 0,
   });
+
+  const traitsTotalSupply = useTraitsTotalSupply();
 
   // Fetch trait listings when component mounts or filters change
   useEffect(() => {
@@ -109,7 +111,7 @@ export default function TraitssMarketplace() {
             setStats({
               floorPrice,
               onSale: activeListings.length,
-              totalAmount: data.traitListings.items.length,
+              totalAmount: Number(traitsTotalSupply?.toString()),
               owners: uniqueSellers,
               bestOffer: 0, // This would come from a different query if needed
             });

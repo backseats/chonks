@@ -93,18 +93,18 @@ export default function Trait(props: Props) {
             className="absolute top-0 right-0 bg-black bg-opacity-50 text-white py-1 px-2 text-sm"
             onClick={() => setIsTransferModalOpen(true)}
           >
-            Transfer Trait
+            Transfer
           </button>
         )}
 
-        {!isEquipped && isYours && (
+        {isYours && (
           <button
             className="absolute top-0 left-0 bg-black  bg-opacity-50 text-white py-1 px-2 text-sm"
             onClick={() =>
               (window.location.href = `/marketplace/traits/${traitTokenId}`)
             }
           >
-            Sell Trait
+            List This Trait
           </button>
         )}
 

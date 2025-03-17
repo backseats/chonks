@@ -429,8 +429,7 @@ export default function PriceAndActionsSection(
 
       {hasInsufficientBalance && (
         <p className="text-red-500 text-sm mt-2">
-          Insufficient balance. You need at least{" "}
-          {price && (price + estimatedGasInEth).toFixed(4)} ETH (including gas)
+          Your ETH balance is too low to buy this Trait.
         </p>
       )}
 
@@ -460,7 +459,7 @@ export default function PriceAndActionsSection(
       {!isOfferSpecific && (
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select your chonk that the trait will transfer to
+            Which Chonk will own this Trait?
           </label>
           <select
             value={selectedChonkId}

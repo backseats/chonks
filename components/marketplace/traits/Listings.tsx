@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useReadContract } from "wagmi";
-import { traitsContract, traitsABI, chainId } from "@/config";
 import { Trait } from "@/types/Trait";
 import { TraitListing } from "@/pages/marketplace/traits";
 import { FaEthereum } from "react-icons/fa6";
 import { formatEther } from "viem";
+import ListingInfo from "@/components/marketplace/common/ListingInfo";
 
 interface ListingsProps {
   isSidebarVisible: boolean;
@@ -89,23 +88,12 @@ export default function Listings({
                 alt={`Trait #${id}`}
                 className="w-full h-auto"
               />
-              <div className="mt-4 space-y-2 p-4">
-                <h3 className="text-[1.2vw] font-bold">Trait #{id}</h3>
-                <div className="flex flex-row">
-                  <span className="text-[1vw] -mt-1">
-                    {listing && listing.price
-                      ? `${formatEther(BigInt(listing.price))} `
-                      : "Not for sale "}
-                  </span>
-                  <FaEthereum className="ml-1 text-[1vw]" />
-                </div>
-                <button
-                  className="w-full text-[1vw] border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
-                  onClick={(e) => handleBuyNow(e, id)}
-                >
-                  View Listing
-                </button>
-              </div>
+
+              <ListingInfo
+                chonkOrTrait="trait"
+                id={Number(id)}
+                price={listing.price}
+              />
             </Link>
           )
         )}

@@ -56,8 +56,6 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
 
-  // const { hasActiveBid, chonkBid } = useMarketplaceActions(parseInt(id));
-
   // //get Chonk Offers - accessing the offers directly from mapping
   // // but we now have : getChonkOffer
   // const { data: chonkOfferArray } = useReadContract({
@@ -418,16 +416,6 @@ export default function ChonkDetail({ id }: { id: string }) {
         <main className="w-full border-t border-gray-300">
           {tokenData ? (
             <div>
-              <section className="flex pt-[1.725vw] px-[3.45vw]">
-                <Link
-                  href="/marketplace/chonks"
-                  className="flex items-center gap-2 mb-4 hover:opacity-70 transition-opacity"
-                >
-                  <span className="text-[1.2vw]">←</span>
-                  <span className="text-[1.2vw]">Back</span>
-                </Link>
-              </section>
-
               <section className="flex flex-row gap-[3.45vw] py-[1.725vw] px-[3.45vw]">
                 <div className="w-2/5">
                   {/* <img

@@ -9,6 +9,7 @@ import Actions from "@/components/marketplace/Actions";
 import { GET_CHONK_LISTINGS } from "@/lib/graphql/queries";
 import client from "@/lib/apollo-client";
 import { formatEther } from "viem";
+import { useChonksTotalSupply } from "@/hooks/useTotalSupply";
 
 export type ChonkListing = {
   id: string;
@@ -41,6 +42,8 @@ export default function ChonksMarketplace() {
     owners: 0,
     bestOffer: 0,
   });
+
+  const chonksTotalSupply = useChonksTotalSupply();
 
   // Fetch chonk listings when component mounts or filters change
   useEffect(() => {
@@ -116,7 +119,7 @@ export default function ChonksMarketplace() {
             setStats({
               floorPrice,
               onSale: activeListings.length,
-              totalAmount: data.activeChonkListings.items.length,
+              totalAmount: Number(chonksTotalSupply?.toString()),
               owners: uniqueSellers,
               bestOffer: 0, // This would come from a different query if needed
             });
