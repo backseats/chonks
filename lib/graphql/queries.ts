@@ -2,10 +2,9 @@ import { gql } from '@apollo/client';
 
 export const TRAIT_LISTINGS = gql`
   query chonkListings {
-    traitListings {
+    traitListings(where: {isActive: true}) {
       items {
         id
-        isActive
         listingTime
         listingTxHash
         price
@@ -27,7 +26,6 @@ query chonkListings {
   activeChonkListings(where: {isActive: true}) {
     items {
       id
-      isActive
       listingTime
       listingTxHash
       price
