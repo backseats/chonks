@@ -50,6 +50,7 @@ type StoredTrait = {
   seed: number;
   dataMinterContract: string;
   traitIndex: number;
+  traitName: string | undefined;
 };
 
 export default function PriceAndActionsSection(
@@ -63,6 +64,7 @@ export default function PriceAndActionsSection(
     tbaOwner,
     isEquipped,
     tbaAddress,
+    traitName,
   } = props;
 
   const { address } = useAccount();
@@ -537,6 +539,7 @@ export default function PriceAndActionsSection(
                 <>
                   <ListOrApproveButton
                     traitId={traitId}
+                    traitName={traitName}
                     isApprovalPending={isUnequipTraitPending}
                     finalIsApproved={Boolean(finalIsApproved)}
                     handleApproveMarketplace={handleApproveTBAForMarketplace}

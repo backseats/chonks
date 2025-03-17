@@ -1,10 +1,8 @@
-import EquippedAttributes from "@/components/chonk_explorer/EquippedAttributes";
 import { Trait } from "@/types/Trait";
 import { Address } from "viem";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { useEnsName, useEnsAvatar } from "wagmi";
 import { normalize } from "viem/ens";
-import RefreshAndShare from "../RefreshAndShare";
 import Link from "next/link";
 import { mainnet } from "wagmi/chains";
 
@@ -16,11 +14,20 @@ interface Props {
   tokenIdOfTBA: string | null;
   address: Address | undefined;
   isEquipped: boolean | undefined;
+  traitName: string | undefined;
 }
 
 export default function OwnershipSection(props: Props) {
-  const { id, tokenData, owner, tbaOwner, tokenIdOfTBA, address, isEquipped } =
-    props;
+  const {
+    id,
+    tokenData,
+    owner,
+    tbaOwner,
+    tokenIdOfTBA,
+    address,
+    isEquipped,
+    traitName,
+  } = props;
 
   // console.log("owner", owner);
   // Add ENS resolution
@@ -37,7 +44,9 @@ export default function OwnershipSection(props: Props) {
     <>
       <div className="flex justify-between items-center">
         <div className="flex flex-row items-baseline gap-2">
-          <h1 className="text-3xl font-bold">Trait #{id}</h1>
+          <h1 className="text-3xl font-bold">
+            Trait #{id} {traitName ? `- ${traitName}` : ""}
+          </h1>
           <p className="text-sm text-gray-600 pb-7">
             {isEquipped ? "(Equipped)" : "(Not Equipped)"}
           </p>

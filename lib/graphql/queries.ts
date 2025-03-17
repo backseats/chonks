@@ -41,3 +41,22 @@ query chonkListings {
   }
 }
 `;
+
+export const GET_TRAIT_METADATA_BY_ID = gql`
+  query TraitMetadataById($id: BigInt!) {
+    traitMetadata(where: { id: $id }) {
+      items {
+        id
+        traitType
+        traitName
+        release
+        traitIndex
+        dataMinterContract
+        creatorName
+        creator
+        colorMap
+        activeListing
+      }
+    }
+  }
+`;

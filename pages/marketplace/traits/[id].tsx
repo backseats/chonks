@@ -19,6 +19,9 @@ import PriceAndActionsSection from "@/components/marketplace/traits/PriceAndActi
 import { Address } from "viem";
 import Loading from "@/components/marketplace/Loading";
 import { TokenboundClient } from "@tokenbound/sdk";
+import { TraitMetadata, TraitMetadataResponse } from "@/types/TraitMetadata";
+import { GET_TRAIT_METADATA_BY_ID } from "@/lib/graphql/queries";
+import client from "@/lib/apollo-client";
 
 // type TraitOffer = {
 //   priceInWei: bigint;
@@ -284,13 +287,39 @@ export default function TraitDetail({ id }: { id: string }) {
     return owner.toLowerCase() === address.toLowerCase();
   }, [owner, address]);
 
+  const [traitMetadata, setTraitMetadata] = useState<TraitMetadata | null>(
+    null
+  );
+
+  // Fetch trait metadata from GraphQL
+  useEffect(() => {
+    const fetchTraitMetadata = async () => {
+      try {
+        const { data } = await client.query<TraitMetadataResponse>({
+          query: GET_TRAIT_METADATA_BY_ID,
+          variables: { id: parseInt(id) },
+        });
+
+        console.log("Trait metadata from GraphQL:", data);
+
+        if (data?.traitMetadata?.items?.length > 0) {
+          setTraitMetadata(data.traitMetadata.items[0]);
+        }
+      } catch (error) {
+        console.error("Error fetching trait metadata:", error);
+      }
+    };
+
+    fetchTraitMetadata();
+  }, [id]);
+
   return (
     <>
       <Head>
         <title>Trait #{id} - Marketplace - Chonks</title>
         <meta
           name="description"
-          content="View Trait #${id} on the Chonks marketplace"
+          content={`View Trait #${id} on the Chonks marketplace`}
         />
         <meta
           property="og:title"
@@ -362,6 +391,7 @@ export default function TraitDetail({ id }: { id: string }) {
                     tokenIdOfTBA={tokenIdOfTBA?.toString()}
                     address={address}
                     isEquipped={isEquipped}
+                    traitName={traitMetadata?.traitName}
                   />
 
                   <PriceAndActionsSection
@@ -372,6 +402,7 @@ export default function TraitDetail({ id }: { id: string }) {
                     tbaOwner={ownerOfTraitOwner}
                     isEquipped={isEquipped}
                     tbaAddress={tbaAddress as Address | null}
+                    traitName={traitMetadata?.traitName}
                     // price={formattedPrice}
                     // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
                     // isOfferSpecific={isOfferSpecific}
