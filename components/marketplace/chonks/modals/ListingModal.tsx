@@ -100,7 +100,7 @@ export const ListingModal = ({
 
       <div className="flex gap-2 mt-4">
         <button
-          className={`flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300 ${
+          className={`flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300 text-[16px] ${
             status.isPending ? "opacity-50" : ""
           }`}
           onClick={onClose}
@@ -115,7 +115,7 @@ export const ListingModal = ({
 
         {!status.isSuccess && !status.isPending && !status.isRejected && (
           <button
-            className="flex-1 bg-chonk-blue text-white py-2 px-4 hover:brightness-110 disabled:opacity-50"
+            className="flex-1 bg-chonk-blue text-white py-2 px-4 hover:brightness-110 disabled:opacity-50 text-[16px]"
             onClick={onSubmit}
             disabled={status.isPending || status.isSuccess}
           >
