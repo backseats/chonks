@@ -489,6 +489,7 @@ export default function PriceAndActionsSection({
                     hasActiveBid={hasActiveBid}
                     isEquipped={false}
                     handleUnequipTrait={() => {}}
+                    traitName={""}
                   />
 
                   {finalIsApproved && hasActiveBid && chonkBid && (
