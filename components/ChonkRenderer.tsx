@@ -26,8 +26,6 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
     bodyIndex = 0,
   } = props;
 
-  console.log(bodyIndex);
-
   const pixelSize = Math.floor(size / gridSize);
 
   const generateGrid = (): Pixel[] => {
