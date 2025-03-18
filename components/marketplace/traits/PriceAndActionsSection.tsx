@@ -41,6 +41,7 @@ type PriceAndActionsSectionProps = {
   tbaOwner: string | null;
   isEquipped: boolean;
   tbaAddress: Address | null;
+  traitName?: string;
 };
 
 type StoredTrait = {
