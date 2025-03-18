@@ -8,7 +8,6 @@ import Listings from "@/components/marketplace/traits/Listings";
 import Actions from "@/components/marketplace/Actions";
 import { TRAIT_LISTINGS } from "@/lib/graphql/queries";
 import client from "@/lib/apollo-client";
-import { formatEther } from "viem";
 import { useTraitsTotalSupply } from "@/hooks/useTotalSupply";
 export type TraitListing = {
   id: string;
@@ -26,9 +25,9 @@ export default function TraitsMarketplace() {
   >({});
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [searchId, setSearchId] = useState("");
-  const [sortOrder, setSortOrder] = useState<
-    "low-to-high" | "high-to-low" | ""
-  >("");
+  const [sortOrder, setSortOrder] = useState<"low-to-high" | "high-to-low">(
+    "low-to-high"
+  );
   const [activeTab, setActiveTab] = useState("Traits");
   const [rawTraitListings, setRawTraitListings] = useState<TraitListing[]>([]);
   const [loading, setLoading] = useState(true);

@@ -8,7 +8,6 @@ import Listings from "@/components/marketplace/chonks/Listings";
 import Actions from "@/components/marketplace/Actions";
 import { GET_CHONK_LISTINGS } from "@/lib/graphql/queries";
 import client from "@/lib/apollo-client";
-import { formatEther } from "viem";
 import { useChonksTotalSupply } from "@/hooks/useTotalSupply";
 
 export type ChonkListing = {
@@ -29,9 +28,9 @@ export default function ChonksMarketplace() {
   >({});
   const [isSidebarVisible, setIsSidebarVisible] = useState(false);
   const [searchId, setSearchId] = useState("");
-  const [sortOrder, setSortOrder] = useState<
-    "low-to-high" | "high-to-low" | ""
-  >("");
+  const [sortOrder, setSortOrder] = useState<"low-to-high" | "high-to-low">(
+    "low-to-high"
+  );
   const [activeTab, setActiveTab] = useState("Chonks");
   const [rawChonkListings, setRawChonkListings] = useState<ChonkListing[]>([]);
   const [loading, setLoading] = useState(true);
