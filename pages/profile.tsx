@@ -24,9 +24,9 @@ export default function Profile(props: Props) {
   >({});
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [searchId, setSearchId] = useState("");
-  const [sortOrder, setSortOrder] = useState<
-    "low-to-high" | "high-to-low" | ""
-  >("");
+  const [sortOrder, setSortOrder] = useState<"low-to-high" | "high-to-low">(
+    "low-to-high"
+  );
   const [activeTab, setActiveTab] = useState("Chonks");
   const [mounted, setMounted] = useState(false);
 

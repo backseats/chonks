@@ -6,8 +6,8 @@ interface ActionsProps {
   setIsSidebarVisible: (visible: boolean) => void;
   searchId: string;
   setSearchId: (id: string) => void;
-  sortOrder: "low-to-high" | "high-to-low" | "";
-  setSortOrder: (order: "low-to-high" | "high-to-low" | "") => void;
+  sortOrder: "low-to-high" | "high-to-low";
+  setSortOrder: (order: "low-to-high" | "high-to-low") => void;
 }
 
 export default function Actions({
@@ -48,7 +48,7 @@ export default function Actions({
             className="px-4 py-2 border border-black text-[1vw] bg-white"
             value={sortOrder}
             onChange={(e) =>
-              setSortOrder(e.target.value as "low-to-high" | "high-to-low" | "")
+              setSortOrder(e.target.value as "low-to-high" | "high-to-low")
             }
           >
             <option value="" disabled>
