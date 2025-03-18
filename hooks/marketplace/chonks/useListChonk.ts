@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useWriteContract, useReadContract } from "wagmi";
+import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
 import { marketplaceContract, marketplaceABI, chainId } from "@/config";
 import { parseEther, Address, zeroAddress, formatEther, getAddress } from "viem";
 
@@ -16,13 +16,13 @@ export default function useListChonk(address: Address | undefined, chonkId: numb
 
   ////// Read //////
 
-  const { data: chonkOfferArray } = useReadContract({
+  const { data: chonkOfferArray, refetch: refetchChonkOffer } = useReadContract({
     address: marketplaceContract,
     abi: marketplaceABI,
     functionName: "chonkOffers",
     args: [BigInt(chonkId)],
     chainId,
-  }) as { data: [bigint, string, string, string, string] };
+  }) as { data: [bigint, string, string, string, string], refetch: () => Promise<any> };
 
   ////// Format //////
 
@@ -59,7 +59,12 @@ export default function useListChonk(address: Address | undefined, chonkId: numb
 
   //// Write ////
 
-  const { writeContract: listChonk, isPending: isListChonkPending, isSuccess: isListChonkSuccess, isError: isListChonkError } = useWriteContract();
+  const { writeContract: listChonk, isPending: isListChonkPending, isSuccess: isListChonkSuccess, isError: isListChonkError, data: listChonkHash } = useWriteContract();
+
+  const { data: listChonkReceipt } = useWaitForTransactionReceipt({
+    hash: listChonkHash,
+    chainId,
+  });
 
   const handleListChonk = (priceInEth: string, toAddress: string | null) => {
     setIsListingRejected(false);
@@ -109,5 +114,8 @@ export default function useListChonk(address: Address | undefined, chonkId: numb
     canAcceptOffer,
     hasActiveOffer,
     onlySellToAddress: chonkOffer?.onlySellTo,
+    refetchChonkOffer,
+    listChonkHash,
+    listChonkReceipt,
   }
 }

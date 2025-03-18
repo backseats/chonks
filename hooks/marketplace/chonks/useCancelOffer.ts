@@ -1,10 +1,15 @@
 import { useState } from "react";
-import { marketplaceContract, marketplaceABI } from "@/config";
-import { useWriteContract } from "wagmi";
+import { marketplaceContract, marketplaceABI, chainId } from "@/config";
+import { useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { Address } from "viem";
 
 export default function useCancelOffer(address: Address | undefined, chonkId: number) {
-  const { writeContract: cancelOfferChonk, isPending: isCancelOfferChonkPending, isSuccess: isCancelOfferChonkSuccess, isError: isCancelOfferChonkError} = useWriteContract();
+  const { writeContract: cancelOfferChonk, isPending: isCancelOfferChonkPending, isSuccess: isCancelOfferChonkSuccess, isError: isCancelOfferChonkError, data: cancelOfferChonkHash} = useWriteContract();
+
+  const { data: cancelOfferChonkReceipt } = useWaitForTransactionReceipt({
+    hash: cancelOfferChonkHash,
+    chainId,
+  });
 
   const [isCancelOfferChonkRejected, setIsCancelOfferChonkRejected] = useState(false);
 
@@ -36,6 +41,8 @@ export default function useCancelOffer(address: Address | undefined, chonkId: nu
     isCancelOfferChonkSuccess,
     isCancelOfferChonkError,
     isCancelOfferChonkRejected,
+    cancelOfferChonkHash,
+    cancelOfferChonkReceipt,
   };
 
 }
