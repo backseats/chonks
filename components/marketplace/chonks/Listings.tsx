@@ -27,27 +27,35 @@ export default function Listings({
     Record<string, number>
   >({});
   const containerRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [fetchedIds, setFetchedIds] = useState<Set<string>>(new Set());
 
-  // Initialize chonks array from chonkListings
+  // Initialize chonks array from chonkListings, preserving already fetched data
   useEffect(() => {
     if (!chonkListings.length) return;
 
+    // Create a map of existing chonk data for quick lookup
+    const existingChonksMap = new Map(
+      chonks.map((chonk) => [chonk.id, chonk.data])
+    );
+
+    // Create updated chonks array, preserving data for existing IDs
     const chonksArray = chonkListings.map((listing) => ({
       id: listing.id,
-      data: null,
+      data: existingChonksMap.get(listing.id) || null,
       listing,
     }));
 
     setChonks(chonksArray);
   }, [chonkListings]);
 
-  // Fetch token URI data for each token
+  // Fetch token URI data only for tokens that haven't been fetched yet
   useEffect(() => {
     const fetchTokenURIs = async () => {
       const updatedChonks = [...chonks];
+      let hasUpdates = false;
 
       for (const chonk of updatedChonks) {
-        if (chonk.data === null) {
+        if (chonk.data === null && !fetchedIds.has(chonk.id)) {
           try {
             const response = await fetch(`/api/chonks/tokenURI/${chonk.id}`);
             const data = (await response.json()) as {
@@ -55,6 +63,8 @@ export default function Listings({
               bodyIndex: number;
             };
             chonk.data = { bytes: data.bytes, bodyIndex: data.bodyIndex };
+            setFetchedIds((prev) => new Set([...prev, chonk.id]));
+            hasUpdates = true;
           } catch (error) {
             console.error(
               `Error fetching token URI for Chonk #${chonk.id}:`,
@@ -64,13 +74,15 @@ export default function Listings({
         }
       }
 
-      setChonks(updatedChonks);
+      if (hasUpdates) {
+        setChonks(updatedChonks);
+      }
     };
 
     if (chonks.length > 0 && chonks.some((chonk) => chonk.data === null)) {
       fetchTokenURIs();
     }
-  }, [chonks]);
+  }, [chonks, fetchedIds]);
 
   // Measure container widths
   useEffect(() => {

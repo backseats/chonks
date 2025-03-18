@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Head from "next/head";
 import MenuBar from "@/components/marketplace/MenuBar";
 import Stats from "@/components/marketplace/Stats";
@@ -33,7 +33,7 @@ export default function ChonksMarketplace() {
     "low-to-high" | "high-to-low" | ""
   >("");
   const [activeTab, setActiveTab] = useState("Chonks");
-  const [chonkListings, setChonkListings] = useState<ChonkListing[]>([]);
+  const [rawChonkListings, setRawChonkListings] = useState<ChonkListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     floorPrice: 0,
@@ -63,79 +63,79 @@ export default function ChonksMarketplace() {
           data.activeChonkListings &&
           data.activeChonkListings.items
         ) {
-          // Filter listings based on search, price, etc.
-          let filteredListings = data.activeChonkListings
-            .items as ChonkListing[];
-
-          // Filter by search term if provided
-          if (searchId) {
-            filteredListings = filteredListings.filter((listing) =>
-              listing.id.toLowerCase().includes(searchId.toLowerCase())
-            );
-          }
-
-          // Filter by price range if provided
-          if (priceMin) {
-            filteredListings = filteredListings.filter(
-              (listing) => BigInt(listing.price) >= BigInt(priceMin)
-            );
-          }
-
-          if (priceMax) {
-            filteredListings = filteredListings.filter(
-              (listing) => BigInt(listing.price) <= BigInt(priceMax)
-            );
-          }
-
-          // Sort listings based on sortOrder
-          if (sortOrder === "low-to-high") {
-            filteredListings.sort((a, b) =>
-              Number(BigInt(a.price) - BigInt(b.price))
-            );
-          } else if (sortOrder === "high-to-low") {
-            filteredListings.sort((a, b) =>
-              Number(BigInt(b.price) - BigInt(a.price))
-            );
-          }
-
-          setChonkListings(filteredListings);
-
-          // Calculate stats
-          if (filteredListings.length > 0) {
-            const activeListings = filteredListings.filter(
-              (listing) => listing.isActive
-            );
-
-            // Convert prices to ETH for display
-            const prices = activeListings.map((listing) =>
-              Number(listing.price)
-            );
-
-            const floorPrice = prices.length > 0 ? Math.min(...prices) : 0;
-            const uniqueSellers = new Set(
-              activeListings.map((listing) => listing.seller)
-            ).size;
-
-            setStats({
-              floorPrice,
-              onSale: activeListings.length,
-              totalAmount: Number(chonksTotalSupply?.toString()),
-              owners: uniqueSellers,
-              bestOffer: 0, // This would come from a different query if needed
-            });
-          }
+          // Store raw listings without filtering or sorting
+          setRawChonkListings(data.activeChonkListings.items as ChonkListing[]);
         }
       } catch (error) {
         console.error("Error fetching chonk listings:", error);
         // Set default values in case of error
-        setChonkListings([]);
+        setRawChonkListings([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchChonkListings();
-  }, [searchId, priceMin, priceMax, sortOrder]);
+  }, []);
+
+  // Apply filters and sorting without re-fetching data
+  const chonkListings = useMemo(() => {
+    let filteredListings = [...rawChonkListings];
+
+    // Filter by search term if provided
+    if (searchId) {
+      filteredListings = filteredListings.filter((listing) =>
+        listing.id.toLowerCase().includes(searchId.toLowerCase())
+      );
+    }
+
+    // Filter by price range if provided
+    if (priceMin) {
+      filteredListings = filteredListings.filter(
+        (listing) => BigInt(listing.price) >= BigInt(priceMin)
+      );
+    }
+
+    if (priceMax) {
+      filteredListings = filteredListings.filter(
+        (listing) => BigInt(listing.price) <= BigInt(priceMax)
+      );
+    }
+
+    // Sort listings based on sortOrder
+    if (sortOrder === "low-to-high") {
+      filteredListings.sort((a, b) =>
+        Number(BigInt(a.price) - BigInt(b.price))
+      );
+    } else if (sortOrder === "high-to-low") {
+      filteredListings.sort((a, b) =>
+        Number(BigInt(b.price) - BigInt(a.price))
+      );
+    }
+
+    return filteredListings;
+  }, [rawChonkListings, searchId, priceMin, priceMax, sortOrder]);
+
+  // Calculate stats based on filtered listings
+  useEffect(() => {
+    if (chonkListings.length > 0) {
+      // Convert prices to ETH for display
+      const prices = chonkListings.map((listing) => Number(listing.price));
+
+      const floorPrice = prices.length > 0 ? Math.min(...prices) : 0;
+      const uniqueSellers = new Set(
+        chonkListings.map((listing) => listing.seller)
+      ).size;
+
+      setStats({
+        floorPrice,
+        onSale: chonkListings.length,
+        totalAmount: chonksTotalSupply ? Number(chonksTotalSupply) : 0,
+        owners: uniqueSellers,
+        bestOffer: 0, // This would come from a different query if needed
+      });
+    }
+  }, [chonkListings, chonksTotalSupply]);
 
   return (
     <>

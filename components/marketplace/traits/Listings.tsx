@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Trait } from "@/types/Trait";
 import { TraitListing } from "@/pages/marketplace/traits";
 import { FaEthereum } from "react-icons/fa6";
@@ -18,31 +18,41 @@ export default function Listings({
   const [traits, setTraits] = useState<
     Array<{ id: string; data: Trait | null; listing: TraitListing }>
   >([]);
+  const [fetchedIds, setFetchedIds] = useState<Set<string>>(new Set());
 
-  // Initialize traits array from traitListings
+  // Initialize traits array from traitListings, preserving already fetched data
   useEffect(() => {
     if (!traitListings.length) return;
 
+    // Create a map of existing trait data for quick lookup
+    const existingTraitsMap = new Map(
+      traits.map((trait) => [trait.id, trait.data])
+    );
+
+    // Create updated traits array, preserving data for existing IDs
     const traitsArray = traitListings.map((listing) => ({
       id: listing.id,
-      data: null,
+      data: existingTraitsMap.get(listing.id) || null,
       listing,
     }));
 
     setTraits(traitsArray);
   }, [traitListings]);
 
-  // Fetch token URI data for each token
+  // Fetch token URI data only for tokens that haven't been fetched yet
   useEffect(() => {
     const fetchTokenURIs = async () => {
       const updatedTraits = [...traits];
+      let hasUpdates = false;
 
       for (const trait of updatedTraits) {
-        if (trait.data === null) {
+        if (trait.data === null && !fetchedIds.has(trait.id)) {
           try {
             const response = await fetch(`/api/traits/tokenURI/${trait.id}`);
             const data = await response.json();
             trait.data = data;
+            setFetchedIds((prev) => new Set([...prev, trait.id]));
+            hasUpdates = true;
           } catch (error) {
             console.error(
               `Error fetching token URI for Trait #${trait.id}:`,
@@ -52,13 +62,15 @@ export default function Listings({
         }
       }
 
-      setTraits(updatedTraits);
+      if (hasUpdates) {
+        setTraits(updatedTraits);
+      }
     };
 
     if (traits.length > 0 && traits.some((trait) => trait.data === null)) {
       fetchTokenURIs();
     }
-  }, [traits]);
+  }, [traits, fetchedIds]);
 
   const LoadingCard = () => (
     <div className="flex flex-col border border-black bg-white p-4 h-[300px] justify-center items-center">
