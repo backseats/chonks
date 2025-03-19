@@ -1,9 +1,7 @@
 import Link from "next/link";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Trait } from "@/types/Trait";
 import { TraitListing } from "@/pages/market/traits";
-import { FaEthereum } from "react-icons/fa6";
-import { formatEther } from "viem";
 import ListingInfo from "@/components/marketplace/common/ListingInfo";
 
 interface ListingsProps {
