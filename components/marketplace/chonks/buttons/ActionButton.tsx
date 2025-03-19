@@ -17,7 +17,7 @@ export const ActionButton = ({
 
   return (
     <button
-      className={`w-full py-2 px-4 transition-colors ${
+      className={`w-full text-[18px] py-2 px-4 transition-colors ${
         variantClasses[variant]
       } ${disabled ? "opacity-50" : ""}`}
       disabled={disabled}

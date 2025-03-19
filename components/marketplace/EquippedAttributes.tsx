@@ -38,24 +38,26 @@ export default function EquippedAttributes(props: Props) {
   return (
     <div className="mt-[1.725vw] grid grid-cols-2 gap-[1.725vw]">
       {orderedAttributes.map((attribute: any, index: any) => (
-        <div className="border border-black p-[1.15vw] " key={index}>
-          <div className="text-[0.8vw] text-gray-600">
+        <div className="border border-black p-2 sm:p-[1.15vw] " key={index}>
+          <div className="sm:text-[0.8vw] text-gray-600">
             {attribute.trait_type}
           </div>
+
           {type === "chonk" && (
             <Link
-              href={`/marketplace/traits/${
+              href={`/market/traits/${
                 (
                   equippedTraits?.[
                     attribute.trait_type.toLowerCase() as keyof CurrentChonk
                   ] as any
                 )?.tokenId || ""
               }`}
-              className="text-lg font-bold mb-2 underline"
+              className="text-[16px] sm:text-lg font-bold mb-2 underline"
             >
               {attribute.value}
             </Link>
           )}
+
           {/* <div className="flex flex-col justify-between text-[0.8vw] text-gray-600 mb-4 gap-2"> */}
           {/* <div>193 (2%)</div>  */}
           {/* <div className="underline">Buy It Now for 0.4 ETH</div>{" "} */}

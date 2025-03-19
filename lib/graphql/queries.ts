@@ -60,3 +60,47 @@ export const GET_TRAIT_METADATA_BY_ID = gql`
     }
   }
 `;
+
+export const GET_CHONKS_BY_EOA = gql`
+query GetChonksByEOA($eoa: String!) {
+  chonks(
+    where: {owner: $eoa}
+    limit: 1000
+  ) {
+    items {
+      id
+      owner
+      activeListing
+    }
+    pageInfo {
+      hasPreviousPage
+      hasNextPage
+      endCursor
+      startCursor
+    }
+    }
+  }
+`;
+
+export const GET_TRAITS_FOR_CHONK_ID = gql`
+query GetTraitsForChonkId($id: BigInt!) {
+  chonk(id: $id) {
+    id
+    owner
+    tbas {
+      items {
+        id
+        traits {
+          items {
+            traitInfo {
+              id
+              traitName
+              traitType
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`;

@@ -422,18 +422,20 @@ export default function PriceAndActionsSection({
 
   return (
     <>
-      <div className="border border-black p-[1.725vw] mb-[1.725vw]">
+      <div className="border m-4 sm:m-0 border-black p-[1.725vw] mb-[1.725vw]">
         {/* Has Offer, or just been Listed */}
         {(hasActiveOffer || isListChonkSuccess) &&
         !localCancelOfferChonkSuccess ? (
           <>
             <div className="flex flex-col mb-4">
               <div className="flex items-baseline gap-2">
-                <div className="text-xl">
-                  {isOwner ? `Listed for` : `Buy Chonk #${chonkId} now for`}
+                <div className="text-[20px] sm:text-xl">
+                  {isOwner ? `Listed for` : `Buy for`}
                 </div>
 
-                <span className="text-2xl font-bold">{price} ETH</span>
+                <span className="text-[20px] sm:text-2xl font-bold">
+                  {price} ETH
+                </span>
                 {/* <span className="text-gray-500">(${priceUSD.toLocaleString()})</span> */}
               </div>
 

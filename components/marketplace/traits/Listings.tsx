@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { Trait } from "@/types/Trait";
-import { TraitListing } from "@/pages/marketplace/traits";
+import { TraitListing } from "@/pages/market/traits";
 import { FaEthereum } from "react-icons/fa6";
 import { formatEther } from "viem";
 import ListingInfo from "@/components/marketplace/common/ListingInfo";
@@ -80,7 +80,7 @@ export default function Listings({
 
   const handleBuyNow = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
-    window.location.href = `/marketplace/traits/${id}`;
+    window.location.href = `/market/traits/${id}`;
   };
 
   return (
@@ -91,7 +91,7 @@ export default function Listings({
             <LoadingCard key={id} />
           ) : (
             <Link
-              href={`/marketplace/traits/${id}`}
+              href={`/market/traits/${id}`}
               key={id}
               className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
             >

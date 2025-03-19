@@ -593,7 +593,7 @@ export default function PriceAndActionsSection(
                         <br />
                         <Link
                           className="text-chonk-blue underline"
-                          href="/marketplace/chonks"
+                          href="/market/chonks"
                           rel="noopener noreferrer"
                         >
                           Go buy one here

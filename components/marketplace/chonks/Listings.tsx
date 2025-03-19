@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
-import { ChonkListing } from "@/pages/marketplace/chonks/index";
+import { ChonkListing } from "@/pages/market/chonks/index";
 import { FaEthereum } from "react-icons/fa6";
 import { formatEther } from "viem";
 import ChonkRenderer from "@/components/ChonkRenderer";
@@ -116,7 +116,7 @@ export default function Listings({
 
   const handleBuyNow = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
-    window.location.href = `/marketplace/chonks/${id}`;
+    window.location.href = `/market/chonks/${id}`;
   };
 
   return (
@@ -127,7 +127,7 @@ export default function Listings({
             <LoadingCard key={id} />
           ) : (
             <Link
-              href={`/marketplace/chonks/${id}`}
+              href={`/market/chonks/${id}`}
               key={id}
               className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity overflow-hidden"
             >

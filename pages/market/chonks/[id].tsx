@@ -1,6 +1,6 @@
 import Head from "next/head";
 import MenuBar from "@/components/marketplace/MenuBar";
-import Link from "next/link";
+4;
 import { useState, useEffect, useMemo } from "react";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { TokenboundClient } from "@tokenbound/sdk";
@@ -8,8 +8,6 @@ import { Chonk } from "@/types/Chonk";
 import {
   mainABI,
   mainContract,
-  marketplaceContract,
-  marketplaceABI,
   traitsContract,
   traitsABI,
   chainId,
@@ -33,10 +31,6 @@ import Loading from "@/components/marketplace/Loading";
 // }
 
 export default function ChonkDetail({ id }: { id: string }) {
-  // const router = useRouter()
-  // const { id } = router.query
-  const [isActivityOpen, setIsActivityOpen] = useState(true);
-  const [isOffersOpen, setIsOffersOpen] = useState(true);
   const [isTraitsOpen, setIsTraitsOpen] = useState(true);
 
   const TOKEN_URI = "tokenURI";
@@ -55,59 +49,6 @@ export default function ChonkDetail({ id }: { id: string }) {
   );
 
   const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
-
-  // //get Chonk Offers - accessing the offers directly from mapping
-  // // but we now have : getChonkOffer
-  // const { data: chonkOfferArray } = useReadContract({
-  //     address: marketplaceContract,
-  //     abi: marketplaceABI,
-  //     functionName: "chonkOffers",
-  //     args: [BigInt(id)],
-  //     chainId,
-  // }) as { data: [bigint, string, string, string, string] };
-
-  // // Convert array to object
-  // const chonkOffer: ChonkOffer | null = useMemo(() => {
-  //     if (!chonkOfferArray) return null;
-  //     return {
-  //         priceInWei: chonkOfferArray[0],
-  //         seller: chonkOfferArray[1],
-  //         sellerTBA: chonkOfferArray[2],
-  //         onlySellTo: chonkOfferArray[3],
-  //         encodedTraitIds: chonkOfferArray[4],
-  //     };
-  // }, [chonkOfferArray]);
-
-  // // Add this console log to see the raw response
-  // useEffect(() => {
-  //     console.group("Raw Response");
-  //     console.log("Raw chonkOffer:", chonkOffer);
-  //     if (Array.isArray(chonkOffer)) {
-  //         console.log("Is array, length:", chonkOffer.length);
-  //         chonkOffer.forEach((item, index) => {
-  //             console.log(`Item ${index}:`, item);
-  //         });
-  //     } else {
-  //         console.log("Is not array, type:", typeof chonkOffer);
-  //     }
-  //     console.groupEnd();
-  // }, [chonkOffer]);
-
-  // const formattedPrice = useMemo(() => {
-  //     if (!chonkOffer?.priceInWei) return null;
-  //     console.log("Price in Wei before formatting:", chonkOffer.priceInWei);
-  //     return parseFloat(formatEther(chonkOffer.priceInWei));
-  // }, [chonkOffer]);
-
-  // const isOfferSpecific = useMemo(() => {
-  //     if (!chonkOffer?.onlySellTo) return false;
-  //     return chonkOffer.onlySellTo !== "0x0000000000000000000000000000000000000000";
-  // }, [chonkOffer]);
-
-  // const canAcceptOffer = useMemo(() => {
-  //     if (!chonkOffer?.onlySellTo || !address || !isOfferSpecific) return false;
-  //     return chonkOffer.onlySellTo.toLowerCase() === address.toLowerCase();
-  // }, [chonkOffer, address, isOfferSpecific]);
 
   // Get main body tokenURI
   const { data: tokenURIData } = useReadContract({
@@ -221,11 +162,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId,
   });
 
-  // if (address) {
-  //   console.log("address is", address);
-  //   console.log("tba address is", account);
-  // }
-
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
     address: traitsContract,
@@ -318,44 +254,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     setFilteredTraitTokenIds(filteredTraitTokenIds);
   }, [allTraitTokenIds, storedChonk]);
 
-  // // Add these console logs
-  // useEffect(() => {
-  //     console.log("Raw contract response:", chonkOffer);
-  //     if (chonkOffer) {
-  //         try {
-  //             // Log each property individually
-  //             console.group("Chonk Offer Details");
-  //             if (chonkOffer.priceInWei) {
-  //                 console.log("Price in Wei:", chonkOffer.priceInWei.toString());
-  //             } else {
-  //                 console.log("Price in Wei: undefined");
-  //             }
-  //             console.log("Seller:", chonkOffer.seller || "undefined");
-  //             console.log("Seller TBA:", chonkOffer.sellerTBA || "undefined");
-  //             console.log("Only sell to:", chonkOffer.onlySellTo || "undefined");
-  //             console.log("Encoded trait IDs:", chonkOffer.encodedTraitIds || "undefined");
-  //             console.groupEnd();
-
-  //             if (address) {
-  //                 console.group("Wallet Info");
-  //                 console.log("Connected wallet:", address);
-  //                 console.log("Can accept offer:", chonkOffer.onlySellTo?.toLowerCase() === address.toLowerCase());
-  //                 console.groupEnd();
-  //             }
-  //         } catch (error) {
-  //             console.error("Error accessing chonkOffer properties:", error);
-  //             console.log("chonkOffer type:", typeof chonkOffer);
-  //             console.log("chonkOffer keys:", Object.keys(chonkOffer));
-  //         }
-  //     } else {
-  //         console.log("No offer found for this Chonk");
-  //     }
-  // }, [chonkOffer, address]);
-
-  // const hasActiveOffer = useMemo(() => {
-  //     return Boolean(chonkOffer && chonkOffer.priceInWei > 0n);
-  // }, [chonkOffer]);
-
   const isOwner = useMemo(() => {
     if (!owner || !address) return false;
     return owner.toLowerCase() === address.toLowerCase();
@@ -382,7 +280,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         {tokenData && <meta property="og:image" content={tokenData.image} />}
         <meta
           property="og:url"
-          content={`https://chonks.xyz/marketplace/chonks/${id}`}
+          content={`https://chonks.xyz/market/chonks/${id}`}
         />
         <meta property="og:type" content="website" />
         <meta
@@ -415,24 +313,25 @@ export default function ChonkDetail({ id }: { id: string }) {
 
         <main className="w-full border-t border-gray-300">
           {tokenData ? (
-            <div>
-              <section className="flex flex-row gap-[3.45vw] py-[1.725vw] px-[3.45vw]">
+            <>
+              <div className="hidden sm:flex sm:flex-row sm:gap-[3.45vw] sm:py-[1.725vw] sm:px-[3.45vw]">
                 <div className="w-2/5">
-                  {/* <img
-                                        src={tokenData.image}
-                                        alt={`Chonk ${id}`}
-                                        className="w-full h-auto"
-                                    /> */}
+                  <img
+                    src={tokenData.image}
+                    alt={`Chonk ${id}`}
+                    className="w-full h-auto"
+                  />
 
-                  <div className="relative w-full pt-[100%]">
+                  {/* <div className="relative w-full pt-[100%]">
                     <iframe
                       className="absolute top-0 left-0 w-full h-full"
                       src={tokenData.animation_url}
                       // TODO: use the colormap data rather than the animation_url which might be in 3d
                     ></iframe>
-                  </div>
+                  </div> */}
 
                   <TraitsSection
+                    chonkId={id}
                     tokenData={tokenData}
                     equippedTraits={currentChonk}
                     isOpen={isTraitsOpen}
@@ -440,6 +339,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                     type="chonk"
                   />
                 </div>
+
                 <div className="w-3/5">
                   <OwnershipSection
                     id={id}
@@ -474,8 +374,52 @@ export default function ChonkDetail({ id }: { id: string }) {
                           address={address}
                       /> */}
                 </div>
-              </section>
-            </div>
+              </div>
+
+              <div className="flex flex-col sm:hidden">
+                <h1 className="text-[28px] mt-3 font-bold text-center">
+                  Chonk #{id}
+                </h1>
+
+                <img
+                  src={tokenData.image}
+                  alt={`Chonk ${id}`}
+                  className="w-full h-auto p-4"
+                />
+
+                <OwnershipSection
+                  id={id}
+                  tokenData={tokenData}
+                  owner={owner}
+                  address={address}
+                />
+
+                <PriceAndActionsSection
+                  chonkId={parseInt(id)}
+                  isOwner={isOwner}
+                  // price={formattedPrice}
+                  // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
+                  // isOfferSpecific={isOfferSpecific}
+                  // canAcceptOffer={canAcceptOffer}
+
+                  // hasActiveOffer={hasActiveOffer}
+                  // hasActiveBid={hasActiveBid}
+                  // chonkBid={chonkBid}
+                  // onListingSuccess={() => {
+                  //     setIsListingSuccess(true);
+                  // }}
+                />
+
+                <TraitsSection
+                  chonkId={id}
+                  tokenData={tokenData}
+                  equippedTraits={currentChonk}
+                  isOpen={isTraitsOpen}
+                  onToggle={() => setIsTraitsOpen(!isTraitsOpen)}
+                  type="chonk"
+                />
+              </div>
+            </>
           ) : (
             <Loading />
           )}

@@ -1,28 +1,62 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { useAccount, useReadContract } from "wagmi";
-import { mainContract, mainABI, chainId } from "@/config";
-import { Chonk } from "@/types/Chonk";
-import { ConnectKitButton } from "connectkit";
+// import { Chonk } from "@/types/Chonk";
 import { Address } from "viem";
+import client from "@/lib/apollo-client";
+import { GET_CHONKS_BY_EOA } from "@/lib/graphql/queries";
+import MarketplaceConnectKitButton from "../marketplace/common/MarketplaceConnectKitButton";
 
 interface ListingsProps {
   isSidebarVisible: boolean;
   address: Address | undefined;
 }
 
+type Chonk = {
+  id: number;
+  activeListing: boolean;
+};
+
 export default function Listings({ isSidebarVisible, address }: ListingsProps) {
   const [chonks, setChonks] = useState<
     Array<{ id: number; data: Chonk | null }>
   >([]);
 
-  const { data: allChonkTokenIds } = useReadContract({
-    address: mainContract,
-    abi: mainABI,
-    functionName: "walletOfOwner",
-    args: [address],
-    chainId,
-  }) as { data: BigInt[] };
+  const [allChonkTokenIds, setAllChonkTokenIds] = useState<Chonk[]>([]);
+
+  useEffect(() => {
+    if (!address) return;
+
+    const fetchChonksFromGraphQL = async () => {
+      try {
+        const response = await client.query({
+          query: GET_CHONKS_BY_EOA,
+          variables: { eoa: address.toLowerCase() },
+          fetchPolicy: "cache-first",
+          context: {
+            ttl: 600, // 10 minutes
+          },
+        });
+
+        // console.log("GraphQL chonks result:", response);
+
+        if (!response.data) {
+          console.error("No data returned from GraphQL query");
+          return;
+        }
+
+        setAllChonkTokenIds(
+          response.data!.chonks.items.map((chonk: Chonk) => ({
+            id: Number(chonk.id),
+            isActiveListing: Boolean(chonk.activeListing),
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching chonks from GraphQL:", error);
+      }
+    };
+
+    fetchChonksFromGraphQL();
+  }, [address]);
 
   useEffect(() => {
     if (!allChonkTokenIds) return;
@@ -30,9 +64,12 @@ export default function Listings({ isSidebarVisible, address }: ListingsProps) {
     const fetchChonks = async () => {
       const chonksArray = [];
       for (let i = 1; i <= Number(allChonkTokenIds.length); i++) {
-        // for (let i = 1; i <= 4; i++) { // just get 4 for now
-        chonksArray.push({ id: Number(allChonkTokenIds[i - 1]), data: null });
+        chonksArray.push({
+          id: allChonkTokenIds[i - 1].id,
+          data: null,
+        });
       }
+
       setChonks(chonksArray);
     };
 
@@ -69,62 +106,41 @@ export default function Listings({ isSidebarVisible, address }: ListingsProps) {
     }
   }, [chonks]);
 
-  const LoadingCard = () => (
-    <div className="flex flex-col border border-black bg-white p-4 h-[300px] justify-center items-center">
-      <p className="text-lg">Loading...</p>
-    </div>
-  );
-
   return (
     <div className="w-full">
       {!address && (
-        <div className="flex flex-col border border-black bg-white p-4 h-[300px] justify-center items-center">
+        <div className="flex flex-col border border-black bg-white p-4 h-[300px justify-center items-center">
           <p className="text-lg">Connect your wallet to view your chonks</p>
-          <ConnectKitButton
-            // theme="web"
-            customTheme={{
-              "--ck-font-family": "'Source Code Pro', monospace",
-              "--ck-primary-button-background": "#2F7BA7",
-              "--ck-primary-button-hover-background": "#FFFFFF",
-              "--ck-primary-button-hover-color": "#2F7BA7",
-              "--ck-primary-button-border-radius": "0px",
-              "--ck-primary-button-font-weight": "600",
-              "--ck-connectbutton-background": "#2F7BA7",
-              "--ck-connectbutton-hover-background": "#111111",
-              "--ck-connectbutton-hover-color": "#FFFFFF",
-              "--ck-connectbutton-border-radius": "0px",
-              "--ck-connectbutton-color": "#FFFFFF",
-              "--ck-connectbutton-font-weight": "600",
-              "--ck-connectbutton-font-size": "21px",
-            }}
-          />
+          <MarketplaceConnectKitButton />
         </div>
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
-        {chonks.map(({ id, data }) =>
-          data === null ? (
-            <LoadingCard key={id} />
-          ) : (
-            <Link
-              href={`/chonks/${id}`}
-              key={id}
-              className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
-            >
+        {chonks.map(({ id, data }) => (
+          <Link
+            href={`/chonks/${id}`}
+            key={id}
+            className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
+          >
+            {data === null ? (
+              <div className="flex flex-col bg-white p-4 aspect-square justify-center items-center text-lg">
+                Loading...
+              </div>
+            ) : (
               <img
-                src={data.image}
+                // src={data.image}
                 alt={`Chonk #${id}`}
                 className="w-full h-auto"
               />
+            )}
 
-              <div className="mt-4 space-y-2 p-4">
-                <h3 className="text-[3.45vw] md:text-[1.2vw] font-bold">
-                  Chonk #{id}
-                </h3>
-              </div>
-            </Link>
-          )
-        )}
+            <div className="space-y-2 p-4">
+              <h3 className="text-[3.45vw] sm:text-[16px] font-bold">
+                Chonk #{id}
+              </h3>
+            </div>
+          </Link>
+        ))}
       </div>
     </div>
   );

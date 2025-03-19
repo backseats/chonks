@@ -1,12 +1,12 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function Marketplace() {
-    const router = useRouter();
+  const router = useRouter();
 
-    useEffect(() => {
-        router.replace('/marketplace/chonks');
-    }, [router]);
+  useEffect(() => {
+    router.replace("/market/chonks");
+  }, [router]);
 
-    return null; // No need to render anything as we're redirecting
+  return null; // No need to render anything as we're redirecting
 }

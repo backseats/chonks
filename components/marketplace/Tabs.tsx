@@ -15,10 +15,10 @@ export default function Tabs({ activeTab, onTabChange }: TabsProps) {
     // Handle navigation based on tab
     switch (tab) {
       case "Chonks":
-        router.push("/marketplace/chonks");
+        router.push("/market/chonks");
         break;
       case "Traits":
-        router.push("/marketplace/traits");
+        router.push("/market/traits");
         break;
       // Offers and Activity tabs do nothing for now
       default:

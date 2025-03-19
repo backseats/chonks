@@ -166,9 +166,10 @@ export default function ChonksMarketplace() {
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
 
-      <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
+      <div className="sm:min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
         <MenuBar />
-        <main className="w-full border-t border-gray-300 ">
+
+        <main className="w-full border-t border-gray-300">
           {/* overflow-x-hidden: this caused issue with sticky sidebar, need to put in a fix for the border */}
 
           <div className="mx-[20px] sm:mx-[3.45vw] ">

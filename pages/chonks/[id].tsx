@@ -45,6 +45,7 @@ import { SendHorizontal } from "lucide-react";
 import { ModalWrapper } from "@/components/marketplace/chonks/modals/ModalWrapper";
 import { ListingModal } from "@/components/marketplace/chonks/modals/ListingModal";
 import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
+import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
 
 const renderAsDataUriABI = [
   {
@@ -123,6 +124,8 @@ export default function ChonkDetail({ id }: { id: string }) {
   const [priceError, setPriceError] = useState("");
   const [localListingSuccess, setLocalListingSuccess] = useState(false);
   const [localListingRejected, setLocalListingRejected] = useState(false);
+  const [localCancelOfferChonkSuccess, setLocalCancelOfferChonkSuccess] =
+    useState(false);
 
   // Get main body tokenURI
   const { data: tokenURIData, error: tokenURIError } = useReadContract({
@@ -198,7 +201,17 @@ export default function ChonkDetail({ id }: { id: string }) {
     isListChonkPending,
     isListChonkSuccess,
     isListingRejected,
+    hasActiveOffer,
+    refetchChonkOffer,
+    listChonkHash,
   } = useListChonk(address, Number(id));
+
+  const {
+    handleCancelOfferChonk,
+    isCancelOfferChonkPending,
+    isCancelOfferChonkSuccess,
+    cancelOfferChonkHash,
+  } = useCancelOffer(address, Number(id));
 
   const handleModalClose = () => {
     setShowListModal(false);
@@ -344,6 +357,19 @@ export default function ChonkDetail({ id }: { id: string }) {
   useEffect(() => {
     console.log("currentChonk", currentChonk);
   }, [currentChonk]);
+
+  useEffect(() => {
+    if (isListChonkSuccess) handleModalClose();
+    setTimeout(() => refetchChonkOffer(), 3000);
+    setLocalCancelOfferChonkSuccess(false);
+  }, [isListChonkSuccess]);
+
+  useEffect(() => {
+    if (isCancelOfferChonkSuccess) {
+      setLocalCancelOfferChonkSuccess(true);
+      setTimeout(() => refetchChonkOffer(), 3000);
+    }
+  }, [isCancelOfferChonkSuccess]);
 
   const tbaAddress = tokenboundClient.getAccount({
     tokenContract: mainContract,
@@ -539,12 +565,39 @@ export default function ChonkDetail({ id }: { id: string }) {
 
         <div className="w-full mx-auto">
           <div className="flex flex-row justify-end">
-            <button
-              className="bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black"
-              onClick={() => setShowListModal(true)}
-            >
-              <div className="pt-[2px]">List Chonk</div>
-            </button>
+            {hasActiveOffer ? (
+              <button
+                className={`bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black ${
+                  isCancelOfferChonkPending || cancelOfferChonkHash
+                    ? "opacity-50"
+                    : ""
+                }`}
+                onClick={() => handleCancelOfferChonk()}
+                disabled={isCancelOfferChonkPending}
+              >
+                {isCancelOfferChonkPending
+                  ? "Confirm with wallet"
+                  : cancelOfferChonkHash && localCancelOfferChonkSuccess
+                  ? "List My Chonk"
+                  : "Cancel Listing"}
+              </button>
+            ) : (
+              <button
+                className={`bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black ${
+                  isListChonkPending || listChonkHash ? "opacity-50" : ""
+                }`}
+                onClick={() => setShowListModal(true)}
+                disabled={isListChonkPending || !!listChonkHash}
+              >
+                <div className="pt-[2px]">
+                  {isListChonkPending
+                    ? "Confirm with wallet"
+                    : listChonkHash
+                    ? "Cancel Listing"
+                    : "List My Chonk"}
+                </div>
+              </button>
+            )}
 
             <div className="flex flex-col items-end">
               {isOwner && (

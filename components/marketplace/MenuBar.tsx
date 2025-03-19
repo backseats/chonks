@@ -2,10 +2,14 @@ import React from "react";
 import { ConnectKitButton } from "connectkit";
 import Image from "next/image";
 import Link from "next/link";
+import { useAccount } from "wagmi";
+import MarketplaceConnectKitButton from "./common/MarketplaceConnectKitButton";
 
 interface Props {}
 
 export default function MenuBar(props: Props) {
+  const { address, isConnected } = useAccount();
+
   return (
     <nav id="top" className="w-full flex justify-between px-4 py-4 bg-white">
       <div>
@@ -40,38 +44,30 @@ export default function MenuBar(props: Props) {
 
         <div> | </div>
 
-        <Link
-          href="/profile"
-          className="hover:opacity-70 transition-opacity"
-        >
+        <Link href="/profile" className="hover:opacity-70 transition-opacity">
           Your Chonks
         </Link>
       </div>
 
-      <ConnectKitButton
-        // theme="web"
-        customTheme={{
-          "--ck-font-family": "'Source Code Pro', monospace",
-          "--ck-primary-button-background": "#FFFFFF",
-          "--ck-primary-button-hover-background": "#2F7BA7",
-          "--ck-primary-button-hover-color": "#FFFFFF",
-          "--ck-primary-button-border-radius": "0px",
-          "--ck-primary-button-font-weight": "600",
-          "--ck-connectbutton-background": "#FFFFFF",
-          "--ck-connectbutton-hover-background": "#2F7BA7",
-          "--ck-connectbutton-hover-color": "#FFFFFF",
-          "--ck-connectbutton-border-radius": "0px",
-          "--ck-connectbutton-color": "#000000",
-          "--ck-connectbutton-font-weight": "600",
-        }}
-      />
-
-      {/* <button
-          disabled
-          className="px-4 py-2 bg-gray-300 text-gray-600  font-source-code-pro text-sm cursor-not-allowed"
-      >
-          Mint Soon
-      </button> */}
+      <div className="hidden sm:block">
+        <ConnectKitButton
+          // theme="web"
+          customTheme={{
+            "--ck-font-family": "'Source Code Pro', monospace",
+            "--ck-primary-button-background": "#FFFFFF",
+            "--ck-primary-button-hover-background": "#2F7BA7",
+            "--ck-primary-button-hover-color": "#FFFFFF",
+            "--ck-primary-button-border-radius": "0px",
+            "--ck-primary-button-font-weight": "600",
+            "--ck-connectbutton-background": "#FFFFFF",
+            "--ck-connectbutton-hover-background": "#2F7BA7",
+            "--ck-connectbutton-hover-color": "#FFFFFF",
+            "--ck-connectbutton-border-radius": "0px",
+            "--ck-connectbutton-color": "#000000",
+            "--ck-connectbutton-font-weight": "600",
+          }}
+        />
+      </div>
     </nav>
   );
 }

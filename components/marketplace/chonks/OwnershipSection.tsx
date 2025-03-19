@@ -28,32 +28,25 @@ export default function OwnershipSection(props: Props) {
 
   return (
     <>
-      <div className="flex justify-between items-center">
+      <div className="hidden sm:flex sm:justify-between sm:items-center">
         <h1 className="text-3xl font-bold">Chonk #{id}</h1>
         {/* <RefreshAndShare /> */}
       </div>
 
       {owner && (
-        <div className="flex items-center mt-6 mb-8">
-          {/* <div className="w-12 h-12 rounded-full overflow-hidden"> */}
-          {/* <img
-              src="https://placehold.co/600x400"
-              alt="Owner Avatar"
-              className="w-full h-full object-cover"
-            /> */}
-          {/* {data && <img src={data} alt="ENS Avatar" className="w-full h-full object-cover" />} */}
-          {/* </div> */}
-          <div>
-            <div className="text-[1vw] text-gray-600">Owned by</div>
-            <div className="text-lg">
-              {address && address === owner ? (
-                "You"
-              ) : (
-                <Link href={`/profile/${owner}`} className="underline">
-                  {ensName || truncateEthAddress(owner)}
-                </Link>
-              )}
-            </div>
+        <div className="ml-4 sm:ml-0 flex flex-row sm:flex-col sm:mt-6 sm:mb-8">
+          <div className="text-[18px] sm:text-[1vw] text-gray-600">
+            Owned by
+          </div>
+
+          <div className="text-lg ml-2 sm:ml-0">
+            {address && address === owner ? (
+              "You"
+            ) : (
+              <Link href={`/profile/${owner}`} className="underline">
+                {ensName || truncateEthAddress(owner)}
+              </Link>
+            )}
           </div>
         </div>
       )}
