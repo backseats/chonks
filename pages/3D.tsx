@@ -1,6 +1,7 @@
 import React from "react";
 import Head from "next/head";
 import MenuBar from "@/components/mint/MenuBar";
+
 import Footer from "@/components/layout/Footer";
 import { Canvas } from "@react-three/fiber";
 import ThreeDExporter from "@/components/3D/3DExporter";

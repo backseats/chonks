@@ -32,7 +32,7 @@ export default function MenuBar(props: Props) {
         </Link>
 
         <Link
-          href="/marketplace"
+          href="/market"
           className="hover:opacity-70 transition-opacity underline"
         >
           Marketplace

@@ -27,14 +27,14 @@ export default function Tabs({ activeTab, onTabChange }: TabsProps) {
   };
 
   return (
-    <section className="tabs text-[1vw] border-t border-gray-300  flex flex-col bg-white py-[1.725vw] px-[3.45vw]">
+    <section className="tabs text-[14px] border-t border-gray-300  flex flex-col bg-white py-[1.725vw] px-[3.45vw]">
       <div className="flex">
         {tabs.map((tab, index) => (
           <>
             <button
               key={tab}
               className={`hover:bg-gray-200 hover:text-black px-4 mr-2 py-2 border border-black ${
-                activeTab === tab ? "bg-[#2F7BA7] text-white" : ""
+                activeTab === tab ? "bg-[#126E9D] text-white" : ""
               }`}
               onClick={() => handleTabClick(tab)}
             >

@@ -1,16 +1,21 @@
-import Link from "next/link";
 import { Chonk } from "@/types/Chonk";
 import { CurrentChonk } from "@/types/CurrentChonk";
 import { Category } from "@/types/Category";
+import Attributes from "@/components/marketplace/Attributes";
 
 interface Props {
   tokenData: Chonk | null;
   equippedTraits: CurrentChonk | null;
-  type: "chonk" | "trait";
 }
 
+type Trait = {
+  id: string;
+  traitName: string;
+  traitType: number; // Category id
+};
+
 export default function EquippedAttributes(props: Props) {
-  const { tokenData, equippedTraits, type } = props;
+  const { tokenData, equippedTraits } = props;
 
   if (!tokenData) return null;
 
@@ -27,44 +32,37 @@ export default function EquippedAttributes(props: Props) {
       return aIndex - bIndex;
     });
 
-  if (orderedAttributes.length === 0) {
-    return (
-      <div className="mt-[1.725vw] text-center text-[1.2vw] text-gray-600">
-        No Traits equipped
-      </div>
-    );
-  }
+  const traitsWithTokenIds: Trait[] = orderedAttributes.map(
+    (attribute: any) => {
+      const categoryKey =
+        attribute.trait_type.toLowerCase() as keyof CurrentChonk;
+      const equippedTrait = equippedTraits?.[categoryKey] as
+        | {
+            tokenId: number;
+            category: Category;
+            isEquipped: boolean;
+          }
+        | undefined;
 
-  return (
-    <div className="mt-[1.725vw] grid grid-cols-2 gap-[1.725vw]">
-      {orderedAttributes.map((attribute: any, index: any) => (
-        <div className="border border-black p-2 sm:p-[1.15vw] " key={index}>
-          <div className="sm:text-[0.8vw] text-gray-600">
-            {attribute.trait_type}
-          </div>
+      // Find the category number based on the trait_type string
+      const categoryValues = Object.values(Category);
+      const categoryIndex = categoryValues.indexOf(
+        attribute.trait_type as Category
+      );
 
-          {type === "chonk" && (
-            <Link
-              href={`/market/traits/${
-                (
-                  equippedTraits?.[
-                    attribute.trait_type.toLowerCase() as keyof CurrentChonk
-                  ] as any
-                )?.tokenId || ""
-              }`}
-              className="text-[16px] sm:text-lg font-bold mb-2 underline"
-            >
-              {attribute.value}
-            </Link>
-          )}
+      return {
+        id: equippedTrait?.tokenId.toString() || "0",
+        traitName: attribute.value,
+        traitType: categoryIndex,
+      };
+    }
+  );
 
-          {/* <div className="flex flex-col justify-between text-[0.8vw] text-gray-600 mb-4 gap-2"> */}
-          {/* <div>193 (2%)</div>  */}
-          {/* <div className="underline">Buy It Now for 0.4 ETH</div>{" "} */}
-          {/* TODO, price. should link to trait category /traits/:category/:name */}
-          {/* </div> */}
-        </div>
-      ))}
+  return orderedAttributes.length === 0 ? (
+    <div className="mt-4 text-center text-[16px] text-gray-600">
+      No Traits equipped
     </div>
+  ) : (
+    <Attributes attributes={traitsWithTokenIds} />
   );
 }

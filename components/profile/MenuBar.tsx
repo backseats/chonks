@@ -27,7 +27,7 @@ export default function MenuBar(props: Props) {
           Home
         </Link>
 
-        {/* <Link href="/marketplace" className="hover:opacity-70 transition-opacity">
+        {/* <Link href="/market" className="hover:opacity-70 transition-opacity">
                     Marketplace
                   </Link>
 

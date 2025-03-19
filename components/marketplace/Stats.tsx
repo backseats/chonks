@@ -37,15 +37,15 @@ export default function Stats({
         <div className="w-auto flex flex-row space-x-8 border border-black p-4 bg-gray-100">
           <h2 className="flex flex-col px-8 border-r border-gray-300">
             <span className="text-sm mb-1">Buy It Now</span>
-            <span className="text-[1.5vw] flex items-center">
+            <span className="text-sm flex items-center font-bold">
               {formatEther(BigInt(floorPrice))}{" "}
-              <FaEthereum className="ml-1 text-[1vw]" />
+              <FaEthereum className="ml-1 text-sm" />
             </span>
           </h2>
 
-          <h2 className="flex flex-col px-8 border-r border-gray-300">
+          <h2 className="flex flex-col px-8">
             <span className="text-sm mb-1">On Sale</span>
-            <span className="text-[1.5vw]">
+            <span className="text-sm font-bold">
               {onSale}/{totalAmount.toLocaleString()}
             </span>
           </h2>
@@ -55,12 +55,12 @@ export default function Stats({
             <span className="text-[1.5vw]">{owners}</span>
           </h2> */}
 
-          <h2 className="flex flex-col px-8">
-            <span className="text-sm mb-1">Best Offer</span>
-            <span className="text-[1.5vw] flex items-center">
-              --{/* {bestOffer} <FaEthereum className="ml-1 text-[1vw]" /> */}
-            </span>
-          </h2>
+          {/* <h2 className="flex flex-col px-8"> */}
+          {/* <span className="text-sm mb-1">Best Offer</span> */}
+          {/* <span className="text-[1.5vw] flex items-center"> */}
+          {/* --{bestOffer} <FaEthereum className="ml-1 text-[1vw]" /> */}
+          {/* </span> */}
+          {/* </h2> */}
         </div>
       </div>
     </section>

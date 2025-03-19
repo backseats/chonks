@@ -30,11 +30,11 @@ canvas {
   filter: saturate(1.4);
 }
 
-h1, h2{
-line-height: 1;
+h1, h2 {
+  line-height: 1;
 }
 
-p{
+p {
   padding-bottom: 3.45vw;
 }
 
@@ -63,6 +63,6 @@ p{
   perspective: 1000px;
 }
 
-.hero h1{
+.hero h1 {
   opacity: 0;
 }

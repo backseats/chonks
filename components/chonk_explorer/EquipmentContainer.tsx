@@ -14,7 +14,8 @@ interface Props {
 }
 
 export default function EquipmentContainer(props: Props) {
-  const { chonkId, tbaAddress, traitTokenIds, isYours, tokenboundClient } = props;
+  const { chonkId, tbaAddress, traitTokenIds, isYours, tokenboundClient } =
+    props;
   const { address } = useAccount();
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -69,7 +70,9 @@ export default function EquipmentContainer(props: Props) {
           </div>
         </>
       ) : (
-        <p className="flex justify-center text-lg text-gray-500">No Traits to Display</p>
+        <p className="flex justify-center text-lg text-gray-500">
+          No Traits to display
+        </p>
       )}
     </>
   );

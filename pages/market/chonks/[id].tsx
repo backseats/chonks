@@ -31,8 +31,6 @@ import Loading from "@/components/marketplace/Loading";
 // }
 
 export default function ChonkDetail({ id }: { id: string }) {
-  const [isTraitsOpen, setIsTraitsOpen] = useState(true);
-
   const TOKEN_URI = "tokenURI";
 
   const { address } = useAccount();
@@ -47,8 +45,10 @@ export default function ChonkDetail({ id }: { id: string }) {
   const [filteredTraitTokenIds, setFilteredTraitTokenIds] = useState<BigInt[]>(
     []
   );
-
   const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
+
+  const [isEquippedTraitsOpen, setIsEquippedTraitsOpen] = useState(true);
+  const [isTraitsOpen, setIsTraitsOpen] = useState(true);
 
   // Get main body tokenURI
   const { data: tokenURIData } = useReadContract({
@@ -334,8 +334,12 @@ export default function ChonkDetail({ id }: { id: string }) {
                     chonkId={id}
                     tokenData={tokenData}
                     equippedTraits={currentChonk}
-                    isOpen={isTraitsOpen}
-                    onToggle={() => setIsTraitsOpen(!isTraitsOpen)}
+                    isEquippedTraitsOpen={isEquippedTraitsOpen}
+                    onToggleEquippedTraits={() =>
+                      setIsEquippedTraitsOpen(!isEquippedTraitsOpen)
+                    }
+                    isTraitsOpen={isTraitsOpen}
+                    onToggleTraits={() => setIsTraitsOpen(!isTraitsOpen)}
                     type="chonk"
                   />
                 </div>
@@ -414,8 +418,12 @@ export default function ChonkDetail({ id }: { id: string }) {
                   chonkId={id}
                   tokenData={tokenData}
                   equippedTraits={currentChonk}
-                  isOpen={isTraitsOpen}
-                  onToggle={() => setIsTraitsOpen(!isTraitsOpen)}
+                  isEquippedTraitsOpen={isEquippedTraitsOpen}
+                  onToggleEquippedTraits={() =>
+                    setIsEquippedTraitsOpen(!isEquippedTraitsOpen)
+                  }
+                  isTraitsOpen={isTraitsOpen}
+                  onToggleTraits={() => setIsTraitsOpen(!isTraitsOpen)}
                   type="chonk"
                 />
               </div>

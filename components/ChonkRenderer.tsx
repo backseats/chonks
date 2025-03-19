@@ -119,7 +119,7 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
           gridTemplateColumns: `repeat(${gridSize}, ${pixelSize}px)`,
           gridTemplateRows: `repeat(${gridSize}, ${pixelSize}px)`,
           gap: 0,
-          // opacity: backgroundBody === "ghost.svg" ? 0.5 : 1,
+          opacity: !bodyIndex && backgroundBody === "ghost.svg" ? 0.5 : 1,
         }}
       >
         {generateGrid().map((pixel, index) => {

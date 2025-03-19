@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 import { ChonkListing } from "@/pages/market/chonks/index";
-import { FaEthereum } from "react-icons/fa6";
-import { formatEther } from "viem";
 import ChonkRenderer from "@/components/ChonkRenderer";
 import ListingInfo from "@/components/marketplace/common/ListingInfo";
 
