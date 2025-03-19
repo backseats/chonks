@@ -353,17 +353,24 @@ export default function Home() {
               <div className={`sm:w-1/2 px-[3.45vw] py-[6.9vw] sm:border-r `}>
                 <p>
                   Using the ERC-6551 standard - Token Bound Accounts - your
-                  Chonk holds all of its traits which you can put on and take
-                  off to customize your Chonk!
+                  Chonk holds all of its Traits which you can put on and take
+                  off at any time to customize your Chonk!
                 </p>
               </div>
               <div
                 className={`sm:w-1/2 px-[3.45vw] pb-[3.45vw] md:py-[6.9vw] p-4  `}
               >
                 <p>
-                  Mint, collect, and trade Traits whenever you like on the
-                  Chonks Marketplace, our custom marketplace built specifically
-                  for Chonks & TBAs.
+                  Mint, collect, and trade Traits whenever you like on the{" "}
+                  <a
+                    href="https://chonkx.xyz/market"
+                    target="_blank"
+                    className="underline text-[#0D6E9D] hover:no-underline"
+                  >
+                    Chonks Market
+                  </a>
+                  , our custom marketplace built specifically for Chonks and
+                  TBAs.
                 </p>
               </div>
             </section>
@@ -481,7 +488,7 @@ export default function Home() {
                     />
                     <span className="text-[3vw] md:text-[1vw]">
                       Tradable together with the Body or individually on the
-                      Chonks Marketplace
+                      Chonks Market
                     </span>
                   </div>
                 </div>
@@ -612,9 +619,9 @@ export default function Home() {
                   target="_blank"
                   className="underline text-[#0D6E9D] hover:no-underline"
                 >
-                  now open to all here
+                  Give it a spin
                 </Link>
-                .
+                !
               </p>
               <div className="w-full px-[3.45vw]">
                 <video
@@ -634,9 +641,9 @@ export default function Home() {
               >
                 <div className={`sm:w-1/2 px-[3.45vw] py-[6.9vw] sm:border-r `}>
                   <p>
-                    The Studio will be open to everyone so they can have fun
-                    unleashing their Chonk creativity. We can&apos;t wait to see
-                    what you will create!
+                    The Studio is open to everyone. Have fun unleashing your
+                    Chonks creativity! We can&apos;t wait to see what you'll
+                    make!
                   </p>
                 </div>
                 <div
@@ -646,8 +653,8 @@ export default function Home() {
                     <i>
                       <strong>Approved Creators</strong>
                     </i>{" "}
-                    will be able to use the Studio to deploy their Traits to the
-                    official collection for future Season releases. Simple.
+                    can use the Studio to deploy their Traits and sell them as
+                    part of the official collection in future seasons.
                   </p>
                 </div>
               </div>
@@ -668,13 +675,11 @@ export default function Home() {
                   {/* But wait... there&apos;s more! */}
                   Chonks in 3D
                 </h2>
-                <p>Every Chonk also comes in 3D at launch.</p>
-                <p>Pixel and voxel data is stored onchain.</p>
+                <p>Every Chonk and every Trait comes in 2D and 3D.</p>
                 <p>
-                  Switch between rendering your Chonk in 2D or 3D whenever you
-                  like.
+                  All pixel and voxel data is stored onchain for anyone to use,
+                  permissionlessly.
                 </p>
-                <p>Newly released Traits will come in 3D as well.</p>
 
                 {/* <p>Every Chonk is also 3D.</p>
                 <p>Yes, Chonks are both 2D & 3D, oooohhh.</p>
@@ -685,10 +690,15 @@ export default function Home() {
                 <p>X, Y & Z and colour values for the 3D version.</p>
                 <p>You can then output your Chonk as 3D if you wish - and we can do fun stuff down the track with games, 3d printing and so much more.</p> */}
                 <p className="">
-                  <i>
-                    <strong>Coming Soon: Chonks Ztudio</strong> (it&apos;s a
-                    voxel studio, get it?)
-                  </i>
+                  Design your Chonk in 3D using the{" "}
+                  <a
+                    href="https://chonks-voxelator.netlify.app"
+                    target="_blank"
+                    className="underline text-[#0D6E9D] hover:no-underline"
+                  >
+                    Chonks Voxelator
+                  </a>
+                  .
                 </p>
                 {/* <p className="">
                   Chonks are initially designed as 2d pixel characters in the <i>Chonk Studio</i>. The pixel data is added to the contract as a bytes array: for each pixel, we store the x, y and rgb values.
@@ -711,11 +721,8 @@ export default function Home() {
             >
               <div className="mb-[3.45vw] md:mb-[1vw]">
                 <h2 className="font-source-code-pro text-[4vw] font-weight-600 mx-[3.45vw] mb-[3.45vw]">
-                  Chonks Marketplace
+                  Chonks Market
                 </h2>
-                {/* <p className="font-source-code-pro  font-weight-600 mx-[3.45vw]">
-                  Inspired by our beloved Cryptopunks, we&apos;ve built a fully onchain marketplace where you can buy & sell Chonks and individual Traits.
-                </p> */}
               </div>
 
               <div className="mx-[3.45vw] font-source-code-pro font-weight-600 ">
@@ -732,9 +739,9 @@ export default function Home() {
                      */}
                     <p>
                       Buy and sell Chonks and individual Traits. Due to the
-                      technical architecture of Chonks, leading marketplaces
-                      don’t support the functionality we needed, so we built our
-                      own.
+                      technical architecture of Chonks and ERC-6551s, leading
+                      marketplaces don&apos;t support the functionality we
+                      needed, so we built our own.
                     </p>
                   </div>
 
@@ -772,7 +779,17 @@ export default function Home() {
                       height={12}
                       className="mt-[0.69vw] w-[3vw] h-[3vw] md:w-[0.69vw] md:h-[0.69vw]"
                     />
-                    <p>More info coming soon.</p>
+                    <p>
+                      Visit{" "}
+                      <a
+                        href="https://chonk.xyz/market"
+                        target="_blank"
+                        className="underline text-[#0D6E9D] hover:no-underline"
+                      >
+                        the Chonks Market
+                      </a>{" "}
+                      to get started.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -780,7 +797,7 @@ export default function Home() {
               <div className="w-full mt-[3.45vw] bg-[#181818] py-[3.45vw]">
                 <Image
                   src="/chonks-market.webp"
-                  alt="Chonks Marketplace"
+                  alt="Chonks Market"
                   width={3000}
                   height={1688}
                   className="w-full h-auto"
