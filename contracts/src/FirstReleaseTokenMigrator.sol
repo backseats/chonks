@@ -3,6 +3,10 @@ pragma solidity ^0.8.22;
 
 import { Ownable } from 'solady/auth/Ownable.sol';
 
+// Deployed to 0x733cf87C02b15377091D80155F12A3a5f9E7A6fe
+// https://basescan.org/address/0x733cf87c02b15377091d80155f12a3a5f9e7a6fe
+// Ownership revoked on 3/19/2025
+
 interface IChonkTraits {
     function updateEpochOnce() external;
     function replaceMint(address _to, uint256 _tokenId) external;
