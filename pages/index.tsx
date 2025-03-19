@@ -642,8 +642,8 @@ export default function Home() {
                 <div className={`sm:w-1/2 px-[3.45vw] py-[6.9vw] sm:border-r `}>
                   <p>
                     The Studio is open to everyone. Have fun unleashing your
-                    Chonks creativity! We can&apos;t wait to see what you'll
-                    make!
+                    Chonks creativity! We can&apos;t wait to see what
+                    you&apos;ll make!
                   </p>
                 </div>
                 <div
