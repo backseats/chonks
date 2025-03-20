@@ -78,7 +78,7 @@ export const OfferModal = ({
           You need to own a Chonk to make an Offer on this Trait.{" "}
           <a
             className="text-chonk-blue underline"
-            href="https://chonk.xyz/marketplace"
+            href="https://chonks.xyz/market"
             rel="noopener noreferrer"
           >
             Buy a Chonk here

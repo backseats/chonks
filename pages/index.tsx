@@ -782,7 +782,7 @@ export default function Home() {
                     <p>
                       Visit{" "}
                       <a
-                        href="https://chonk.xyz/market"
+                        href="https://chonks.xyz/market"
                         target="_blank"
                         className="underline text-[#0D6E9D] hover:no-underline"
                       >
