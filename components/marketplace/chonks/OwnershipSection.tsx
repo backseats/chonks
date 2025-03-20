@@ -35,7 +35,7 @@ export default function OwnershipSection(props: Props) {
 
       {owner && (
         <div className="ml-4 sm:ml-0 flex flex-row sm:flex-col sm:mt-6 sm:mb-8">
-          <div className="text-[18px] sm:text-[1vw] text-gray-600">
+          <div className="text-lg text-gray-600">
             Owned by
           </div>
 

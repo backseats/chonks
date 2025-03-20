@@ -37,7 +37,7 @@ export default function Listings({ isSidebarVisible, address }: ListingsProps) {
           },
         });
 
-        // console.log("GraphQL chonks result:", response);
+        console.log("GraphQL chonks result:", response);
 
         if (!response.data) {
           console.error("No data returned from GraphQL query");

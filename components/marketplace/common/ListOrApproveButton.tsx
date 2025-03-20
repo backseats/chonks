@@ -28,7 +28,7 @@ export default function ListOrApproveButton({
   return (
     <>
       <button
-        className={`w-full bg-chonk-blue text-white py-2 px-4 hover:brightness-110 transition-colors ${
+        className={`text-xl w-full bg-chonk-blue text-white py-2 px-4 hover:brightness-110 transition-colors ${
           isApprovalPending ? "opacity-50" : ""
         }`}
         onClick={async () => {

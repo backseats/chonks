@@ -565,38 +565,42 @@ export default function ChonkDetail({ id }: { id: string }) {
 
         <div className="w-full mx-auto">
           <div className="flex flex-row justify-end">
-            {hasActiveOffer ? (
-              <button
-                className={`bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black ${
-                  isCancelOfferChonkPending || cancelOfferChonkHash
-                    ? "opacity-50"
-                    : ""
-                }`}
-                onClick={() => handleCancelOfferChonk()}
-                disabled={isCancelOfferChonkPending}
-              >
-                {isCancelOfferChonkPending
-                  ? "Confirm with wallet"
-                  : cancelOfferChonkHash && localCancelOfferChonkSuccess
-                  ? "List My Chonk"
-                  : "Cancel Listing"}
-              </button>
-            ) : (
-              <button
-                className={`bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black ${
-                  isListChonkPending || listChonkHash ? "opacity-50" : ""
-                }`}
-                onClick={() => setShowListModal(true)}
-                disabled={isListChonkPending || !!listChonkHash}
-              >
-                <div className="pt-[2px]">
-                  {isListChonkPending
-                    ? "Confirm with wallet"
-                    : listChonkHash
-                    ? "Cancel Listing"
-                    : "List My Chonk"}
-                </div>
-              </button>
+            {isOwner && (
+              <>
+                {hasActiveOffer ? (
+                  <button
+                    className={`bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black ${
+                      isCancelOfferChonkPending || cancelOfferChonkHash
+                        ? "opacity-50"
+                        : ""
+                    }`}
+                    onClick={() => handleCancelOfferChonk()}
+                    disabled={isCancelOfferChonkPending}
+                  >
+                    {isCancelOfferChonkPending
+                      ? "Confirm with wallet"
+                      : cancelOfferChonkHash && localCancelOfferChonkSuccess
+                      ? "List My Chonk"
+                      : "Cancel Listing"}
+                  </button>
+                ) : (
+                  <button
+                    className={`bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-4 mt-4 text-sm border-2 border-black ${
+                      isListChonkPending || listChonkHash ? "opacity-50" : ""
+                    }`}
+                    onClick={() => setShowListModal(true)}
+                    disabled={isListChonkPending || !!listChonkHash}
+                  >
+                    <div className="pt-[2px]">
+                      {isListChonkPending
+                        ? "Confirm with wallet"
+                        : listChonkHash
+                        ? "Cancel Listing"
+                        : "List My Chonk"}
+                    </div>
+                  </button>
+                )}
+              </>
             )}
 
             <div className="flex flex-col items-end">
