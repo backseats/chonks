@@ -13,7 +13,7 @@ export default function MakeCancelOfferButton({
   isWithdrawBidPending,
   handleWithdrawBid,
 }: Props) {
-  const baseStyle = "w-full py-2 px-4 transition-colors text-white";
+  const baseStyle = "w-full text-[18px] py-2 px-4 transition-colors text-white";
   const makeOfferStyle = `${baseStyle} ${
     isMakeOfferPending
       ? "bg-chonk-blue opacity-50"
