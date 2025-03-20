@@ -26,9 +26,9 @@ export const config = createConfig({
   chains: [base],
   connectors: [
     injected(),
-    // walletConnect({
-    //   projectId: "6637dd8a880463f857799d3d1011b7a2",
-    // }),
+    walletConnect({
+      projectId: "6637dd8a880463f857799d3d1011b7a2",
+    }),
     coinbaseWallet({ appName: 'Chonks', preference: 'all' }),
   ],
   transports: {
