@@ -3,9 +3,7 @@ import { ConnectKitButton } from "connectkit";
 import Image from "next/image";
 import Link from "next/link";
 
-interface Props {}
-
-export default function MenuBar(props: Props) {
+export default function MenuBar() {
   return (
     <nav id="top" className="w-full flex justify-between px-4 py-4 bg-white">
       <div>
@@ -45,23 +43,25 @@ export default function MenuBar(props: Props) {
         </Link>
       </div>
 
-      <ConnectKitButton
-        // theme="web"
-        customTheme={{
-          "--ck-font-family": "'Source Code Pro', monospace",
-          "--ck-primary-button-background": "#FFFFFF",
-          "--ck-primary-button-hover-background": "#2F7BA7",
-          "--ck-primary-button-hover-color": "#FFFFFF",
-          "--ck-primary-button-border-radius": "0px",
-          "--ck-primary-button-font-weight": "600",
-          "--ck-connectbutton-background": "#FFFFFF",
-          "--ck-connectbutton-hover-background": "#2F7BA7",
-          "--ck-connectbutton-hover-color": "#FFFFFF",
-          "--ck-connectbutton-border-radius": "0px",
-          "--ck-connectbutton-color": "#000000",
-          "--ck-connectbutton-font-weight": "600",
-        }}
-      />
+      <div className="hidden sm:flex">
+        <ConnectKitButton
+          // theme="web"
+          customTheme={{
+            "--ck-font-family": "'Source Code Pro', monospace",
+            "--ck-primary-button-background": "#FFFFFF",
+            "--ck-primary-button-hover-background": "#2F7BA7",
+            "--ck-primary-button-hover-color": "#FFFFFF",
+            "--ck-primary-button-border-radius": "0px",
+            "--ck-primary-button-font-weight": "600",
+            "--ck-connectbutton-background": "#FFFFFF",
+            "--ck-connectbutton-hover-background": "#2F7BA7",
+            "--ck-connectbutton-hover-color": "#FFFFFF",
+            "--ck-connectbutton-border-radius": "0px",
+            "--ck-connectbutton-color": "#000000",
+            "--ck-connectbutton-font-weight": "600",
+          }}
+        />
+      </div>
 
       {/* <button
           disabled
