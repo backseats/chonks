@@ -946,21 +946,6 @@ export default function ChonkDetail({ id }: { id: string }) {
   );
 }
 
-// @ts-ignore
-export async function getServerSideProps(context) {
-  const { id } = context.params;
-
-  if (!id) {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: { id },
-  };
-}
-
 const ChonkControls = ({
   hasActiveOffer,
   isCancelOfferChonkPending,
@@ -972,7 +957,6 @@ const ChonkControls = ({
   setShowListModal,
   setShowSendModal,
 }: {
-  isOwner: boolean;
   hasActiveOffer: boolean;
   isCancelOfferChonkPending: boolean;
   cancelOfferChonkHash: Address | undefined;
@@ -1035,3 +1019,18 @@ const ChonkControls = ({
     </>
   );
 };
+
+// @ts-ignore
+export async function getServerSideProps(context) {
+  const { id } = context.params;
+
+  if (!id) {
+    return {
+      notFound: true,
+    };
+  }
+
+  return {
+    props: { id },
+  };
+}

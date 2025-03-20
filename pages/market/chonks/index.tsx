@@ -139,8 +139,8 @@ export default function ChonksMarketplace() {
   return (
     <>
       <Head>
-        <title>Chonks Marketplace | Chonks</title>
-        <meta name="description" content="Chonks Marketplace | Chonks" />
+        <title>Chonks Market | Chonks</title>
+        <meta name="description" content="Chonks Market | Chonks" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"

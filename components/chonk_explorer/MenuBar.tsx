@@ -46,7 +46,10 @@ export default function MenuBar() {
 
   return (
     <>
-      <nav id="top" className="w-full flex justify-between px-4 py-4 bg-white">
+      <nav
+        id="top"
+        className="flex justify-between sm:px-4 py-4 bg-white ml-2 mr-4 mb-2 sm:mb-0"
+      >
         <div className="">
           {/* Left */}
           <Link href="/" className="hover:opacity-70 transition-opacity">
@@ -67,12 +70,21 @@ export default function MenuBar() {
 
           <div className="flex flex-row gap-4">
             {address && (
-              <button
-                className="px-4 py-2 bg-black text-white font-source-code-pro text-sm hidden md:flex"
-                onClick={() => router.push("/profile")}
-              >
-                <div className="mt-[1px]">Your Chonks</div>
-              </button>
+              <>
+                <button
+                  className="px-4 py-2 bg-[#126E9D] text-white font-source-code-pro text-[16px] hidden sm:flex"
+                  onClick={() => router.push("/market")}
+                >
+                  <div className="mt-[1px]">Market</div>
+                </button>
+
+                <button
+                  className="px-4 py-2 bg-black text-white font-source-code-pro text-[16px] hidden sm:flex"
+                  onClick={() => router.push("/profile")}
+                >
+                  <div className="mt-[1px]">Your Chonks</div>
+                </button>
+              </>
             )}
 
             {/* <button
@@ -86,9 +98,17 @@ export default function MenuBar() {
           </div>
         </div>
       </nav>
-      <div className="flex w-full h-12 md:hidden">
+
+      <div className="flex flex-col gap-2 w-full sm:hidden">
         <button
-          className="px-4 py-2 bg-black text-white font-source-code-pro text-sm w-full mx-3"
+          className="mx-4 py-2  text-white font-source-code-pro text-[16px] bg-[#126E9D]"
+          onClick={() => router.push("/market")}
+        >
+          Market
+        </button>
+
+        <button
+          className="mx-4 py-2 bg-black text-white font-source-code-pro text-[16px]"
           onClick={() => router.push("/profile")}
         >
           Your Chonks

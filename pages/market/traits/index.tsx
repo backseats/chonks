@@ -130,8 +130,8 @@ export default function TraitsMarketplace() {
   return (
     <>
       <Head>
-        <title>Traits Marketplace | Chonks</title>
-        <meta name="description" content="Traits Marketplace | Chonks" />
+        <title>Traits Market | Chonks</title>
+        <meta name="description" content="Traits Market | Chonks" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
