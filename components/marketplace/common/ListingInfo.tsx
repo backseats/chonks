@@ -16,10 +16,12 @@ export default function ListingInfo(props: Props) {
         {chonkOrTrait === "chonk" ? "Chonk" : "Trait"} #{id}
       </h3>
 
-      <div className="flex flex-row mt-2">
-        <span>{formatEther(BigInt(price))}</span>
-        <FaEthereum className="ml-1 mt-1 text-[16px]" />
-      </div>
+      {price && (
+        <div className="flex flex-row mt-2">
+          <span>{formatEther(BigInt(price))}</span>
+          <FaEthereum className="ml-1 mt-1 text-[16px]" />
+        </div>
+      )}
     </div>
   );
 }

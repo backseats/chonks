@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import { Trait } from "@/types/Trait";
 import { TraitListing } from "@/pages/market/traits";
 import ListingInfo from "@/components/marketplace/common/ListingInfo";
+import { useReadContract } from "wagmi";
+import { traitsContract, traitsABI } from "@/config";
 
 interface ListingsProps {
   isSidebarVisible: boolean;
@@ -13,69 +13,6 @@ export default function Listings({
   isSidebarVisible,
   traitListings = [],
 }: ListingsProps) {
-  const [traits, setTraits] = useState<
-    Array<{ id: string; data: Trait | null; listing: TraitListing }>
-  >([]);
-  const [fetchedIds, setFetchedIds] = useState<Set<string>>(new Set());
-
-  // Initialize traits array from traitListings, preserving already fetched data
-  useEffect(() => {
-    if (!traitListings.length) return;
-
-    // Create a map of existing trait data for quick lookup
-    const existingTraitsMap = new Map(
-      traits.map((trait) => [trait.id, trait.data])
-    );
-
-    // Create updated traits array, preserving data for existing IDs
-    const traitsArray = traitListings.map((listing) => ({
-      id: listing.id,
-      data: existingTraitsMap.get(listing.id) || null,
-      listing,
-    }));
-
-    setTraits(traitsArray);
-  }, [traitListings]);
-
-  // Fetch token URI data only for tokens that haven't been fetched yet
-  useEffect(() => {
-    const fetchTokenURIs = async () => {
-      const updatedTraits = [...traits];
-      let hasUpdates = false;
-
-      for (const trait of updatedTraits) {
-        if (trait.data === null && !fetchedIds.has(trait.id)) {
-          try {
-            const response = await fetch(`/api/traits/tokenURI/${trait.id}`);
-            const data = await response.json();
-            trait.data = data;
-            setFetchedIds((prev) => new Set([...prev, trait.id]));
-            hasUpdates = true;
-          } catch (error) {
-            console.error(
-              `Error fetching token URI for Trait #${trait.id}:`,
-              error
-            );
-          }
-        }
-      }
-
-      if (hasUpdates) {
-        setTraits(updatedTraits);
-      }
-    };
-
-    if (traits.length > 0 && traits.some((trait) => trait.data === null)) {
-      fetchTokenURIs();
-    }
-  }, [traits, fetchedIds]);
-
-  const LoadingCard = () => (
-    <div className="flex flex-col border border-black bg-white p-4 h-[300px] justify-center items-center">
-      <p className="text-lg">Loading...</p>
-    </div>
-  );
-
   const handleBuyNow = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
     window.location.href = `/market/traits/${id}`;
@@ -84,30 +21,48 @@ export default function Listings({
   return (
     <div className={`${isSidebarVisible ? "w-3/4" : "w-full"} `}>
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
-        {traits.map(({ id, data, listing }) =>
-          data === null ? (
-            <LoadingCard key={id} />
-          ) : (
-            <Link
-              href={`/market/traits/${id}`}
-              key={id}
-              className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
-            >
-              <img
-                src={data.image || "/marka/marka-chonk.svg"}
-                alt={`Trait #${id}`}
-                className="w-full h-auto"
-              />
+        {traitListings.map(({ id, price }) => (
+          <Link
+            href={`/market/traits/${id}`}
+            key={id}
+            className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity"
+          >
+            <TraitImage id={id} />
 
-              <ListingInfo
-                chonkOrTrait="trait"
-                id={Number(id)}
-                price={listing.price}
-              />
-            </Link>
-          )
-        )}
+            <ListingInfo chonkOrTrait="trait" id={Number(id)} price={price} />
+          </Link>
+        ))}
       </div>
     </div>
   );
 }
+
+// TODO: Grab this from the indexer
+const TraitImage = ({ id }: { id: string }) => {
+  const { data: tokenURI, isLoading } = useReadContract({
+    address: traitsContract,
+    abi: traitsABI,
+    functionName: "tokenURI",
+    args: [BigInt(id)],
+  });
+
+  if (isLoading)
+    return (
+      <div className="flex flex-col bg-white p-4 aspect-square justify-center items-center">
+        <p className="text-lg">Loading...</p>
+      </div>
+    );
+
+  const tokenURIString = tokenURI as string;
+  const base64String = tokenURIString.split(",")[1];
+  const jsonString = atob(base64String);
+  const jsonData = JSON.parse(jsonString);
+
+  return (
+    <img
+      src={jsonData.image || ""}
+      alt={`Trait #${id}`}
+      className="w-full h-auto"
+    />
+  );
+};
