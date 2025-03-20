@@ -101,7 +101,7 @@ export default function Trait(props: Props) {
           <button
             className="absolute top-0 left-0 bg-black  bg-opacity-50 text-white py-1 px-2 text-sm"
             onClick={() =>
-              (window.location.href = `/marketplace/traits/${traitTokenId}`)
+              (window.location.href = `/market/traits/${traitTokenId}`)
             }
           >
             List This Trait
