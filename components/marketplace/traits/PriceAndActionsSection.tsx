@@ -460,14 +460,14 @@ export default function PriceAndActionsSection(
 
       {/* Chonk selection for buying traits */}
       {!isOfferSpecific && (
-        <div className="mb-4">
+        <div className="mb-2 mt-4 sm:mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Which Chonk will own this Trait?
           </label>
           <select
             value={selectedChonkId}
             onChange={(e) => setSelectedChonkId(e.target.value)}
-            className="w-full text-sm font-medium p-2 border bg-white"
+            className="w-full text-[14px] sm:text-sm font-medium p-2 border bg-white"
           >
             <option value="">Select a Chonk</option>
             {ownedChonks?.map((chonk) => (
@@ -483,18 +483,20 @@ export default function PriceAndActionsSection(
 
   return (
     <>
-      <div className="border border-black p-[1.725vw] mb-[1.725vw]">
+      <div className="border m-4 sm:m-0 border-black p-3 sm:p-[1.725vw] mb-[1.725vw]">
         {/* Has Offer, or just been Listed */}
         {(hasActiveOffer || isListTraitSuccess) &&
         !localCancelOfferTraitSuccess ? (
           <>
             <div className="flex flex-col mb-4">
               <div className="flex items-baseline gap-2">
-                <div className="text-xl">
-                  {isOwner ? `Listed for` : `Buy Trait #${traitId} now for`}
+                <div className="text-[20px] sm:text-xl">
+                  {isOwner ? `Listed for` : `Buy for`}
                 </div>
 
-                <span className="text-2xl font-bold">{price} ETH</span>
+                <span className="text-[20px] sm:text-2xl font-bold">
+                  {price} ETH
+                </span>
               </div>
 
               {isOfferSpecific && (

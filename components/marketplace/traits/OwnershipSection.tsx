@@ -42,11 +42,31 @@ export default function OwnershipSection(props: Props) {
 
   return (
     <>
-      <div className="flex justify-between items-center">
-        <div className="flex flex-row items-baseline gap-2">
-          <h1 className="text-3xl font-bold">
+      <div className="flex justify-between items-center px-4 sm:px-0">
+        <div className="flex flex-row justify-between w-full sm:justify-start sm:items-baseline sm:gap-2">
+          <h1 className="hidden sm:flex sm:text-3xl sm:font-bold">
             Trait #{id} {traitName ? `- ${traitName}` : ""}
           </h1>
+
+          {owner && (
+            <div className="flex sm:hidden items-center mb-4 sm:mb-8">
+              <div>
+                <div className="text-sm text-gray-600">In the Backpack of</div>
+                <div className="text-[16px]">
+                  <Link href={`/chonks/${tokenIdOfTBA}`} className="underline">
+                    Chonk #{tokenIdOfTBA?.toString() ?? "N/A"}
+                    <br />
+                    (Owned by:{" "}
+                    {address && address === tbaOwner
+                      ? "You"
+                      : ensName || truncateEthAddress(tbaOwner as Address)}
+                    )
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
           <p className="text-sm text-gray-600 pb-7">
             {isEquipped ? "(Equipped)" : "(Not Equipped)"}
           </p>
@@ -56,15 +76,7 @@ export default function OwnershipSection(props: Props) {
       </div>
 
       {owner && (
-        <div className="flex items-center mb-8">
-          {/* <div className="w-12 h-12 rounded-full overflow-hidden"> */}
-          {/* <img
-              src="https://placehold.co/600x400"
-              alt="Owner Avatar"
-              className="w-full h-full object-cover"
-            /> */}
-          {/* {data && <img src={data} alt="ENS Avatar" className="w-full h-full object-cover" />} */}
-          {/* </div> */}
+        <div className="hidden sm:flex sm:items-center sm:mb-8">
           <div>
             <div className="text-sm text-gray-600">In the Backpack of</div>
             <div className="text-lg">

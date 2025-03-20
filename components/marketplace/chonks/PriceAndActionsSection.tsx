@@ -422,7 +422,7 @@ export default function PriceAndActionsSection({
 
   return (
     <>
-      <div className="border m-4 sm:m-0 border-black p-[1.725vw] mb-[1.725vw]">
+      <div className="border m-4 sm:m-0 border-black p-3 sm:p-[1.725vw] mb-[1.725vw]">
         {/* Has Offer, or just been Listed */}
         {(hasActiveOffer || isListChonkSuccess) &&
         !localCancelOfferChonkSuccess ? (

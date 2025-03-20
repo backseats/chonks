@@ -365,12 +365,12 @@ export default function TraitDetail({ id }: { id: string }) {
 
         <main className="w-full border-t border-gray-300">
           {tokenData ? (
-            <div>
-              <section className="flex flex-row gap-[3.45vw] py-[1.725vw] px-[3.45vw]">
+            <>
+              <div className="hidden sm:flex sm:flex-row sm:gap-[3.45vw] sm:py-[1.725vw] sm:px-[3.45vw]">
                 <div className="w-2/5">
                   <img
                     src={tokenData.image}
-                    alt={`Chonk ${id}`}
+                    alt={`Trait ${id}`}
                     className="w-full h-auto"
                   />
 
@@ -422,8 +422,49 @@ export default function TraitDetail({ id }: { id: string }) {
                                         address={address}
                                     /> */}
                 </div>
-              </section>
-            </div>
+              </div>
+
+              <div className="flex flex-col sm:hidden">
+                <h1 className="text-[22px] mt-3 font-bold text-center">
+                  Trait #{id} - {traitMetadata?.traitName}
+                </h1>
+
+                <img
+                  src={tokenData.image}
+                  alt={`Trait ${id}`}
+                  className="w-full h-auto p-4"
+                />
+
+                <OwnershipSection
+                  id={id}
+                  tokenData={tokenData}
+                  owner={owner}
+                  tbaOwner={ownerOfTraitOwner}
+                  tokenIdOfTBA={tokenIdOfTBA?.toString()}
+                  address={address}
+                  isEquipped={isEquipped}
+                  traitName={traitMetadata?.traitName}
+                />
+
+                <PriceAndActionsSection
+                  isOwner={isOwner}
+                  chonkId={Number(chonkId)}
+                  traitId={parseInt(id)}
+                  tokenIdOfTBA={tokenIdOfTBA?.toString()}
+                  tbaOwner={ownerOfTraitOwner}
+                  isEquipped={isEquipped}
+                  tbaAddress={tbaAddress as Address | null}
+                  traitName={traitMetadata?.traitName}
+                  // price={formattedPrice}
+                  // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
+                  // isOfferSpecific={isOfferSpecific}
+                  // canAcceptOffer={canAcceptOffer}
+                  // hasActiveOffer={hasActiveOffer}
+                  // hasActiveBid={hasActiveBid}
+                  // traitBid={traitBid}
+                />
+              </div>
+            </>
           ) : (
             <Loading />
           )}
