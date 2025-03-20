@@ -119,12 +119,7 @@ export default function Profile(props: Props) {
                                 priceMax={priceMax}
                                 setPriceMax={setPriceMax}
                             /> */}
-              <Listings
-                isSidebarVisible={isSidebarVisible}
-                address={_address}
-                // setSelectedChonk={setSelectedChonk}
-                // setIsModalOpen={setIsModalOpen}
-              />
+              <Listings address={_address} />
             </div>
           </section>
         </main>
