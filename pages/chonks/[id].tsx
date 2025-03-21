@@ -127,14 +127,20 @@ export default function ChonkDetail({ id }: { id: string }) {
   const [localCancelOfferChonkSuccess, setLocalCancelOfferChonkSuccess] =
     useState(false);
 
+  const [isEquipPending, setIsEquipPending] = useState(false);
+
   // Get main body tokenURI
-  const { data: tokenURIData, error: tokenURIError } = useReadContract({
+  const {
+    data: tokenURIData,
+    error: tokenURIError,
+    refetch: refetchTokenURI,
+  } = useReadContract({
     address: mainContract,
     abi: mainABI,
     functionName: TOKEN_URI,
     args: [BigInt(id)],
     chainId,
-  }) as { data: string; error: Error };
+  }) as { data: string; error: Error; refetch: () => void };
 
   useEffect(() => {
     if (tokenURIError) {
@@ -157,21 +163,28 @@ export default function ChonkDetail({ id }: { id: string }) {
     return getAddress(owner) === getAddress(address);
   }, [owner, address]);
 
-  const { data: render2dData } = useReadContract({
+  const { data: render2dData, refetch: refetchRender2D } = useReadContract({
     address: mainContract,
     abi: renderAsDataUriABI,
     functionName: "renderAsDataUri2D",
     args: [BigInt(id)],
     chainId,
-  }) as { data: string };
+  }) as { data: string; refetch: () => void };
 
-  const { data: render3dData } = useReadContract({
+  const { data: render3dData, refetch: refetchRender3D } = useReadContract({
     address: mainContract,
     abi: renderAsDataUriABI,
     functionName: "renderAsDataUri3D",
     args: [BigInt(id)],
     chainId,
-  }) as { data: string };
+  }) as { data: string; refetch: () => void };
+
+  useEffect(() => {
+    refetchTokenURI();
+    refetchStoredChonk();
+    refetchRender2D();
+    refetchRender3D();
+  }, [isEquipPending]);
 
   useEffect(() => {
     if (tokenURIData) {
@@ -188,13 +201,13 @@ export default function ChonkDetail({ id }: { id: string }) {
   }, [render3dData]);
 
   // Get the trait ids that are equipped to the body
-  const { data: storedChonk } = useReadContract({
+  const { data: storedChonk, refetch: refetchStoredChonk } = useReadContract({
     address: mainContract,
     abi: mainABI,
     functionName: "getChonk",
     args: [BigInt(id)],
     chainId,
-  }) as { data: StoredChonk };
+  }) as { data: StoredChonk; refetch: () => void };
 
   const {
     handleListChonk,
@@ -682,6 +695,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                               tbaAddress={tbaAddress}
                               tokenboundClient={tokenboundClient}
                               address={address}
+                              isEquipPending={isEquipPending}
+                              setIsEquipPending={setIsEquipPending}
                             />
                           </div>
                         );
@@ -701,6 +716,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                         isYours={isOwner}
                         tokenboundClient={tokenboundClient}
                         tbaAddress={tbaAddress}
+                        isEquipPending={isEquipPending}
+                        setIsEquipPending={setIsEquipPending}
                       />
                     )}
                   </div>

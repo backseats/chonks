@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useReadContract, useWriteContract } from "wagmi";
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 
 import {
   mainContract,
@@ -115,34 +115,56 @@ export function useTraitName(traitTokenId: string) {
   return traitName;
 }
 
-export function useEquipFunction(chonkId: string, traitTokenId: string, traitType: Category | null, isEquipped: boolean) {
-  const { writeContract } = useWriteContract();
+export function useEquip(chonkId: string, traitTokenId: string) {
+  const { writeContract: equip, data: equipHash } = useWriteContract();
+  const { data: equipReceipt, isSuccess: isEquipSuccess } = useWaitForTransactionReceipt({
+    hash: equipHash,
+    chainId,
+  });
 
-  const equip = useCallback(() => {
-    writeContract({
+  const handleEquip = () => {
+    equip({
       address: mainContract,
       abi: mainABI,
       functionName: "equip",
       args: [parseInt(chonkId), parseInt(traitTokenId)],
       chainId,
+    }, {
+      onError: (error) => {
+        console.error('Contract revert:', error);
+      }
     });
-  }, [writeContract, chonkId, traitTokenId]);
+  };
 
-  const unequip = useCallback(() => {
-    if (!traitType) {
-      console.log("no trait type");
-      return;
-    }
+  return { handleEquip, equipHash,
+   equipReceipt, isEquipSuccess };
+}
+
+export function useUnequip(chonkId: string, traitType: Category | null) {
+  const { writeContract: unequip, data: unequipHash } = useWriteContract();
+
+  const { data: unequipReceipt, isSuccess: isUnequipSuccess } = useWaitForTransactionReceipt({
+    hash: unequipHash,
+    chainId,
+  });
+
+  const handleUnequip = () => {
+    if (!traitType) return;
 
     const categoryIndex = Object.values(Category).indexOf(traitType!);
-    writeContract({
+
+    unequip({
       address: mainContract,
       abi: mainABI,
       functionName: "unequip",
       args: [parseInt(chonkId), categoryIndex],
       chainId,
+    }, {
+      onError: (error) => {
+        console.error('Contract revert:', error);
+      }
     });
-  }, [writeContract, chonkId, traitType]);
+  };
 
-  return { equip, unequip };
+  return { handleUnequip, unequipHash, unequipReceipt, isUnequipSuccess };
 }

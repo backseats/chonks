@@ -56,6 +56,7 @@ export const GET_TRAIT_METADATA_BY_ID = gql`
         creator
         colorMap
         activeListing
+        tokenURI
       }
     }
   }
@@ -96,10 +97,68 @@ query GetTraitsForChonkId($id: BigInt!) {
               id
               traitName
               traitType
+              tokenURI
             }
           }
         }
       }
+    }
+  }
+}
+`;
+
+export const GET_CHONK_HISTORY = gql`
+query GetChonkHistory($id: BigInt!) {
+  chonk(id: $id) {
+    id
+    owner
+    tbas {
+      items {
+        traits {
+          items {
+            traitInfo {
+              id
+              traitName
+              traitType
+            }
+          }
+        }
+        id
+      }
+    }
+    transactions {
+      items {
+        amount
+        bidder
+        from
+        id
+        seller
+        sellerTBA
+        txType
+        txHash
+        to
+        time
+      }
+    }
+  }
+}
+`;
+
+export const GET_TRAIT_HISTORY = gql`
+query GetTraitHistory($id: BigInt!) {
+  traitTransactionHistories(where: {traitId: $id}) {
+    items {
+      amount
+      bidder
+      from
+      id
+      seller
+      sellerTBA
+      time
+      to
+      traitId
+      txHash
+      txType
     }
   }
 }

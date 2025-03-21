@@ -6,6 +6,7 @@ import { chonksMainABI } from './abis/chonksMainABI'
 import { chonkTraitsABI } from './abis/chonkTraitsABI'
 import { chonksMarketABI } from './abis/chonksMarketABI'
 import { chonksColorMapABI } from './abis/chonksColorMapABI'
+import { chonkBulkTraitTransferABI } from './abis/chonkBulkTraitTransferABI'
 
 export const mainContract = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
 
@@ -17,10 +18,13 @@ export const marketplaceContract = "0x6d00a9A2a0C6B5499d56bd4c9005663C88a544a6";
 
 export const colorMapContract = "0x92BC112321E1EEd44C7CdB802ED727Ef2a9864Cd";
 
+export const bulkTraitTransferContract = "0xEf6cA22D4e55F0c60ACdB2269463fC261Df95bf3";
+
 export const mainABI = chonksMainABI;
 export const traitsABI = chonkTraitsABI;
 export const marketplaceABI = chonksMarketABI;
 export const colorMapABI = chonksColorMapABI;
+export const bulkTraitTransferABI = chonkBulkTraitTransferABI;
 
 export const simpleHashKey = "makingmemark_sk_ab7284sr3v5o19g3iaublzep6sffynfu"; // TODO: env var
 

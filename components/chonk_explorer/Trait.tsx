@@ -1,16 +1,16 @@
+import { useEffect, useState } from "react";
 import { Category } from "@/types/Category";
-import Link from "next/link";
 import {
   useTraitData,
   useTraitType,
   useTraitName,
-  useEquipFunction,
+  useEquip,
+  useUnequip,
   useIsRevealed,
 } from "@/hooks/traitHooks";
 import { useTBATransferTrait } from "@/hooks/useTBATransferTrait";
 import { Address } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
-import { useState } from "react";
 import TransferTraitModal from "./TransferTraitModal";
 
 export const categoryList = Object.values(Category);
@@ -25,6 +25,8 @@ interface Props {
   selectedCategory: string;
   isYours: boolean;
   tokenboundClient: TokenboundClient;
+  isEquipPending: boolean;
+  setIsEquipPending: (isPending: boolean) => void;
 }
 
 export default function Trait(props: Props) {
@@ -37,6 +39,8 @@ export default function Trait(props: Props) {
     isYours,
     tokenboundClient,
     tbaAddress,
+    isEquipPending,
+    setIsEquipPending,
   } = props;
 
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
@@ -52,12 +56,27 @@ export default function Trait(props: Props) {
 
   const isRevealed = useIsRevealed(traitTokenId);
 
-  const { equip, unequip } = useEquipFunction(
+  const { handleEquip, equipHash, equipReceipt, isEquipSuccess } = useEquip(
     chonkId,
-    traitTokenId,
-    traitType,
-    isEquipped
+    traitTokenId
   );
+
+  const unequipResult = useUnequip(chonkId, traitType);
+  const { handleUnequip, unequipHash, unequipReceipt, isUnequipSuccess } =
+    unequipResult || {};
+
+  console.log("equipHash", equipHash);
+  console.log("equipReceipt", equipReceipt);
+  console.log("isEquipSuccess", isEquipSuccess);
+
+  console.log("unequipHash", unequipHash);
+  console.log("unequipReceipt", unequipReceipt);
+  console.log("isUnequipSuccess", isUnequipSuccess);
+
+  useEffect(() => {
+    if (isEquipSuccess) setIsEquipPending(!isEquipPending);
+    if (isUnequipSuccess) setIsEquipPending(!isEquipPending);
+  }, [isEquipSuccess, isUnequipSuccess]);
 
   if (
     !isEquipped &&
@@ -117,7 +136,9 @@ export default function Trait(props: Props) {
         {isYours ? (
           <button
             className={buttonClass}
-            onClick={isRevealed ? (isEquipped ? unequip : equip) : () => {}}
+            onClick={
+              isRevealed ? (isEquipped ? handleUnequip : handleEquip) : () => {}
+            }
             disabled={!isRevealed || (isEquipped && traitName == "")}
           >
             <span

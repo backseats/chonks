@@ -11,11 +11,20 @@ interface Props {
   traitTokenIds: BigInt[];
   isYours: boolean;
   tokenboundClient: TokenboundClient;
+  isEquipPending: boolean;
+  setIsEquipPending: (isPending: boolean) => void;
 }
 
 export default function EquipmentContainer(props: Props) {
-  const { chonkId, tbaAddress, traitTokenIds, isYours, tokenboundClient } =
-    props;
+  const {
+    chonkId,
+    tbaAddress,
+    traitTokenIds,
+    isYours,
+    tokenboundClient,
+    setIsEquipPending,
+    isEquipPending,
+  } = props;
   const { address } = useAccount();
 
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
@@ -64,6 +73,8 @@ export default function EquipmentContainer(props: Props) {
                   tokenboundClient={tokenboundClient}
                   tbaAddress={tbaAddress}
                   address={address}
+                  isEquipPending={isEquipPending}
+                  setIsEquipPending={setIsEquipPending}
                 />
               </div>
             ))}
