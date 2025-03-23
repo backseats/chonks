@@ -1,15 +1,12 @@
 import Head from "next/head";
 import MenuBar from "@/components/marketplace/MenuBar";
-import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
-import { Trait } from "@/types/Trait";
 import {
   mainABI,
   mainContract,
   marketplaceContract,
   marketplaceABI,
-  traitsContract,
   chainId,
 } from "@/config";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
@@ -20,25 +17,11 @@ import { Address } from "viem";
 import Loading from "@/components/marketplace/Loading";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { TraitMetadata, TraitMetadataResponse } from "@/types/TraitMetadata";
-import { GET_TRAIT_METADATA_BY_ID } from "@/lib/graphql/queries";
-import client from "@/lib/apollo-client";
-
-// type TraitOffer = {
-//   priceInWei: bigint;
-//   seller: string;
-//   sellerTBA: string;
-//   onlySellTo: string;
-// };
-
-export function decodeAndSetData(data: string, setData: (data: Trait) => void) {
-  const base64String = data.split(",")[1];
-  const jsonString = atob(base64String);
-  const jsonData = JSON.parse(jsonString) as Trait;
-
-  // console.log(jsonData);
-
-  setData(jsonData);
-}
+import {
+  GET_TRAIT_METADATA_BY_ID,
+  GET_TRAIT_IMAGE_BY_ID,
+} from "@/lib/graphql/queries";
+import client, { traitTokenURIClient } from "@/lib/apollo-client";
 
 export default function TraitDetail({ id }: { id: string }) {
   // const router = useRouter()
@@ -46,8 +29,8 @@ export default function TraitDetail({ id }: { id: string }) {
   const [isActivityOpen, setIsActivityOpen] = useState(true);
   const [isOffersOpen, setIsOffersOpen] = useState(true);
   const [isTraitsOpen, setIsTraitsOpen] = useState(true);
-
-  const TOKEN_URI = "tokenURI";
+  const [isLoading, setIsLoading] = useState(false);
+  const [traitImage, setTraitImage] = useState<string | undefined>(undefined);
 
   const { address } = useAccount();
 
@@ -56,13 +39,6 @@ export default function TraitDetail({ id }: { id: string }) {
     walletClient,
     chainId,
   });
-
-  const [tokenData, setTokenData] = useState<Trait | null>(null);
-  const [filteredTraitTokenIds, setFilteredTraitTokenIds] = useState<BigInt[]>(
-    []
-  );
-
-  // const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
 
   //get Trait Offers - accessing the offers directly from mapping
   // but we now have : getTraitOffer
@@ -118,14 +94,40 @@ export default function TraitDetail({ id }: { id: string }) {
   //   return traitOffer.onlySellTo.toLowerCase() === address.toLowerCase();
   // }, [traitOffer, address, isOfferSpecific]);
 
+  useEffect(() => {
+    const fetchTraitImage = async () => {
+      setIsLoading(true);
+
+      try {
+        const response = await traitTokenURIClient.query({
+          query: GET_TRAIT_IMAGE_BY_ID,
+          variables: { id: id.toString() },
+        });
+
+        const tokenURI = response.data.traitUri.tokenUri;
+        const tokenURIString = tokenURI as string;
+        const base64String = tokenURIString.split(",")[1];
+        const jsonString = atob(base64String);
+        const jsonData = JSON.parse(jsonString);
+
+        setIsLoading(false);
+        setTraitImage(jsonData.image);
+      } catch (error) {
+        console.error("Error fetching trait image", error);
+      }
+    };
+
+    if (!isLoading) fetchTraitImage();
+  }, [id, isLoading]);
+
   // Get main body tokenURI
-  const { data: tokenURIData } = useReadContract({
-    address: traitsContract,
-    abi: mainABI,
-    functionName: TOKEN_URI,
-    args: [BigInt(id)],
-    chainId,
-  }) as { data: string };
+  // const { data: tokenURIData } = useReadContract({
+  //   address: traitsContract,
+  //   abi: mainABI,
+  //   functionName: TOKEN_URI,
+  //   args: [BigInt(id)],
+  //   chainId,
+  // }) as { data: string };
 
   // const { data: owner } = useReadContract({
   //     address: traitsContract,
@@ -185,10 +187,6 @@ export default function TraitDetail({ id }: { id: string }) {
   const [owner, tokenIdOfTBA, ownerOfTraitOwner, isEquipped] =
     fullPictureForTrait || [];
 
-  // console.log("traitOwnerTBA", owner);
-  // console.log("chonkTokenId", tokenIdOfTBA?.toString());
-  // console.log("chonkOwner", ownerOfTraitOwner);
-
   const chonkId = tokenIdOfTBA?.toString() ?? null;
 
   const tbaAddress = chonkId
@@ -217,15 +215,6 @@ export default function TraitDetail({ id }: { id: string }) {
   //     args: [tokenIdOfTBA, BigInt(id)],
   //     chainId,
   // }) as { data: boolean };
-
-  useEffect(() => {
-    if (tokenURIData) {
-      decodeAndSetData(tokenURIData, setTokenData);
-    }
-    // else {
-    //   console.log("No tokenURI data");
-    // }
-  }, [tokenURIData]);
 
   // const account = tokenboundClient.getAccount({
   //     tokenContract: mainContract,
@@ -300,7 +289,7 @@ export default function TraitDetail({ id }: { id: string }) {
           variables: { id: parseInt(id) },
         });
 
-        console.log("Trait metadata from GraphQL:", data);
+        // console.log("Trait metadata from GraphQL:", data);
 
         if (data?.traitMetadata?.items?.length > 0) {
           setTraitMetadata(data.traitMetadata.items[0]);
@@ -329,7 +318,7 @@ export default function TraitDetail({ id }: { id: string }) {
           property="og:description"
           content={`View Trait #${id} on the Chonks marketplace`}
         />
-        {tokenData && <meta property="og:image" content={tokenData.image} />}
+        {traitImage && <meta property="og:image" content={traitImage} />}
         <meta
           property="og:url"
           content={`https://chonks.xyz/market/traits/${id}`}
@@ -364,12 +353,12 @@ export default function TraitDetail({ id }: { id: string }) {
         <MenuBar />
 
         <main className="w-full border-t border-gray-300">
-          {tokenData ? (
+          {traitImage ? (
             <>
               <div className="hidden sm:flex sm:flex-row sm:gap-[3.45vw] sm:py-[1.725vw] sm:px-[3.45vw]">
                 <div className="w-2/5">
                   <img
-                    src={tokenData.image}
+                    src={traitImage}
                     alt={`Trait ${id}`}
                     className="w-full h-auto"
                   />
@@ -385,7 +374,6 @@ export default function TraitDetail({ id }: { id: string }) {
                 <div className="w-3/5">
                   <OwnershipSection
                     id={id}
-                    tokenData={tokenData}
                     owner={owner}
                     tbaOwner={ownerOfTraitOwner}
                     tokenIdOfTBA={tokenIdOfTBA?.toString()}
@@ -433,14 +421,13 @@ export default function TraitDetail({ id }: { id: string }) {
                 </h1>
 
                 <img
-                  src={tokenData.image}
+                  src={traitImage}
                   alt={`Trait ${id}`}
                   className="w-full h-auto p-4"
                 />
 
                 <OwnershipSection
                   id={id}
-                  tokenData={tokenData}
                   owner={owner}
                   tbaOwner={ownerOfTraitOwner}
                   tokenIdOfTBA={tokenIdOfTBA?.toString()}

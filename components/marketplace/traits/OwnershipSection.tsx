@@ -8,7 +8,6 @@ import { mainnet } from "wagmi/chains";
 
 interface Props {
   id: string;
-  tokenData: Trait | null;
   owner: Address | string | null;
   tbaOwner: Address | string | null;
   tokenIdOfTBA: string | null;
@@ -18,16 +17,8 @@ interface Props {
 }
 
 export default function OwnershipSection(props: Props) {
-  const {
-    id,
-    tokenData,
-    owner,
-    tbaOwner,
-    tokenIdOfTBA,
-    address,
-    isEquipped,
-    traitName,
-  } = props;
+  const { id, owner, tbaOwner, tokenIdOfTBA, address, isEquipped, traitName } =
+    props;
 
   // console.log("owner", owner);
   // Add ENS resolution

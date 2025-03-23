@@ -407,6 +407,27 @@ export default function PriceAndActionsSection(
   // Render buyer actions
   const renderBuyerActions = () => (
     <div className="flex flex-col gap-2">
+      {/* Chonk selection for buying traits */}
+      {!isOfferSpecific && (
+        <div className="mb-2 sm:mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Which Chonk will own this Trait?
+          </label>
+          <select
+            value={selectedChonkId}
+            onChange={(e) => setSelectedChonkId(e.target.value)}
+            className="w-full text-[14px] sm:text-sm font-medium p-2 border bg-white"
+          >
+            <option value="">Select a Chonk</option>
+            {ownedChonks?.map((chonk) => (
+              <option key={parseInt(chonk)} value={parseInt(chonk)}>
+                Chonk #{parseInt(chonk)}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <ActionButton
         variant="primary"
         disabled={Boolean(
@@ -456,27 +477,6 @@ export default function PriceAndActionsSection(
             </div>
           )}
         </>
-      )}
-
-      {/* Chonk selection for buying traits */}
-      {!isOfferSpecific && (
-        <div className="mb-2 mt-4 sm:mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Which Chonk will own this Trait?
-          </label>
-          <select
-            value={selectedChonkId}
-            onChange={(e) => setSelectedChonkId(e.target.value)}
-            className="w-full text-[14px] sm:text-sm font-medium p-2 border bg-white"
-          >
-            <option value="">Select a Chonk</option>
-            {ownedChonks?.map((chonk) => (
-              <option key={parseInt(chonk)} value={parseInt(chonk)}>
-                Chonk #{parseInt(chonk)}
-              </option>
-            ))}
-          </select>
-        </div>
       )}
     </div>
   );

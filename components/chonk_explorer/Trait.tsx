@@ -12,7 +12,7 @@ import { useTBATransferTrait } from "@/hooks/useTBATransferTrait";
 import { Address } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import TransferTraitModal from "./TransferTraitModal";
-
+import { Chonk } from "@/types/Chonk";
 export const categoryList = Object.values(Category);
 
 interface Props {
@@ -44,11 +44,20 @@ export default function Trait(props: Props) {
   } = props;
 
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  // A data object w/ name, desc, image, attributes
+  const [traitData, setTraitData] = useState<Chonk | null>(null);
 
   const { transferTrait } = useTBATransferTrait(tokenboundClient);
 
-  // A data object w/ name, desc, image, attributes
-  const traitData = useTraitData(traitTokenId);
+  useEffect(() => {
+    const fetchTraitData = async () => {
+      const data = await useTraitData(traitTokenId);
+      setTraitData(data);
+    };
+
+    if (!traitData) fetchTraitData();
+  }, [traitTokenId]);
+
   // e.g. "Hair"
   const traitType = useTraitType(traitTokenId);
   // e.g. "Blue Pants"

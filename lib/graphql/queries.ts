@@ -56,7 +56,6 @@ export const GET_TRAIT_METADATA_BY_ID = gql`
         creator
         colorMap
         activeListing
-        tokenURI
       }
     }
   }
@@ -97,7 +96,6 @@ query GetTraitsForChonkId($id: BigInt!) {
               id
               traitName
               traitType
-              tokenURI
             }
           }
         }
@@ -160,6 +158,15 @@ query GetTraitHistory($id: BigInt!) {
       txHash
       txType
     }
+  }
+}
+`;
+
+export const GET_TRAIT_IMAGE_BY_ID = gql`
+query traitURI($id: BigInt!) {
+  traitUri(id: $id) {
+    tokenUri
+    id
   }
 }
 `;

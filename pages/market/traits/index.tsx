@@ -52,8 +52,6 @@ export default function TraitsMarketplace() {
           query: TRAIT_LISTINGS,
         });
 
-        // console.log("Trait listings data:", data);
-
         if (data && data.traitListings && data.traitListings.items) {
           // Store raw listings without filtering or sorting
           setRawTraitListings(data.traitListings.items as TraitListing[]);

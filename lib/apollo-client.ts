@@ -25,6 +25,14 @@ const httpLink = new HttpLink({
   },
 });
 
+const traitTokenURILink = new HttpLink({
+  uri: process.env.NEXT_PUBLIC_TRAIT_TOKEN_URI_GRAPHQL_ENDPOINT,
+  credentials: 'include', // This might help with CORS issues
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
 // Create the Apollo Client instance
 const client = new ApolloClient({
   link: from([errorLink, httpLink]),
@@ -35,10 +43,25 @@ const client = new ApolloClient({
       errorPolicy: 'all',
     },
     query: {
-      fetchPolicy: 'no-cache',
+      fetchPolicy: 'cache-first',
       errorPolicy: 'all',
     },
   },
 });
 
 export default client;
+
+export const traitTokenURIClient = new ApolloClient({
+  link: from([errorLink, traitTokenURILink]),
+  cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'all',
+    },
+    query: {
+      fetchPolicy: 'cache-first',
+      errorPolicy: 'all',
+    },
+  },
+});

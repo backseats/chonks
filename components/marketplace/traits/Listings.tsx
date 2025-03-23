@@ -3,6 +3,9 @@ import { TraitListing } from "@/pages/market/traits";
 import ListingInfo from "@/components/marketplace/common/ListingInfo";
 import { useReadContract } from "wagmi";
 import { traitsContract, traitsABI } from "@/config";
+import { traitTokenURIClient as client } from "@/lib/apollo-client";
+import { GET_TRAIT_IMAGE_BY_ID } from "@/lib/graphql/queries";
+import { useEffect, useState } from "react";
 
 interface ListingsProps {
   isSidebarVisible: boolean;
@@ -37,8 +40,37 @@ export default function Listings({
   );
 }
 
-// TODO: Grab this from the indexer
+// TODO: Grab this from the indexer. Issue was rate limit with so many of these requests
 const TraitImage = ({ id }: { id: string }) => {
+  // const [isLoading, setIsLoading] = useState(false);
+  // const [traitImage, setTraitImage] = useState<string | null>(null);
+
+  // useEffect(() => {
+  //   const fetchTraitImage = async () => {
+  //     setIsLoading(true);
+
+  //     try {
+  //       const response = await client.query({
+  //         query: GET_TRAIT_IMAGE_BY_ID,
+  //         variables: { id: id.toString() },
+  //       });
+
+  //       const tokenURI = response.data.traitUri.tokenUri;
+  //       const tokenURIString = tokenURI as string;
+  //       const base64String = tokenURIString.split(",")[1];
+  //       const jsonString = atob(base64String);
+  //       const jsonData = JSON.parse(jsonString);
+
+  //       setIsLoading(false);
+  //       setTraitImage(jsonData.image);
+  //     } catch (error) {
+  //       console.error("Error fetching trait image", error);
+  //     }
+  //   };
+
+  //   if (!isLoading) fetchTraitImage();
+  // }, [id, isLoading]);
+
   const { data: tokenURI, isLoading } = useReadContract({
     address: traitsContract,
     abi: traitsABI,

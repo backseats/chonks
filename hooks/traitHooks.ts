@@ -1,6 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-
 import {
   mainContract,
   mainABI,
@@ -10,43 +9,26 @@ import {
 } from "@/config";
 import { Chonk } from "@/types/Chonk";
 import { Category } from "@/types/Category";
-
-// Temporarily here because /chonks/[id] is hidden in vercelignore
-function decodeAndSetData(data: string, setData: (data: Chonk) => void) {
-  // const decodedContent = decodeURIComponent(data);
-  // const base64String = decodedContent.split("data:application/json,")[1];
-  // // Parse as JSON and stringify with proper formatting
-  // const jsonData = JSON.parse(base64String);
-
-  // console.log(jsonData);
-
-  const base64String = data.split(",")[1];
-  const jsonString = atob(base64String);
-  const jsonData = JSON.parse(jsonString) as Chonk;
-
-  setData(jsonData);
-}
+import {
+  GET_TRAIT_IMAGE_BY_ID,
+} from "@/lib/graphql/queries";
+import { traitTokenURIClient } from "@/lib/apollo-client";
 
 export const categoryList = Object.values(Category);
 
-export function useTraitData(traitTokenId: string) {
-  const [traitData, setTraitData] = useState<Chonk | null>(null);
+export async function useTraitData(traitTokenId: string) {
+  const response = await traitTokenURIClient.query({
+    query: GET_TRAIT_IMAGE_BY_ID,
+    variables: { id: traitTokenId },
+  });
 
-  const { data: traitTokenURIData } = useReadContract({
-    address: traitsContract,
-    abi: mainABI,
-    functionName: "tokenURI",
-    args: [traitTokenId],
-    chainId,
-  }) as { data: string };
+  const traitTokenURIData = response.data.traitUri.tokenUri;
 
-  useEffect(() => {
-    if (traitTokenURIData && !traitData) {
-      decodeAndSetData(traitTokenURIData, setTraitData);
-    }
-  }, [traitTokenURIData, traitData]);
+  const base64String = traitTokenURIData.split(",")[1];
+  const jsonString = atob(base64String);
+  const jsonData = JSON.parse(jsonString) as Chonk;
 
-  return traitData;
+  return jsonData;
 }
 
 export function useGetTrait(traitTokenId: string) {
