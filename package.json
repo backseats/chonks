@@ -22,7 +22,7 @@
     "@uiw/react-color-block": "^2.3.0",
     "@uiw/react-color-circle": "^2.3.0",
     "@uiw/react-color-colorful": "^2.3.0",
-    "connectkit": "^1.8.0",
+    "connectkit": "^1.8.2",
     "file-saver": "^2.0.5",
     "graphql": "^16.10.0",
     "gsap": "^3.12.5",

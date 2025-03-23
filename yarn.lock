@@ -2789,9 +2789,9 @@ confbox@^0.1.7:
   resolved "https://registry.npmjs.org/confbox/-/confbox-0.1.7.tgz"
   integrity sha512-uJcB/FKZtBMCJpK8MQji6bJHgu1tixKPxRLeGkNzBoOZzpnZUJm0jm2/sBDWcuBx1dYgxV4JU+g5hmNxCyAmdA==
 
-connectkit@^1.8.0:
+connectkit@^1.8.2:
   version "1.8.2"
-  resolved "https://registry.npmjs.org/connectkit/-/connectkit-1.8.2.tgz"
+  resolved "https://registry.yarnpkg.com/connectkit/-/connectkit-1.8.2.tgz#9b350b47720347f0ebb599260fe3a8c964e51321"
   integrity sha512-Za6jR5RtCimzSFqAH1OgUYES96ThTei6d/TvKWNU3GeZPPnwVojtfhFn9wUOam81RknxylvVpG727BPmjguzbA==
   dependencies:
     buffer "^6.0.3"
