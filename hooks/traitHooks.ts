@@ -16,7 +16,7 @@ import { traitTokenURIClient } from "@/lib/apollo-client";
 
 export const categoryList = Object.values(Category);
 
-export async function useTraitData(traitTokenId: string) {
+export async function getTraitData(traitTokenId: string) {
   const response = await traitTokenURIClient.query({
     query: GET_TRAIT_IMAGE_BY_ID,
     variables: { id: traitTokenId },

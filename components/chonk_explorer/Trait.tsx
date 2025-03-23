@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Category } from "@/types/Category";
 import {
-  useTraitData,
+  getTraitData,
   useTraitType,
   useTraitName,
   useEquip,
@@ -51,7 +51,7 @@ export default function Trait(props: Props) {
 
   useEffect(() => {
     const fetchTraitData = async () => {
-      const data = await useTraitData(traitTokenId);
+      const data = await getTraitData(traitTokenId);
       setTraitData(data);
     };
 
