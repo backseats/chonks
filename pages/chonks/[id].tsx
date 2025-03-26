@@ -38,6 +38,7 @@ import {
   useOneBitChonksOwnership,
   useRetroChonksOwnership,
   useClassOfTwentyFour,
+  useLiquidCulturePodcastOwnership,
 } from "@/hooks/useSongADayMannOwnership";
 import Image from "next/image";
 import Link from "next/link";
@@ -397,6 +398,8 @@ export default function ChonkDetail({ id }: { id: string }) {
   const oneBitChonksOwnership = useOneBitChonksOwnership(tbaAddress);
   const classOfTwentyFourOwnership = useClassOfTwentyFour(tbaAddress);
   const retroChonksOwnership = useRetroChonksOwnership(tbaAddress);
+  const liquidCulturePodcastOwnership =
+    useLiquidCulturePodcastOwnership(tbaAddress);
 
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
@@ -744,6 +747,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                   basePaintOwnership577 ||
                   songDaymannOwnership ||
                   farWestOwnership ||
+                  liquidCulturePodcastOwnership ||
                   oneBitChonksOwnership.hasAssets ||
                   retroChonksOwnership.hasAssets ||
                   classOfTwentyFourOwnership.hasAssets) && (
@@ -873,6 +877,21 @@ export default function ChonkDetail({ id }: { id: string }) {
                             />
                           </Link>
                         ))}
+
+                      {liquidCulturePodcastOwnership && (
+                        <Link
+                          href="https://opensea.io/assets/base/0xa0e9e8f792c2f15938474cabaca2705d9d8475eb/42"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Image
+                            src="/liquidculture.png"
+                            alt="Liquid Culture Podcast"
+                            width={300}
+                            height={300}
+                          />
+                        </Link>
+                      )}
                     </div>
                   </div>
                 )}

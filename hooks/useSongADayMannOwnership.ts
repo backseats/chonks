@@ -129,3 +129,7 @@ export function useRetroChonksOwnership(tbaAddress: Address): NFTOwnershipResult
 export function useClassOfTwentyFour(tbaAddress: Address): NFTOwnershipResult {
   return _useNFTOwnership(tbaAddress, "0xc3a9812cb19fb2495a88f77a09b2f1099276e87e");
 }
+
+export function useLiquidCulturePodcastOwnership(tbaAddress: Address): boolean {
+  return _useSimpleNFTOwnership(tbaAddress, "0xa0e9e8f792c2f15938474cabaca2705d9d8475eb", 42n);
+}
