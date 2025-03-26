@@ -60,20 +60,21 @@ function _useNFTOwnership(tbaAddress: Address, contractAddress: Address): NFTOwn
     queryKey: [`base-${contractAddress}`, tbaAddress],
     queryFn: async () => {
       const res = await fetch(
-        `https://api.simplehash.com/api/v0/nfts/owners_v2?chains=base&wallet_addresses=${tbaAddress}&queried_wallet_balances=1&contract_ids=base.${contractAddress}&order_by=transfer_time__desc&limit=20`,
+        `https://base-mainnet.g.alchemy.com/nft/v3/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}/getNFTsForOwner?owner=${tbaAddress}&contractAddresses[]=${contractAddress}&withMetadata=true&pageSize=100`,
         {
           headers: {
-            'X-API-KEY': process.env.NEXT_PUBLIC_SIMPLEHASH_API_KEY!,
             'accept': 'application/json'
           }
         }
       );
       const data = await res.json();
 
-      return data.nfts.map((nft: any) => ({
-        imageUrl: nft.previews.image_medium_url,
+      return data.ownedNfts.map((nft: any) => ({
+        imageUrl: nft.image.pngUrl,
+        thumbNailUrl: nft.image.thumbnailUrl,
+        cachedUrl: nft.image.cachedUrl,
         name: nft.name,
-        id: nft.token_id
+        id: nft.tokenId
       }));
     },
     enabled: Boolean(balance && balance > 0n)

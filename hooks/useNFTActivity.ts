@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { mainContract, simpleHashKey, traitsContract } from '@/config';
+import { mainContract, traitsContract } from '@/config';
 
 interface NFTActivity {
   // We'll need to define the full type based on SimpleHash response
@@ -16,6 +16,7 @@ interface NFTActivity {
 // Add chain constant at the top
 const CHAIN = 'base-sepolia';
 
+// NOTE: NOT USED ANYMORE.
 export function useNFTActivity(type: "chonk" | "trait", tokenId?: string) {
   const contractAddress = type === "chonk" ? mainContract : traitsContract;
 

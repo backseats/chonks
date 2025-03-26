@@ -26,8 +26,6 @@ export const marketplaceABI = chonksMarketABI;
 export const colorMapABI = chonksColorMapABI;
 export const bulkTraitTransferABI = chonkBulkTraitTransferABI;
 
-export const simpleHashKey = "makingmemark_sk_ab7284sr3v5o19g3iaublzep6sffynfu"; // TODO: env var
-
 export const chainId = base.id;
 
 export const config = createConfig({

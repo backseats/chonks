@@ -822,8 +822,8 @@ export default function ChonkDetail({ id }: { id: string }) {
                             rel="noopener noreferrer"
                           >
                             <div className="flex flex-col items-center">
-                              <Image
-                                src={asset.imageUrl}
+                              <img
+                                src={asset.cachedUrl}
                                 alt={`One Bit Chonks #${asset.id}`}
                                 width={300}
                                 height={300}
@@ -845,7 +845,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                           >
                             <div className="flex flex-col items-center">
                               <Image
-                                src={asset.imageUrl}
+                                src={asset.cachedUrl}
                                 alt={`Retro Chonks #${asset.id}`}
                                 width={300}
                                 height={300}
