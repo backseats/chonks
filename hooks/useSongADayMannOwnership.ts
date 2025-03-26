@@ -1,12 +1,11 @@
 import { useReadContract } from 'wagmi';
 import { Address } from 'viem';
 import { useQuery } from '@tanstack/react-query';
-import { base } from "viem/chains";
-
-const chainId = base.id
+import { chainId } from "@/config"
 
 // abis
 
+/// 1155 ABI
 const abi = [
   {
     inputs: [
@@ -20,6 +19,7 @@ const abi = [
   },
 ] as const;
 
+/// 721 ABI
 const erc721Abi = [
   {
     inputs: [
@@ -114,8 +114,13 @@ export function useSongDaymannOwnership(tbaAddress: Address): boolean {
   return _useSimpleNFTOwnership(tbaAddress, "0xb3bad5fe12268edc8a52ff786076c1d1fa92ef0d", 2n);
 }
 
+// TOOD: update to useNFTOwnership
 export function useFarWestOwnership(tbaAddress: Address): boolean {
   return _useSimpleNFTOwnership(tbaAddress, "0x0000000080d04343d60d06e1a36aaf46c9242805");
+}
+
+export function useLiquidCulturePodcastOwnership(tbaAddress: Address): boolean {
+  return _useSimpleNFTOwnership(tbaAddress, "0xa0e9e8f792c2f15938474cabaca2705d9d8475eb", 42n);
 }
 
 export function useOneBitChonksOwnership(tbaAddress: Address): NFTOwnershipResult {
@@ -128,8 +133,4 @@ export function useRetroChonksOwnership(tbaAddress: Address): NFTOwnershipResult
 
 export function useClassOfTwentyFour(tbaAddress: Address): NFTOwnershipResult {
   return _useNFTOwnership(tbaAddress, "0xc3a9812cb19fb2495a88f77a09b2f1099276e87e");
-}
-
-export function useLiquidCulturePodcastOwnership(tbaAddress: Address): boolean {
-  return _useSimpleNFTOwnership(tbaAddress, "0xa0e9e8f792c2f15938474cabaca2705d9d8475eb", 42n);
 }
