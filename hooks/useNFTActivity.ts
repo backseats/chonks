@@ -26,12 +26,7 @@ export function useNFTActivity(type: "chonk" | "trait", tokenId?: string) {
       if (!tokenId) return null;
 
       const response = await fetch(
-        `https://api.simplehash.com/api/v0/nfts/transfers/${CHAIN}/${contractAddress}/${tokenId}`,
-        {
-          headers: {
-            'X-API-KEY': simpleHashKey,
-          },
-        }
+        `https://api.simplehash.com/api/v0/nfts/transfers/${CHAIN}/${contractAddress}/${tokenId}`
       );
 
       if (!response.ok) {
