@@ -1,5 +1,5 @@
 import Head from "next/head";
-import MenuBar from "@/components/marketplace/MenuBar";
+import MenuBar from "@/components//MenuBar";
 import { useState, useEffect, useMemo } from "react";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import {

@@ -21,7 +21,7 @@ import { mainnet } from "viem/chains";
 import { StoredChonk } from "@/types/StoredChonk";
 import EquipmentContainer from "@/components/chonk_explorer/EquipmentContainer";
 import { Category } from "@/types/Category";
-import MenuBar from "@/components/chonk_explorer/MenuBar";
+import MenuBar from "@/components/MenuBar";
 import MainChonkImage from "@/components/chonk_explorer/MainChonkImage";
 import OwnershipSection from "@/components/chonk_explorer/OwnershipSection";
 import Trait from "@/components/chonk_explorer/Trait";
@@ -579,7 +579,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       <div className="min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw] pb-12 sm:pb-6">
         <MenuBar />
 
-        <div className="w-full mx-auto">
+        <div className="w-full mx-auto border-t">
           {isOwner && (
             <div className="hidden sm:block">
               <ChonkControls

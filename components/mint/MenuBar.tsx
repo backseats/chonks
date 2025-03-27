@@ -38,7 +38,7 @@ export default function MenuBar(props: Props) {
         <div> | </div>
 
         <Link href="/profile" className="hover:opacity-70 transition-opacity">
-          Your Chonks
+          My Chonks
         </Link>
       </div>
 

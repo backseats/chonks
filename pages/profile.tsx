@@ -1,5 +1,5 @@
 import Head from "next/head";
-import MenuBar from "@/components/profile/MenuBar";
+import MenuBar from "@/components/MenuBar";
 import { useState, useEffect } from "react";
 import { VscListFilter, VscSearch } from "react-icons/vsc";
 import Stats from "@/components/marketplace/Stats";
@@ -52,7 +52,7 @@ export default function Profile(props: Props) {
         <title>
           {possibleAddress ? `${possibleAddress}'s Chonks` : "Your Chonks"}
         </title>
-        <meta name="description" content="Your Chonks| Chonks" />
+        <meta name="description" content="My Chonks| Chonks" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import Head from "next/head";
-import MenuBar from "@/components/marketplace/MenuBar";
+import MenuBar from "@/components//MenuBar";
 import Stats from "@/components/marketplace/Stats";
 import Tabs from "@/components/marketplace/Tabs";
 import Sidebar from "@/components/marketplace/Sidebar";

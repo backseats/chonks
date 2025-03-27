@@ -39,7 +39,7 @@ export default function OwnershipSection(props: Props) {
 
   return (
     <>
-      <h1 className="text-[28px] font-bold text-center mt-8 sm:mt-0 mb-1">
+      <h1 className="text-[28px] font-bold text-center mt-6 sm:mt-8 mb-1">
         Chonk #{id}
       </h1>
 

@@ -39,7 +39,7 @@ export default function MenuBar() {
           href="/profile"
           className="hover:opacity-70 transition-opacity underline"
         >
-          Your Chonks
+          My Chonks
         </Link>
       </div>
 

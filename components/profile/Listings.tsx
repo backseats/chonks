@@ -58,7 +58,7 @@ export default function Listings({
     <div className="w-full">
       {!address && (
         <div className="flex flex-col border border-black bg-white p-4 h-[300px justify-center items-center">
-          <p className="text-lg">Connect your wallet to see your Chonks</p>
+          <div className="text-lg mb-4">Sign in to see your Chonks</div>
           <MarketplaceConnectKitButton />
         </div>
       )}

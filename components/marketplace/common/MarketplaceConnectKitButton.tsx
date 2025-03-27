@@ -4,6 +4,7 @@ export default function MarketplaceConnectKitButton() {
   return (
     <ConnectKitButton
       // theme="web"
+      label="Sign In"
       customTheme={{
         "--ck-font-family": "'Source Code Pro', monospace",
         "--ck-primary-button-background": "#2F7BA7",
@@ -17,7 +18,7 @@ export default function MarketplaceConnectKitButton() {
         "--ck-connectbutton-border-radius": "0px",
         "--ck-connectbutton-color": "#FFFFFF",
         "--ck-connectbutton-font-weight": "600",
-        "--ck-connectbutton-font-size": "21px",
+        "--ck-connectbutton-font-size": "18px",
       }}
     />
   );

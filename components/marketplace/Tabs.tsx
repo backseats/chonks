@@ -32,7 +32,7 @@ export default function Tabs({ activeTab, onTabChange }: TabsProps) {
         {tabs.map((tab, index) => (
           <>
             <button
-              key={tab}
+              key={`${tab}-${index}`}
               className={`hover:bg-gray-200 hover:text-black px-4 mr-2 py-2 border border-black ${
                 activeTab === tab ? "bg-[#126E9D] text-white" : ""
               }`}

@@ -82,7 +82,7 @@ export default function MenuBar() {
                   className="px-4 py-2 bg-black text-white font-source-code-pro text-[16px] hidden sm:flex"
                   onClick={() => router.push("/profile")}
                 >
-                  <div className="mt-[1px]">Your Chonks</div>
+                  <div className="mt-[1px]">My Chonks</div>
                 </button>
               </>
             )}
@@ -111,7 +111,7 @@ export default function MenuBar() {
           className="mx-4 py-2 bg-black text-white font-source-code-pro text-[16px]"
           onClick={() => router.push("/profile")}
         >
-          Your Chonks
+          My Chonks
         </button>
       </div>
     </>
