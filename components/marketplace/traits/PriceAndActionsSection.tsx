@@ -214,8 +214,8 @@ export default function PriceAndActionsSection(
     chainId: mainnet.id,
   });
 
-   // onlySellToAddress ens name
-   const { data: ensOnlySellToAddress } = useEnsName({
+  // onlySellToAddress ens name
+  const { data: ensOnlySellToAddress } = useEnsName({
     address: onlySellToAddress as Address,
     chainId: mainnet.id,
   });
@@ -420,7 +420,7 @@ export default function PriceAndActionsSection(
       {!isOfferSpecific && (
         <div className="mb-2 sm:mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Which Chonk will own this Trait?
+            Buy Trait for which Chonk?
           </label>
           <select
             value={selectedChonkId}
@@ -508,7 +508,11 @@ export default function PriceAndActionsSection(
                 </span>
                 {ethPrice && price && (
                   <span className="text-gray-500 text-sm">
-                    (${(price * ethPrice).toLocaleString(undefined, { maximumFractionDigits: 2 })})
+                    ($
+                    {(price * ethPrice).toLocaleString(undefined, {
+                      maximumFractionDigits: 2,
+                    })}
+                    )
                   </span>
                 )}
               </div>
@@ -520,7 +524,8 @@ export default function PriceAndActionsSection(
                   address &&
                   getAddress(onlySellToAddress) === getAddress(address)
                     ? "You"
-                    : ensOnlySellToAddress || truncateEthAddress(onlySellToAddress)}
+                    : ensOnlySellToAddress ||
+                      truncateEthAddress(onlySellToAddress)}
                 </span>
               )}
 
