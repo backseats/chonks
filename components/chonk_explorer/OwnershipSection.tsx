@@ -3,7 +3,8 @@ import { Address } from "viem";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-
+import { mainnet } from "viem/chains";
+import { useEnsName } from "wagmi";
 interface Props {
   id: string;
   tokenData: Chonk | null;
@@ -15,6 +16,11 @@ interface Props {
 
 export default function OwnershipSection(props: Props) {
   const { id, tokenData, owner, address, tbaAddress, isYours } = props;
+
+  const { data: ensName } = useEnsName({
+    address: owner as Address,
+    chainId: mainnet.id,
+  });
 
   const router = useRouter();
 
@@ -53,7 +59,7 @@ export default function OwnershipSection(props: Props) {
             >
               {isYours
                 ? "Owned by You"
-                : `Owned By ${truncateEthAddress(owner)}`}
+                : `Owned By ${ensName || truncateEthAddress(owner)}`}
             </div>
 
             <span
