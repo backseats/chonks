@@ -66,7 +66,7 @@ export const OfferModal = ({
           min={MARKETPLACE_CONSTANTS.MIN_LISTING_PRICE}
           value={offerAmount}
           onChange={handleAmountChange}
-          className="border p-2"
+          className="border p-2 text-[16px]"
           placeholder={minimumOffer}
         />
 
@@ -110,7 +110,7 @@ export const OfferModal = ({
         </div>
       )}
 
-      <div className="flex gap-2 mt-4 text-[16px]">
+      <div className="flex gap-4 mt-4 text-[16px]">
         {!isBidPending && (
           <button
             className="flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300"

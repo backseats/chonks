@@ -10,11 +10,15 @@ import Footer from "../components/layout/Footer";
 import LFC from "../components/layout/LFC";
 import Team from "../components/home/Team";
 import Link from "next/link";
+import { useAccount } from "wagmi";
+import { ConnectKitButton } from "connectkit";
+import MenuBar from "@/components/MenuBar";
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
+  const { isConnected } = useAccount();
   const heroRef = useRef<HTMLHeadingElement>(null);
   const gridSectionRef = useRef<HTMLElement>(null);
   const chonkAppearRef = useRef<HTMLElement>(null);
@@ -258,7 +262,7 @@ export default function Home() {
               onClick={(e) => scrollToSection(e, "#tbas")}
               className="hover:opacity-70 transition-opacity"
             >
-              TBAs
+              Token Bound Accounts
             </a>
 
             <a
@@ -273,7 +277,7 @@ export default function Home() {
               onClick={(e) => scrollToSection(e, "#marketplace")}
               className="hover:opacity-70 transition-opacity"
             >
-              Marketplace
+              Market
             </a>
             <a
               href="#team"
@@ -284,11 +288,46 @@ export default function Home() {
             </a>
           </div>
 
-          <Link href="/profile" className="hover:opacity-70 transition-opacity">
-            <button className="px-4 py-2 bg-black text-white font-source-code-pro text-sm">
-              Your Chonks
-            </button>
-          </Link>
+          {isConnected ? (
+            <div className="flex gap-2 mt-[2px] sm:mt-1">
+              <Link
+                href="/market"
+                className="hover:opacity-70 transition-opacity"
+              >
+                <button className="px-4 py-2 mt-1 sm:mt-0 bg-[#2F7BA7] text-white font-source-code-pro text-xs sm:text-sm">
+                  Market
+                </button>
+              </Link>
+
+              <Link
+                href="/profile"
+                className="hover:opacity-70 transition-opacity"
+              >
+                <button className="px-4 py-2 mt-1 sm:mt-0 bg-black text-white font-source-code-pro text-xs sm:text-sm">
+                  My Chonks
+                </button>
+              </Link>
+            </div>
+          ) : (
+            <ConnectKitButton
+              label="Sign In"
+              customTheme={{
+                "--ck-font-family": "'Source Code Pro', monospace",
+                "--ck-primary-button-background": "#2F7BA7",
+                "--ck-primary-button-hover-background": "#FFFFFF",
+                "--ck-primary-button-hover-color": "#2F7BA7",
+                "--ck-primary-button-border-radius": "0px",
+                "--ck-primary-button-font-weight": "400",
+                "--ck-connectbutton-background": "#2F7BA7",
+                "--ck-connectbutton-hover-background": "#111111",
+                "--ck-connectbutton-hover-color": "#FFFFFF",
+                "--ck-connectbutton-border-radius": "0px",
+                "--ck-connectbutton-color": "#FFFFFF",
+                "--ck-connectbutton-font-weight": "400",
+                "--ck-connectbutton-font-size": "16px",
+              }}
+            />
+          )}
         </nav>
 
         <main className="w-full overflow-x-hidden">

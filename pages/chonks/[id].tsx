@@ -48,47 +48,6 @@ import { ListingModal } from "@/components/marketplace/chonks/modals/ListingModa
 import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
 import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
 
-const renderAsDataUriABI = [
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "renderAsDataUri2D",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_tokenId",
-        type: "uint256",
-      },
-    ],
-    name: "renderAsDataUri3D",
-    outputs: [
-      {
-        internalType: "string",
-        name: "",
-        type: "string",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-];
-
 export default function ChonkDetail({ id }: { id: string }) {
   const TOKEN_URI = "tokenURI";
 
@@ -149,8 +108,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     }
   }, [tokenURIError]);
 
-  console.log("tokenURIData", tokenURIData);
-
   const { data: owner } = useReadContract({
     address: mainContract,
     abi: mainABI,
@@ -166,7 +123,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   const { data: render2dData, refetch: refetchRender2D } = useReadContract({
     address: mainContract,
-    abi: renderAsDataUriABI,
+    abi: mainABI,
     functionName: "renderAsDataUri2D",
     args: [BigInt(id)],
     chainId,
@@ -174,7 +131,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   const { data: render3dData, refetch: refetchRender3D } = useReadContract({
     address: mainContract,
-    abi: renderAsDataUriABI,
+    abi: mainABI,
     functionName: "renderAsDataUri3D",
     args: [BigInt(id)],
     chainId,
