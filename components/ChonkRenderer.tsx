@@ -190,7 +190,7 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
           );
           return (
             <div
-              key={`bg-${index}`}
+              key={`bg-${pixel.x}-${pixel.y}`}
               style={{
                 width: `${pixelSize}px`,
                 height: `${pixelSize}px`,
@@ -204,7 +204,7 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
       {/* Main Grid Layer */}
       {gridData.map((pixel, index) => (
         <div
-          key={index}
+          key={`pixel-${pixel.x}-${pixel.y}`}
           style={{
             width: `${pixelSize}px`,
             height: `${pixelSize}px`,
