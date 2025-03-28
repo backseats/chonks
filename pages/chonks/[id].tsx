@@ -10,16 +10,10 @@ import { Address, getAddress, isAddress } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
 import { CurrentChonk } from "@/types/CurrentChonk";
-import {
-  mainABI,
-  mainContract,
-  traitsContract,
-  traitsABI,
-  chainId,
-} from "@/config";
+import { mainABI, mainContract, chainId } from "@/config";
 import { mainnet } from "viem/chains";
 import { StoredChonk } from "@/types/StoredChonk";
-import EquipmentContainer from "@/components/chonk_explorer/EquipmentContainer";
+import UnequippedTraits from "@/components/chonk_explorer/UnequippedTraits";
 import { Category } from "@/types/Category";
 import MenuBar from "@/components/MenuBar";
 import MainChonkImage from "@/components/chonk_explorer/MainChonkImage";
@@ -47,10 +41,17 @@ import { ModalWrapper } from "@/components/marketplace/chonks/modals/ModalWrappe
 import { ListingModal } from "@/components/marketplace/chonks/modals/ListingModal";
 import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
 import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
+import client from "@/lib/apollo-client";
+import { GET_TRAITS_FOR_CHONK_ID } from "@/lib/graphql/queries";
+
+export type TraitInfo = {
+  colorMap: string;
+  id: string;
+  traitName: string;
+  traitType: number;
+};
 
 export default function ChonkDetail({ id }: { id: string }) {
-  const TOKEN_URI = "tokenURI";
-
   const { address } = useAccount();
 
   const { data: walletClient } = useWalletClient();
@@ -64,11 +65,10 @@ export default function ChonkDetail({ id }: { id: string }) {
   const [renderData2D, setRenderData2D] = useState<Chonk | null>(null);
   const [renderData3D, setRenderData3D] = useState<Chonk | null>(null);
 
-  const [filteredTraitTokenIds, setFilteredTraitTokenIds] = useState<BigInt[]>(
-    []
-  );
-
+  const [filteredTraitInfo, setFilteredTraitInfo] = useState<TraitInfo[]>([]);
+  const [equippedTraitInfo, setEquippedTraitInfo] = useState<TraitInfo[]>([]);
   const [currentChonk, setCurrentChonk] = useState<CurrentChonk | null>(null);
+  const [allTraitTokenIds, setAllTraitTokenIds] = useState<TraitInfo[]>([]);
 
   // Local Marketplace Listing States
   const [showListModal, setShowListModal] = useState(false);
@@ -97,7 +97,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   } = useReadContract({
     address: mainContract,
     abi: mainABI,
-    functionName: TOKEN_URI,
+    functionName: "tokenURI",
     args: [BigInt(id)],
     chainId,
   }) as { data: string; error: Error; refetch: () => void };
@@ -243,15 +243,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     setLocalListingPending(true);
   };
 
-  // useEffect(() => {
-  //   if (storedChonk) {
-  //     console.log("storedChonk:", storedChonk);
-  //   }
-  // else {
-  //   console.log("error getting storedChonk data");
-  // }
-  // }, [storedChonk]);
-
   useEffect(() => {
     if (isListingRejected) {
       setLocalListingRejected(true); // needed because we want to clear the rejection here
@@ -358,33 +349,35 @@ export default function ChonkDetail({ id }: { id: string }) {
   const liquidCulturePodcastOwnership =
     useLiquidCulturePodcastOwnership(tbaAddress);
 
-  // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
-  const { data: allTraitTokenIds } = useReadContract({
-    address: traitsContract,
-    abi: traitsABI,
-    functionName: "walletOfOwner",
-    args: [tbaAddress],
-    chainId,
-  }) as { data: BigInt[] };
+  useEffect(() => {
+    const fetchTraitsForChonkId = async () => {
+      const response = await client.query({
+        query: GET_TRAITS_FOR_CHONK_ID,
+        variables: { id },
+      });
 
-  // console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
+      const traits = response.data.chonk.tbas.items[0].traits.items;
+      const traitInfo: TraitInfo[] = traits.map(
+        (trait: any) => trait.traitInfo
+      );
+
+      setAllTraitTokenIds(traitInfo);
+    };
+
+    fetchTraitsForChonkId();
+  }, []);
 
   // This gets the ids that are equipped to the chonk
   useEffect(() => {
     if (!storedChonk) return;
     if (!allTraitTokenIds) return;
 
-    // console.log("storedChonk", storedChonk);
-    // console.log("allTraitTokenIds", allTraitTokenIds);
-
-    // need to check if the trait is revealed
-
     const headIdIndex =
       // @ts-ignore
       storedChonk.headId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedChonk.headId
+            (traitInfo) => traitInfo.id === storedChonk.headId.toString()
           );
 
     const hairIdIndex =
@@ -392,7 +385,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       storedChonk.hairId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedChonk.hairId
+            (traitInfo) => traitInfo.id === storedChonk.hairId.toString()
           );
 
     const faceIdIndex =
@@ -400,7 +393,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       storedChonk.faceId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedChonk.faceId
+            (traitInfo) => traitInfo.id === storedChonk.faceId.toString()
           );
 
     const accessoryIdIndex =
@@ -408,7 +401,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       storedChonk.accessoryId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedChonk.accessoryId
+            (traitInfo) => traitInfo.id === storedChonk.accessoryId.toString()
           );
 
     const topIdIndex =
@@ -416,7 +409,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       storedChonk.topId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedChonk.topId
+            (traitInfo) => traitInfo.id === storedChonk.topId.toString()
           );
 
     const bottomIdIndex =
@@ -424,7 +417,7 @@ export default function ChonkDetail({ id }: { id: string }) {
       storedChonk.bottomId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedChonk.bottomId
+            (traitInfo) => traitInfo.id === storedChonk.bottomId.toString()
           );
 
     const shoesIdIndex =
@@ -432,25 +425,36 @@ export default function ChonkDetail({ id }: { id: string }) {
       storedChonk.shoesId === 0n
         ? null
         : allTraitTokenIds.findIndex(
-            (tokenId) => tokenId === storedChonk.shoesId
+            (traitInfo) => traitInfo.id === storedChonk.shoesId.toString()
           );
 
-    const filteredTraitTokenIds = allTraitTokenIds.filter((tokenId, index) => {
-      return (
-        index !== headIdIndex &&
-        index !== hairIdIndex &&
-        index !== faceIdIndex &&
-        index !== accessoryIdIndex &&
-        index !== topIdIndex &&
-        index !== bottomIdIndex &&
-        index !== shoesIdIndex
-      );
-    });
+    const filteredTraitTokenIds = allTraitTokenIds
+      .map((traitInfo) => BigInt(traitInfo.id))
+      .filter((tokenId, index) => {
+        return (
+          index !== headIdIndex &&
+          index !== hairIdIndex &&
+          index !== faceIdIndex &&
+          index !== accessoryIdIndex &&
+          index !== topIdIndex &&
+          index !== bottomIdIndex &&
+          index !== shoesIdIndex
+        );
+      });
 
     // [] means everything is equipped
     console.log("filteredTraitTokenIds", filteredTraitTokenIds);
 
-    setFilteredTraitTokenIds(filteredTraitTokenIds);
+    const filteredTraitInfo = allTraitTokenIds.filter((traitInfo) =>
+      filteredTraitTokenIds.includes(BigInt(traitInfo.id))
+    );
+
+    const equippedTraitInfo = allTraitTokenIds.filter(
+      (traitInfo) => !filteredTraitTokenIds.includes(BigInt(traitInfo.id))
+    );
+
+    setEquippedTraitInfo(equippedTraitInfo);
+    setFilteredTraitInfo(filteredTraitInfo); // everything else
   }, [allTraitTokenIds, storedChonk]);
 
   const [showSendModal, setShowSendModal] = useState(false);
@@ -623,44 +627,26 @@ export default function ChonkDetail({ id }: { id: string }) {
                     {isOwner ? "Your" : "This"} Chonk is Wearing
                   </div>
 
-                  {/* Updated grid layout */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8 px-4 sm:px-8 max-w-[1400px] mx-auto">
-                    {currentChonk &&
-                      Object.keys(currentChonk).map((key, index) => {
-                        if (
-                          key === "epoch" ||
-                          key === "seed" ||
-                          key === "isRevealed" ||
-                          key === "bodyIndex" ||
-                          key === "tokenId" ||
-                          key === "backgroundColor" ||
-                          key === "render3D"
-                        )
-                          return null;
-
-                        const stored = currentChonk;
-
-                        // @ts-ignore
-                        if (stored[key]?.tokenId == 0) return null;
-
-                        return (
-                          <div key={index} className="aspect-square w-full">
-                            <Trait
-                              chonkId={id}
-                              // @ts-ignore
-                              traitTokenId={stored[key].tokenId.toString()}
-                              isEquipped={true}
-                              selectedCategory={"All"}
-                              isYours={isOwner}
-                              tbaAddress={tbaAddress}
-                              tokenboundClient={tokenboundClient}
-                              address={address}
-                              isEquipPending={isEquipPending}
-                              setIsEquipPending={setIsEquipPending}
-                            />
-                          </div>
-                        );
-                      })}
+                    {equippedTraitInfo.map((traitInfo, index) => {
+                      return (
+                        <div key={index} className="aspect-square w-full">
+                          <Trait
+                            chonkId={id}
+                            // @ts-ignore
+                            traitTokenId={traitInfo.id}
+                            isEquipped={true}
+                            isYours={isOwner}
+                            tbaAddress={tbaAddress}
+                            tokenboundClient={tokenboundClient}
+                            address={address}
+                            isEquipPending={isEquipPending}
+                            setIsEquipPending={setIsEquipPending}
+                            traitInfo={traitInfo}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -669,10 +655,10 @@ export default function ChonkDetail({ id }: { id: string }) {
                     Additional Traits in {isOwner ? "Your" : "Their"} Backpack
                   </div>
                   <div className="max-w-[1400px] mx-auto w-full">
-                    {filteredTraitTokenIds && (
-                      <EquipmentContainer
+                    {filteredTraitInfo && (
+                      <UnequippedTraits
                         chonkId={id.toString()}
-                        traitTokenIds={filteredTraitTokenIds}
+                        traits={filteredTraitInfo}
                         isYours={isOwner}
                         tokenboundClient={tokenboundClient}
                         tbaAddress={tbaAddress}
