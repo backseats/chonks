@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 
+// used on /market/traits
 export const TRAIT_LISTINGS = gql`
   query chonkListings {
     traitListings(where: {isActive: true}) {
@@ -21,6 +22,7 @@ export const TRAIT_LISTINGS = gql`
   }
 `;
 
+// used on /market/chonks
 export const GET_CHONK_LISTINGS = gql`
 query chonkListings {
   activeChonkListings(where: {isActive: true}) {
@@ -42,6 +44,7 @@ query chonkListings {
 }
 `;
 
+// used on /market/traits and in useTraitMetadata
 export const GET_TRAIT_METADATA_BY_ID = gql`
   query TraitMetadataById($id: BigInt!) {
     traitMetadata(where: { id: $id }) {
@@ -55,12 +58,12 @@ export const GET_TRAIT_METADATA_BY_ID = gql`
         creatorName
         creator
         colorMap
-        activeListing
       }
     }
   }
 `;
 
+// used on /profile
 export const GET_CHONKS_BY_EOA = gql`
 query GetChonksByEOA($eoa: String!) {
   chonks(
@@ -82,6 +85,8 @@ query GetChonksByEOA($eoa: String!) {
   }
 `;
 
+// used on components/marketplace/TraitsSection (?)
+// coming in here will be if it's actively listed later
 export const GET_TRAITS_FOR_CHONK_ID = gql`
 query GetTraitsForChonkId($id: BigInt!) {
   chonk(id: $id) {
@@ -96,6 +101,7 @@ query GetTraitsForChonkId($id: BigInt!) {
               id
               traitName
               traitType
+              colorMap
             }
           }
         }
@@ -105,6 +111,7 @@ query GetTraitsForChonkId($id: BigInt!) {
 }
 `;
 
+// unused
 export const GET_CHONK_HISTORY = gql`
 query GetChonkHistory($id: BigInt!) {
   chonk(id: $id) {
@@ -142,6 +149,44 @@ query GetChonkHistory($id: BigInt!) {
 }
 `;
 
+// basically the same as above
+// query ChonkAndBackpack {
+//   chonk(id: "1") {
+//     tbas {
+//       items {
+//         id
+//         traits {
+//           items {
+//             traitInfo {
+//               id
+//               traitIndex
+//               traitName
+//               traitType
+//               colorMap
+//             }
+//           }
+//         }
+//       }
+//     }
+//     transactions {
+//       items {
+//         amount
+//         bidder
+//         chonkId
+//         from
+//         id
+//         seller
+//         sellerTBA
+//         time
+//         to
+//         txHash
+//         txType
+//       }
+//     }
+//   }
+// }
+
+// unused
 export const GET_TRAIT_HISTORY = gql`
 query GetTraitHistory($id: BigInt!) {
   traitTransactionHistories(where: {traitId: $id}) {
@@ -162,11 +207,38 @@ query GetTraitHistory($id: BigInt!) {
 }
 `;
 
+// i dont think i need this, can probably get rid of and just use a useReadContract
 export const GET_TRAIT_IMAGE_BY_ID = gql`
 query traitURI($id: BigInt!) {
   traitUri(id: $id) {
     tokenUri
     id
+  }
+}
+`;
+
+// unused
+export const GET_TRAIT_LISTINGS = gql`
+query traitListing($id: BigInt!) {
+  traitListing(id: $id) {
+    id
+    isActive
+    listingTime
+    listingTxHash
+    price
+    seller
+    sellerTBA
+    traitMetadata {
+      traitType
+      traitName
+      traitIndex
+      release
+      dataMinterContract
+      creatorName
+      creator
+      colorMap
+      activeListingId
+    }
   }
 }
 `;
