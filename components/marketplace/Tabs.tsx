@@ -7,18 +7,18 @@ interface TabsProps {
 
 export default function Tabs({ activeTab, onTabChange }: TabsProps) {
   const router = useRouter();
-  const tabs = ["Chonks", "Traits"]; //, 'Offers', 'Activity'];
+  const tabs = ["Traits", "Chonks"]; //, 'Offers', 'Activity'];
 
   const handleTabClick = (tab: string) => {
     onTabChange(tab);
 
     // Handle navigation based on tab
     switch (tab) {
-      case "Chonks":
-        router.push("/market/chonks");
-        break;
       case "Traits":
         router.push("/market/traits");
+        break;
+      case "Chonks":
+        router.push("/market/chonks");
         break;
       // Offers and Activity tabs do nothing for now
       default:
