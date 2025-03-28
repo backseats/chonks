@@ -620,7 +620,7 @@ export default function ChonkDetail({ id }: { id: string }) {
               <div className="flex flex-col mt-12">
                 <div>
                   <div className="text-2xl font-bold mt-12 w-full text-center">
-                    {isOwner ? "Your" : "This"} Chonk Is Wearing
+                    {isOwner ? "Your" : "This"} Chonk is Wearing
                   </div>
 
                   {/* Updated grid layout */}
@@ -666,7 +666,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                 <div className="flex flex-col mt-12">
                   <div className="text-2xl font-bold mt-12 mb-8 w-full text-center">
-                    Additional Traits In {isOwner ? "Your" : "Their"} Backpack
+                    Additional Traits in {isOwner ? "Your" : "Their"} Backpack
                   </div>
                   <div className="max-w-[1400px] mx-auto w-full">
                     {filteredTraitTokenIds && (

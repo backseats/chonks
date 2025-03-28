@@ -49,12 +49,15 @@ export default function MenuBar(props: Props) {
       <div className="hidden md:flex gap-8 items-center font-source-code-pro text-sm font-weight-600">
         <Link
           href="/market"
-          className="hover:opacity-80 transition-opacity underline"
+          className="hover:opacity-80 transition-opacity hover:underline"
         >
           Market
         </Link>
 
-        <Link href="/studio" className="hover:opacity-80 transition-opacity">
+        <Link
+          href="/studio"
+          className="hover:opacity-80 transition-opacity hover:underline"
+        >
           Studio
         </Link>
 
@@ -63,7 +66,7 @@ export default function MenuBar(props: Props) {
             <div> | </div>
             <Link
               href="/profile"
-              className="hover:opacity-80 transition-opacity"
+              className="hover:opacity-80 transition-opacity hover:underline"
             >
               My Chonks
             </Link>
