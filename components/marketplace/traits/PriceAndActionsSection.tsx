@@ -7,13 +7,11 @@ import useWithdrawBidOnTrait from "@/hooks/marketplace/traits/useWithdrawBidOnTr
 import useAcceptBidForTrait from "@/hooks/marketplace/traits/useAcceptBidForTrait";
 import useGetTraitBid from "@/hooks/marketplace/traits/useGetTraitBid";
 import { useEthPrice } from "@/hooks/useEthPrice";
-
 import {
   useBalance,
   useAccount,
   useEnsAddress,
   useEnsName,
-  useWriteContract,
   useReadContract,
 } from "wagmi";
 import { parseEther, isAddress, formatEther, getAddress, Address } from "viem";
@@ -27,7 +25,6 @@ import { ListingModal } from "@/components/marketplace/chonks/modals/ListingModa
 import { traitsContract, traitsABI, chainId } from "@/config";
 import { useUnequipTrait } from "@/hooks/marketplace/traits/useUnequipTrait";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
-// Import common components
 import { ActionButton } from "../chonks/buttons/ActionButton";
 import MarketplaceConnectKitButton from "../common/MarketplaceConnectKitButton";
 import CurrentBid from "../common/CurrentBid";

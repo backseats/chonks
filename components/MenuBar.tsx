@@ -46,7 +46,7 @@ export default function MenuBar(props: Props) {
         </Link>
       </div>
 
-      <div className="hidden md:flex gap-8 items-center font-source-code-pro text-sm font-weight-600">
+      <div className="hidden md:flex gap-8 items-center font-source-code-pro text-[15px] font-weight-600">
         <Link
           href="/market"
           className="hover:opacity-80 transition-opacity hover:underline"
@@ -95,7 +95,7 @@ export default function MenuBar(props: Props) {
           visibility: dropdownHeight > 0 ? "visible" : "hidden",
         }}
       >
-        <div className="flex flex-col font-source-code-pro text-sm font-weight-600 text-right">
+        <div className="flex flex-col font-source-code-pro text-[15px] font-weight-600 text-right">
           <Link
             href="/market"
             className="px-4 py-3 hover:bg-gray-100 border-b border-gray-200"
