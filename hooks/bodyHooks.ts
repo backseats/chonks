@@ -24,9 +24,6 @@ export function useSetBodyIndexFunction() {
 
 
 export function useSetTokenRender3DFunction(chonkId: string, render3d: boolean) {
-
-  console.log("chonkId", chonkId);
-  console.log("render3d", render3d);
   const { writeContract } = useWriteContract();
 
   const setTokenRender3D = useCallback(() => {
