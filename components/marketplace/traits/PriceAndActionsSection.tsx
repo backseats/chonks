@@ -6,6 +6,7 @@ import useBidOnTrait from "@/hooks/marketplace/traits/useBidOnTrait";
 import useWithdrawBidOnTrait from "@/hooks/marketplace/traits/useWithdrawBidOnTrait";
 import useAcceptBidForTrait from "@/hooks/marketplace/traits/useAcceptBidForTrait";
 import useGetTraitBid from "@/hooks/marketplace/traits/useGetTraitBid";
+import { useEthPrice } from "@/hooks/useEthPrice";
 
 import {
   useBalance,
@@ -73,6 +74,7 @@ export default function PriceAndActionsSection(
   const { data: balance } = useBalance({ address });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [listingPrice, setListingPrice] = useState("");
+  const { ethPrice } = useEthPrice();
 
   const OFFER_PRICE_DECIMAL_PRECISION = 4;
   const MIN_LISTING_PRICE = `0.${"0".repeat(
@@ -504,6 +506,11 @@ export default function PriceAndActionsSection(
                 <span className="text-[20px] sm:text-2xl font-bold">
                   {price} ETH
                 </span>
+                {ethPrice && price && (
+                  <span className="text-gray-500 text-sm">
+                    (${(price * ethPrice).toLocaleString(undefined, { maximumFractionDigits: 2 })})
+                  </span>
+                )}
               </div>
 
               {isOfferSpecific && (

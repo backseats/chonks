@@ -21,6 +21,7 @@ import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
 import useBidOnChonk from "@/hooks/marketplace/chonks/useBidOnChonk";
 import useWithdrawChonkBid from "@/hooks/marketplace/chonks/useWithdrawChonkBid";
 import useBuyChonk from "@/hooks/marketplace/chonks/useBuyChonk";
+import { useEthPrice } from "@/hooks/useEthPrice";
 
 export default function PriceAndActionsSection({
   chonkId,
@@ -34,6 +35,7 @@ export default function PriceAndActionsSection({
   const { data: balance } = useBalance({ address });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [listingPrice, setListingPrice] = useState("");
+  const { ethPrice } = useEthPrice();
 
   //// Hooks ////
 
@@ -442,7 +444,11 @@ export default function PriceAndActionsSection({
                 <span className="text-[20px] sm:text-2xl font-bold">
                   {price} ETH
                 </span>
-                {/* <span className="text-gray-500">(${priceUSD.toLocaleString()})</span> */}
+                {ethPrice && price && (
+                  <span className="text-gray-500 text-sm">
+                    (${(price * ethPrice).toLocaleString(undefined, { maximumFractionDigits: 2 })})
+                  </span>
+                )}
               </div>
 
               {isOfferSpecific && (
