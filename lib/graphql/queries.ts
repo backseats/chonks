@@ -11,6 +11,9 @@ export const TRAIT_LISTINGS = gql`
         price
         seller
         sellerTBA
+        traitMetadata {
+          colorMap
+        }
       }
       pageInfo {
         endCursor

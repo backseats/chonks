@@ -40,15 +40,15 @@ export default function OwnershipSection(props: Props) {
   return (
     <>
       <div className="hidden sm:flex sm:justify-between sm:items-center">
-        <h1 className="text-3xl font-bold">Chonk #{id}</h1>
+        <Link href={`/chonks/${id}`}>
+          <h1 className="text-3xl font-bold hover:underline">Chonk #{id}</h1>
+        </Link>
         {/* <RefreshAndShare /> */}
       </div>
 
       {owner && (
         <div className="ml-4 sm:ml-0 flex flex-row sm:flex-col sm:mt-6 sm:mb-8">
-          <div className="text-lg text-gray-600">
-            Owned by
-          </div>
+          <div className="text-lg text-gray-600">Owned by</div>
 
           <div className="text-lg ml-2 sm:ml-0">
             {address && address === owner ? (

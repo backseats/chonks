@@ -9,12 +9,18 @@ import Actions from "@/components/marketplace/Actions";
 import { TRAIT_LISTINGS } from "@/lib/graphql/queries";
 import client from "@/lib/apollo-client";
 import { useTraitsTotalSupply } from "@/hooks/useTotalSupply";
+
+type TraitMetadata = {
+  colorMap: string;
+};
+
 export type TraitListing = {
   id: string;
   isActive: boolean;
   price: string;
   seller: string;
   sellerTBA: string;
+  traitMetadata: TraitMetadata;
 };
 
 export default function TraitsMarketplace() {
@@ -53,7 +59,6 @@ export default function TraitsMarketplace() {
         });
 
         if (data && data.traitListings && data.traitListings.items) {
-          // Store raw listings without filtering or sorting
           setRawTraitListings(data.traitListings.items as TraitListing[]);
         }
       } catch (error) {

@@ -112,7 +112,6 @@ const Attribute = ({
           style={{ top: "-160px", left: "50%", transform: "translateX(-50%)" }}
         >
           <ChonkRenderer
-            size={150}
             bytes={colorMap}
             backgroundColor="#0F6E9D"
             backgroundBody="ghost.svg"

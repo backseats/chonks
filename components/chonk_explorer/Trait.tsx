@@ -1,18 +1,15 @@
 import { useEffect, useState } from "react";
 import { Category } from "@/types/Category";
-import {
-  getTraitData,
-  useTraitType,
-  useTraitName,
-  useEquip,
-  useUnequip,
-  useIsRevealed,
-} from "@/hooks/traitHooks";
+import { useEquip, useUnequip, useIsRevealed } from "@/hooks/traitHooks";
 import { useTBATransferTrait } from "@/hooks/useTBATransferTrait";
 import { Address } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import TransferTraitModal from "./TransferTraitModal";
-import { Chonk } from "@/types/Chonk";
+import { useReadContract } from "wagmi";
+import { chainId, colorMapABI, colorMapContract } from "@/config";
+import ChonkRenderer from "@/components/ChonkRenderer";
+import { TraitInfo } from "@/pages/chonks/[id]";
+
 export const categoryList = Object.values(Category);
 
 interface Props {
@@ -22,7 +19,7 @@ interface Props {
   tbaAddress: Address;
   toTbaAddress?: Address | null;
   isEquipped: boolean;
-  selectedCategory: string;
+  traitInfo: TraitInfo;
   isYours: boolean;
   tokenboundClient: TokenboundClient;
   isEquipPending: boolean;
@@ -35,7 +32,7 @@ export default function Trait(props: Props) {
     address = undefined,
     traitTokenId,
     isEquipped,
-    selectedCategory,
+    traitInfo,
     isYours,
     tokenboundClient,
     tbaAddress,
@@ -44,24 +41,16 @@ export default function Trait(props: Props) {
   } = props;
 
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
-  // A data object w/ name, desc, image, attributes
-  const [traitData, setTraitData] = useState<Chonk | null>(null);
 
   const { transferTrait } = useTBATransferTrait(tokenboundClient);
 
-  useEffect(() => {
-    const fetchTraitData = async () => {
-      const data = await getTraitData(traitTokenId);
-      setTraitData(data);
-    };
-
-    if (!traitData) fetchTraitData();
-  }, [traitTokenId]);
-
-  // e.g. "Hair"
-  const traitType = useTraitType(traitTokenId);
-  // e.g. "Blue Pants"
-  const traitName = useTraitName(traitTokenId);
+  const { data: bodyIndex } = useReadContract({
+    address: colorMapContract,
+    abi: colorMapABI,
+    functionName: "getBodyIndexForChonk",
+    args: [chonkId],
+    chainId,
+  }) as { data: number };
 
   const isRevealed = useIsRevealed(traitTokenId);
 
@@ -70,31 +59,14 @@ export default function Trait(props: Props) {
     traitTokenId
   );
 
-  const unequipResult = useUnequip(chonkId, traitType);
+  const unequipResult = useUnequip(chonkId, traitInfo.traitType);
   const { handleUnequip, unequipHash, unequipReceipt, isUnequipSuccess } =
     unequipResult || {};
-
-  console.log("equipHash", equipHash);
-  console.log("equipReceipt", equipReceipt);
-  console.log("isEquipSuccess", isEquipSuccess);
-
-  console.log("unequipHash", unequipHash);
-  console.log("unequipReceipt", unequipReceipt);
-  console.log("isUnequipSuccess", isUnequipSuccess);
 
   useEffect(() => {
     if (isEquipSuccess) setIsEquipPending(!isEquipPending);
     if (isUnequipSuccess) setIsEquipPending(!isEquipPending);
   }, [isEquipSuccess, isUnequipSuccess]);
-
-  if (
-    !isEquipped &&
-    selectedCategory !== "All" &&
-    selectedCategory !== traitType
-  ) {
-    console.log("returning null");
-    return null;
-  }
 
   const handleTransferTrait = (toTbaAddress: Address) => {
     transferTrait(tbaAddress, toTbaAddress, traitTokenId);
@@ -110,15 +82,21 @@ export default function Trait(props: Props) {
   const buttonClass =
     "absolute bottom-0 left-0 w-full bg-black bg-opacity-50 text-white py-2";
 
-  return traitData ? (
+  return (
     <>
       <div
         className="relative w-full h-full text-lg sm:text-[15px]"
         data-token-id={traitTokenId}
       >
+        <ChonkRenderer
+          bytes={traitInfo.colorMap.slice(2)}
+          bodyIndex={bodyIndex}
+          opacity={0.6}
+        />
+
         {!isEquipped && isYours && (
           <button
-            className="absolute top-0 right-0 bg-black bg-opacity-50 text-white py-1 px-2 text-sm"
+            className="absolute top-0 right-0 bg-black bg-opacity-50 text-white py-1 px-2 text-sm z-10"
             onClick={() => setIsTransferModalOpen(true)}
           >
             Transfer
@@ -127,20 +105,14 @@ export default function Trait(props: Props) {
 
         {isYours && (
           <button
-            className="absolute top-0 left-0 bg-black  bg-opacity-50 text-white py-1 px-2 text-sm"
+            className="absolute top-0 left-0 bg-black bg-opacity-50 text-white py-1 px-2 text-sm z-10"
             onClick={() =>
               (window.location.href = `/market/traits/${traitTokenId}`)
             }
           >
-            List This Trait
+            Offer
           </button>
         )}
-
-        <img
-          src={isRevealed ? traitData.image : "/unrevealed.svg"}
-          className="w-full h-full object-contain"
-          alt={traitName || "Trait"}
-        />
 
         {isYours ? (
           <button
@@ -148,19 +120,19 @@ export default function Trait(props: Props) {
             onClick={
               isRevealed ? (isEquipped ? handleUnequip : handleEquip) : () => {}
             }
-            disabled={!isRevealed || (isEquipped && traitName == "")}
+            disabled={!isRevealed || (isEquipped && traitInfo.traitName == "")}
           >
             <span
               className={
-                (isEquipped && traitName == "") || !isRevealed
+                (isEquipped && traitInfo.traitName == "") || !isRevealed
                   ? "opacity-50"
                   : ""
               }
             >
               {isRevealed
                 ? isEquipped
-                  ? `Unequip ${traitName}`
-                  : `Equip ${traitName}`
+                  ? `Unequip ${traitInfo.traitName}`
+                  : `Equip ${traitInfo.traitName}`
                 : "Revealing Soon"}
             </span>
           </button>
@@ -168,12 +140,12 @@ export default function Trait(props: Props) {
           <button className={buttonClass} onClick={() => {}}>
             <span
               className={
-                (isEquipped && traitName == "") || !isRevealed
+                (isEquipped && traitInfo.traitName == "") || !isRevealed
                   ? "opacity-50"
                   : ""
               }
             >
-              {isRevealed ? traitName : "Revealing Soon"}
+              {isRevealed ? traitInfo.traitName : "Revealing Soon"}
             </span>
           </button>
         )}
@@ -187,11 +159,9 @@ export default function Trait(props: Props) {
           tokenboundClient={tokenboundClient}
           chonkId={chonkId}
           address={address}
-          traitName={`${traitName} ${traitType}`}
+          traitName={`${traitInfo.traitName} ${traitInfo.traitType}`}
         />
       )}
     </>
-  ) : (
-    <div className="relative w-full h-full" />
   );
 }

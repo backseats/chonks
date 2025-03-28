@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useSimulateContract } from "wagmi";
 import {
   mainContract,
   mainABI,
@@ -16,19 +16,25 @@ import { traitTokenURIClient } from "@/lib/apollo-client";
 
 export const categoryList = Object.values(Category);
 
+// used as fallback in the unused useTraitMetadata hook
 export async function getTraitData(traitTokenId: string) {
-  const response = await traitTokenURIClient.query({
-    query: GET_TRAIT_IMAGE_BY_ID,
-    variables: { id: traitTokenId },
-  });
+  try {
+      const response = await traitTokenURIClient.query({
+        query: GET_TRAIT_IMAGE_BY_ID,
+        variables: { id: traitTokenId },
+      });
 
-  const traitTokenURIData = response.data.traitUri.tokenUri;
+      const traitTokenURIData = response.data.traitUri.tokenUri;
 
-  const base64String = traitTokenURIData.split(",")[1];
-  const jsonString = atob(base64String);
-  const jsonData = JSON.parse(jsonString) as Chonk;
+      const base64String = traitTokenURIData.split(",")[1];
+      const jsonString = atob(base64String);
+      const jsonData = JSON.parse(jsonString) as Chonk;
 
-  return jsonData;
+      return jsonData;
+  } catch (error) {
+    console.error("Error fetching trait data:", error);
+    // debugger
+  }
 }
 
 export function useGetTrait(traitTokenId: string) {
@@ -98,16 +104,79 @@ export function useTraitName(traitTokenId: string) {
 }
 
 export function useEquip(chonkId: string, traitTokenId: string) {
-  const { writeContract: equip, data: equipHash } = useWriteContract();
+  const { writeContract: equip, data: equipHash, error: equipError, isError: isEquipError } = useWriteContract();
   const { data: equipReceipt, isSuccess: isEquipSuccess } = useWaitForTransactionReceipt({
     hash: equipHash,
+    chainId,
+  });
+
+  const { data: simulateEquipReceipt, isSuccess: isSimulateEquipSuccess, isError: isSimulateEquipError, error: simulateEquipError } = useSimulateContract({
+    address: mainContract,
+    abi: mainABI,
+    functionName: "equip",
+    args: [parseInt(chonkId), parseInt(traitTokenId)],
     chainId,
   });
 
   const handleEquip = () => {
     equip({
       address: mainContract,
-      abi: mainABI,
+      abi: [...mainABI,
+        {
+          "inputs": [
+            {"internalType": "address", "name": "_chonksMain", "type": "address"},
+            {"internalType": "address", "name": "_chonkTraits", "type": "address"},
+            {"internalType": "address", "name": "_chonksMarket", "type": "address"}
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {"inputs": [], "name": "IncorrectTBAOwner", "type": "error"},
+        {"inputs": [], "name": "IncorrectTraitType", "type": "error"},
+        {"inputs": [], "name": "TraitIsOffered", "type": "error"},
+        {
+          "inputs": [],
+          "name": "chonkTraits",
+          "outputs": [{"internalType": "contract ChonkTraits", "name": "", "type": "address"}],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "chonksMain",
+          "outputs": [{"internalType": "contract IChonksMain", "name": "", "type": "address"}],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "chonksMarket",
+          "outputs": [{"internalType": "contract IChonksMarket", "name": "", "type": "address"}],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "uint256", "name": "_chonkTokenId", "type": "uint256"},
+            {"internalType": "uint256", "name": "_traitTokenId", "type": "uint256"}
+          ],
+          "name": "equipValidation",
+          "outputs": [{"internalType": "enum TraitCategory.Name", "name": "traitType", "type": "uint8"}],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {"internalType": "address", "name": "_tbaForChonk", "type": "address"},
+            {"internalType": "uint256", "name": "_traitTokenId", "type": "uint256"},
+            {"internalType": "enum TraitCategory.Name", "name": "_traitType", "type": "uint8"}
+          ],
+          "name": "performValidations",
+          "outputs": [],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ],
       functionName: "equip",
       args: [parseInt(chonkId), parseInt(traitTokenId)],
       chainId,
@@ -119,10 +188,10 @@ export function useEquip(chonkId: string, traitTokenId: string) {
   };
 
   return { handleEquip, equipHash,
-   equipReceipt, isEquipSuccess };
+   equipReceipt, isEquipSuccess, equipError, isEquipError, isSimulateEquipError, simulateEquipError, isSimulateEquipSuccess };
 }
 
-export function useUnequip(chonkId: string, traitType: Category | null) {
+export function useUnequip(chonkId: string, traitType: number | undefined) {
   const { writeContract: unequip, data: unequipHash } = useWriteContract();
 
   const { data: unequipReceipt, isSuccess: isUnequipSuccess } = useWaitForTransactionReceipt({
@@ -133,13 +202,11 @@ export function useUnequip(chonkId: string, traitType: Category | null) {
   const handleUnequip = () => {
     if (!traitType) return;
 
-    const categoryIndex = Object.values(Category).indexOf(traitType!);
-
     unequip({
       address: mainContract,
       abi: mainABI,
       functionName: "unequip",
-      args: [parseInt(chonkId), categoryIndex],
+      args: [parseInt(chonkId), traitType],
       chainId,
     }, {
       onError: (error) => {

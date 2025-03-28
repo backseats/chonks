@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { useState, useRef, useLayoutEffect } from "react";
 import { ChonkListing } from "@/pages/market/chonks/index";
 import ChonkRenderer from "@/components/ChonkRenderer";
 import ListingInfo from "@/components/marketplace/common/ListingInfo";
@@ -15,26 +14,6 @@ export default function Listings({
   isSidebarVisible,
   chonkListings = [],
 }: ListingsProps) {
-  const [containerWidths, setContainerWidths] = useState<
-    Record<string, number>
-  >({});
-  const containerRefs = useRef<Record<string, HTMLDivElement | null>>({});
-
-  const updateWidths = () => {
-    const newWidths: Record<string, number> = {};
-
-    Object.entries(containerRefs.current).forEach(([id, ref]) => {
-      if (ref) {
-        newWidths[id] = ref.offsetWidth;
-      }
-    });
-
-    setContainerWidths(newWidths);
-  };
-
-  // Use useLayoutEffect to measure container widths after DOM updates but before browser paint
-  useLayoutEffect(() => updateWidths(), []);
-
   const handleBuyNow = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
     window.location.href = `/market/chonks/${id}`;
@@ -49,15 +28,7 @@ export default function Listings({
             key={listing.id}
             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity overflow-hidden"
           >
-            <Listing
-              id={listing.id}
-              size={containerWidths[listing.id] || undefined}
-              setContainerRef={(el) => {
-                if (el) containerRefs.current[listing.id] = el;
-                // Update widths when ref is set
-                if (el) requestAnimationFrame(updateWidths);
-              }}
-            />
+            <Listing id={listing.id} />
 
             <ListingInfo
               chonkOrTrait="chonk"
@@ -71,15 +42,7 @@ export default function Listings({
   );
 }
 
-const Listing = ({
-  id,
-  size,
-  setContainerRef,
-}: {
-  id: string;
-  size: number | undefined;
-  setContainerRef: (el: HTMLDivElement | null) => void;
-}) => {
+const Listing = ({ id }: { id: string }) => {
   const contract = {
     address: colorMapContract,
     abi: colorMapABI,
@@ -111,11 +74,8 @@ const Listing = ({
     );
 
   return (
-    <div
-      ref={setContainerRef}
-      className="w-full flex justify-center items-center bg-[#0F6E9D]"
-    >
-      <ChonkRenderer bytes={bytes} size={size} bodyIndex={bodyIndex} />
+    <div className="w-full flex justify-center items-center bg-[#0F6E9D]">
+      <ChonkRenderer bytes={bytes} bodyIndex={bodyIndex} />
     </div>
   );
 };
