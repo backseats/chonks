@@ -142,8 +142,8 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
   // Memoize the empty grid for the background layer
   const emptyGrid = React.useMemo(() => generateGrid(), [generateGrid]);
 
-  const gridWidth = gridSize * pixelSize;
-  const gridHeight = gridSize * pixelSize;
+  // const gridWidth = gridSize * pixelSize;
+  // const gridHeight = gridSize * pixelSize;
 
   // If we don't have a pixel size yet, render just the container
   if (pixelSize === null) {
