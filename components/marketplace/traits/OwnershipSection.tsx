@@ -23,7 +23,7 @@ export default function OwnershipSection(props: Props) {
   // console.log("owner", owner);
   // Add ENS resolution
   const { data: ensName } = useEnsName({
-    address: owner as Address,
+    address: tbaOwner as Address,
     chainId: mainnet.id,
   });
 

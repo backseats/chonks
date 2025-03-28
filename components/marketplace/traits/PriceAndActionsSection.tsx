@@ -11,6 +11,7 @@ import {
   useBalance,
   useAccount,
   useEnsAddress,
+  useEnsName,
   useWriteContract,
   useReadContract,
 } from "wagmi";
@@ -208,6 +209,12 @@ export default function PriceAndActionsSection(
     name: recipientAddress.endsWith(".eth")
       ? recipientAddress.toLowerCase()
       : undefined,
+    chainId: mainnet.id,
+  });
+
+   // onlySellToAddress ens name
+   const { data: ensOnlySellToAddress } = useEnsName({
+    address: onlySellToAddress as Address,
     chainId: mainnet.id,
   });
 
@@ -506,7 +513,7 @@ export default function PriceAndActionsSection(
                   address &&
                   getAddress(onlySellToAddress) === getAddress(address)
                     ? "You"
-                    : truncateEthAddress(onlySellToAddress)}
+                    : ensOnlySellToAddress || truncateEthAddress(onlySellToAddress)}
                 </span>
               )}
 

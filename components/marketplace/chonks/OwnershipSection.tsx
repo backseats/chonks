@@ -24,14 +24,14 @@ export default function OwnershipSection(props: Props) {
     chainId: mainnet.id,
   });
 
-  const ensResponse = useEnsName({
-    address: owner as Address,
-    chainId: mainnet.id,
-  });
-  console.log("=== full ENS response ===", ensResponse);
+  // const ensResponse = useEnsName({
+  //   address: owner as Address,
+  //   chainId: mainnet.id,
+  // });
+  // console.log("=== full ENS response ===", ensResponse);
 
-  console.log("=== ensName ===", ensName);
-  console.log("=== owner ===", owner);
+  // console.log("=== ensName ===", ensName);
+  // console.log("=== owner ===", owner);
 
   // const { data, isError, isLoading } = useEnsAvatar({
   //   name: normalize('wevm.eth'),

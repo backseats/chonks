@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
-import { useBalance, useAccount, useEnsAddress, useFeeData } from "wagmi";
-import { parseEther, isAddress, formatEther, getAddress } from "viem";
+import { useBalance, useAccount, useEnsAddress, useEnsName, useFeeData } from "wagmi";
+import { parseEther, isAddress, formatEther, getAddress, Address } from "viem";
 import { mainnet } from "wagmi/chains";
 import { ModalWrapper } from "./modals/ModalWrapper";
 import { ListingModal } from "./modals/ListingModal";
@@ -242,6 +242,12 @@ export default function PriceAndActionsSection({
     chainId: mainnet.id,
   });
 
+  // onlySellToAddress ens name
+  const { data: ensOnlySellToAddress } = useEnsName({
+    address: onlySellToAddress as Address,
+    chainId: mainnet.id,
+  });
+
   // console.log("ensDebug:", {
   //   resolved: ensAddress,
   // });
@@ -446,7 +452,7 @@ export default function PriceAndActionsSection({
                   address &&
                   getAddress(onlySellToAddress) === getAddress(address)
                     ? "You"
-                    : truncateEthAddress(onlySellToAddress)}
+                    : ensOnlySellToAddress || truncateEthAddress(onlySellToAddress)}
                 </span>
               )}
 
