@@ -1,6 +1,6 @@
 import { http, createConfig } from "wagmi";
 import { coinbaseWallet, injected, walletConnect } from "wagmi/connectors";
-import { base } from "viem/chains";
+import { base, mainnet } from "viem/chains";
 
 import { chonksMainABI } from './abis/chonksMainABI'
 import { chonkTraitsABI } from './abis/chonkTraitsABI'
@@ -29,7 +29,7 @@ export const bulkTraitTransferABI = chonkBulkTraitTransferABI;
 export const chainId = base.id;
 
 export const config = createConfig({
-  chains: [base],
+  chains: [base, mainnet],
   connectors: [
     injected(),
     walletConnect({
@@ -39,6 +39,7 @@ export const config = createConfig({
   ],
   transports: {
     [base.id]: http(`${process.env.NEXT_PUBLIC_BASE_MAINNET_RPC_URL}`), // toggle for prod
+    [mainnet.id]: http(`${process.env.NEXT_PUBLIC_MAINNET_RPC_URL}`),
     // [base.id]: http('http://localhost:8545') // toggle for dev
   },
 });

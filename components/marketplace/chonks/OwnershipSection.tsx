@@ -6,6 +6,7 @@ import { useEnsName, useEnsAvatar } from "wagmi";
 import { normalize } from "viem/ens";
 import RefreshAndShare from "../RefreshAndShare";
 import Link from "next/link";
+import { mainnet } from "viem/chains";
 
 interface Props {
   id: string;
@@ -20,7 +21,17 @@ export default function OwnershipSection(props: Props) {
   // Add ENS resolution
   const { data: ensName } = useEnsName({
     address: owner as Address,
+    chainId: mainnet.id,
   });
+
+  const ensResponse = useEnsName({
+    address: owner as Address,
+    chainId: mainnet.id,
+  });
+  console.log("=== full ENS response ===", ensResponse);
+
+  console.log("=== ensName ===", ensName);
+  console.log("=== owner ===", owner);
 
   // const { data, isError, isLoading } = useEnsAvatar({
   //   name: normalize('wevm.eth'),
