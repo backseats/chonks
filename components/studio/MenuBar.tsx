@@ -31,6 +31,8 @@ export default function MenuBar(props: Props) {
     <div className="px-8 py-4 border-b border-gray-300 flex flex-col md:flex-row justify-between">
       <div className="flex items-center gap-2">
         <h1 className=" text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
+          <img
+            src="/chonks-logo.svg"
             alt="Chonks"
             className="h-12 md:h-8 w-auto"
           />
