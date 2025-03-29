@@ -15,7 +15,7 @@ export default function MenuBar(props: Props) {
 
   React.useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setShowRandomButton(params.get('loadRandomChonk') === 'true');
+    setShowRandomButton(params.get("loadRandomChonk") === "true");
   }, []);
 
   const {
@@ -31,16 +31,11 @@ export default function MenuBar(props: Props) {
     <div className="px-8 py-4 border-b border-gray-300 flex flex-col md:flex-row justify-between">
       <div className="flex items-center gap-2">
         <h1 className=" text-5xl md:text-2xl font-bold cursor-pointer flex items-center gap-1">
-          <img 
-            src="/chonks-logo.svg" 
             alt="Chonks"
             className="h-12 md:h-8 w-auto"
           />
           Studio
         </h1>
-        <span className="text-sm font-normal text-red-400 relative -left-3 -top-3 rotate-12">
-          (beta)
-        </span>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4">
@@ -58,7 +53,7 @@ export default function MenuBar(props: Props) {
           Load a Trait
         </button>
 
-        {(process.env.NODE_ENV === 'development' || showRandomButton) && (
+        {(process.env.NODE_ENV === "development" || showRandomButton) && (
           <button
             onClick={loadRandomChonk}
             className="px-4 py-2 bg-gray-500 text-white  hover:brightness-[105%] transition-colors"
