@@ -28,7 +28,7 @@ export default function Listings({
             key={listing.id}
             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity overflow-hidden"
           >
-            <Listing id={listing.id} />
+            {/* <Listing id={listing.id} /> */}
 
             <ListingInfo
               chonkOrTrait="chonk"
