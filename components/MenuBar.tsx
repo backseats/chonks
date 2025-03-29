@@ -120,6 +120,7 @@ export default function MenuBar(props: Props) {
           )}
 
           <div className="px-4 py-3 flex justify-end">
+            {/* TODO: dropdown menu here for mobile */}
             <ConnectKitButton
               label="Sign In"
               // theme="web"

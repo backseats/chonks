@@ -248,7 +248,6 @@ export default function Home() {
               />
             </h1>
           </div>
-
           <div className="hidden md:flex gap-8 items-center font-source-code-pro text-sm font-weight-600">
             <a
               href="#intro"
@@ -288,46 +287,46 @@ export default function Home() {
             </a>
           </div>
 
-          {isConnected ? (
-            <div className="flex gap-2 mt-[2px] sm:mt-1">
-              <Link
-                href="/market"
-                className="hover:opacity-70 transition-opacity"
-              >
-                <button className="px-4 py-2 mt-1 sm:mt-0 bg-[#2F7BA7] text-white font-source-code-pro text-xs sm:text-sm">
-                  Market
-                </button>
-              </Link>
+          <div className="flex gap-2 mt-[4px] sm:mt-1">
+            <Link
+              href="/market"
+              className="hover:opacity-70 transition-opacity"
+            >
+              <button className="px-4 py-[11px] mt-[1px] sm:mt-[1px] bg-[#007DAB] text-white font-source-code-pro text-xs">
+                Market
+              </button>
+            </Link>
 
+            {isConnected ? (
               <Link
                 href="/profile"
                 className="hover:opacity-70 transition-opacity"
               >
-                <button className="px-4 py-2 mt-1 sm:mt-0 bg-black text-white font-source-code-pro text-xs sm:text-sm">
+                <button className="px-4 py-[11px] mt-[1px] sm:mt-[1px] bg-black text-white font-source-code-pro text-xs">
                   My Chonks
                 </button>
               </Link>
-            </div>
-          ) : (
-            <ConnectKitButton
-              label="Sign In"
-              customTheme={{
-                "--ck-font-family": "'Source Code Pro', monospace",
-                "--ck-primary-button-background": "#2F7BA7",
-                "--ck-primary-button-hover-background": "#FFFFFF",
-                "--ck-primary-button-hover-color": "#2F7BA7",
-                "--ck-primary-button-border-radius": "0px",
-                "--ck-primary-button-font-weight": "400",
-                "--ck-connectbutton-background": "#2F7BA7",
-                "--ck-connectbutton-hover-background": "#111111",
-                "--ck-connectbutton-hover-color": "#FFFFFF",
-                "--ck-connectbutton-border-radius": "0px",
-                "--ck-connectbutton-color": "#FFFFFF",
-                "--ck-connectbutton-font-weight": "400",
-                "--ck-connectbutton-font-size": "16px",
-              }}
-            />
-          )}
+            ) : (
+              <ConnectKitButton
+                label="Sign In"
+                customTheme={{
+                  "--ck-font-family": "'Source Code Pro', monospace",
+                  "--ck-primary-button-background": "#2F7BA7",
+                  "--ck-primary-button-hover-background": "#FFFFFF",
+                  "--ck-primary-button-hover-color": "#2F7BA7",
+                  "--ck-primary-button-border-radius": "0px",
+                  "--ck-primary-button-font-weight": "400",
+                  "--ck-connectbutton-background": "#2F7BA7",
+                  "--ck-connectbutton-hover-background": "#63A4C4",
+                  "--ck-connectbutton-hover-color": "#FFFFFF",
+                  "--ck-connectbutton-border-radius": "0px",
+                  "--ck-connectbutton-color": "#FFFFFF",
+                  "--ck-connectbutton-font-weight": "400",
+                  "--ck-connectbutton-font-size": "12px",
+                }}
+              />
+            )}
+          </div>
         </nav>
 
         <main className="w-full overflow-x-hidden">
