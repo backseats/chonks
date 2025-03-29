@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { mainnet } from "viem/chains";
 import { useEnsName } from "wagmi";
+import Link from "next/link";
 interface Props {
   id: string;
   tokenData: Chonk | null;
@@ -45,8 +46,19 @@ export default function OwnershipSection(props: Props) {
 
   return (
     <>
-      <h1 className="text-[28px] font-bold text-center mt-6 sm:mt-8 mb-1">
+      <h1 className="text-[28px] font-bold text-center mt-6 sm:mt-8 mb-1 sm:flex sm:items-center sm:justify-center sm:gap-3">
         Chonk #{id}
+        {!isYours && (
+          <span className="hidden sm:block">
+            <Link href={`/studio?id=${id}`} className="mt-[16px]">
+              <img
+                src="/studio-no-grid.svg"
+                className="w-[38px] h-[38px]"
+                alt="View in Chonks Studio"
+              />
+            </Link>
+          </span>
+        )}
       </h1>
 
       {/* TODO: ENS for owner, heads up on the network, might need to use mainnet ens as well as basename */}

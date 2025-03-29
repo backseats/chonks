@@ -622,6 +622,19 @@ export default function ChonkDetail({ id }: { id: string }) {
                 </div>
               )}
 
+              {/* Hide on mobile for now until we fix up the mobile studio */}
+              {/* {!isOwner && (
+                <span className="sm:hidden flex justify-end px-4">
+                  <Link href={`/studio?id=${id}`} className="mt-[16px]">
+                    <img
+                      src="/studio-no-grid.svg"
+                      className="w-[50px] h-[50px]"
+                      alt="View in Chonks Studio"
+                    />
+                  </Link>
+                </span>
+              )} */}
+
               {/* Equipped Attributes Grids */}
               <div className="flex flex-col mt-12">
                 <div>
