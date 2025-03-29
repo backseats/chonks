@@ -28,7 +28,7 @@ export default function Listings({
             key={listing.id}
             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity overflow-hidden"
           >
-            {/* <Listing id={listing.id} /> */}
+            <Listing id={listing.id} />
 
             <ListingInfo
               chonkOrTrait="chonk"
@@ -49,7 +49,11 @@ const Listing = ({ id }: { id: string }) => {
     args: [BigInt(id)],
   } as const;
 
-  const { data: results, isLoading } = useReadContracts({
+  const {
+    data: results,
+    isLoading,
+    isError,
+  } = useReadContracts({
     contracts: [
       {
         ...contract,
@@ -62,16 +66,25 @@ const Listing = ({ id }: { id: string }) => {
     ],
   });
 
-  // @ts-ignore
-  const bytes = results?.[0]?.result.slice(2) as string;
-  const bodyIndex = results?.[1]?.result as number;
+  // Add proper error handling and null checks
+  const colorMapResult = results?.[0]?.result;
+  const bodyIndexResult = results?.[1]?.result;
 
-  if (isLoading)
+  // Only proceed if we have valid results
+  const bytes = colorMapResult
+    ? ((colorMapResult as any).slice(2) as string)
+    : null;
+  const bodyIndex = bodyIndexResult as number | undefined;
+
+  if (isLoading || isError || !bytes || bodyIndex === undefined) {
     return (
       <div className="flex flex-col bg-white p-4 aspect-square justify-center items-center">
-        <p className="text-lg">Loading...</p>
+        <p className="text-lg">
+          {isLoading ? "Loading..." : "Error loading Chonk"}
+        </p>
       </div>
     );
+  }
 
   return (
     <div className="w-full flex justify-center items-center bg-[#0F6E9D]">
