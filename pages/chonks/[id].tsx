@@ -544,6 +544,7 @@ export default function ChonkDetail({ id }: { id: string }) {
           {isOwner && (
             <div className="hidden sm:block">
               <ChonkControls
+                id={id}
                 hasActiveOffer={hasActiveOffer}
                 isCancelOfferChonkPending={isCancelOfferChonkPending}
                 cancelOfferChonkHash={cancelOfferChonkHash}
@@ -957,7 +958,6 @@ const ChonkControls = ({
       <div className="flex justify-between sm:justify-end flex-row px-4">
         {hasActiveOffer ? (
           <button
-            className={`${base} mr-4 mt-4 text-sm border-2 border-black ${
             className={`${base} mr-3 mt-4 text-sm border-2 border-black ${
               isCancelOfferChonkPending || cancelOfferChonkHash
                 ? "opacity-50"
@@ -974,7 +974,6 @@ const ChonkControls = ({
           </button>
         ) : (
           <button
-            className={`${base} mr-4 mt-4 text-sm border-2 border-black ${
             className={`${base} mr-3 mt-4 text-sm border-2 border-black ${
               isListChonkPending || listChonkHash ? "opacity-50" : ""
             }`}
@@ -991,7 +990,6 @@ const ChonkControls = ({
           </button>
         )}
 
-        <div className="flex flex-col items-end">
         <div className="flex flex-row gap-3 items-end">
           <button
             onClick={() => setShowSendModal(true)}
