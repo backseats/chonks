@@ -607,6 +607,7 @@ export default function ChonkDetail({ id }: { id: string }) {
               {isOwner && (
                 <div className="sm:hidden w-full mx-auto">
                   <ChonkControls
+                    id={id}
                     hasActiveOffer={hasActiveOffer}
                     isCancelOfferChonkPending={isCancelOfferChonkPending}
                     cancelOfferChonkHash={cancelOfferChonkHash}
@@ -678,7 +679,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                       <BGColorSwitcher
                         id={id}
                         backgroundColor={
-                          currentChonk?.backgroundColor ?? "#48A6FA"
+                          currentChonk?.backgroundColor ?? "#126E9D"
                         }
                         render2dData={renderData2D}
                       />
@@ -926,6 +927,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 }
 
 const ChonkControls = ({
+  id,
   hasActiveOffer,
   isCancelOfferChonkPending,
   cancelOfferChonkHash,
@@ -936,6 +938,7 @@ const ChonkControls = ({
   setShowListModal,
   setShowSendModal,
 }: {
+  id: string;
   hasActiveOffer: boolean;
   isCancelOfferChonkPending: boolean;
   cancelOfferChonkHash: Address | undefined;
@@ -955,6 +958,7 @@ const ChonkControls = ({
         {hasActiveOffer ? (
           <button
             className={`${base} mr-4 mt-4 text-sm border-2 border-black ${
+            className={`${base} mr-3 mt-4 text-sm border-2 border-black ${
               isCancelOfferChonkPending || cancelOfferChonkHash
                 ? "opacity-50"
                 : ""
@@ -971,6 +975,7 @@ const ChonkControls = ({
         ) : (
           <button
             className={`${base} mr-4 mt-4 text-sm border-2 border-black ${
+            className={`${base} mr-3 mt-4 text-sm border-2 border-black ${
               isListChonkPending || listChonkHash ? "opacity-50" : ""
             }`}
             onClick={() => setShowListModal(true)}
@@ -987,12 +992,21 @@ const ChonkControls = ({
         )}
 
         <div className="flex flex-col items-end">
+        <div className="flex flex-row gap-3 items-end">
           <button
             onClick={() => setShowSendModal(true)}
-            className={`${base} sm:mr-4 mt-4 text-sm border-2 border-black`}
+            className={`${base} mt-4 text-sm border-2 border-black`}
           >
             <SendHorizontal size={24} />
           </button>
+
+          <Link href={`/studio?id=${id}`} className="mt-[16px]">
+            <img
+              src="/studio-no-grid.svg"
+              className="w-[43px] h-[44px]"
+              alt="View in Chonks Studio"
+            />
+          </Link>
         </div>
       </div>
     </>

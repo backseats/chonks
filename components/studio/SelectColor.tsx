@@ -56,6 +56,8 @@ export default function SelectColor({
       "#9A6D2E", // mid 2
       "#8A5E24", // dark 1
       "#77511E", // dark 2
+      "#493212", // dark 3
+      "#291D0B", // dark 4
     ],
     []
   );

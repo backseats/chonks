@@ -9,10 +9,12 @@ import KeyboardShortcutsModal from "../components/studio/KeyboardShortcutsModal"
 import LoadTraitModal from "../components/studio/LoadTraitModal";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import { useAccount } from "wagmi";
+import { useAccount, useReadContracts } from "wagmi";
+import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import traits from "../contracts/csv-conversion/latest.json";
 import bodies from "../contracts/csv-conversion/bodies.json";
+import { colorMapContract, colorMapABI } from "../config";
 
 import BodyPresets from "../components/studio/BodyPresets";
 import {
@@ -51,6 +53,8 @@ const Grid: React.FC = () => {
   };
 
   const { address } = useAccount();
+  const router = useRouter();
+  const { id: urlId } = router.query;
 
   const [backgroundBody, setBackgroundBody] = useState<string>("skinTone2.svg");
   const [gridData, setGridData] = useState<Pixel[]>(generateGrid());
@@ -802,7 +806,17 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
     }
 
     // Update the text area content
-    setTextAreaContent(JSON.stringify(colorGrid, null, 2));
+    const initialColorGrid: string[][] = Array(30)
+      .fill(null)
+      .map(() => Array(30).fill(""));
+    colorGrid.forEach((row, y) => {
+      row.forEach((color, x) => {
+        if (y + yOffset < 30 && x + xOffset < 30) {
+          initialColorGrid[y + yOffset][x + xOffset] = color;
+        }
+      });
+    });
+    setTextAreaContent(JSON.stringify(initialColorGrid, null, 2));
   };
 
   useEffect(() => {
@@ -821,6 +835,52 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
       )
     );
   };
+
+  // Contract call setup
+  const contract = {
+    address: colorMapContract,
+    abi: colorMapABI,
+    args:
+      urlId && typeof urlId === "string" && /^\d+$/.test(urlId)
+        ? [BigInt(urlId)]
+        : undefined,
+  } as const;
+
+  const { data: results, isLoading: isLoadingColorMap } = useReadContracts({
+    contracts: [
+      {
+        ...contract,
+        functionName: "getColorMapForChonk",
+      },
+      {
+        ...contract,
+        functionName: "getBodyIndexForChonk",
+      },
+    ],
+  });
+
+  // @ts-ignore
+  const colorMapData = results?.[0]?.result;
+  const bodyIndex = results?.[1]?.result as number;
+
+  // Load trait from URL ID when data is available
+  useEffect(() => {
+    if (!isLoadingColorMap && colorMapData) {
+      // @ts-ignore // Assuming result type needs assertion like in Listings.tsx
+      const bytes = (colorMapData as string).startsWith("0x")
+        ? (colorMapData as string).slice(2)
+        : (colorMapData as string);
+      if (bytes) {
+        console.log("Loading trait from URL ID:", urlId);
+        loadTrait(bytes, 0, 0, false); // Load trait, replacing existing grid (affix=false)
+      }
+    }
+
+    if (bodyIndex) {
+      setBackgroundBody(`skinTone${bodyIndex + 1}.svg`);
+    }
+    // Only run this effect when colorMapData changes or component mounts with urlId
+  }, [colorMapData, isLoadingColorMap, urlId, bodyIndex]); // Added urlId to dependencies
 
   return (
     <div className="bg-white">
