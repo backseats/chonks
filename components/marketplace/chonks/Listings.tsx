@@ -3,7 +3,7 @@ import { ChonkListing } from "@/pages/market/chonks/index";
 import ChonkRenderer from "@/components/ChonkRenderer";
 import ListingInfo from "@/components/marketplace/common/ListingInfo";
 import { useReadContracts } from "wagmi";
-import { colorMapContract, colorMapABI } from "@/config";
+import { colorMapContract, colorMapABI, chainId } from "@/config";
 
 interface ListingsProps {
   isSidebarVisible: boolean;
@@ -28,7 +28,7 @@ export default function Listings({
             key={listing.id}
             className="flex flex-col border border-black bg-white hover:opacity-90 transition-opacity overflow-hidden"
           >
-            {/* <Listing id={listing.id} /> */}
+            <Listing id={listing.id} />
 
             <ListingInfo
               chonkOrTrait="chonk"
@@ -47,6 +47,7 @@ const Listing = ({ id }: { id: string }) => {
     address: colorMapContract,
     abi: colorMapABI,
     args: [BigInt(id)],
+    chainId,
   } as const;
 
   const { data: results, isLoading } = useReadContracts({
@@ -62,16 +63,16 @@ const Listing = ({ id }: { id: string }) => {
     ],
   });
 
-  // @ts-ignore
-  const bytes = results?.[0]?.result.slice(2) as string;
-  const bodyIndex = results?.[1]?.result as number;
-
-  if (isLoading)
+  if (isLoading && !results)
     return (
       <div className="flex flex-col bg-white p-4 aspect-square justify-center items-center">
         <p className="text-lg">Loading...</p>
       </div>
     );
+
+  // @ts-ignore
+  const bytes = results?.[0]?.result.slice(2) as string;
+  const bodyIndex = results?.[1]?.result as number;
 
   return (
     <div className="w-full flex justify-center items-center bg-[#0F6E9D]">
