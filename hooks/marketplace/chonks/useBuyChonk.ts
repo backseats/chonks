@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { marketplaceContract, marketplaceABI } from "@/config";
+import { marketplaceContract, marketplaceABI, chainId } from "@/config";
 import { useWriteContract } from "wagmi";
 import { parseEther } from "viem";
 
@@ -20,6 +20,7 @@ export default function useBuyChonk(chonkId: number) {
       functionName: 'buyChonk',
       args: [BigInt(chonkId)],
       value: parseEther(priceInEth.toString()),
+      chainId,
     }, {
       onError: (error) => {
         console.error('Error buying chonk:', error);

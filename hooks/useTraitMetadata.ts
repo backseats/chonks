@@ -70,7 +70,7 @@ export function useTraitMetadata(traitTokenId: string) {
             // Fallback to getTraitData
             const traitData = await getTraitData(traitTokenId);
             console.log("traitData", traitData);
-            debugger
+            // debugger
             // setTraitMetadata(traitData);
           } catch (fallbackErr) {
             console.error("Fallback data fetch also failed:", fallbackErr);

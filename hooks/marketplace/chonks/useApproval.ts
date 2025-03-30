@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useReadContract, useWriteContract } from "wagmi";
-import { mainContract, mainABI, marketplaceContract } from "@/config"
+import { mainContract, mainABI, marketplaceContract, chainId } from "@/config"
 import { Address } from "viem";
 
 // This should be roughly the same for traits, just using the traits contract
@@ -15,6 +15,7 @@ export default function useApproval(address: Address | undefined) {
     abi: mainABI,
     functionName: 'isApprovedForAll',
     args: [address, marketplaceContract]
+    chainId,
   }) as { data: boolean | undefined, refetch: () => Promise<any> };
 
   const finalIsApproved = isApproved || localApproved;
@@ -31,6 +32,7 @@ export default function useApproval(address: Address | undefined) {
         abi: mainABI,
         functionName: 'setApprovalForAll',
         args: [marketplaceContract, true],
+        chainId,
       }, {
         onError: (error) => {
           // console.error('Error approving marketplace:', error);

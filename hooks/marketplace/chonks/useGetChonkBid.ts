@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useReadContract } from "wagmi";
-import { marketplaceContract, marketplaceABI } from "@/config";
+import { marketplaceContract, marketplaceABI, chainId } from "@/config";
 import { zeroAddress } from "viem";
 
 export default function useGetChonkBid(chonkId: number) {
@@ -10,6 +10,7 @@ export default function useGetChonkBid(chonkId: number) {
     abi: marketplaceABI,
     functionName: 'getChonkBid',
     args: [BigInt(chonkId)],
+    chainId,
   }) as { data: [string, bigint, bigint[], string], refetch: () => void }; // matches return types from contract
 
   // Convert array to object

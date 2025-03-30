@@ -5,7 +5,7 @@ import client from "@/lib/apollo-client";
 import { GET_CHONKS_BY_EOA } from "@/lib/graphql/queries";
 import MarketplaceConnectKitButton from "../marketplace/common/MarketplaceConnectKitButton";
 import { useReadContract } from "wagmi";
-import { mainContract, mainABI } from "@/config";
+import { mainContract, mainABI, chainId } from "@/config";
 
 type Chonk = {
   id: number;
@@ -90,6 +90,7 @@ const Chonk = ({ id }: { id: number }) => {
     abi: mainABI,
     functionName: "renderAsDataUri2D",
     args: [BigInt(id)],
+    chainId,
   });
 
   if (isLoading)

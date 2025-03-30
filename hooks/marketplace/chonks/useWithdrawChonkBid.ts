@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useWriteContract } from "wagmi";
-import { marketplaceContract, marketplaceABI } from "@/config";
+import { marketplaceContract, marketplaceABI, chainId } from "@/config";
 
 export default function useWithdrawChonkBid(chonkId: number) {
   const [withdrawBidOnChonkError, setWithdrawBidOnChonkError] = useState<string | null>(null);
@@ -20,6 +20,7 @@ export default function useWithdrawChonkBid(chonkId: number) {
         abi: marketplaceABI,
         functionName: 'withdrawBidOnChonk',
         args: [BigInt(chonkId)],
+        chainId,
       }, {
         onError: (error) => {
           console.log('Withdrawal transaction rejected:', error.message);

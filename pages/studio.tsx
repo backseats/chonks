@@ -14,7 +14,7 @@ import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import traits from "../contracts/csv-conversion/latest.json";
 import bodies from "../contracts/csv-conversion/bodies.json";
-import { colorMapContract, colorMapABI } from "../config";
+import { colorMapContract, colorMapABI, chainId } from "../config";
 
 import BodyPresets from "../components/studio/BodyPresets";
 import {
@@ -844,6 +844,7 @@ Follow @chonksxyz on X to stay up to date, as we get closer to mint in late Octo
       urlId && typeof urlId === "string" && /^\d+$/.test(urlId)
         ? [BigInt(urlId)]
         : undefined,
+    chainId,
   } as const;
 
   const { data: results, isLoading: isLoadingColorMap } = useReadContracts({

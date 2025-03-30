@@ -1,5 +1,5 @@
 import { useWriteContract } from "wagmi";
-import { marketplaceContract, marketplaceABI } from "@/config";
+import { marketplaceContract, marketplaceABI, chainId } from "@/config";
 import { parseEther } from "viem";
 
 export default function useBidOnChonk(chonkId: number) {
@@ -13,7 +13,8 @@ export default function useBidOnChonk(chonkId: number) {
         abi: marketplaceABI,
         functionName: 'bidOnChonk',
         args: [BigInt(chonkId)],
-        value: amountInWei
+        value: amountInWei,
+        chainId,
       }, {
         onError: (error) => {
           console.error('Error placing bid:', error);

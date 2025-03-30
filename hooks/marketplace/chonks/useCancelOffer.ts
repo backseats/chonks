@@ -22,6 +22,7 @@ export default function useCancelOffer(address: Address | undefined, chonkId: nu
         abi: marketplaceABI,
         functionName: 'cancelOfferChonk',
         args: [BigInt(chonkId)],
+        chainId,
       }, {
         onError: (error) => {
           if (error.message.includes("User rejected the request")) {

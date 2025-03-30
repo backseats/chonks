@@ -79,6 +79,7 @@ export default function useListChonk(address: Address | undefined, chonkId: numb
         abi: marketplaceABI,
         functionName: toAddress ? 'offerChonkToAddress' : 'offerChonk',
         args: toAddress ? [BigInt(chonkId), priceInWei, toAddress] : [BigInt(chonkId), priceInWei],
+        chainId,
       }, {
         onError: (error) => {
           console.log('Listing transaction rejected:', error);

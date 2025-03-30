@@ -501,6 +501,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         abi: mainABI,
         functionName: "transferFrom",
         args: [address, recipientAddress, BigInt(id)],
+        chainId,
       });
     } catch (error) {
       console.error("Error sending Chonk:", error);
