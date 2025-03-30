@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { ChonkListing } from "@/pages/market/chonks/index";
-import ChonkRenderer from "@/components/ChonkRenderer";
 import ListingInfo from "@/components/marketplace/common/ListingInfo";
-import { useReadContracts } from "wagmi";
+import { useReadContract, useReadContracts } from "wagmi";
 import { colorMapContract, colorMapABI, chainId } from "@/config";
 
 interface ListingsProps {
@@ -46,9 +45,10 @@ const Listing = ({ id }: { id: string }) => {
   const contract = {
     address: colorMapContract,
     abi: colorMapABI,
+    functionName: "getColorMapForChonk",
     args: [BigInt(id)],
     chainId,
-  } as const;
+  };
 
   const { data: results, isLoading } = useReadContracts({
     contracts: [
@@ -75,8 +75,6 @@ const Listing = ({ id }: { id: string }) => {
   const bodyIndex = results?.[1]?.result as number;
 
   return (
-    <div className="w-full flex justify-center items-center bg-[#0F6E9D]">
-      <ChonkRenderer bytes={bytes} bodyIndex={bodyIndex} />
-    </div>
+    <img src={jsonData.image} alt={`Chonk #${id}`} className="w-full h-auto" />
   );
 };
