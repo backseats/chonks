@@ -17,11 +17,9 @@ import { Address } from "viem";
 import Loading from "@/components/marketplace/Loading";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { TraitMetadata, TraitMetadataResponse } from "@/types/TraitMetadata";
-import {
-  GET_TRAIT_METADATA_BY_ID,
-  GET_TRAIT_IMAGE_BY_ID,
-} from "@/lib/graphql/queries";
-import client, { traitTokenURIClient } from "@/lib/apollo-client";
+import { GET_TRAIT_METADATA_BY_ID } from "@/lib/graphql/queries";
+import client from "@/lib/apollo-client";
+import ChonkRenderer from "@/components/ChonkRenderer";
 
 export default function TraitDetail({ id }: { id: string }) {
   // const router = useRouter()
@@ -30,7 +28,6 @@ export default function TraitDetail({ id }: { id: string }) {
   const [isOffersOpen, setIsOffersOpen] = useState(true);
   const [isTraitsOpen, setIsTraitsOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [traitImage, setTraitImage] = useState<string | undefined>(undefined);
 
   const { address } = useAccount();
 
@@ -93,32 +90,6 @@ export default function TraitDetail({ id }: { id: string }) {
   //   if (!traitOffer?.onlySellTo || !address || !isOfferSpecific) return false;
   //   return traitOffer.onlySellTo.toLowerCase() === address.toLowerCase();
   // }, [traitOffer, address, isOfferSpecific]);
-
-  useEffect(() => {
-    const fetchTraitImage = async () => {
-      setIsLoading(true);
-
-      try {
-        const response = await traitTokenURIClient.query({
-          query: GET_TRAIT_IMAGE_BY_ID,
-          variables: { id: id.toString() },
-        });
-
-        const tokenURI = response.data.traitUri.tokenUri;
-        const tokenURIString = tokenURI as string;
-        const base64String = tokenURIString.split(",")[1];
-        const jsonString = atob(base64String);
-        const jsonData = JSON.parse(jsonString);
-
-        setIsLoading(false);
-        setTraitImage(jsonData.image);
-      } catch (error) {
-        console.error("Error fetching trait image", error);
-      }
-    };
-
-    if (!isLoading) fetchTraitImage();
-  }, [id, isLoading]);
 
   // Get main body tokenURI
   // const { data: tokenURIData } = useReadContract({
@@ -289,8 +260,6 @@ export default function TraitDetail({ id }: { id: string }) {
           variables: { id: parseInt(id) },
         });
 
-        // console.log("Trait metadata from GraphQL:", data);
-
         if (data?.traitMetadata?.items?.length > 0) {
           setTraitMetadata(data.traitMetadata.items[0]);
         }
@@ -318,7 +287,10 @@ export default function TraitDetail({ id }: { id: string }) {
           property="og:description"
           content={`View Trait #${id} on the Chonks marketplace`}
         />
-        {traitImage && <meta property="og:image" content={traitImage} />}
+
+        {/* // TODO: add trait image */}
+        {/* {traitImage && <meta property="og:image" content={traitImage} />} */}
+
         <meta
           property="og:url"
           content={`https://chonks.xyz/market/traits/${id}`}
@@ -353,15 +325,11 @@ export default function TraitDetail({ id }: { id: string }) {
         <MenuBar />
 
         <main className="w-full border-t border-gray-300">
-          {traitImage ? (
+          {traitMetadata ? (
             <>
               <div className="hidden sm:flex sm:flex-row sm:gap-[3.45vw] sm:py-[1.725vw] sm:px-[3.45vw]">
                 <div className="w-2/5">
-                  <img
-                    src={traitImage}
-                    alt={`Trait ${id}`}
-                    className="w-full h-auto"
-                  />
+                  <ChonkRenderer bytes={traitMetadata.colorMap.slice(2)} />
 
                   {/* <TraitsSection
                                         tokenData={tokenData}
@@ -413,18 +381,16 @@ export default function TraitDetail({ id }: { id: string }) {
               </div>
 
               <div className="flex flex-col sm:hidden">
-                <h1 className="text-[22px] mt-3 font-bold text-center">
+                <h1 className="text-[22px] mt-3 font-bold text-center px-4">
                   Trait #{id}{" "}
                   {traitMetadata?.traitName
                     ? `- ${traitMetadata.traitName}`
                     : ""}
                 </h1>
 
-                <img
-                  src={traitImage}
-                  alt={`Trait ${id}`}
-                  className="w-full h-auto p-4"
-                />
+                <div className="w-full h-auto p-4">
+                  <ChonkRenderer bytes={traitMetadata.colorMap.slice(2)} />
+                </div>
 
                 <OwnershipSection
                   id={id}
