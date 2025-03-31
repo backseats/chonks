@@ -7,6 +7,7 @@ import { chonkTraitsABI } from './abis/chonkTraitsABI'
 import { chonksMarketABI } from './abis/chonksMarketABI'
 import { chonksColorMapABI } from './abis/chonksColorMapABI'
 import { chonkBulkTraitTransferABI } from './abis/chonkBulkTraitTransferABI'
+import errors from "@/errors.json";
 
 export const mainContract = "0x07152bfde079b5319e5308c43fb1dbc9c76cb4f9";
 
@@ -20,11 +21,12 @@ export const colorMapContract = "0x92BC112321E1EEd44C7CdB802ED727Ef2a9864Cd";
 
 export const bulkTraitTransferContract = "0xEf6cA22D4e55F0c60ACdB2269463fC261Df95bf3";
 
-export const mainABI = chonksMainABI;
-export const traitsABI = chonkTraitsABI;
-export const marketplaceABI = chonksMarketABI;
-export const colorMapABI = chonksColorMapABI;
-export const bulkTraitTransferABI = chonkBulkTraitTransferABI;
+// Add errors to all ABIs
+export const mainABI = [...chonksMainABI, ...errors];
+export const traitsABI = [...chonkTraitsABI, ...errors];
+export const marketplaceABI = [...chonksMarketABI, ...errors];
+export const colorMapABI = [...chonksColorMapABI, ...errors];
+export const bulkTraitTransferABI = [...chonkBulkTraitTransferABI, ...errors];
 
 export const chainId = base.id;
 
