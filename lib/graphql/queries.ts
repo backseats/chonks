@@ -221,7 +221,7 @@ query traitURI($id: BigInt!) {
 `;
 
 // unused
-export const GET_TRAIT_LISTINGS = gql`
+export const GET_TRAIT_LISTING = gql`
 query traitListing($id: BigInt!) {
   traitListing(id: $id) {
     id
