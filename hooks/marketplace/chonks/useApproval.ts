@@ -14,7 +14,7 @@ export default function useApproval(address: Address | undefined) {
     address: mainContract,
     abi: mainABI,
     functionName: 'isApprovedForAll',
-    args: [address, marketplaceContract]
+    args: [address, marketplaceContract],
     chainId,
   }) as { data: boolean | undefined, refetch: () => Promise<any> };
 
