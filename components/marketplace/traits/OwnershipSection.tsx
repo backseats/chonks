@@ -35,7 +35,7 @@ export default function OwnershipSection(props: Props) {
     <>
       <div className="flex justify-between items-center px-4 sm:px-0">
         <div className="flex flex-row justify-between w-full sm:justify-start sm:items-baseline sm:gap-2">
-          <h1 className="hidden sm:flex sm:text-3xl sm:font-bold">
+          <h1 className="hidden sm:flex sm:text-[26px] sm:font-bold">
             Trait #{id} {traitName ? `- ${traitName}` : ""}
           </h1>
 
@@ -58,9 +58,9 @@ export default function OwnershipSection(props: Props) {
             </div>
           )}
 
-          <p className="text-sm text-gray-600 pb-7">
+          <div className="text-sm text-gray-600 pb-7 whitespace-nowrap">
             {isEquipped ? "(Equipped)" : "(Not Equipped)"}
-          </p>
+          </div>
         </div>
 
         {/* <RefreshAndShare /> */}

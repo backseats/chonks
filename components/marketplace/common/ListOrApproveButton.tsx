@@ -52,7 +52,7 @@ export default function ListOrApproveButton({
           : finalIsApproved
           ? traitId && isEquipped
             ? "Unequip to List"
-            : `List Your ${traitId ? `Trait` : "Chonk"}`
+            : `List My ${traitId ? `Trait` : "Chonk"}`
           : `Approve the Marketplace to List ${
               hasActiveBid ? "or accept Bid" : ""
             }`}
