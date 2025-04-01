@@ -4,6 +4,7 @@ import { Category } from "@/types/Category";
 import Attributes from "@/components/marketplace/Attributes";
 
 interface Props {
+  chonkId: string;
   tokenData: Chonk | null;
   equippedTraits: CurrentChonk | null;
 }
@@ -15,7 +16,7 @@ type Trait = {
 };
 
 export default function EquippedAttributes(props: Props) {
-  const { tokenData, equippedTraits } = props;
+  const { chonkId, tokenData, equippedTraits } = props;
 
   if (!tokenData) return null;
 
@@ -63,6 +64,6 @@ export default function EquippedAttributes(props: Props) {
       No Traits equipped
     </div>
   ) : (
-    <Attributes attributes={traitsWithTokenIds} />
+    <Attributes chonkId={chonkId} attributes={traitsWithTokenIds} />
   );
 }

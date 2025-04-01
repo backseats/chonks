@@ -116,6 +116,7 @@ export default function TraitsSection({
 
         {isEquippedTraitsOpen && (
           <EquippedAttributes
+            chonkId={chonkId}
             tokenData={tokenData}
             equippedTraits={equippedTraits}
           />
