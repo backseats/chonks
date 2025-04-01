@@ -3,7 +3,6 @@ import { ConnectKitButton } from "connectkit";
 export default function MarketplaceConnectKitButton() {
   return (
     <ConnectKitButton
-      // theme="web"
       label="Sign In"
       customTheme={{
         "--ck-font-family": "'Source Code Pro', monospace",

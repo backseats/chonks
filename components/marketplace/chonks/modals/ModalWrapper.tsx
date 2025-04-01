@@ -17,9 +17,7 @@ export const ModalWrapper = ({
         // Prevents closing if user is waiting to sign the txn
         if (localListingPending) return;
 
-        if (e.target === e.currentTarget) {
-          onClose();
-        }
+        if (e.target === e.currentTarget) onClose();
       }}
     >
       <div className="bg-white p-8 max-w-md w-full mx-4 min-w-[25vw]">

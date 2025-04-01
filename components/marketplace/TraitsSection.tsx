@@ -154,7 +154,7 @@ export default function TraitsSection({
                 No Traits to display
               </div>
             ) : (
-              <Attributes attributes={traits} />
+              <Attributes chonkId={chonkId} attributes={traits} />
             ))}
         </div>
       )}

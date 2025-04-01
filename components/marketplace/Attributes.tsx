@@ -1,6 +1,12 @@
 import { useState } from "react";
 import Link from "next/link";
-import { traitsABI, traitsContract, chainId } from "@/config";
+import {
+  traitsABI,
+  traitsContract,
+  chainId,
+  colorMapABI,
+  colorMapContract,
+} from "@/config";
 import { useReadContract } from "wagmi";
 import ChonkRenderer from "../ChonkRenderer";
 import { getCategoryString } from "@/types/Category";
@@ -22,12 +28,19 @@ type Trait = {
   traitType: number; // Category id
 };
 
-export const Attributes = ({ attributes }: { attributes: Trait[] }) => {
+export const Attributes = ({
+  chonkId,
+  attributes,
+}: {
+  chonkId: string;
+  attributes: Trait[];
+}) => {
   return (
     <div className="mt-4 grid grid-cols-2 gap-4">
       {attributes.map((attribute: Trait) => (
         <Attribute
           key={attribute.id}
+          chonkId={chonkId}
           tokenId={parseInt(attribute.id)}
           traitType={attribute.traitType}
           value={attribute.traitName}
@@ -40,36 +53,16 @@ export const Attributes = ({ attributes }: { attributes: Trait[] }) => {
 export default Attributes;
 
 const Attribute = ({
+  chonkId,
   tokenId,
   traitType,
   value,
 }: {
+  chonkId: string;
   tokenId: number;
   traitType: number;
   value: string;
 }) => {
-  const abi = [
-    {
-      inputs: [
-        {
-          internalType: "uint256",
-          name: "_tokenId",
-          type: "uint256",
-        },
-      ],
-      name: "getColorMapForTokenId",
-      outputs: [
-        {
-          internalType: "bytes",
-          name: "",
-          type: "bytes",
-        },
-      ],
-      stateMutability: "view",
-      type: "function",
-    },
-  ];
-
   const { data, isLoading } = useReadContract({
     address: traitsContract,
     abi: traitsABI,
@@ -77,6 +70,16 @@ const Attribute = ({
     args: [tokenId],
     chainId,
   });
+
+  const { data: bodyIndexData } = useReadContract({
+    address: colorMapContract,
+    abi: colorMapABI,
+    functionName: "getBodyIndexForChonk",
+    args: [chonkId],
+    chainId,
+  });
+
+  const bodyIndex = bodyIndexData ? Number(bodyIndexData) : undefined;
 
   const colorMap = data ? data.toString().substring(2) : null;
 
@@ -106,7 +109,7 @@ const Attribute = ({
         {value}
       </Link>
 
-      {showPreview && colorMap && (
+      {showPreview && colorMap && bodyIndex && (
         <div
           className="absolute z-10 w-[150px] h-[150px]"
           style={{ top: "-160px", left: "50%", transform: "translateX(-50%)" }}
@@ -114,7 +117,10 @@ const Attribute = ({
           <ChonkRenderer
             bytes={colorMap}
             backgroundColor="#0F6E9D"
-            backgroundBody="ghost.svg"
+            backgroundBody={
+              bodyIndex ? `skinTone${bodyIndex + 1}.svg` : "ghost.svg"
+            }
+            opacity={0.6}
           />
         </div>
       )}

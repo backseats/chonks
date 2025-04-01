@@ -33,9 +33,7 @@ export default function MakeCancelOfferButton({
         onClick={handleWithdrawBid}
         disabled={isWithdrawBidPending}
       >
-        {isWithdrawBidPending
-          ? "Confirm with your wallet"
-          : "Cancel your Offer"}
+        {isWithdrawBidPending ? "Confirm with your wallet" : "Cancel my Offer"}
       </button>
     );
   }
