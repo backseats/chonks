@@ -37,7 +37,7 @@ export default function useApproval(address: Address | undefined) {
         onError: (error) => {
           // console.error('Error approving marketplace:', error);
           if (error.message.includes("User rejected the request")) {
-            setApprovalError("Please approve the marketplace to continue");
+            setApprovalError("Please approve the Market to continue");
           } else {
             setApprovalError("An approval signing message occurred");
           }

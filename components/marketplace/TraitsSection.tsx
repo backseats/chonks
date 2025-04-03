@@ -151,7 +151,7 @@ export default function TraitsSection({
 
           {isTraitsOpen &&
             (traits.length === 0 ? (
-              <div className="text-lg mt-4 text-gray-600">
+              <div className="text-[16px] text-center mt-4 text-gray-600">
                 No Traits to display
               </div>
             ) : (

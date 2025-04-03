@@ -1,5 +1,13 @@
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { MARKETPLACE_CONSTANTS } from "@/constants/marketplace";
+import { Address } from "viem";
+import {
+  useWriteContract,
+  useWalletClient,
+  useWaitForTransactionReceipt,
+  usePublicClient,
+} from "wagmi";
+import { chainId } from "@/config";
 
 interface ListingModalProps {
   chonkId: number;
@@ -9,49 +17,130 @@ interface ListingModalProps {
   recipientAddress: string;
   addressError: string;
   priceError: string;
-  status: {
-    isRejected: boolean;
-    isPending: boolean;
-    isSuccess: boolean;
-  };
-  onSubmit: () => void;
+  address: Address;
+  abi: any[];
+  args: any[];
+  functionName: string;
+  inFlightLabel: string;
   onClose: () => void;
   setListingPrice: (price: string) => void;
   setIsPrivateListingExpanded: (expanded: boolean) => void;
   setRecipientAddress: (address: string) => void;
+  onSuccess?: () => void;
+  validateListing: () => void;
 }
 
-export const ListingModal = ({
-  chonkId,
-  traitId,
-  listingPrice,
-  setListingPrice,
-  isPrivateListingExpanded,
-  setIsPrivateListingExpanded,
-  recipientAddress,
-  setRecipientAddress,
-  addressError,
-  priceError,
-  onSubmit,
-  onClose,
-  status,
-}: ListingModalProps) => {
-  useEffect(() => {
-    if (status.isRejected || (status.isSuccess && status.isPending)) {
-      setListingPrice("");
-      setRecipientAddress("");
-      onClose();
+export const ListingModal = (props: ListingModalProps) => {
+  const {
+    chonkId,
+    traitId,
+    listingPrice,
+    setListingPrice,
+    isPrivateListingExpanded,
+    setIsPrivateListingExpanded,
+    recipientAddress,
+    setRecipientAddress,
+    addressError,
+    priceError,
+    onClose,
+    address,
+    abi,
+    args,
+    functionName,
+    inFlightLabel,
+    onSuccess,
+    validateListing,
+  } = props;
+
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [bottomError, setBottomError] = useState<string | null>(null);
+
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient({ chainId });
+
+  const {
+    writeContract,
+    data: writeContractHash,
+    isPending: isWriteContractPending,
+    error: writeContractError,
+  } = useWriteContract();
+
+  const {
+    data: receipt,
+    isLoading: isWaiting,
+    error: waitingError,
+  } = useWaitForTransactionReceipt({
+    hash: writeContractHash,
+  });
+
+  const processError = (error: string) => {
+    if (error.includes("User denied transaction signature")) {
+      setBottomError("Confirm the transaction to continue");
+    } else if (error.includes("MustWaitToWithdrawBid")) {
+      // TODO: get the block from the contract and make it more dynamic
+      setBottomError("Wait one minute before withdrawing your Bid");
+    } else if (error.includes("CantBeZero")) {
+      setBottomError(null); // handled elsewhere
+    } else {
+      setBottomError(error);
     }
-  }, [status]);
+  };
+
+  const handleClick = async () => {
+    validateListing();
+    setBottomError(null);
+    setIsSimulating(true);
+
+    try {
+      // Must connect wallet. Should never hit this
+      if (!walletClient) {
+        return;
+      }
+
+      const simulation = await publicClient?.simulateContract({
+        address: address,
+        abi,
+        functionName,
+        args,
+        account: walletClient.account!,
+      });
+
+      if (!simulation) {
+        setBottomError("Simulation failed");
+        return;
+      }
+
+      await writeContract(simulation.request);
+    } catch (err: any) {
+      processError(err.message || "Simulation or transaction failed");
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
+  useEffect(() => {
+    if (receipt) onSuccess?.();
+  }, [receipt]);
 
   const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9.]/g, "");
     setListingPrice(value);
   };
 
+  const isDisabled = useMemo(() => {
+    return isSimulating || isWriteContractPending || isWaiting;
+  }, [isSimulating, isWriteContractPending, isWaiting]);
+
+  const buttonLabel = useMemo(() => {
+    if (isSimulating) return "Preparing...";
+    if (isWriteContractPending) return "Confirm with your wallet";
+    if (isWaiting) return inFlightLabel;
+    return traitId ? "List Trait" : "List Chonk";
+  }, [isSimulating, isWriteContractPending, isWaiting, inFlightLabel, traitId]);
+
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold">
+      <h2 className="text-[22px] font-bold">
         {traitId ? `List Trait #${traitId}` : `List Chonk #${chonkId}`}
       </h2>
 
@@ -65,8 +154,9 @@ export const ListingModal = ({
           onChange={handlePriceChange}
           className="border p-2 text-sm"
           placeholder="0.00"
-          disabled={status.isPending || status.isSuccess}
+          disabled={isDisabled}
         />
+
         {priceError && (
           <span className="text-red-500 text-sm">{priceError}</span>
         )}
@@ -76,7 +166,7 @@ export const ListingModal = ({
         <button
           className="text-left text-sm text-gray-600 underline"
           onClick={() => setIsPrivateListingExpanded(!isPrivateListingExpanded)}
-          disabled={status.isPending || status.isSuccess}
+          disabled={isDisabled}
         >
           Make it a {isPrivateListingExpanded ? "public" : "private"} listing
         </button>
@@ -89,8 +179,9 @@ export const ListingModal = ({
               onChange={(e) => setRecipientAddress(e.target.value)}
               className="border p-2 text-sm"
               placeholder="Recipient address or ENS"
-              disabled={status.isPending || status.isSuccess}
+              disabled={isDisabled}
             />
+
             {addressError && (
               <span className="text-red-500 text-sm">{addressError}</span>
             )}
@@ -98,29 +189,31 @@ export const ListingModal = ({
         )}
       </div>
 
-      <div className="flex gap-2 mt-4">
-        <button
-          className={`flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300 text-[16px] ${
-            status.isPending ? "opacity-50" : ""
-          }`}
-          onClick={onClose}
-          disabled={status.isPending && !status.isSuccess && !status.isRejected}
-        >
-          {status.isSuccess
-            ? "Close"
-            : status.isPending
-            ? "Confirm with your wallet"
-            : "Cancel"}
-        </button>
+      <div className="flex flex-col gap-2">
+        <div className="flex sm:flex-row flex-col gap-2 mt-4">
+          {!isWriteContractPending && !isWaiting && (
+            <button
+              className="flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300 text-[16px] disabled:opacity-50"
+              onClick={onClose}
+              disabled={isDisabled}
+            >
+              Cancel
+            </button>
+          )}
 
-        {!status.isSuccess && !status.isPending && !status.isRejected && (
           <button
             className="flex-1 bg-chonk-blue text-white py-2 px-4 hover:brightness-110 disabled:opacity-50 text-[16px]"
-            onClick={onSubmit}
-            disabled={status.isPending || status.isSuccess}
+            onClick={handleClick}
+            disabled={isDisabled}
           >
-            {traitId ? "List Trait" : "List Chonk"}
+            {buttonLabel}
           </button>
+        </div>
+
+        {bottomError && (
+          <span className="text-red-500 text-sm text-center mt-2 -mb-4">
+            {bottomError}
+          </span>
         )}
       </div>
     </div>

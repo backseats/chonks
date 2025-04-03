@@ -16,13 +16,13 @@ export default function useListTrait(address: Address | undefined, traitId: numb
 
   ////// Read //////
 
-  const { data: traitOfferArray } = useReadContract({
+  const { data: traitOfferArray, refetch: refetchTraitListing } = useReadContract({
     address: marketplaceContract,
     abi: marketplaceABI,
     functionName: "traitOffers",
     args: [BigInt(traitId)],
     chainId,
-  }) as { data: [bigint, string, string, string, string] };
+  }) as { data: [bigint, string, string, string, string], refetch: () => void };
 
   ////// Format //////
 
@@ -128,5 +128,6 @@ export default function useListTrait(address: Address | undefined, traitId: numb
     isOfferSpecific,
     canAcceptOffer,
     onlySellToAddress: traitOffer?.onlySellTo,
+    refetchTraitListing,
   };
 }

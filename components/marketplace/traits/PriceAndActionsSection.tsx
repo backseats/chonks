@@ -22,7 +22,13 @@ import { useTBAApproval } from "@/hooks/marketplace/traits/useTBAApproval";
 import { OfferModal } from "@/components/marketplace/chonks/modals/OfferModal";
 import { ModalWrapper } from "@/components/marketplace/chonks/modals/ModalWrapper";
 import { ListingModal } from "@/components/marketplace/chonks/modals/ListingModal";
-import { traitsContract, traitsABI, chainId } from "@/config";
+import {
+  traitsContract,
+  traitsABI,
+  chainId,
+  marketplaceContract,
+  marketplaceABI,
+} from "@/config";
 import { useUnequipTrait } from "@/hooks/marketplace/traits/useUnequipTrait";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { ActionButton } from "../chonks/buttons/ActionButton";
@@ -31,7 +37,7 @@ import CurrentBid from "../common/CurrentBid";
 import AcceptOfferButton from "../common/AcceptOfferButton";
 import MakeCancelOfferButton from "../common/MakeCancelOfferButton";
 import ListOrApproveButton from "../common/ListOrApproveButton";
-
+import TransactionButton from "@/components/TransactionButton";
 type PriceAndActionsSectionProps = {
   isOwner: boolean;
   chonkId: number;
@@ -79,18 +85,13 @@ export default function PriceAndActionsSection(
   )}1`;
   const STEP_SIZE = MIN_LISTING_PRICE;
 
-  // Replace monolithic hook with individual hooks
   const {
-    handleListTrait,
-    isListTraitPending,
-    isListTraitSuccess,
-    isListingRejected,
-    listTraitError,
     price,
     hasActiveOffer,
     isOfferSpecific,
     canAcceptOffer,
     onlySellToAddress,
+    refetchTraitListing,
   } = useListTrait(address, traitId);
 
   const {
@@ -154,8 +155,6 @@ export default function PriceAndActionsSection(
   const [priceError, setPriceError] = useState("");
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [offerAmount, setOfferAmount] = useState("");
-  const [localListingSuccess, setLocalListingSuccess] = useState(false);
-  const [localListingRejected, setLocalListingRejected] = useState(false);
   const [localListingPending, setLocalListingPending] = useState(false);
   const [selectedChonkId, setSelectedChonkId] = useState<string>("");
   const [localCancelOfferTraitPending, setLocalCancelOfferTraitPending] =
@@ -164,6 +163,8 @@ export default function PriceAndActionsSection(
     useState(false);
 
   const [chonkSelectError, setChonkSelectError] = useState("");
+
+  const [error, setError] = useState<string | null>(null);
 
   const { ownedChonks } = useOwnedChonks(address); // This hook should fetch owned Chonks
 
@@ -236,24 +237,6 @@ export default function PriceAndActionsSection(
     price &&
     balance &&
     balance.value < parseEther((price + estimatedGasInEth).toString());
-
-  useEffect(() => {
-    if (isListingRejected) {
-      setLocalListingRejected(true);
-    }
-  }, [isListingRejected]);
-
-  useEffect(() => {
-    if (isListTraitPending) {
-      setLocalListingPending(true);
-    }
-  }, [isListTraitPending]);
-
-  useEffect(() => {
-    if (isListTraitSuccess) {
-      setLocalListingSuccess(true);
-    }
-  }, [isListTraitSuccess]);
 
   // Track cancel offer state
   useEffect(() => {
@@ -347,7 +330,7 @@ export default function PriceAndActionsSection(
     resetForm();
   }
 
-  function handleListingSubmit() {
+  function validateListing() {
     const listingPriceNum = Number(listingPrice);
     if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
       setPriceError(`Minimum listing price is ${MIN_LISTING_PRICE} ETH`);
@@ -359,17 +342,18 @@ export default function PriceAndActionsSection(
       return;
     }
 
-    if (isPrivateListingExpanded && resolvedAddress) {
-      handleListTrait(
-        listingPrice,
-        parseInt(tokenIdOfTBA ?? "0"),
-        resolvedAddress
-      );
-    } else {
-      handleListTrait(listingPrice, parseInt(tokenIdOfTBA ?? "0"));
-    }
+    // if (isPrivateListingExpanded && resolvedAddress) {
+    //   handleListTrait(
+    //     listingPrice,
+    //     parseInt(tokenIdOfTBA ?? "0"),
+    //     resolvedAddress
+    //   );
+    // } else {
+    //   handleListTrait(listingPrice, parseInt(tokenIdOfTBA ?? "0"));
+    // }
 
-    resetForm();
+    // resetForm();
+    setLocalListingPending(true);
   }
 
   function resetForm() {
@@ -379,21 +363,32 @@ export default function PriceAndActionsSection(
     setRecipientAddress("");
     setAddressError("");
     setPriceError("");
+    setLocalListingPending(false);
     setIsPrivateListingExpanded(false);
   }
 
   // Render owner actions
   const renderOwnerActions = () => (
     <div className="flex flex-col gap-2">
-      <ActionButton
-        variant="danger"
-        onClick={() => handleCancelOfferTrait(parseInt(tokenIdOfTBA ?? "0"))}
-        disabled={localCancelOfferTraitPending && !isCancelOfferTraitSuccess}
-      >
-        {localCancelOfferTraitPending && !isCancelOfferTraitSuccess
-          ? "Confirm with your wallet"
-          : "Cancel Listing"}
-      </ActionButton>
+      <TransactionButton
+        buttonStyle="secondary"
+        address={marketplaceContract}
+        abi={marketplaceABI}
+        args={[traitId, chonkId]}
+        functionName="cancelOfferTrait"
+        label="Cancel Listing"
+        inFlightLabel="Canceling Listing..."
+        onSuccess={() => {
+          refetchTraitListing();
+          handleModalClose();
+          setError(null);
+        }}
+        reset={() => {
+          setError(null);
+        }}
+        setError={setError}
+      />
+      {/* TODO why no refetch */}
 
       {hasActiveBid && traitBid && (
         <AcceptOfferButton
@@ -491,8 +486,7 @@ export default function PriceAndActionsSection(
     <>
       <div className="border m-4 sm:m-0 border-black p-3 sm:p-[1.725vw] mb-[1.725vw]">
         {/* Has Offer, or just been Listed */}
-        {(hasActiveOffer || isListTraitSuccess) &&
-        !localCancelOfferTraitSuccess ? (
+        {hasActiveOffer ? (
           <>
             <div className="flex flex-col mb-4">
               <div className="flex items-baseline gap-2">
@@ -558,7 +552,6 @@ export default function PriceAndActionsSection(
                 <>
                   <ListOrApproveButton
                     traitId={traitId}
-                    traitName={traitName}
                     isApprovalPending={isUnequipTraitPending}
                     finalIsApproved={Boolean(finalIsApproved)}
                     handleApproveMarketplace={handleApproveTBAForMarketplace}
@@ -632,7 +625,11 @@ export default function PriceAndActionsSection(
         )}
       </div>
 
-      <ModalWrapper isOpen={isModalOpen} onClose={handleModalClose}>
+      <ModalWrapper
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        localListingPending={localListingPending}
+      >
         <ListingModal
           chonkId={chonkId}
           traitId={traitId}
@@ -644,13 +641,21 @@ export default function PriceAndActionsSection(
           setRecipientAddress={setRecipientAddress}
           addressError={addressError}
           priceError={priceError}
-          onSubmit={handleListingSubmit}
           onClose={handleModalClose}
-          status={{
-            isRejected: localListingRejected,
-            isPending: localListingPending,
-            isSuccess: localListingSuccess,
+          address={marketplaceContract}
+          abi={marketplaceABI}
+          args={
+            isValidAddress
+              ? [traitId, chonkId, parseEther(listingPrice), resolvedAddress]
+              : [traitId, chonkId, parseEther(listingPrice)]
+          }
+          functionName={isValidAddress ? "offerTraitToAddress" : "offerTrait"}
+          inFlightLabel="Listing your Trait..."
+          onSuccess={() => {
+            handleModalClose();
+            refetchTraitListing();
           }}
+          validateListing={validateListing}
         />
       </ModalWrapper>
 

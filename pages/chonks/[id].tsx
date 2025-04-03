@@ -39,7 +39,7 @@ import Link from "next/link";
 import { SendHorizontal } from "lucide-react";
 import { ModalWrapper } from "@/components/marketplace/chonks/modals/ModalWrapper";
 import { ListingModal } from "@/components/marketplace/chonks/modals/ListingModal";
-import useListChonk from "@/hooks/marketplace/chonks/useListChonk";
+import useListChonk from "@/hooks/marketplace/chonks/useGetChonkListing";
 import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
 import client from "@/lib/apollo-client";
 import { GET_TRAITS_FOR_CHONK_ID } from "@/lib/graphql/queries";

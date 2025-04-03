@@ -17,7 +17,6 @@ export default function useGetChonkBid(chonkId: number) {
   const chonkBid = useMemo(() => {
     if (!chonkBidData || chonkBidData[0] === zeroAddress) return null;
 
-    // console.log('chonkBidData:', chonkBidData);
     return {
       bidder: chonkBidData[0],
       amountInWei: chonkBidData[1],

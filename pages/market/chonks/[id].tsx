@@ -60,21 +60,18 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId,
   }) as { data: string };
 
-  const { data: owner } = useReadContract({
+  const { data: owner, refetch: refetchOwner } = useReadContract({
     address: mainContract,
     abi: mainABI,
     functionName: "ownerOf",
     args: [BigInt(id)],
     chainId,
-  }) as { data: string };
+  }) as { data: string; refetch: () => void };
 
   useEffect(() => {
     if (tokenURIData) {
       decodeAndSetData(tokenURIData, setTokenData);
     }
-    // else {
-    //   console.log("No tokenURI data");
-    // }
   }, [tokenURIData]);
 
   // Get the trait ids that are equipped to the body
@@ -348,6 +345,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                   <PriceAndActionsSection
                     chonkId={parseInt(id)}
                     isOwner={isOwner}
+                    refetchOwner={refetchOwner}
                     // price={formattedPrice}
                     // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
                     // isOfferSpecific={isOfferSpecific}
@@ -396,6 +394,7 @@ export default function ChonkDetail({ id }: { id: string }) {
                 <PriceAndActionsSection
                   chonkId={parseInt(id)}
                   isOwner={isOwner}
+                  refetchOwner={refetchOwner}
                   // price={formattedPrice}
                   // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
                   // isOfferSpecific={isOfferSpecific}

@@ -1,25 +1,39 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { MARKETPLACE_CONSTANTS } from "@/constants/marketplace";
+import { Address } from "viem";
+import {
+  usePublicClient,
+  useWaitForTransactionReceipt,
+  useWalletClient,
+  useWriteContract,
+} from "wagmi";
+import { chainId } from "@/config";
 
 interface OfferModalProps {
   chonkId: number;
   traitId?: number;
   offerAmount: string;
-  setOfferAmount: (amount: string) => void;
   minimumOffer: string;
   hasActiveBid: boolean;
   currentBid?: {
     bidder: string;
     amountInWei: bigint;
   } | null;
-  onSubmit: () => void;
-  onClose: () => void;
   ownedChonks: string[];
   selectedChonkId?: string;
-  setSelectedChonkId?: (chonkId: string) => void;
   priceError: string | null;
-  isBidPending: boolean;
   chonkSelectError: string;
+  address: Address;
+  abi: any[];
+  args: any[];
+  value: bigint;
+  functionName: string;
+  inFlightLabel: string;
+  setOfferAmount: (amount: string) => void;
+  onClose: () => void;
+  setSelectedChonkId?: (chonkId: string) => void;
+  validateBid: () => boolean;
+  onSuccess?: () => void;
 }
 
 export const OfferModal = ({
@@ -31,22 +45,112 @@ export const OfferModal = ({
   priceError,
   hasActiveBid,
   currentBid,
-  onSubmit,
   onClose,
   ownedChonks,
   selectedChonkId,
   setSelectedChonkId,
-  isBidPending,
   chonkSelectError,
+  address,
+  abi,
+  args,
+  functionName,
+  value,
+  inFlightLabel,
+  validateBid,
+  onSuccess,
 }: OfferModalProps) => {
-  const handleAmountChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const [isSimulating, setIsSimulating] = useState(false);
+  const [bottomError, setBottomError] = useState<string | null>(null);
+
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient({ chainId });
+
+  const {
+    writeContract,
+    data: writeContractHash,
+    isPending: isWriteContractPending,
+    error: writeContractError,
+  } = useWriteContract();
+
+  const {
+    data: receipt,
+    isLoading: isWaiting,
+    error: waitingError,
+  } = useWaitForTransactionReceipt({
+    hash: writeContractHash,
+  });
+
+  const processError = (error: string) => {
+    if (error.includes("User denied transaction signature")) {
+      setBottomError("Confirm the transaction to continue");
+    } else if (error.includes("MustWaitToWithdrawBid")) {
+      // TODO: get the block from the contract and make it more dynamic
+      setBottomError("Wait one minute before withdrawing your Bid");
+    } else if (error.includes("CantBeZero")) {
+      setBottomError(null); // handled elsewhere
+    } else {
+      setBottomError(error);
+    }
+  };
+
+  const handleCLick = async () => {
+    let isBidValid = validateBid();
+    if (!isBidValid) return;
+
+    setBottomError(null);
+    setIsSimulating(true);
+
+    try {
+      // Must connect wallet. Should never hit this
+      if (!walletClient) {
+        return;
+      }
+
+      const simulation = await publicClient?.simulateContract({
+        address: address,
+        abi,
+        functionName,
+        args,
+        value,
+        account: walletClient.account!,
+      });
+
+      if (!simulation) {
+        setBottomError("Simulation failed");
+        return;
+      }
+
+      await writeContract(simulation.request);
+    } catch (err: any) {
+      processError(err.message || "Simulation or transaction failed");
+    } finally {
+      setIsSimulating(false);
+    }
+  };
+
+  useEffect(() => {
+    if (receipt) onSuccess?.();
+  }, [receipt]);
+
+  const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value.replace(/[^0-9.]/g, "");
     setOfferAmount(value);
   };
 
+  const isDisabled = useMemo(() => {
+    return isSimulating || isWriteContractPending || isWaiting;
+  }, [isSimulating, isWriteContractPending, isWaiting]);
+
+  const buttonLabel = useMemo(() => {
+    if (isSimulating) return "Preparing...";
+    if (isWriteContractPending) return "Confirm with your wallet";
+    if (isWaiting) return inFlightLabel;
+    return "Make Offer";
+  }, [isSimulating, isWriteContractPending, isWaiting, inFlightLabel, traitId]);
+
   return (
     <div className="flex flex-col gap-4">
-      <h2 className="text-2xl font-bold">
+      <h2 className="text-[22px] font-bold">
         {traitId
           ? `Make an Offer for Trait #${traitId}`
           : `Make an Offer for Chonk #${chonkId}`}
@@ -55,7 +159,7 @@ export const OfferModal = ({
       <div className="flex flex-col gap-2">
         {hasActiveBid && currentBid && (
           <div className="text-sm text-gray-600">
-            Current highest offer: {Number(currentBid.amountInWei) / 1e18} ETH
+            Current Bid: {Number(currentBid.amountInWei) / 1e18} ETH
           </div>
         )}
 
@@ -65,9 +169,10 @@ export const OfferModal = ({
           step={MARKETPLACE_CONSTANTS.STEP_SIZE}
           min={MARKETPLACE_CONSTANTS.MIN_LISTING_PRICE}
           value={offerAmount}
-          onChange={handleAmountChange}
+          onChange={handlePriceChange}
           className="border p-2 text-[16px]"
           placeholder={minimumOffer}
+          disabled={isDisabled}
         />
 
         {priceError && <div className="text-red-500 text-sm">{priceError}</div>}
@@ -104,31 +209,39 @@ export const OfferModal = ({
               </option>
             ))}
           </select>
+
           {chonkSelectError.length > 0 && (
             <div className="text-red-500 text-sm">{chonkSelectError}</div>
           )}
         </div>
       )}
 
-      <div className="flex gap-4 mt-4 text-[16px]">
-        {!isBidPending && (
-          <button
-            className="flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300"
-            onClick={onClose}
-          >
-            Cancel
-          </button>
-        )}
+      <div className="flex flex-col gap-2">
+        <div className="flex sm:flex-row flex-col gap-4 mt-4 text-[16px]">
+          {!isWriteContractPending && !isWaiting && (
+            <button
+              className="flex-1 bg-gray-200 py-2 px-4 hover:bg-gray-300 text-[16px] disabled:opacity-50"
+              onClick={onClose}
+              disabled={isDisabled}
+            >
+              Cancel
+            </button>
+          )}
 
-        <button
-          className={`flex-1 bg-chonk-blue text-white py-2 px-4 hover:brightness-110 ${
-            isBidPending ? "opacity-50" : ""
-          }`}
-          onClick={onSubmit}
-          disabled={isBidPending}
-        >
-          {isBidPending ? "Confirm with your wallet" : "Make Offer"}
-        </button>
+          <button
+            className={`flex-1 bg-chonk-blue text-white py-2 px-4 hover:brightness-110 disabled:opacity-50 text-[16px]`}
+            onClick={handleCLick}
+            disabled={isDisabled}
+          >
+            {buttonLabel}
+          </button>
+        </div>
+
+        {bottomError && (
+          <span className="text-red-500 text-sm text-center mt-2 -mb-4">
+            {bottomError}
+          </span>
+        )}
       </div>
     </div>
   );

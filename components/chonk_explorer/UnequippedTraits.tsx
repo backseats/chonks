@@ -50,7 +50,7 @@ export default function UnequippedTraits(props: Props) {
           ))}
         </div>
       ) : (
-        <p className="flex justify-center text-lg text-gray-500">
+        <p className="flex justify-center text-[16px] text-gray-500">
           No Traits to display
         </p>
       )}
