@@ -313,7 +313,7 @@ export default function ChonkDetail({ id }: { id: string }) {
           {tokenData ? (
             <>
               <div className="hidden sm:flex sm:flex-row sm:gap-[3.45vw] sm:py-[1.725vw] sm:px-[3.45vw]">
-                <div className="w-2/5">
+                <div className="w-2/5 h-fit">
                   <img
                     src={tokenData.image}
                     alt={`Chonk ${id}`}

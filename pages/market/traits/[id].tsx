@@ -8,14 +8,12 @@ import {
   marketplaceContract,
   marketplaceABI,
   chainId,
-  traitsContract,
-  traitsABI,
 } from "@/config";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from "@/components/marketplace/TraitsSection";
 // import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
 import PriceAndActionsSection from "@/components/marketplace/traits/PriceAndActionsSection";
-import { Address } from "viem";
+import { Address, getAddress } from "viem";
 import Loading from "@/components/marketplace/Loading";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { TraitMetadata, TraitMetadataResponse } from "@/types/TraitMetadata";
@@ -253,7 +251,7 @@ export default function TraitDetail({ id }: { id: string }) {
 
   const isOwner = useMemo(() => {
     if (!owner || !address) return false;
-    return owner.toLowerCase() === address.toLowerCase();
+    return getAddress(owner) === getAddress(address);
   }, [owner, address]);
 
   const [traitMetadata, setTraitMetadata] = useState<TraitMetadata | null>(
@@ -337,17 +335,10 @@ export default function TraitDetail({ id }: { id: string }) {
           {traitMetadata ? (
             <>
               <div className="hidden sm:flex sm:flex-row sm:gap-[3.45vw] sm:py-[1.725vw] sm:px-[3.45vw]">
-                <div className="w-2/5">
+                <div className="w-2/5 h-fit">
                   <ChonkRenderer bytes={traitMetadata.colorMap.slice(2)} />
-
-                  {/* <TraitsSection
-                                        tokenData={tokenData}
-                                        equippedTraits={null}
-                                        isOpen={isTraitsOpen}
-                                        onToggle={() => setIsTraitsOpen(!isTraitsOpen)}
-                                        type="trait"
-                                    /> */}
                 </div>
+
                 <div className="w-3/5">
                   <OwnershipSection
                     id={id}

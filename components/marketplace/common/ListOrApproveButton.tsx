@@ -49,7 +49,7 @@ export default function ListOrApproveButton({
           ? "Confirm with your wallet"
           : finalIsApproved
           ? traitId && isEquipped
-            ? "Unequip to List"
+            ? `Unequip to List ${hasActiveBid ? "or accept Bid" : ""}`
             : `List My ${traitId ? `Trait` : "Chonk"}`
           : `Approve the Market to List ${hasActiveBid ? "or accept Bid" : ""}`}
       </button>

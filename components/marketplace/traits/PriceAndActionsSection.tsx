@@ -216,6 +216,7 @@ export default function PriceAndActionsSection(
 
   const validateListing = useCallback(() => {
     let isValid = true;
+
     setPriceError("");
     setAddressError("");
 
@@ -225,17 +226,29 @@ export default function PriceAndActionsSection(
       isValid = false;
     }
 
-    if (isPrivateListingExpanded && !resolvedAddress) {
-      setAddressError("Please enter a valid address or ENS name");
-      isValid = false;
+    if (recipientAddress === "") {
+      setAddressError("");
+      setIsPrivateListingExpanded(false);
     }
 
-    if (isValid) {
-      setLocalListingPending(true);
+    if (isPrivateListingExpanded) {
+      if (recipientAddress !== "" && resolvedAddress === "") {
+        setAddressError("Please enter a valid address or ENS name");
+        isValid = false;
+      } else if (resolvedAddress) {
+        setRecipientAddress(resolvedAddress);
+      }
     }
+
+    if (isValid) setLocalListingPending(true);
 
     return isValid;
-  }, [listingPrice, isPrivateListingExpanded, resolvedAddress]);
+  }, [
+    listingPrice,
+    isPrivateListingExpanded,
+    resolvedAddress,
+    recipientAddress,
+  ]);
 
   const validateBid = useCallback(() => {
     let isValid = true;
@@ -314,7 +327,7 @@ export default function PriceAndActionsSection(
         />
       )}
 
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
     </div>
   );
 
@@ -373,12 +386,12 @@ export default function PriceAndActionsSection(
       />
 
       {hasInsufficientBalance && (
-        <p className="text-red-500 text-sm mt-2">
+        <div className="text-red-500 text-sm mt-2">
           Your ETH balance is too low to buy this Trait.
-        </p>
+        </div>
       )}
 
-      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
+      {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
 
       {hasActiveBid && traitBid && traitBid.bidder === address && (
         <>
@@ -429,7 +442,7 @@ export default function PriceAndActionsSection(
             <div className="flex flex-col mb-4">
               <div className="flex items-baseline gap-2">
                 <div className="text-[20px]">
-                  {isOwner ? `Listed for` : `Buy for`}
+                  {tbaOwner === address ? `Listed for` : `Buy for`}
                 </div>
 
                 <span className="text-[20px] sm:text-2xl font-bold">

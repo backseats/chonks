@@ -86,6 +86,12 @@ function TransactionButton(props: TransactionButtonProps) {
       setError("Wait one minute before withdrawing your Bid");
     } else if (error.includes("CantBeZero")) {
       setError("Price must be at least 0.0001 ETH");
+    } else if (
+      error.includes(
+        'The contract function "buyTrait" reverted with the following reason:\nERC721: invalid token ID'
+      )
+    ) {
+      setError("Select a Chonk to buy this Trait");
     } else if (error.includes("exceeds the balance of the account")) {
       setError(
         `You need at least ${formatEther(

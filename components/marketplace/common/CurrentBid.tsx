@@ -23,7 +23,9 @@ export default function CurrentBid(props: Props) {
 
       {chonkId && (
         <Link href={`/chonks/${chonkId}`}>
-          <div className="text-gray-500 text-sm"> to be owned by Chonk #10</div>
+          <div className="text-gray-500 text-sm">
+            to be owned by Chonk #{chonkId}
+          </div>
         </Link>
       )}
     </div>
