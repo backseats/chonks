@@ -77,9 +77,7 @@ const Attribute = ({
     functionName: "getBodyIndexForChonk",
     args: [chonkId],
     chainId,
-  });
-
-  const bodyIndex = bodyIndexData ? Number(bodyIndexData) : undefined;
+  }) as { data: number };
 
   const colorMap = data ? data.toString().substring(2) : null;
 
@@ -109,19 +107,19 @@ const Attribute = ({
         {value}
       </Link>
 
-      {showPreview && colorMap && bodyIndex && (
+      {showPreview && colorMap && (
         <div
           className="absolute z-10 w-[150px] h-[150px]"
           style={{ top: "-160px", left: "50%", transform: "translateX(-50%)" }}
         >
-          <ChonkRenderer
-            bytes={colorMap}
-            backgroundColor="#0F6E9D"
-            backgroundBody={
-              bodyIndex ? `skinTone${bodyIndex + 1}.svg` : "ghost.svg"
-            }
-            opacity={0.6}
-          />
+          <div className="w-full h-full">
+            <ChonkRenderer
+              bytes={colorMap}
+              backgroundColor="#0F6E9D"
+              bodyIndex={bodyIndexData}
+              opacity={0.6}
+            />
+          </div>
         </div>
       )}
     </div>

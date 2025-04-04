@@ -110,7 +110,7 @@ export default function Trait(props: Props) {
               (window.location.href = `/market/traits/${traitTokenId}`)
             }
           >
-            Offer
+            List
           </button>
         )}
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   useReadContract,
   useWalletClient,
@@ -6,11 +6,17 @@ import {
   useWriteContract,
   useEnsAddress,
 } from "wagmi";
-import { Address, getAddress, isAddress } from "viem";
+import { Address, getAddress, isAddress, parseEther } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
 import { CurrentChonk } from "@/types/CurrentChonk";
-import { mainABI, mainContract, chainId } from "@/config";
+import {
+  mainABI,
+  mainContract,
+  chainId,
+  marketplaceContract,
+  marketplaceABI,
+} from "@/config";
 import { mainnet } from "viem/chains";
 import { StoredChonk } from "@/types/StoredChonk";
 import UnequippedTraits from "@/components/chonk_explorer/UnequippedTraits";
@@ -43,6 +49,7 @@ import useListChonk from "@/hooks/marketplace/chonks/useGetChonkListing";
 import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
 import client from "@/lib/apollo-client";
 import { GET_TRAITS_FOR_CHONK_ID } from "@/lib/graphql/queries";
+import TransactionButton from "@/components/TransactionButton";
 
 export type TraitInfo = {
   colorMap: string;
@@ -82,8 +89,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     useState(false);
   const [chonkListingAddressError, setChonkListingAddressError] = useState("");
   const [priceError, setPriceError] = useState("");
-  const [localListingSuccess, setLocalListingSuccess] = useState(false);
-  const [localListingRejected, setLocalListingRejected] = useState(false);
   const [localCancelOfferChonkSuccess, setLocalCancelOfferChonkSuccess] =
     useState(false);
 
@@ -167,15 +172,10 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId,
   }) as { data: StoredChonk; refetch: () => void };
 
-  const {
-    handleListChonk,
-    isListChonkPending,
-    isListChonkSuccess,
-    isListingRejected,
-    hasActiveOffer,
-    refetchChonkOffer,
-    listChonkHash,
-  } = useListChonk(address, Number(id));
+  const { hasActiveOffer, refetchChonkOffer } = useListChonk(
+    address,
+    Number(id)
+  );
 
   const {
     handleCancelOfferChonk,
@@ -190,9 +190,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     setChonkPrivateListingRecipientAddress("");
     setPriceError("");
     setChonkListingAddressError("");
-    setLocalListingRejected(false);
     setLocalListingPending(false);
-    setLocalListingSuccess(false);
     setIsPrivateListingExpanded(false);
   };
 
@@ -219,35 +217,6 @@ export default function ChonkDetail({ id }: { id: string }) {
     if (chonkPrivateListingRecipientAddress.endsWith(".eth")) return ensAddress;
     return isValidAddress ? chonkPrivateListingRecipientAddress : "";
   }, [chonkPrivateListingRecipientAddress, ensAddress, isValidAddress]);
-
-  const handleListingSubmit = () => {
-    const listingPriceNum = Number(listingPrice);
-    if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
-      setPriceError(`Minimum listing price is ${MIN_LISTING_PRICE} ETH`);
-      return;
-    }
-
-    if (isPrivateListingExpanded) {
-      if (resolvedAddress !== "" && !resolvedAddress) {
-        setAddressError("Please enter a valid address or ENS name");
-        return;
-      }
-    }
-
-    if (isPrivateListingExpanded && resolvedAddress) {
-      handleListChonk(listingPrice, resolvedAddress);
-    } else {
-      handleListChonk(listingPrice, null);
-    }
-
-    setLocalListingPending(true);
-  };
-
-  useEffect(() => {
-    if (isListingRejected) {
-      setLocalListingRejected(true); // needed because we want to clear the rejection here
-    }
-  }, [isListingRejected]);
 
   useEffect(() => {
     if (!storedChonk) return;
@@ -319,12 +288,6 @@ export default function ChonkDetail({ id }: { id: string }) {
   useEffect(() => {
     console.log("currentChonk", currentChonk);
   }, [currentChonk]);
-
-  useEffect(() => {
-    if (isListChonkSuccess) handleModalClose();
-    setTimeout(() => refetchChonkOffer(), 3000);
-    setLocalCancelOfferChonkSuccess(false);
-  }, [isListChonkSuccess]);
 
   useEffect(() => {
     if (isCancelOfferChonkSuccess) {
@@ -491,7 +454,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   const handleSendChonk = async () => {
     if (!isAddress(recipientAddress)) {
-      setAddressError("Please enter a valid Ethereum address");
+      setAddressError("Please enter a valid address");
       return;
     }
 
@@ -507,6 +470,36 @@ export default function ChonkDetail({ id }: { id: string }) {
       console.error("Error sending Chonk:", error);
     }
   };
+
+  const validateListing = useCallback(() => {
+    let isValid = true;
+
+    setPriceError("");
+    setAddressError("");
+
+    const listingPriceNum = Number(listingPrice);
+    if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
+      setPriceError(`Minimum listing price is ${MIN_LISTING_PRICE} ETH`);
+      setListingPrice(MIN_LISTING_PRICE);
+      isValid = false;
+    }
+
+    if (recipientAddress === "") {
+      setAddressError("");
+      setIsPrivateListingExpanded(false);
+    }
+
+    if (isPrivateListingExpanded) {
+      if (resolvedAddress !== "" && !resolvedAddress) {
+        setAddressError("Please enter a valid address or ENS name");
+        isValid = false;
+      }
+    }
+
+    if (isValid) setLocalListingPending(true);
+
+    return isValid;
+  }, [listingPrice, resolvedAddress, isPrivateListingExpanded]);
 
   return (
     <>
@@ -547,14 +540,10 @@ export default function ChonkDetail({ id }: { id: string }) {
               <ChonkControls
                 id={id}
                 hasActiveOffer={hasActiveOffer}
-                isCancelOfferChonkPending={isCancelOfferChonkPending}
-                cancelOfferChonkHash={cancelOfferChonkHash}
-                localCancelOfferChonkSuccess={localCancelOfferChonkSuccess}
-                isListChonkPending={isListChonkPending}
-                listChonkHash={listChonkHash}
-                handleCancelOfferChonk={handleCancelOfferChonk}
+                isListChonkPending={localListingPending}
                 setShowListModal={setShowListModal}
                 setShowSendModal={setShowSendModal}
+                refetchChonkOffer={refetchChonkOffer}
               />
             </div>
           )}
@@ -574,13 +563,23 @@ export default function ChonkDetail({ id }: { id: string }) {
               setRecipientAddress={setChonkPrivateListingRecipientAddress}
               addressError={addressError}
               priceError={priceError}
-              onSubmit={handleListingSubmit}
               onClose={handleModalClose}
-              status={{
-                isRejected: localListingRejected,
-                isPending: localListingPending,
-                isSuccess: localListingSuccess,
+              address={marketplaceContract}
+              abi={marketplaceABI}
+              args={
+                isValidAddress
+                  ? [Number(id), parseEther(listingPrice), recipientAddress]
+                  : [Number(id), parseEther(listingPrice)]
+              }
+              functionName={
+                isValidAddress ? "offerChonkToAddress" : "offerChonk"
+              }
+              inFlightLabel={"Listing your Chonk..."}
+              onSuccess={() => {
+                handleModalClose();
+                refetchChonkOffer();
               }}
+              validateListing={validateListing}
             />
           </ModalWrapper>
 
@@ -611,14 +610,10 @@ export default function ChonkDetail({ id }: { id: string }) {
                   <ChonkControls
                     id={id}
                     hasActiveOffer={hasActiveOffer}
-                    isCancelOfferChonkPending={isCancelOfferChonkPending}
-                    cancelOfferChonkHash={cancelOfferChonkHash}
-                    localCancelOfferChonkSuccess={localCancelOfferChonkSuccess}
-                    isListChonkPending={isListChonkPending}
-                    listChonkHash={listChonkHash}
-                    handleCancelOfferChonk={handleCancelOfferChonk}
+                    isListChonkPending={localListingPending}
                     setShowListModal={setShowListModal}
                     setShowSendModal={setShowSendModal}
+                    refetchChonkOffer={refetchChonkOffer}
                   />
                 </div>
               )}
@@ -944,80 +939,76 @@ export default function ChonkDetail({ id }: { id: string }) {
 const ChonkControls = ({
   id,
   hasActiveOffer,
-  isCancelOfferChonkPending,
-  cancelOfferChonkHash,
-  localCancelOfferChonkSuccess,
   isListChonkPending,
-  listChonkHash,
-  handleCancelOfferChonk,
   setShowListModal,
   setShowSendModal,
+  refetchChonkOffer,
 }: {
   id: string;
   hasActiveOffer: boolean;
-  isCancelOfferChonkPending: boolean;
-  cancelOfferChonkHash: Address | undefined;
-  localCancelOfferChonkSuccess: boolean;
   isListChonkPending: boolean;
-  listChonkHash: Address | undefined;
-  handleCancelOfferChonk: () => void;
   setShowListModal: (show: boolean) => void;
   setShowSendModal: (show: boolean) => void;
+  refetchChonkOffer: () => void;
 }) => {
+  const [error, setError] = useState<string | null>(null);
+
   const base =
-    "bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200";
+    "bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mt-4 text-sm border-2 border-black";
 
   return (
     <>
       <div className="flex justify-between sm:justify-end flex-row px-4">
+        <Link href={`/market/chonks/${id}`} className={`${base} mr-3`}>
+          <div className="pt-[2px] text-center">View on Market</div>
+        </Link>
+
         {hasActiveOffer ? (
-          <button
-            className={`${base} mr-3 mt-4 text-sm border-2 border-black ${
-              isCancelOfferChonkPending || cancelOfferChonkHash
-                ? "opacity-50"
-                : ""
-            }`}
-            onClick={() => handleCancelOfferChonk()}
-            disabled={isCancelOfferChonkPending}
-          >
-            {isCancelOfferChonkPending
-              ? "Confirm with wallet"
-              : cancelOfferChonkHash && localCancelOfferChonkSuccess
-              ? "List My Chonk"
-              : "Cancel Listing"}
-          </button>
+          <div className="flex flex-col gap-2 max-w-[300px] max-h-[100px]">
+            <TransactionButton
+              buttonStyle="simple"
+              address={marketplaceContract}
+              abi={marketplaceABI}
+              args={[id]}
+              functionName="cancelOfferChonk"
+              label="Cancel Listing"
+              inFlightLabel="Canceling Listing..."
+              setError={setError}
+              reset={() => {}}
+              onSuccess={() => {
+                refetchChonkOffer();
+              }}
+            />
+            {error && <div className="text-red-500 text-sm">{error}</div>}
+          </div>
         ) : (
           <button
-            className={`${base} mr-3 mt-4 text-sm border-2 border-black ${
-              isListChonkPending || listChonkHash ? "opacity-50" : ""
-            }`}
+            className={`${base} mr-3 disabled:opacity-50`}
             onClick={() => setShowListModal(true)}
-            disabled={isListChonkPending || !!listChonkHash}
+            disabled={isListChonkPending}
           >
-            <div className="pt-[2px]">
-              {isListChonkPending
-                ? "Confirm with wallet"
-                : listChonkHash
-                ? "Cancel Listing"
-                : "List My Chonk"}
-            </div>
+            <div className="pt-[2px]">List My Chonk</div>
           </button>
         )}
 
-        <div className="flex flex-row gap-3 items-end">
-          <button
-            onClick={() => setShowSendModal(true)}
-            className={`${base} mt-4 text-sm border-2 border-black`}
-          >
-            <SendHorizontal size={24} />
+        <div className="flex flex-row justify-between items-end">
+          <button onClick={() => setShowSendModal(true)} className={`${base}`}>
+            <div className="hidden sm:block">
+              <SendHorizontal size={24} />
+            </div>
+            <div className="sm:hidden h-[44px] flex items-center justify-center">
+              Send
+            </div>
           </button>
 
           <Link href={`/studio?id=${id}`} className="mt-[16px]">
-            <img
-              src="/studio-no-grid.svg"
-              className="w-[43px] h-[44px]"
-              alt="View in Chonks Studio"
-            />
+            <div className="hidden sm:block sm:ml-3">
+              <img
+                src="/studio-no-grid.svg"
+                className="w-[43px] h-[44px]"
+                alt="View in Chonks Studio"
+              />
+            </div>
           </Link>
         </div>
       </div>

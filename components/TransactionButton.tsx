@@ -15,7 +15,7 @@ import { chainId } from "@/config";
 ////////////////////////////////////////////////////////////////////////
 
 type TransactionButtonProps = {
-  buttonStyle: "primary" | "secondary";
+  buttonStyle: "primary" | "secondary" | "simple";
   address: Address;
   abi: any[];
   args: any[];
@@ -26,7 +26,7 @@ type TransactionButtonProps = {
   onSuccess?: () => void;
   setError: (e: string | null) => void;
   reset: () => void;
-  toggleExternalState?: () => void;
+  setIsCancelingOffer?: (isCancelingOffer: boolean) => void;
 };
 
 function TransactionButton(props: TransactionButtonProps) {
@@ -42,7 +42,7 @@ function TransactionButton(props: TransactionButtonProps) {
     onSuccess,
     setError,
     reset,
-    toggleExternalState,
+    setIsCancelingOffer,
   } = props;
 
   const [isSimulating, setIsSimulating] = useState(false);
@@ -73,10 +73,14 @@ function TransactionButton(props: TransactionButtonProps) {
     if (receipt) onSuccess?.();
   }, [receipt]);
 
+  useEffect(() => {
+    if (writeContractError) setIsCancelingOffer?.(false);
+  }, [writeContractError]);
+
   const processError = (error: string) => {
     if (error.includes("User denied transaction signature")) {
       setError("Confirm the transaction to continue");
-      toggleExternalState?.();
+      setIsCancelingOffer?.(false);
     } else if (error.includes("MustWaitToWithdrawBid")) {
       // TODO: get the block from the contract and make it more dynamic
       setError("Wait one minute before withdrawing your Bid");
@@ -118,7 +122,7 @@ function TransactionButton(props: TransactionButtonProps) {
         return;
       }
 
-      toggleExternalState?.();
+      setIsCancelingOffer?.(true);
 
       await writeContract(simulation.request);
     } catch (err: any) {
@@ -143,8 +147,11 @@ function TransactionButton(props: TransactionButtonProps) {
   const style = useMemo(() => {
     if (buttonStyle === "primary") {
       return "bg-[#2F7BA7] hover:bg-[#2F7BA7] text-white";
+    } else if (buttonStyle === "secondary") {
+      return "bg-gray-300 hover:bg-gray-400 text-gray-800";
+    } else if (buttonStyle === "simple") {
+      return "bg-white text-black px-4 py-[10px] rounded-lg hover:bg-gray-100 transition-colors duration-200 mr-3 mt-4 text-sm border-2 border-black disabled:opacity-50 ";
     }
-    return "bg-gray-300 hover:bg-gray-400 text-gray-800";
   }, [buttonStyle]);
 
   return (

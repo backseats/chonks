@@ -10,15 +10,12 @@ import MarketplaceConnectKitButton from "../common/MarketplaceConnectKitButton";
 import CurrentBid from "../common/CurrentBid";
 import ListOrApproveButton from "../common/ListOrApproveButton";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
-
 import useApproval from "@/hooks/marketplace/chonks/useApproval";
 import useGetChonkBid from "@/hooks/marketplace/chonks/useGetChonkBid";
 import useGetChonkListing from "@/hooks/marketplace/chonks/useGetChonkListing";
-
 import { useEthPrice } from "@/hooks/useEthPrice";
 import TransactionButton from "@/components/TransactionButton";
-import { marketplaceABI } from "@/config";
-import { marketplaceContract } from "@/config";
+import { marketplaceContract, marketplaceABI } from "@/config";
 
 export default function PriceAndActionsSection({
   chonkId,
@@ -69,7 +66,7 @@ export default function PriceAndActionsSection({
   const [localBidOnChonkPending, setLocalBidOnChonkPending] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
-  const [isCancellingOffer, setIsCancellingOffer] = useState(false);
+  const [isCancelingOffer, setIsCancelingOffer] = useState(false);
 
   const OFFER_PRICE_DECIMAL_PRECISION = 4;
   const MIN_LISTING_PRICE = `0.${"0".repeat(
@@ -158,24 +155,44 @@ export default function PriceAndActionsSection({
   }, []);
 
   const validateListing = useCallback(() => {
+    let isValid = true;
+
+    setPriceError(""); // Reset errors
+    setAddressError("");
+
     const listingPriceNum = Number(listingPrice);
     if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
       setPriceError(`Minimum listing price is ${MIN_LISTING_PRICE} ETH`);
-      return;
+      isValid = false;
+    }
+
+    if (recipientAddress === "") {
+      setAddressError("");
+      setIsPrivateListingExpanded(false);
     }
 
     if (isPrivateListingExpanded) {
-      if (resolvedAddress !== "" && !resolvedAddress) {
+      if (recipientAddress !== "" && resolvedAddress === "") {
         setAddressError("Please enter a valid address or ENS name");
-        return;
+        isValid = false;
+      } else if (resolvedAddress) {
+        setRecipientAddress(resolvedAddress);
       }
     }
 
-    setLocalListingPending(true);
-  }, [listingPrice, resolvedAddress, isPrivateListingExpanded]);
+    if (isValid) setLocalListingPending(true);
+
+    return isValid;
+  }, [
+    listingPrice,
+    resolvedAddress,
+    isPrivateListingExpanded,
+    recipientAddress,
+  ]);
 
   const validateBid = useCallback(() => {
     let isValid = true;
+
     if (hasActiveBid && chonkBid && minimumOffer) {
       if (Number(offerAmount) < Number(minimumOffer)) {
         setPriceError(
@@ -211,7 +228,7 @@ export default function PriceAndActionsSection({
           <>
             <div className="flex flex-col mb-4">
               <div className="flex items-baseline gap-2">
-                <div className="text-[20px] sm:text-xl">
+                <div className="text-[20px]">
                   {isOwner ? `Listed for` : `Buy for`}
                 </div>
 
@@ -261,15 +278,13 @@ export default function PriceAndActionsSection({
                   functionName={"cancelOfferChonk"}
                   label={"Cancel Offer"}
                   inFlightLabel={"Canceling Offer..."}
-                  setError={setError}
-                  reset={() => {
-                    setError(null);
-                  }}
                   onSuccess={() => {
                     refetchChonkListing();
                     setListingPrice("");
                     setError(null);
                   }}
+                  reset={() => setError(null)}
+                  setError={setError}
                 />
 
                 <div className="text-red-500 text-sm">{error}</div>
@@ -333,26 +348,28 @@ export default function PriceAndActionsSection({
                   />
 
                   {finalIsApproved && hasActiveBid && chonkBid && (
-                    <TransactionButton
-                      buttonStyle="primary"
-                      address={marketplaceContract}
-                      abi={marketplaceABI}
-                      args={[Number(chonkId), chonkBid.bidder]}
-                      functionName={"acceptBidForChonk"}
-                      label={`Accept Offer of ${formatEther(
-                        chonkBid.amountInWei
-                      )} ETH`}
-                      inFlightLabel={"Accepting the Offer..."}
-                      setError={setError}
-                      reset={() => {
-                        setError(null);
-                      }}
-                      onSuccess={() => {
-                        refetchChonkBid();
-                        refetchOwner();
-                        setError(null);
-                      }}
-                    />
+                    <div className="mt-3">
+                      <TransactionButton
+                        buttonStyle="primary"
+                        address={marketplaceContract}
+                        abi={marketplaceABI}
+                        args={[Number(chonkId), chonkBid.bidder]}
+                        functionName={"acceptBidForChonk"}
+                        label={`Accept Offer of ${formatEther(
+                          chonkBid.amountInWei
+                        )} ETH`}
+                        inFlightLabel={"Accepting Offer..."}
+                        setError={setError}
+                        reset={() => {
+                          setError(null);
+                        }}
+                        onSuccess={() => {
+                          refetchChonkBid();
+                          refetchOwner();
+                          setError(null);
+                        }}
+                      />
+                    </div>
                   )}
                 </>
               ) : (
@@ -365,9 +382,10 @@ export default function PriceAndActionsSection({
                         variant="primary"
                         onClick={() => {
                           setPriceError("");
+                          setError(null);
                           setIsOfferModalOpen(true);
                         }}
-                        disabled={isCancellingOffer}
+                        disabled={isCancelingOffer}
                       >
                         Increase my Offer
                       </ActionButton>
@@ -387,12 +405,10 @@ export default function PriceAndActionsSection({
                         onSuccess={() => {
                           refetchChonkBid();
                           setError(null);
-                          setListingPrice("");
                           setRecipientAddress("");
+                          setOfferAmount("");
                         }}
-                        toggleExternalState={() =>
-                          setIsCancellingOffer((prev) => !prev)
-                        }
+                        setIsCancelingOffer={setIsCancelingOffer}
                       />
                       {error && (
                         <div className="text-red-500 text-sm">{error}</div>
@@ -402,7 +418,7 @@ export default function PriceAndActionsSection({
                     <ActionButton
                       variant="primary"
                       onClick={() => {
-                        setListingPrice("");
+                        setOfferAmount("");
                         setIsOfferModalOpen(true);
                       }}
                     >
@@ -473,14 +489,16 @@ export default function PriceAndActionsSection({
           abi={marketplaceABI}
           args={[Number(chonkId)]}
           functionName={"bidOnChonk"}
-          inFlightLabel={"Making Offer..."}
+          inFlightLabel={"Creating Bid..."}
           onSuccess={() => {
-            handleBidModalClose();
-            setOfferAmount("");
             refetchChonkBid();
+            setOfferAmount("");
+            handleBidModalClose();
+            setIsCancelingOffer(false);
           }}
           value={parseEther(offerAmount)}
           validateBid={validateBid}
+          setError={setError}
         />
       </ModalWrapper>
     </>

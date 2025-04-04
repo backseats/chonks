@@ -8,6 +8,8 @@ import {
   marketplaceContract,
   marketplaceABI,
   chainId,
+  traitsContract,
+  traitsABI,
 } from "@/config";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from "@/components/marketplace/TraitsSection";
@@ -130,14 +132,21 @@ export default function TraitDetail({ id }: { id: string }) {
   // console.log("owner of trait owner", ownerOfTraitOwner);
 
   //getFullPictureForTrait
-  const { data: fullPictureForTrait, error: fullPictureError } =
-    useReadContract({
-      address: mainContract,
-      abi: mainABI,
-      functionName: "getFullPictureForTrait",
-      args: [BigInt(id)],
-      chainId,
-    }) as { data: [string, bigint, string, boolean]; error: Error };
+  const {
+    data: fullPictureForTrait,
+    error: fullPictureError,
+    refetch: refetchFullPictureForTrait,
+  } = useReadContract({
+    address: mainContract,
+    abi: mainABI,
+    functionName: "getFullPictureForTrait",
+    args: [BigInt(id)],
+    chainId,
+  }) as {
+    data: [string, bigint, string, boolean];
+    error: Error;
+    refetch: () => void;
+  };
 
   useEffect(() => {
     if (fullPictureError) {
@@ -354,11 +363,10 @@ export default function TraitDetail({ id }: { id: string }) {
                     isOwner={isOwner}
                     chonkId={Number(chonkId)}
                     traitId={parseInt(id)}
-                    tokenIdOfTBA={tokenIdOfTBA?.toString()}
                     tbaOwner={ownerOfTraitOwner}
                     isEquipped={isEquipped}
                     tbaAddress={tbaAddress as Address | null}
-                    traitName={traitMetadata?.traitName}
+                    refetchOwner={refetchFullPictureForTrait}
                     // price={formattedPrice}
                     // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
                     // isOfferSpecific={isOfferSpecific}
@@ -406,11 +414,10 @@ export default function TraitDetail({ id }: { id: string }) {
                   isOwner={isOwner}
                   chonkId={Number(chonkId)}
                   traitId={parseInt(id)}
-                  tokenIdOfTBA={tokenIdOfTBA?.toString()}
                   tbaOwner={ownerOfTraitOwner}
                   isEquipped={isEquipped}
                   tbaAddress={tbaAddress as Address | null}
-                  traitName={traitMetadata?.traitName}
+                  refetchOwner={refetchFullPictureForTrait}
                   // price={formattedPrice}
                   // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
                   // isOfferSpecific={isOfferSpecific}

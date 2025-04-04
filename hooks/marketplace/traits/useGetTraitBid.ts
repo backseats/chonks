@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useReadContract } from "wagmi";
-import { marketplaceContract, marketplaceABI, chainId } from "@/config";
+import { marketplaceContract, marketplaceABI, chainId, mainContract, mainABI } from "@/config";
 import { zeroAddress } from "viem";
 
 export default function useGetTraitBid(traitId: number) {
@@ -29,6 +29,14 @@ export default function useGetTraitBid(traitId: number) {
     return Boolean(traitBid);
   }, [traitBid]);
 
+  const { data: bidOnTraitGoesToChonkId } = useReadContract({
+    address: mainContract,
+    abi: mainABI,
+    functionName: 'tbaAddressToTokenId',
+    args: [traitBid?.bidderTBA ?? 0],
+    chainId,
+  }) as { data: bigint };
+
   // String error state
   const getTraitBidError = error ? `Failed to fetch trait bid: ${error.message}` : "";
 
@@ -37,5 +45,6 @@ export default function useGetTraitBid(traitId: number) {
     hasActiveBid,
     refetchTraitBid,
     getTraitBidError,
+    bidOnTraitGoesToChonkId,
   };
 }

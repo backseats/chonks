@@ -26,7 +26,7 @@ export default function ListOrApproveButton({
   return (
     <>
       <button
-        className={`text-xl w-full bg-chonk-blue text-white py-2 px-4 hover:brightness-110 transition-colors ${
+        className={`text-[18px] w-full bg-chonk-blue text-white py-2 px-4 hover:brightness-110 transition-colors ${
           isApprovalPending ? "opacity-50" : ""
         }`}
         onClick={async () => {
@@ -59,7 +59,7 @@ export default function ListOrApproveButton({
 
         {!traitId && !finalIsApproved && (
           <div className="relative group">
-            <div className="text-xs cursor-pointer text-right text-gray-500 hover:text-gray-700">
+            <div className="text-xs cursor-pointer text-right text-gray-500 hover:text-gray-700 mt-2">
               Why do I need to do this again?
             </div>
             <div className="absolute bottom-full right-0 mb-2 w-64 bg-black text-white text-xs p-2 rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">

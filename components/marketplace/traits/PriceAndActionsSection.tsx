@@ -1,10 +1,5 @@
-import { useState, useMemo, useEffect } from "react";
-import useListTrait from "@/hooks/marketplace/traits/useListTrait";
-import useBuyTrait from "@/hooks/marketplace/traits/useBuyTrait";
-import useCancelOfferTrait from "@/hooks/marketplace/traits/useCancelOfferTrait";
-import useBidOnTrait from "@/hooks/marketplace/traits/useBidOnTrait";
-import useWithdrawBidOnTrait from "@/hooks/marketplace/traits/useWithdrawBidOnTrait";
-import useAcceptBidForTrait from "@/hooks/marketplace/traits/useAcceptBidForTrait";
+import { useState, useMemo, useEffect, useCallback } from "react";
+import useGetTraitListing from "@/hooks/marketplace/traits/useGetTraitListing";
 import useGetTraitBid from "@/hooks/marketplace/traits/useGetTraitBid";
 import { useEthPrice } from "@/hooks/useEthPrice";
 import {
@@ -34,19 +29,17 @@ import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { ActionButton } from "../chonks/buttons/ActionButton";
 import MarketplaceConnectKitButton from "../common/MarketplaceConnectKitButton";
 import CurrentBid from "../common/CurrentBid";
-import AcceptOfferButton from "../common/AcceptOfferButton";
-import MakeCancelOfferButton from "../common/MakeCancelOfferButton";
 import ListOrApproveButton from "../common/ListOrApproveButton";
 import TransactionButton from "@/components/TransactionButton";
+
 type PriceAndActionsSectionProps = {
   isOwner: boolean;
   chonkId: number;
   traitId: number;
-  tokenIdOfTBA: string | null;
   tbaOwner: string | null;
   isEquipped: boolean;
   tbaAddress: Address | null;
-  traitName?: string;
+  refetchOwner: () => void;
 };
 
 type StoredTrait = {
@@ -66,11 +59,10 @@ export default function PriceAndActionsSection(
     isOwner,
     chonkId,
     traitId,
-    tokenIdOfTBA,
     tbaOwner,
     isEquipped,
     tbaAddress,
-    traitName,
+    refetchOwner,
   } = props;
 
   const { address } = useAccount();
@@ -92,58 +84,13 @@ export default function PriceAndActionsSection(
     canAcceptOffer,
     onlySellToAddress,
     refetchTraitListing,
-  } = useListTrait(address, traitId);
+  } = useGetTraitListing(address, traitId);
 
-  const {
-    handleBuyTrait,
-    isBuyTraitPending,
-    isBuyTraitSuccess,
-    isBuyTraitError,
-    buyTraitError,
-  } = useBuyTrait(traitId);
-
-  const {
-    handleCancelOfferTrait,
-    isCancelOfferTraitPending,
-    isCancelOfferTraitSuccess,
-    isCancelOfferTraitRejected,
-    cancelOfferTraitError,
-  } = useCancelOfferTrait(address, traitId);
-
-  const {
-    handleBidOnTrait,
-    isBidOnTraitPending,
-    isBidOnTraitSuccess,
-    isBidOnTraitError,
-    bidOnTraitError,
-  } = useBidOnTrait(traitId);
-
-  const {
-    handleWithdrawBidOnTrait,
-    isWithdrawBidOnTraitPending,
-    isWithdrawBidOnTraitSuccess,
-    isWithdrawBidOnTraitError,
-    withdrawBidOnTraitError,
-  } = useWithdrawBidOnTrait(traitId);
-
-  const {
-    handleAcceptBidForTrait,
-    isAcceptBidPending,
-    isAcceptBidSuccess,
-    isAcceptBidError,
-    acceptBidError,
-  } = useAcceptBidForTrait(traitId);
-
-  const { traitBid, hasActiveBid, refetchTraitBid, getTraitBidError } =
+  const { traitBid, hasActiveBid, refetchTraitBid, bidOnTraitGoesToChonkId } =
     useGetTraitBid(traitId);
 
-  const {
-    handleUnequipTrait,
-    isUnequipTraitPending,
-    isUnequipTraitSuccess,
-    isUnequipTraitError,
-    unequipTraitError,
-  } = useUnequipTrait();
+  const { handleUnequipTrait, isUnequipTraitPending, isUnequipTraitSuccess } =
+    useUnequipTrait();
 
   const { finalIsApproved, approvalError, handleApproveTBAForMarketplace } =
     useTBAApproval(tbaAddress);
@@ -151,22 +98,22 @@ export default function PriceAndActionsSection(
   const [isPrivateListingExpanded, setIsPrivateListingExpanded] =
     useState(false);
   const [recipientAddress, setRecipientAddress] = useState("");
-  const [addressError, setAddressError] = useState("");
-  const [priceError, setPriceError] = useState("");
+
   const [isOfferModalOpen, setIsOfferModalOpen] = useState(false);
   const [offerAmount, setOfferAmount] = useState("");
   const [localListingPending, setLocalListingPending] = useState(false);
   const [selectedChonkId, setSelectedChonkId] = useState<string>("");
-  const [localCancelOfferTraitPending, setLocalCancelOfferTraitPending] =
-    useState(false);
-  const [localCancelOfferTraitSuccess, setLocalCancelOfferTraitSuccess] =
-    useState(false);
 
+  const [addressError, setAddressError] = useState("");
+  const [priceError, setPriceError] = useState("");
   const [chonkSelectError, setChonkSelectError] = useState("");
-
   const [error, setError] = useState<string | null>(null);
+  const [isCancelingOffer, setIsCancelingOffer] = useState(false);
 
-  const { ownedChonks } = useOwnedChonks(address); // This hook should fetch owned Chonks
+  const [isLocalBidOnTraitPending, setIsLocalBidOnTraitPending] =
+    useState(false);
+
+  const { ownedChonks } = useOwnedChonks(address);
 
   // Calculate minimum offer (5% higher than current bid)
   const minimumOffer = useMemo(() => {
@@ -190,21 +137,15 @@ export default function PriceAndActionsSection(
     }
   }, [hasActiveBid, traitBid]);
 
-  // let's initially set offerAmount to the minimum offer
   useEffect(() => {
     if (hasActiveBid && traitBid && minimumOffer) {
       setOfferAmount(minimumOffer);
-    }
-  }, [hasActiveBid, traitBid, minimumOffer]);
-
-  useEffect(() => {
-    if (isWithdrawBidOnTraitSuccess) {
-      refetchTraitBid();
+    } else {
       setOfferAmount("");
     }
-  }, [isWithdrawBidOnTraitSuccess]);
+    setPriceError("");
+  }, [hasActiveBid, traitBid, minimumOffer]);
 
-  // Add ENS resolution
   const { data: ensAddress } = useEnsAddress({
     name: recipientAddress.endsWith(".eth")
       ? recipientAddress.toLowerCase()
@@ -238,41 +179,6 @@ export default function PriceAndActionsSection(
     balance &&
     balance.value < parseEther((price + estimatedGasInEth).toString());
 
-  // Track cancel offer state
-  useEffect(() => {
-    if (isCancelOfferTraitRejected) {
-      setLocalCancelOfferTraitPending(false);
-      setLocalCancelOfferTraitSuccess(false);
-      return;
-    }
-
-    if (isCancelOfferTraitPending) {
-      setLocalCancelOfferTraitPending(true);
-      return;
-    }
-
-    if (isCancelOfferTraitSuccess) {
-      setLocalCancelOfferTraitPending(false);
-      setLocalCancelOfferTraitSuccess(true);
-      return;
-    }
-  }, [
-    isCancelOfferTraitPending,
-    isCancelOfferTraitSuccess,
-    isCancelOfferTraitRejected,
-  ]);
-
-  // Reload after a buy
-  useEffect(() => {
-    if (isBuyTraitSuccess) window.location.reload();
-  }, [isBuyTraitSuccess]);
-
-  // Reload after an accept/buy
-  useEffect(() => {
-    if (isAcceptBidSuccess) window.location.reload();
-  }, [isAcceptBidSuccess]);
-
-  // Reload after an unequip
   useEffect(() => {
     if (isUnequipTraitSuccess) window.location.reload();
   }, [isUnequipTraitSuccess]);
@@ -287,87 +193,90 @@ export default function PriceAndActionsSection(
 
   const traitTypeId = storedTrait?.traitType;
 
-  function handleOfferSubmit() {
-    if (hasActiveBid && traitBid && minimumOffer) {
-      if (Number(offerAmount) < Number(minimumOffer)) {
-        alert(
-          `Your offer must be at least 5% higher than the current bid. Minimum offer: ${minimumOffer} ETH`
-        );
-        return;
-      }
-    }
-
-    if (selectedChonkId === "") {
-      setChonkSelectError("Please select a Chonk to continue");
-      return;
-    } else {
-      setChonkSelectError("");
-    }
-
-    if (offerAmount) {
-      handleBidOnTrait(parseInt(selectedChonkId), offerAmount);
-      return;
-    } else {
-      setPriceError("Enter an amount, minimum of " + minimumOffer + " ETH");
-      return;
-    }
-  }
-
-  useEffect(() => {
-    if (isBidOnTraitSuccess) {
-      setIsOfferModalOpen(false);
-      setOfferAmount("");
-      setIsPrivateListingExpanded(false);
-      setAddressError("");
-      setChonkSelectError("");
-      setPriceError("");
-
-      refetchTraitBid();
-    }
-  }, [isBidOnTraitSuccess]);
-
-  function handleModalClose() {
-    resetForm();
-  }
-
-  function validateListing() {
-    const listingPriceNum = Number(listingPrice);
-    if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
-      setPriceError(`Minimum listing price is ${MIN_LISTING_PRICE} ETH`);
-      return;
-    }
-
-    if (isPrivateListingExpanded && !resolvedAddress) {
-      setAddressError("Please enter a valid address or ENS name");
-      return;
-    }
-
-    // if (isPrivateListingExpanded && resolvedAddress) {
-    //   handleListTrait(
-    //     listingPrice,
-    //     parseInt(tokenIdOfTBA ?? "0"),
-    //     resolvedAddress
-    //   );
-    // } else {
-    //   handleListTrait(listingPrice, parseInt(tokenIdOfTBA ?? "0"));
-    // }
-
-    // resetForm();
-    setLocalListingPending(true);
-  }
-
-  function resetForm() {
+  const handleModalClose = useCallback(() => {
     setIsModalOpen(false);
     setListingPrice("");
-    setOfferAmount("");
     setRecipientAddress("");
     setAddressError("");
     setPriceError("");
     setLocalListingPending(false);
     setIsPrivateListingExpanded(false);
-  }
+    setError(null);
+  }, []);
 
-  // Render owner actions
+  const handleBidModalClose = useCallback(() => {
+    setIsOfferModalOpen(false);
+    setOfferAmount("");
+    setChonkSelectError("");
+    setPriceError("");
+    setError(null);
+    setIsLocalBidOnTraitPending(false);
+    setSelectedChonkId("");
+  }, []);
+
+  const validateListing = useCallback(() => {
+    let isValid = true;
+    setPriceError("");
+    setAddressError("");
+
+    const listingPriceNum = Number(listingPrice);
+    if (listingPriceNum < Number(MIN_LISTING_PRICE)) {
+      setPriceError(`Minimum listing price is ${MIN_LISTING_PRICE} ETH`);
+      isValid = false;
+    }
+
+    if (isPrivateListingExpanded && !resolvedAddress) {
+      setAddressError("Please enter a valid address or ENS name");
+      isValid = false;
+    }
+
+    if (isValid) {
+      setLocalListingPending(true);
+    }
+
+    return isValid;
+  }, [listingPrice, isPrivateListingExpanded, resolvedAddress]);
+
+  const validateBid = useCallback(() => {
+    let isValid = true;
+
+    if (hasActiveBid && traitBid && minimumOffer) {
+      if (Number(offerAmount) < Number(minimumOffer)) {
+        setPriceError(
+          `Offer must be at least 5% higher than the current Bid. Minimum Offer: ${minimumOffer} ETH`
+        );
+        setOfferAmount(minimumOffer);
+        isValid = false;
+      }
+    }
+
+    if (offerAmount) {
+      const offerAmountNum = Number(offerAmount);
+      if (offerAmountNum < Number(MIN_LISTING_PRICE)) {
+        setPriceError(`Minimum Offer is ${MIN_LISTING_PRICE} ETH`);
+        setOfferAmount(MIN_LISTING_PRICE);
+        isValid = false;
+      }
+    } else {
+      setPriceError(`Minimum Offer is ${MIN_LISTING_PRICE} ETH`);
+      setOfferAmount(MIN_LISTING_PRICE);
+      isValid = false;
+    }
+
+    if (selectedChonkId === "") {
+      setChonkSelectError("Please select a Chonk to continue");
+      isValid = false;
+    }
+
+    if (isValid) {
+      setIsLocalBidOnTraitPending(true);
+      setPriceError("");
+      setChonkSelectError("");
+    }
+
+    return isValid;
+  }, [offerAmount, minimumOffer, hasActiveBid, traitBid, selectedChonkId]);
+
   const renderOwnerActions = () => (
     <div className="flex flex-col gap-2">
       <TransactionButton
@@ -380,35 +289,37 @@ export default function PriceAndActionsSection(
         inFlightLabel="Canceling Listing..."
         onSuccess={() => {
           refetchTraitListing();
-          handleModalClose();
+          setListingPrice("");
           setError(null);
         }}
-        reset={() => {
-          setError(null);
-        }}
+        reset={() => setError(null)}
         setError={setError}
       />
-      {/* TODO why no refetch */}
 
       {hasActiveBid && traitBid && (
-        <AcceptOfferButton
-          amountInWei={formatEther(traitBid.amountInWei)}
-          bidder={traitBid.bidder}
-          handleAcceptBidForChonk={handleAcceptBidForTrait}
-          isPending={isAcceptBidPending}
+        <TransactionButton
+          buttonStyle="primary"
+          address={marketplaceContract}
+          abi={marketplaceABI}
+          args={[traitId, traitBid.bidder]}
+          functionName="acceptBidForTrait"
+          label={`Accept Offer of ${formatEther(traitBid.amountInWei)} ETH`}
+          inFlightLabel="Accepting Offer..."
+          onSuccess={() => {
+            window.location.reload();
+            setError(null);
+          }}
+          reset={() => setError(null)}
+          setError={setError}
         />
       )}
 
-      {acceptBidError && (
-        <p className="text-red-500 text-sm mt-2">{acceptBidError}</p>
-      )}
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </div>
   );
 
-  // Render buyer actions
   const renderBuyerActions = () => (
     <div className="flex flex-col gap-2">
-      {/* Chonk selection for buying traits */}
       {!isOfferSpecific && (
         <div className="mb-2 sm:mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -416,7 +327,10 @@ export default function PriceAndActionsSection(
           </label>
           <select
             value={selectedChonkId}
-            onChange={(e) => setSelectedChonkId(e.target.value)}
+            onChange={(e) => {
+              setSelectedChonkId(e.target.value);
+              setError(null);
+            }}
             className="w-full text-[14px] sm:text-sm font-medium p-2 border bg-white"
           >
             <option value="">Select a Chonk</option>
@@ -429,28 +343,34 @@ export default function PriceAndActionsSection(
         </div>
       )}
 
-      <ActionButton
-        variant="primary"
-        disabled={Boolean(
-          (isOfferSpecific && !canAcceptOffer) ||
-            hasInsufficientBalance ||
-            (!isOfferSpecific && !selectedChonkId) ||
-            isBuyTraitPending
-        )}
-        onClick={() => {
-          if (price) {
-            handleBuyTrait(price, parseInt(selectedChonkId));
-          }
+      <TransactionButton
+        buttonStyle="primary"
+        address={marketplaceContract}
+        abi={marketplaceABI}
+        args={[traitId, parseInt(selectedChonkId || "0")]}
+        functionName="buyTrait"
+        priceInWei={price ? parseEther(price.toString()) : undefined}
+        label={
+          isOfferSpecific
+            ? canAcceptOffer
+              ? "Accept Private Offer"
+              : "Private Offer - Not For You"
+            : "Buy Now"
+        }
+        inFlightLabel="Purchasing Trait..."
+        // disabled={Boolean(
+        //   (isOfferSpecific && !canAcceptOffer) ||
+        //     hasInsufficientBalance ||
+        //     (!isOfferSpecific && !selectedChonkId) ||
+        //     !price
+        // )}
+        reset={() => setError(null)}
+        setError={setError}
+        onSuccess={() => {
+          window.location.reload(); // TODO: probably a better refetch here
+          setError(null);
         }}
-      >
-        {isOfferSpecific
-          ? canAcceptOffer
-            ? "Accept Private Offer"
-            : "Private Offer - Not For You"
-          : isBuyTraitPending
-          ? "Confirm with your wallet"
-          : "Buy Now"}
-      </ActionButton>
+      />
 
       {hasInsufficientBalance && (
         <p className="text-red-500 text-sm mt-2">
@@ -458,25 +378,43 @@ export default function PriceAndActionsSection(
         </p>
       )}
 
-      {buyTraitError && (
-        <p className="text-red-500 text-sm mt-2">{buyTraitError}</p>
-      )}
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
       {hasActiveBid && traitBid && traitBid.bidder === address && (
         <>
-          <ActionButton
-            variant="danger"
-            onClick={handleWithdrawBidOnTrait}
-            disabled={isWithdrawBidOnTraitPending}
-          >
-            Cancel Your Offer
-          </ActionButton>
+          <div className="flex flex-col gap-3">
+            <ActionButton
+              variant="primary"
+              onClick={() => {
+                setPriceError("");
+                setIsOfferModalOpen(true);
+              }}
+              disabled={isCancelingOffer}
+            >
+              Increase my Offer
+            </ActionButton>
 
-          {withdrawBidOnTraitError && !isWithdrawBidOnTraitPending && (
-            <div className="text-red-500 text-sm mt-2">
-              {withdrawBidOnTraitError}
-            </div>
-          )}
+            <TransactionButton
+              buttonStyle="secondary"
+              address={marketplaceContract}
+              abi={marketplaceABI}
+              args={[traitId]}
+              functionName="withdrawBidOnTrait"
+              label="Cancel my Offer"
+              inFlightLabel="Canceling Offer..."
+              setError={setError}
+              reset={() => setError(null)}
+              onSuccess={() => {
+                refetchTraitBid();
+                setError(null);
+                setListingPrice("");
+                setRecipientAddress("");
+              }}
+              setIsCancelingOffer={setIsCancelingOffer}
+            />
+
+            {error && <div className="text-red-500 text-sm">{error}</div>}
+          </div>
         </>
       )}
     </div>
@@ -490,7 +428,7 @@ export default function PriceAndActionsSection(
           <>
             <div className="flex flex-col mb-4">
               <div className="flex items-baseline gap-2">
-                <div className="text-[20px] sm:text-xl">
+                <div className="text-[20px]">
                   {isOwner ? `Listed for` : `Buy for`}
                 </div>
 
@@ -501,6 +439,7 @@ export default function PriceAndActionsSection(
                   <span className="text-gray-500 text-sm">
                     ($
                     {(price * ethPrice).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
                     )
@@ -520,7 +459,7 @@ export default function PriceAndActionsSection(
                 </span>
               )}
 
-              {hasActiveBid && traitBid && !isWithdrawBidOnTraitSuccess && (
+              {hasActiveBid && traitBid && (
                 <div className="text-xl">
                   Your Offer: {formatEther(traitBid.amountInWei)} ETH
                 </div>
@@ -542,6 +481,7 @@ export default function PriceAndActionsSection(
                 amountInWei={traitBid.amountInWei}
                 bidder={traitBid.bidder}
                 address={address}
+                chonkId={Number(bidOnTraitGoesToChonkId?.toString())}
               />
             )}
 
@@ -568,36 +508,82 @@ export default function PriceAndActionsSection(
                     finalIsApproved &&
                     hasActiveBid &&
                     traitBid && (
-                      <AcceptOfferButton
-                        amountInWei={formatEther(traitBid.amountInWei)}
-                        bidder={traitBid.bidder}
-                        handleAcceptBidForChonk={handleAcceptBidForTrait}
-                        isPending={isAcceptBidPending}
+                      <TransactionButton
+                        buttonStyle="primary"
+                        address={marketplaceContract}
+                        abi={marketplaceABI}
+                        args={[traitId, traitBid.bidder]}
+                        functionName="acceptBidForTrait"
+                        label={`Accept Offer of ${formatEther(
+                          traitBid.amountInWei
+                        )} ETH`}
+                        inFlightLabel="Accepting Offer..."
+                        setError={setError}
+                        reset={() => setError(null)}
+                        onSuccess={() => {
+                          refetchTraitBid();
+                          refetchOwner();
+                          setError(null);
+                        }}
                       />
                     )}
-
-                  {acceptBidError && (
-                    <div className="text-red-500 text-sm mt-2 text-center">
-                      {acceptBidError}
-                    </div>
-                  )}
                 </>
               ) : (
                 !isOwner &&
                 tbaOwner !== address && (
                   <>
                     {ownedChonks && ownedChonks.length > 0 ? (
-                      <MakeCancelOfferButton
-                        hasOffer={Boolean(
-                          hasActiveBid &&
-                            traitBid &&
-                            traitBid.bidder === address
-                        )}
-                        handleSubmit={() => setIsOfferModalOpen(true)}
-                        isWithdrawBidPending={isWithdrawBidOnTraitPending}
-                        handleWithdrawBid={handleWithdrawBidOnTrait}
-                        isMakeOfferPending={isBidOnTraitPending}
-                      />
+                      Boolean(
+                        hasActiveBid && traitBid && traitBid.bidder === address
+                      ) ? (
+                        <div className="flex flex-col gap-3">
+                          <ActionButton
+                            variant="primary"
+                            onClick={() => {
+                              setPriceError("");
+                              setError(null);
+                              setIsOfferModalOpen(true);
+                            }}
+                            disabled={isCancelingOffer}
+                          >
+                            Increase my Offer
+                          </ActionButton>
+
+                          <TransactionButton
+                            buttonStyle="secondary"
+                            address={marketplaceContract}
+                            abi={marketplaceABI}
+                            args={[traitId]}
+                            functionName={"withdrawBidOnTrait"}
+                            label={"Cancel my Offer"}
+                            inFlightLabel={"Canceling Offer..."}
+                            setError={setError}
+                            reset={() => {
+                              setError(null);
+                            }}
+                            onSuccess={() => {
+                              refetchTraitBid();
+                              setError(null);
+                              setRecipientAddress("");
+                              setOfferAmount("");
+                            }}
+                            setIsCancelingOffer={setIsCancelingOffer}
+                          />
+                          {error && (
+                            <div className="text-red-500 text-sm">{error}</div>
+                          )}
+                        </div>
+                      ) : (
+                        <ActionButton
+                          variant="primary"
+                          onClick={() => {
+                            setListingPrice("");
+                            setIsOfferModalOpen(true);
+                          }}
+                        >
+                          Make an Offer
+                        </ActionButton>
+                      )
                     ) : (
                       <p className="text-red-500 text-[1.25vw]">
                         You need to own a Chonk to make an offer on this trait
@@ -610,12 +596,6 @@ export default function PriceAndActionsSection(
                           Go buy one here
                         </Link>
                       </p>
-                    )}
-
-                    {withdrawBidOnTraitError && (
-                      <div className="text-red-500 text-sm mt-1 text-center">
-                        {withdrawBidOnTraitError}
-                      </div>
                     )}
                   </>
                 )
@@ -666,8 +646,9 @@ export default function PriceAndActionsSection(
           setChonkSelectError("");
           setPriceError("");
           setOfferAmount("");
+          setSelectedChonkId("");
         }}
-        localListingPending={isBidOnTraitPending}
+        localListingPending={isLocalBidOnTraitPending}
       >
         <OfferModal
           chonkId={chonkId}
@@ -677,14 +658,26 @@ export default function PriceAndActionsSection(
           minimumOffer={minimumOffer}
           hasActiveBid={hasActiveBid}
           currentBid={traitBid}
-          onSubmit={handleOfferSubmit}
-          onClose={() => setIsOfferModalOpen(false)}
+          onClose={handleBidModalClose}
           ownedChonks={ownedChonks}
           selectedChonkId={selectedChonkId}
           setSelectedChonkId={setSelectedChonkId}
           priceError={priceError}
-          isBidPending={isBidOnTraitPending}
           chonkSelectError={chonkSelectError}
+          onSuccess={() => {
+            refetchTraitBid();
+            setOfferAmount("");
+            setSelectedChonkId("");
+            handleBidModalClose();
+          }}
+          value={parseEther(offerAmount)}
+          validateBid={validateBid}
+          address={marketplaceContract}
+          abi={marketplaceABI}
+          args={[traitId, parseInt(selectedChonkId)]}
+          functionName="bidOnTrait"
+          inFlightLabel="Creating Bid..."
+          setError={setError}
         />
       </ModalWrapper>
     </>

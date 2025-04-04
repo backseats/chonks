@@ -27,7 +27,7 @@ interface ListingModalProps {
   setIsPrivateListingExpanded: (expanded: boolean) => void;
   setRecipientAddress: (address: string) => void;
   onSuccess?: () => void;
-  validateListing: () => void;
+  validateListing: () => boolean;
 }
 
 export const ListingModal = (props: ListingModalProps) => {
@@ -87,7 +87,9 @@ export const ListingModal = (props: ListingModalProps) => {
   };
 
   const handleClick = async () => {
-    validateListing();
+    let isValid = validateListing();
+    if (!isValid) return;
+
     setBottomError(null);
     setIsSimulating(true);
 
@@ -132,7 +134,7 @@ export const ListingModal = (props: ListingModalProps) => {
   }, [isSimulating, isWriteContractPending, isWaiting]);
 
   const buttonLabel = useMemo(() => {
-    if (isSimulating) return "Preparing...";
+    if (isSimulating) return traitId ? "List Trait" : "List Chonk";
     if (isWriteContractPending) return "Confirm with your wallet";
     if (isWaiting) return inFlightLabel;
     return traitId ? "List Trait" : "List Chonk";

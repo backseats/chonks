@@ -61,7 +61,7 @@ export default function OwnershipSection(props: Props) {
         )}
       </h1>
 
-      {/* TODO: ENS for owner, heads up on the network, might need to use mainnet ens as well as basename */}
+      {/* TODO: basename as well as ens */}
       {owner && (
         <div className="w-full flex justify-center mb-4">
           <div className="flex flex-col sm:flex-row items-center">

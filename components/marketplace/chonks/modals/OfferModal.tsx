@@ -1,6 +1,6 @@
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState, useCallback } from "react";
 import { MARKETPLACE_CONSTANTS } from "@/constants/marketplace";
-import { Address } from "viem";
+import { Address, formatEther, parseEther } from "viem";
 import {
   usePublicClient,
   useWaitForTransactionReceipt,
@@ -8,6 +8,8 @@ import {
   useWriteContract,
 } from "wagmi";
 import { chainId } from "@/config";
+import TransactionButton from "@/components/TransactionButton";
+// import { TraitBid, ChonkBid } from "@/types";
 
 interface OfferModalProps {
   chonkId: number;
@@ -22,7 +24,7 @@ interface OfferModalProps {
   ownedChonks: string[];
   selectedChonkId?: string;
   priceError: string | null;
-  chonkSelectError: string;
+  chonkSelectError: string | null;
   address: Address;
   abi: any[];
   args: any[];
@@ -34,6 +36,7 @@ interface OfferModalProps {
   setSelectedChonkId?: (chonkId: string) => void;
   validateBid: () => boolean;
   onSuccess?: () => void;
+  setError: (error: string | null) => void;
 }
 
 export const OfferModal = ({
@@ -58,6 +61,7 @@ export const OfferModal = ({
   inFlightLabel,
   validateBid,
   onSuccess,
+  setError,
 }: OfferModalProps) => {
   const [isSimulating, setIsSimulating] = useState(false);
   const [bottomError, setBottomError] = useState<string | null>(null);
@@ -142,11 +146,52 @@ export const OfferModal = ({
   }, [isSimulating, isWriteContractPending, isWaiting]);
 
   const buttonLabel = useMemo(() => {
-    if (isSimulating) return "Preparing...";
+    if (isSimulating) return "Make Offer";
     if (isWriteContractPending) return "Confirm with your wallet";
     if (isWaiting) return inFlightLabel;
     return "Make Offer";
   }, [isSimulating, isWriteContractPending, isWaiting, inFlightLabel, traitId]);
+
+  const validateOffer = useCallback(() => {
+    let isValid = true;
+    setError(null);
+    setBottomError(null);
+
+    if (traitId && !selectedChonkId) {
+      setError("Please select the Chonk to receive the Trait.");
+      isValid = false;
+    }
+
+    const offerAmountNum = Number(offerAmount);
+    if (!offerAmount || isNaN(offerAmountNum) || offerAmountNum <= 0) {
+      setError("Please enter a valid offer amount.");
+      isValid = false;
+    } else if (offerAmountNum < Number(minimumOffer)) {
+      setError(
+        `Offer must be at least ${minimumOffer} ETH${
+          hasActiveBid ? " (min. 5% higher)" : ""
+        }.`
+      );
+      isValid = false;
+    }
+
+    return isValid;
+  }, [offerAmount, minimumOffer, hasActiveBid, selectedChonkId, setError]);
+
+  const priceInWei = useMemo(() => {
+    try {
+      if (
+        offerAmount &&
+        !isNaN(Number(offerAmount)) &&
+        Number(offerAmount) > 0
+      ) {
+        return parseEther(offerAmount);
+      }
+    } catch (e) {
+      console.error("Error parsing offer amount:", e);
+    }
+    return 0n;
+  }, [offerAmount]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -210,7 +255,7 @@ export const OfferModal = ({
             ))}
           </select>
 
-          {chonkSelectError.length > 0 && (
+          {chonkSelectError && (
             <div className="text-red-500 text-sm">{chonkSelectError}</div>
           )}
         </div>
