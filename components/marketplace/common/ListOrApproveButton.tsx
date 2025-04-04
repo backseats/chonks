@@ -4,11 +4,9 @@ interface Props {
   finalIsApproved: boolean;
   approvalError: string | null;
   hasActiveBid: boolean;
-  isEquipped: boolean;
   handleApproveMarketplace?: () => void;
   handleTBAApproveMarketplace?: () => Promise<void>;
   setIsModalOpen: (open: boolean) => void;
-  handleUnequipTrait?: () => void;
 }
 
 export default function ListOrApproveButton({
@@ -20,8 +18,6 @@ export default function ListOrApproveButton({
   setIsModalOpen,
   approvalError,
   hasActiveBid,
-  isEquipped,
-  handleUnequipTrait,
 }: Props) {
   return (
     <>
@@ -39,18 +35,14 @@ export default function ListOrApproveButton({
               console.error("Error approving marketplace:", error);
             }
           } else {
-            traitId && isEquipped
-              ? handleUnequipTrait?.()
-              : setIsModalOpen(true);
+            setIsModalOpen(true);
           }
         }}
       >
         {isApprovalPending
           ? "Confirm with your wallet"
           : finalIsApproved
-          ? traitId && isEquipped
-            ? `Unequip to List ${hasActiveBid ? "or accept Bid" : ""}`
-            : `List My ${traitId ? `Trait` : "Chonk"}`
+          ? `List my ${traitId ? "Trait" : "Chonk"}`
           : `Approve the Market to List ${hasActiveBid ? "or accept Bid" : ""}`}
       </button>
 

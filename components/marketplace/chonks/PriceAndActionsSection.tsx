@@ -343,8 +343,6 @@ export default function PriceAndActionsSection({
                     setIsModalOpen={setIsModalOpen}
                     approvalError={approvalError ?? null}
                     hasActiveBid={hasActiveBid}
-                    isEquipped={false}
-                    handleUnequipTrait={() => {}}
                   />
 
                   {finalIsApproved && hasActiveBid && chonkBid && (

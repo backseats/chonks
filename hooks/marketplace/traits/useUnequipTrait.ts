@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { useWriteContract } from "wagmi";
+import { useReadContract, useWriteContract } from "wagmi";
 import { mainContract, mainABI, chainId } from "@/config";
 
-export function useUnequipTrait() {
+export function useUnequipTrait(chonkId: number, traitId: number) {
   const [unequipTraitError, setUnequipTraitError] = useState<string | null>(null);
+
+  const { data: isEquipped, refetch: refetchIsEquipped } = useReadContract({
+    address: mainContract,
+    abi: mainABI,
+    functionName: "checkIfTraitIsEquipped",
+    args: [chonkId, traitId],
+    chainId,
+  });
 
   const {
     writeContract,
@@ -33,6 +41,8 @@ export function useUnequipTrait() {
     isUnequipTraitPending,
     isUnequipTraitSuccess,
     isUnequipTraitError,
-    unequipTraitError
+    unequipTraitError,
+    isTraitEquipped: isEquipped,
+    refetchIsEquipped,
   };
 }

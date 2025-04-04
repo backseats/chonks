@@ -23,6 +23,8 @@ import {
   chainId,
   marketplaceContract,
   marketplaceABI,
+  mainContract,
+  mainABI,
 } from "@/config";
 import { useUnequipTrait } from "@/hooks/marketplace/traits/useUnequipTrait";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
@@ -39,7 +41,7 @@ type PriceAndActionsSectionProps = {
   tbaOwner: string | null;
   isEquipped: boolean;
   tbaAddress: Address | null;
-  refetchOwner: () => void;
+  refetchFullPictureForTrait: () => void;
 };
 
 type StoredTrait = {
@@ -60,9 +62,9 @@ export default function PriceAndActionsSection(
     chonkId,
     traitId,
     tbaOwner,
-    isEquipped,
     tbaAddress,
-    refetchOwner,
+    refetchFullPictureForTrait,
+    isEquipped,
   } = props;
 
   const { address } = useAccount();
@@ -89,8 +91,7 @@ export default function PriceAndActionsSection(
   const { traitBid, hasActiveBid, refetchTraitBid, bidOnTraitGoesToChonkId } =
     useGetTraitBid(traitId);
 
-  const { handleUnequipTrait, isUnequipTraitPending, isUnequipTraitSuccess } =
-    useUnequipTrait();
+  // const { isEquipped, refetchIsEquipped } = useUnequipTrait(chonkId, traitId);
 
   const { finalIsApproved, approvalError, handleApproveTBAForMarketplace } =
     useTBAApproval(tbaAddress);
@@ -178,10 +179,6 @@ export default function PriceAndActionsSection(
     price &&
     balance &&
     balance.value < parseEther((price + estimatedGasInEth).toString());
-
-  useEffect(() => {
-    if (isUnequipTraitSuccess) window.location.reload();
-  }, [isUnequipTraitSuccess]);
 
   const { data: storedTrait } = useReadContract({
     address: traitsContract,
@@ -503,19 +500,35 @@ export default function PriceAndActionsSection(
                 <MarketplaceConnectKitButton />
               ) : isOwner || tbaOwner === address ? (
                 <>
-                  <ListOrApproveButton
-                    traitId={traitId}
-                    isApprovalPending={isUnequipTraitPending}
-                    finalIsApproved={Boolean(finalIsApproved)}
-                    handleApproveMarketplace={handleApproveTBAForMarketplace}
-                    setIsModalOpen={setIsModalOpen}
-                    approvalError={approvalError ?? null}
-                    hasActiveBid={hasActiveBid}
-                    isEquipped={isEquipped}
-                    handleUnequipTrait={() =>
-                      handleUnequipTrait(chonkId, traitTypeId)
-                    }
-                  />
+                  {isEquipped ? (
+                    <TransactionButton
+                      buttonStyle="primary"
+                      address={mainContract}
+                      abi={mainABI}
+                      args={[chonkId, traitTypeId]}
+                      functionName="unequip"
+                      label={`Unequip to List ${
+                        hasActiveBid ? "or accept Bid" : ""
+                      }`}
+                      inFlightLabel="Unequipping..."
+                      setError={setError}
+                      reset={() => setError(null)}
+                      onSuccess={() => {
+                        refetchFullPictureForTrait();
+                        setError(null);
+                      }}
+                    />
+                  ) : (
+                    <ListOrApproveButton
+                      traitId={traitId}
+                      isApprovalPending={false}
+                      finalIsApproved={Boolean(finalIsApproved)}
+                      handleApproveMarketplace={handleApproveTBAForMarketplace}
+                      setIsModalOpen={setIsModalOpen}
+                      approvalError={approvalError ?? null}
+                      hasActiveBid={hasActiveBid}
+                    />
+                  )}
 
                   {!isEquipped &&
                     finalIsApproved &&
@@ -535,7 +548,7 @@ export default function PriceAndActionsSection(
                         reset={() => setError(null)}
                         onSuccess={() => {
                           refetchTraitBid();
-                          refetchOwner();
+                          refetchFullPictureForTrait();
                           setError(null);
                         }}
                       />

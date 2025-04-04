@@ -357,14 +357,7 @@ export default function TraitDetail({ id }: { id: string }) {
                     tbaOwner={ownerOfTraitOwner}
                     isEquipped={isEquipped}
                     tbaAddress={tbaAddress as Address | null}
-                    refetchOwner={refetchFullPictureForTrait}
-                    // price={formattedPrice}
-                    // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
-                    // isOfferSpecific={isOfferSpecific}
-                    // canAcceptOffer={canAcceptOffer}
-                    // hasActiveOffer={hasActiveOffer}
-                    // hasActiveBid={hasActiveBid}
-                    // traitBid={traitBid}
+                    refetchFullPictureForTrait={refetchFullPictureForTrait}
                   />
 
                   {/* <ActivityAndOffersSection
@@ -408,14 +401,7 @@ export default function TraitDetail({ id }: { id: string }) {
                   tbaOwner={ownerOfTraitOwner}
                   isEquipped={isEquipped}
                   tbaAddress={tbaAddress as Address | null}
-                  refetchOwner={refetchFullPictureForTrait}
-                  // price={formattedPrice}
-                  // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
-                  // isOfferSpecific={isOfferSpecific}
-                  // canAcceptOffer={canAcceptOffer}
-                  // hasActiveOffer={hasActiveOffer}
-                  // hasActiveBid={hasActiveBid}
-                  // traitBid={traitBid}
+                  refetchFullPictureForTrait={refetchFullPictureForTrait}
                 />
               </div>
             </>
