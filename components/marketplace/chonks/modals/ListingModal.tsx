@@ -8,6 +8,7 @@ import {
   usePublicClient,
 } from "wagmi";
 import { chainId } from "@/config";
+import ErrorDisplay from "../../common/ErrorDisplay";
 
 interface ListingModalProps {
   chonkId: number;
@@ -159,9 +160,7 @@ export const ListingModal = (props: ListingModalProps) => {
           disabled={isDisabled}
         />
 
-        {priceError && (
-          <span className="text-red-500 text-sm">{priceError}</span>
-        )}
+        {priceError && <ErrorDisplay error={priceError} />}
       </div>
 
       <div className="flex flex-col gap-2">
@@ -184,9 +183,7 @@ export const ListingModal = (props: ListingModalProps) => {
               disabled={isDisabled}
             />
 
-            {addressError && (
-              <span className="text-red-500 text-sm">{addressError}</span>
-            )}
+            {addressError && <ErrorDisplay error={addressError} />}
           </div>
         )}
       </div>
@@ -213,9 +210,10 @@ export const ListingModal = (props: ListingModalProps) => {
         </div>
 
         {bottomError && (
-          <span className="text-red-500 text-sm text-center mt-2 -mb-4">
-            {bottomError}
-          </span>
+          <ErrorDisplay
+            error={bottomError}
+            className="text-center mt-2 -mb-4"
+          />
         )}
       </div>
     </div>

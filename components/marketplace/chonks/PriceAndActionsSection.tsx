@@ -16,6 +16,7 @@ import useGetChonkListing from "@/hooks/marketplace/chonks/useGetChonkListing";
 import { useEthPrice } from "@/hooks/useEthPrice";
 import TransactionButton from "@/components/TransactionButton";
 import { marketplaceContract, marketplaceABI } from "@/config";
+import ErrorDisplay from "@/components/marketplace/common/ErrorDisplay";
 
 export default function PriceAndActionsSection({
   chonkId,
@@ -287,7 +288,7 @@ export default function PriceAndActionsSection({
                   setError={setError}
                 />
 
-                <div className="text-red-500 text-sm">{error}</div>
+                <ErrorDisplay error={error} />
               </div>
             ) : (
               <div className="flex flex-col gap-2">
@@ -317,7 +318,7 @@ export default function PriceAndActionsSection({
                   }}
                 />
 
-                {error && <div className="text-red-500 text-sm">{error}</div>}
+                <ErrorDisplay error={error} />
               </div>
             )}
           </>
@@ -408,9 +409,7 @@ export default function PriceAndActionsSection({
                         }}
                         setIsCancelingOffer={setIsCancelingOffer}
                       />
-                      {error && (
-                        <div className="text-red-500 text-sm">{error}</div>
-                      )}
+                      <ErrorDisplay error={error} />
                     </div>
                   ) : (
                     <ActionButton

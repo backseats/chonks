@@ -26,13 +26,13 @@ import {
   mainContract,
   mainABI,
 } from "@/config";
-import { useUnequipTrait } from "@/hooks/marketplace/traits/useUnequipTrait";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
 import { ActionButton } from "../chonks/buttons/ActionButton";
 import MarketplaceConnectKitButton from "../common/MarketplaceConnectKitButton";
 import CurrentBid from "../common/CurrentBid";
 import ListOrApproveButton from "../common/ListOrApproveButton";
 import TransactionButton from "@/components/TransactionButton";
+import ErrorDisplay from "@/components/marketplace/common/ErrorDisplay";
 
 type PriceAndActionsSectionProps = {
   isOwner: boolean;
@@ -90,8 +90,6 @@ export default function PriceAndActionsSection(
 
   const { traitBid, hasActiveBid, refetchTraitBid, bidOnTraitGoesToChonkId } =
     useGetTraitBid(traitId);
-
-  // const { isEquipped, refetchIsEquipped } = useUnequipTrait(chonkId, traitId);
 
   const { finalIsApproved, approvalError, handleApproveTBAForMarketplace } =
     useTBAApproval(tbaAddress);
@@ -324,7 +322,7 @@ export default function PriceAndActionsSection(
         />
       )}
 
-      {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+      {error && <ErrorDisplay error={error} className="mt-2" />}
     </div>
   );
 
@@ -383,12 +381,13 @@ export default function PriceAndActionsSection(
       />
 
       {hasInsufficientBalance && (
-        <div className="text-red-500 text-sm mt-2">
-          Your ETH balance is too low to buy this Trait.
-        </div>
+        <ErrorDisplay
+          error="Your ETH balance is too low to buy this Trait."
+          className="mt-2"
+        />
       )}
 
-      {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+      {error && <ErrorDisplay error={error} className="mt-2" />}
 
       {hasActiveBid && traitBid && traitBid.bidder === address && (
         <>
@@ -423,7 +422,7 @@ export default function PriceAndActionsSection(
               setIsCancelingOffer={setIsCancelingOffer}
             />
 
-            {error && <div className="text-red-500 text-sm">{error}</div>}
+            {error && <ErrorDisplay error={error} />}
           </div>
         </>
       )}
@@ -595,9 +594,7 @@ export default function PriceAndActionsSection(
                             }}
                             setIsCancelingOffer={setIsCancelingOffer}
                           />
-                          {error && (
-                            <div className="text-red-500 text-sm">{error}</div>
-                          )}
+                          {error && <ErrorDisplay error={error} />}
                         </div>
                       ) : (
                         <ActionButton

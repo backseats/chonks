@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useMemo, useState, useCallback } from "react";
 import { MARKETPLACE_CONSTANTS } from "@/constants/marketplace";
-import { Address, formatEther, parseEther } from "viem";
+import { Address, parseEther } from "viem";
 import {
   usePublicClient,
   useWaitForTransactionReceipt,
@@ -8,8 +8,7 @@ import {
   useWriteContract,
 } from "wagmi";
 import { chainId } from "@/config";
-import TransactionButton from "@/components/TransactionButton";
-// import { TraitBid, ChonkBid } from "@/types";
+import ErrorDisplay from "../../common/ErrorDisplay";
 
 interface OfferModalProps {
   chonkId: number;
@@ -220,7 +219,7 @@ export const OfferModal = ({
           disabled={isDisabled}
         />
 
-        {priceError && <div className="text-red-500 text-sm">{priceError}</div>}
+        {priceError && <ErrorDisplay error={priceError} />}
       </div>
 
       {traitId && ownedChonks.length === 0 && (
@@ -255,9 +254,7 @@ export const OfferModal = ({
             ))}
           </select>
 
-          {chonkSelectError && (
-            <div className="text-red-500 text-sm">{chonkSelectError}</div>
-          )}
+          {chonkSelectError && <ErrorDisplay error={chonkSelectError} />}
         </div>
       )}
 
@@ -283,9 +280,10 @@ export const OfferModal = ({
         </div>
 
         {bottomError && (
-          <span className="text-red-500 text-sm text-center mt-2 -mb-4">
-            {bottomError}
-          </span>
+          <ErrorDisplay
+            error={bottomError}
+            className="text-center mt-2 -mb-4"
+          />
         )}
       </div>
     </div>
