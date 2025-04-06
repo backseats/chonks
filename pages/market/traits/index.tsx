@@ -12,6 +12,7 @@ import { useTraitsTotalSupply } from "@/hooks/useTotalSupply";
 
 type TraitMetadata = {
   colorMap: string;
+  traitName: string;
 };
 
 export type TraitListing = {

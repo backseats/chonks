@@ -13,6 +13,7 @@ export const TRAIT_LISTINGS = gql`
         sellerTBA
         traitMetadata {
           colorMap
+          traitName
         }
       }
       pageInfo {

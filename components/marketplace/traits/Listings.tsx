@@ -32,7 +32,12 @@ export default function Listings({
               opacity={0.6}
             />
 
-            <ListingInfo chonkOrTrait="trait" id={Number(id)} price={price} />
+            <ListingInfo
+              chonkOrTrait="trait"
+              id={Number(id)}
+              price={price}
+              traitName={traitMetadata.traitName}
+            />
           </Link>
         ))}
       </div>
