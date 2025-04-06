@@ -36,6 +36,8 @@ export const config = createConfig({
     injected(),
     walletConnect({
       projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "",
+      name: "Chonks",
+      showQrModal: false,
     }),
     coinbaseWallet({ appName: 'Chonks', preference: 'all' }),
   ],
