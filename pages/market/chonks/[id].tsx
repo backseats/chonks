@@ -372,7 +372,7 @@ export default function ChonkDetail({ id }: { id: string }) {
               </div>
 
               <div className="flex flex-col sm:hidden">
-                <Link href="/chonks/${id}">
+                <Link href={`/chonks/${id}`}>
                   <h1 className="text-[28px] mt-3 font-bold text-center hover:underline">
                     Chonk #{id}
                   </h1>
