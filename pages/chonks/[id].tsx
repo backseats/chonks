@@ -517,10 +517,27 @@ export default function ChonkDetail({ id }: { id: string }) {
         />
         <meta property="og:title" content={`Chonk #${id} - Chonks`} />
         <meta
+          property="og:url"
+          content={`https://www.chonks.xyz/chonks/${id}`}
+        />
+        <meta
           property="og:description"
           content={`View Chonk #${id} on Chonks`}
         />
         <meta property="og:type" content="website" />
+        <meta name="twitter:title" content="Chonks.xyz" />
+        <meta
+          name="twitter:description"
+          content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
+        />
+        <meta
+          name="twitter:image"
+          content={`${
+            process.env.NODE_ENV === "development"
+              ? "http://localhost:3000"
+              : "https://www.chonks.xyz"
+          }/api/og?id=${id}`}
+        />
         <meta property="twitter:card" content="summary_large_image" />
 
         <meta name="robots" content="index, follow" />
