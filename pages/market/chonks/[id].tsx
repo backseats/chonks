@@ -290,6 +290,8 @@ export default function ChonkDetail({ id }: { id: string }) {
         <meta property="og:type" content="website" />
         <meta property="twitter:card" content="summary_large_image" />
 
+        <meta name="robots" content="index, follow" />
+
         <meta
           property="og:url"
           content={`https://chonks.xyz/market/chonks/${id}`}
