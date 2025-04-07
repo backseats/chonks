@@ -506,6 +506,16 @@ export default function ChonkDetail({ id }: { id: string }) {
       <Head>
         <title>{`Chonk #${id} Explorer`}</title>
         <meta name="description" content={`Chonk #${id} Explorer - Chonks`} />
+
+        <meta
+          property="og:image"
+          content={`${
+            process.env.NODE_ENV === "development"
+              ? "http://localhost:3000"
+              : "https://www.chonks.xyz"
+          }/api/og?id=${id}`}
+        />
+
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"

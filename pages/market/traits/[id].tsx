@@ -284,7 +284,7 @@ export default function TraitDetail({ id }: { id: string }) {
         <title>Trait #{id} - Marketplace - Chonks</title>
         <meta
           name="description"
-          content={`View Trait #${id} on the Chonks marketplace`}
+          content={`View Trait #${id} on the Chonks Market`}
         />
         <meta
           property="og:title"
@@ -292,7 +292,7 @@ export default function TraitDetail({ id }: { id: string }) {
         />
         <meta
           property="og:description"
-          content={`View Trait #${id} on the Chonks marketplace`}
+          content={`View Trait #${id} on the Chonks Market`}
         />
 
         {/* // TODO: add trait image */}
