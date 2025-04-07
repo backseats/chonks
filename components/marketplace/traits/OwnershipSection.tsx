@@ -36,7 +36,7 @@ export default function OwnershipSection(props: Props) {
       <div className="flex justify-between items-center px-4 sm:px-0">
         <div className="flex flex-row justify-between w-full sm:justify-start sm:items-baseline sm:gap-2">
           <h1 className="hidden sm:flex sm:text-[26px] sm:font-bold">
-            Trait #{id} {traitName ? `- ${traitName}` : ""}
+            {traitName ? `${traitName}` : ""}
           </h1>
 
           {owner && (

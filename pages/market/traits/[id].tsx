@@ -374,10 +374,7 @@ export default function TraitDetail({ id }: { id: string }) {
 
               <div className="flex flex-col sm:hidden">
                 <h1 className="text-[22px] mt-3 font-bold text-center px-4">
-                  Trait #{id}{" "}
-                  {traitMetadata?.traitName
-                    ? `- ${traitMetadata.traitName}`
-                    : ""}
+                  {traitMetadata?.traitName ? `${traitMetadata.traitName}` : ""}
                 </h1>
 
                 <div className="w-full h-auto p-4">
