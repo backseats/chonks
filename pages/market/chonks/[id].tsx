@@ -1,5 +1,6 @@
 import Head from "next/head";
 import MenuBar from "@/components/MenuBar";
+4;
 import { useState, useEffect, useMemo } from "react";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { TokenboundClient } from "@tokenbound/sdk";
@@ -21,7 +22,6 @@ import { CurrentChonk } from "@/types/CurrentChonk";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import Loading from "@/components/marketplace/Loading";
 import Link from "next/link";
-import ChonkOGMeta from "@/components/ChonkOGMeta";
 
 // type ChonkOffer = {
 //     priceInWei: bigint;
@@ -160,7 +160,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId,
   });
 
-  // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
+  // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
     address: traitsContract,
     abi: traitsABI,
@@ -261,19 +261,42 @@ export default function ChonkDetail({ id }: { id: string }) {
 
   return (
     <>
-      <ChonkOGMeta
-        chonkId={id}
-        title={`Chonk #${id} - Market`}
-        description={`View Chonk #${id} on the Chonks Market`}
-      />
-
       <Head>
         <title>Chonk #{id} - Market - Chonks</title>
+
         <meta
           name="description"
           content="View Chonk #${id} on the Chonks Market"
         />
+        <meta property="og:title" content={`Chonk #${id} - Market - Chonks`} />
+        <meta
+          property="og:description"
+          content={`View Chonk #${id} on the Chonks Market`}
+        />
+
+        <meta
+          property="og:image"
+          content={`${
+            process.env.NODE_ENV === "development"
+              ? "http://localhost:3000"
+              : "https://www.chonks.xyz"
+          }/api/og?id=${id}`}
+        />
+        <meta property="og:title" content={`Chonk #${id} - Market - Chonks`} />
+        <meta
+          property="og:description"
+          content={`View Chonk #${id} on the Chonks Market`}
+        />
+        <meta property="og:type" content="website" />
+        <meta property="twitter:card" content="summary_large_image" />
+
         <meta name="robots" content="index, follow" />
+
+        <meta
+          property="og:url"
+          content={`https://chonks.xyz/market/chonks/${id}`}
+        />
+        <meta property="og:type" content="website" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
@@ -434,30 +457,7 @@ export async function getServerSideProps(context) {
     };
   }
 
-  try {
-    // Get the site URL for absolute URLs
-    const protocol = context.req.headers["x-forwarded-proto"] || "http";
-    const host =
-      context.req.headers["x-forwarded-host"] ||
-      context.req.headers.host ||
-      "chonks.xyz";
-
-    // Use the production URL for OpenGraph images in production
-    const isProduction = process.env.NODE_ENV === "production";
-    const productionDomain = "chonks.xyz";
-
-    // Create props object with the ID
-    const props = { id };
-
-    // For SSR rendering, we only need to pass the ID
-    // The ChonkOGMeta component will handle the rest
-    return {
-      props,
-    };
-  } catch (error) {
-    console.error("Error in getServerSideProps:", error);
-    return {
-      props: { id },
-    };
-  }
+  return {
+    props: { id },
+  };
 }
