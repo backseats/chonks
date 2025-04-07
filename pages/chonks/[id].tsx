@@ -48,8 +48,13 @@ import { ListingModal } from "@/components/marketplace/chonks/modals/ListingModa
 import useListChonk from "@/hooks/marketplace/chonks/useGetChonkListing";
 import useCancelOffer from "@/hooks/marketplace/chonks/useCancelOffer";
 import client from "@/lib/apollo-client";
-import { GET_TRAITS_FOR_CHONK_ID } from "@/lib/graphql/queries";
+import {
+  GET_TRAITS_FOR_CHONK_ID,
+  GET_CHONK_BY_ID,
+} from "@/lib/graphql/queries";
 import TransactionButton from "@/components/TransactionButton";
+import ChonkOGMeta from "@/components/ChonkOGMeta";
+import { GetServerSidePropsContext } from "next";
 
 export type TraitInfo = {
   colorMap: string;
@@ -58,7 +63,17 @@ export type TraitInfo = {
   traitType: number;
 };
 
-export default function ChonkDetail({ id }: { id: string }) {
+export default function ChonkDetail({
+  id,
+  ogImageUrl,
+  ogTitle,
+  ogDescription,
+}: {
+  id: string;
+  ogImageUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+}) {
   const { address } = useAccount();
 
   const { data: walletClient } = useWalletClient();
@@ -502,47 +517,17 @@ export default function ChonkDetail({ id }: { id: string }) {
   }, [listingPrice, resolvedAddress, isPrivateListingExpanded]);
 
   return (
-    <>
+    <div className="relative">
+      <ChonkOGMeta
+        chonkId={id}
+        description={ogDescription}
+        image={ogImageUrl}
+      />
+
       <Head>
-        <title>{`Chonk #${id} Explorer`}</title>
-        <meta name="description" content={`Chonk #${id} Explorer - Chonks`} />
-
-        <meta
-          property="og:image"
-          content={`${
-            process.env.NODE_ENV === "development"
-              ? "http://localhost:3000"
-              : "https://www.chonks.xyz"
-          }/api/og?id=${id}`}
-        />
-        <meta property="og:title" content={`Chonk #${id}`} />
-        <meta
-          property="og:url"
-          content={`https://www.chonks.xyz/chonks/${id}`}
-        />
-        <meta
-          property="og:description"
-          content={`View Chonk #${id} on Chonks.xyz`}
-        />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:title" content="Chonks.xyz" />
-        <meta
-          name="twitter:description"
-          content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
-        />
-        <meta
-          name="twitter:image"
-          content={`${
-            process.env.NODE_ENV === "development"
-              ? "http://localhost:3000"
-              : "https://www.chonks.xyz"
-          }/api/og?id=${id}`}
-        />
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@Chonksxyz" />
-
+        <title>{ogTitle} | Backseats</title>
+        <meta name="description" content={ogDescription} />
         <meta name="robots" content="index, follow" />
-
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
@@ -969,7 +954,7 @@ export default function ChonkDetail({ id }: { id: string }) {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -1053,17 +1038,89 @@ const ChonkControls = ({
   );
 };
 
-// @ts-ignore
-export async function getServerSideProps(context) {
-  const { id } = context.params;
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const { params } = context || {};
+  const { id } = params || {};
 
-  if (!id) {
+  // Guard clause for missing ID
+  if (!id || typeof id !== "string") {
     return {
       notFound: true,
     };
   }
 
-  return {
-    props: { id },
-  };
+  try {
+    // Get the site URL for absolute URLs
+    const protocol = context.req.headers["x-forwarded-proto"] || "http";
+    const host =
+      context.req.headers["x-forwarded-host"] ||
+      context.req.headers.host ||
+      "chonks.xyz";
+    const siteUrl = `${protocol}://${host}`;
+
+    // Use the production URL for OpenGraph images if we're in production
+    const isProduction = process.env.NODE_ENV === "production";
+    const productionDomain = "chonks.xyz";
+
+    // For production or local development, ensure we have absolute URLs
+    let ogImageUrl = `${siteUrl}/api/og-fallback?id=${id}`;
+
+    // Force the production domain for OpenGraph images if in production
+    if (isProduction && !host.includes(productionDomain)) {
+      ogImageUrl = `https://${productionDomain}/api/og-fallback?id=${id}`;
+    }
+
+    console.log(`Using fallback PNG image for OG tags: ${ogImageUrl}`);
+
+    // Fetch Chonk data for name if available
+    let ogTitle = `Chonk #${id}`;
+    let ogDescription = `View Chonk #${id} on Backseats`;
+
+    try {
+      const { data } = await client.query({
+        query: GET_CHONK_BY_ID,
+        variables: { id },
+      });
+
+      if (data?.chonk?.chonkMetaData) {
+        // Parse metadata if it exists
+        if (
+          data.chonk.chonkMetaData.startsWith("data:application/json;base64,")
+        ) {
+          const base64 = data.chonk.chonkMetaData.split(",")[1];
+          const jsonStr = Buffer.from(base64, "base64").toString();
+
+          try {
+            const parsedData = JSON.parse(jsonStr);
+            if (parsedData.name) {
+              ogTitle = parsedData.name;
+            }
+          } catch (e) {
+            console.error("Error parsing Chonk metadata:", e);
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Error fetching Chonk data for OG tags:", e);
+    }
+
+    return {
+      props: {
+        id,
+        ogImageUrl,
+        ogTitle,
+        ogDescription,
+      },
+    };
+  } catch (e) {
+    console.error("Error in getServerSideProps:", e);
+    return {
+      props: {
+        id,
+        ogImageUrl: `/api/og-fallback?id=${id}`,
+        ogTitle: `Chonk #${id}`,
+        ogDescription: `View Chonk #${id} on Backseats`,
+      },
+    };
+  }
 }

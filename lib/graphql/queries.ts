@@ -1,5 +1,13 @@
 import { gql } from '@apollo/client';
 
+export const GET_CHONK_BY_ID = gql`
+  query GetChonkById($id: BigInt!) {
+    chonk(id: $id) {
+      chonkMetaData
+    }
+  }
+`;
+
 // used on /market/traits
 export const TRAIT_LISTINGS = gql`
   query chonkListings {
