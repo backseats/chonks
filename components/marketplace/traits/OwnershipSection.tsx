@@ -1,13 +1,10 @@
-import { Trait } from "@/types/Trait";
 import { Address } from "viem";
 import { truncateEthAddress } from "@/utils/truncateEthAddress";
-import { useEnsName, useEnsAvatar } from "wagmi";
-import { normalize } from "viem/ens";
+import { useEnsName } from "wagmi";
 import Link from "next/link";
 import { mainnet } from "wagmi/chains";
 
 interface Props {
-  id: string;
   owner: Address | string | null;
   tbaOwner: Address | string | null;
   tokenIdOfTBA: string | null;
@@ -17,19 +14,14 @@ interface Props {
 }
 
 export default function OwnershipSection(props: Props) {
-  const { id, owner, tbaOwner, tokenIdOfTBA, address, isEquipped, traitName } =
+  const { owner, tbaOwner, tokenIdOfTBA, address, isEquipped, traitName } =
     props;
 
-  // console.log("owner", owner);
   // Add ENS resolution
   const { data: ensName } = useEnsName({
     address: tbaOwner as Address,
     chainId: mainnet.id,
   });
-
-  // const { data, isError, isLoading } = useEnsAvatar({
-  //   name: normalize('wevm.eth'),
-  // })
 
   return (
     <>

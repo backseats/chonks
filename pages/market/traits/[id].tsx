@@ -341,7 +341,6 @@ export default function TraitDetail({ id }: { id: string }) {
 
                 <div className="w-3/5">
                   <OwnershipSection
-                    id={id}
                     owner={owner}
                     tbaOwner={ownerOfTraitOwner}
                     tokenIdOfTBA={tokenIdOfTBA?.toString()}
@@ -382,7 +381,6 @@ export default function TraitDetail({ id }: { id: string }) {
                 </div>
 
                 <OwnershipSection
-                  id={id}
                   owner={owner}
                   tbaOwner={ownerOfTraitOwner}
                   tokenIdOfTBA={tokenIdOfTBA?.toString()}
