@@ -268,10 +268,7 @@ export default function ChonkDetail({ id }: { id: string }) {
           name="description"
           content="View Chonk #${id} on the Chonks Market"
         />
-        <meta
-          property="og:title"
-          content={`Chonk #${id} - Marketplace - Chonks`}
-        />
+        <meta property="og:title" content={`Chonk #${id} - Market - Chonks`} />
         <meta
           property="og:description"
           content={`View Chonk #${id} on the Chonks Market`}
@@ -285,6 +282,13 @@ export default function ChonkDetail({ id }: { id: string }) {
               : "https://www.chonks.xyz"
           }/api/og?id=${id}`}
         />
+        <meta property="og:title" content={`Chonk #${id} - Market - Chonks`} />
+        <meta
+          property="og:description"
+          content={`View Chonk #${id} on the Chonks Market`}
+        />
+        <meta property="og:type" content="website" />
+        <meta property="twitter:card" content="summary_large_image" />
 
         <meta
           property="og:url"

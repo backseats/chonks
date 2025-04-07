@@ -515,6 +515,13 @@ export default function ChonkDetail({ id }: { id: string }) {
               : "https://www.chonks.xyz"
           }/api/og?id=${id}`}
         />
+        <meta property="og:title" content={`Chonk #${id} - Chonks`} />
+        <meta
+          property="og:description"
+          content={`View Chonk #${id} on Chonks`}
+        />
+        <meta property="og:type" content="website" />
+        <meta property="twitter:card" content="summary_large_image" />
 
         <meta
           name="viewport"
