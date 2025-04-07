@@ -8,6 +8,7 @@ import {
   useEnsAddress,
   useEnsName,
   useReadContract,
+  useWalletClient,
 } from "wagmi";
 import { parseEther, isAddress, formatEther, getAddress, Address } from "viem";
 import { mainnet } from "wagmi/chains"; // mainnet for ens lookup
@@ -79,6 +80,17 @@ export default function PriceAndActionsSection(
   )}1`;
   const STEP_SIZE = MIN_LISTING_PRICE;
 
+  const { data: walletClient } = useWalletClient();
+
+  const { data: tbaIsApproved, refetch: refetchTBAIsApproved } =
+    useReadContract({
+      address: traitsContract,
+      abi: traitsABI,
+      functionName: "isApprovedForAll",
+      args: [tbaAddress, marketplaceContract],
+      chainId,
+    }) as { data: boolean; refetch: () => void };
+
   const {
     price,
     hasActiveOffer,
@@ -91,8 +103,11 @@ export default function PriceAndActionsSection(
   const { traitBid, hasActiveBid, refetchTraitBid, bidOnTraitGoesToChonkId } =
     useGetTraitBid(traitId);
 
-  const { finalIsApproved, approvalError, handleApproveTBAForMarketplace } =
-    useTBAApproval(tbaAddress);
+  const { handleApproveTBAForMarketplace, approvalError } = useTBAApproval({
+    walletClient,
+    tbaAddress,
+    refetchTBAIsApproved,
+  });
 
   const [isPrivateListingExpanded, setIsPrivateListingExpanded] =
     useState(false);
@@ -521,37 +536,34 @@ export default function PriceAndActionsSection(
                     <ListOrApproveButton
                       traitId={traitId}
                       isApprovalPending={false}
-                      finalIsApproved={Boolean(finalIsApproved)}
+                      finalIsApproved={tbaIsApproved}
                       handleApproveMarketplace={handleApproveTBAForMarketplace}
                       setIsModalOpen={setIsModalOpen}
-                      approvalError={approvalError ?? null}
+                      approvalError={approvalError || null}
                       hasActiveBid={hasActiveBid}
                     />
                   )}
 
-                  {!isEquipped &&
-                    finalIsApproved &&
-                    hasActiveBid &&
-                    traitBid && (
-                      <TransactionButton
-                        buttonStyle="primary"
-                        address={marketplaceContract}
-                        abi={marketplaceABI}
-                        args={[traitId, traitBid.bidder]}
-                        functionName="acceptBidForTrait"
-                        label={`Accept Offer of ${formatEther(
-                          traitBid.amountInWei
-                        )} ETH`}
-                        inFlightLabel="Accepting Offer..."
-                        setError={setError}
-                        reset={() => setError(null)}
-                        onSuccess={() => {
-                          refetchTraitBid();
-                          refetchFullPictureForTrait();
-                          setError(null);
-                        }}
-                      />
-                    )}
+                  {!isEquipped && tbaIsApproved && hasActiveBid && traitBid && (
+                    <TransactionButton
+                      buttonStyle="primary"
+                      address={marketplaceContract}
+                      abi={marketplaceABI}
+                      args={[traitId, traitBid.bidder]}
+                      functionName="acceptBidForTrait"
+                      label={`Accept Offer of ${formatEther(
+                        traitBid.amountInWei
+                      )} ETH`}
+                      inFlightLabel="Accepting Offer..."
+                      setError={setError}
+                      reset={() => setError(null)}
+                      onSuccess={() => {
+                        refetchTraitBid();
+                        refetchFullPictureForTrait();
+                        setError(null);
+                      }}
+                    />
+                  )}
                 </>
               ) : (
                 !isOwner &&

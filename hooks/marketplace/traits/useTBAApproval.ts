@@ -1,31 +1,26 @@
 import { useState } from "react";
-import { useReadContract } from "wagmi";
 import { marketplaceContract, traitsContract, traitsABI, chainId } from "@/config";
 import { Address, encodeFunctionData } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
-import { useWalletClient } from "wagmi";
+import { WalletClient } from "viem";
 
-export function useTBAApproval(tbaAddress: Address | null) {
-  const [localApproved, setLocalApproved] = useState(false);
+interface Props {
+  walletClient: WalletClient | undefined;
+  tbaAddress: Address | null;
+  refetchTBAIsApproved: () => void;
+}
+
+export function useTBAApproval(props: Props) {
+  const { walletClient, tbaAddress, refetchTBAIsApproved  }  = props;
+
   const [approvalError, setApprovalError] = useState<string>("");
 
   if (!tbaAddress) return { tbaIsApproved: false };
 
-  const { data: walletClient } = useWalletClient();
-  const tokenboundClient = new TokenboundClient({
+  const tokenboundClient = walletClient ? new TokenboundClient({
       walletClient,
       chainId,
-  });
-
-  const { data: tbaIsApproved } = useReadContract({
-    address: traitsContract,
-    abi: traitsABI,
-    functionName: "isApprovedForAll",
-    args: [tbaAddress, marketplaceContract],
-    chainId,
-  }) as { data: boolean };
-
-  const finalIsApproved = tbaIsApproved || localApproved;
+  }) : null;
 
   const encodedData = (value: boolean) => {
     return encodeFunctionData({
@@ -36,6 +31,11 @@ export function useTBAApproval(tbaAddress: Address | null) {
   };
 
   const handleApproveTBAForMarketplace = async () => {
+    if (!tokenboundClient) {
+      setApprovalError("Wallet not connected or initialized");
+      throw new Error("Tokenbound client not initialized");
+    }
+
     try {
       await tokenboundClient.execute({
         account: tbaAddress as Address,
@@ -44,8 +44,7 @@ export function useTBAApproval(tbaAddress: Address | null) {
         data: encodedData(true),
       });
 
-      // Successfully approved TBA for marketplace
-      setLocalApproved(true);
+      refetchTBAIsApproved();
 
       // console.log("Success: TBA approval transaction", tx);
     } catch (error) {
@@ -55,24 +54,8 @@ export function useTBAApproval(tbaAddress: Address | null) {
     }
   }
 
-  const disconnectTBA = async () => {
-    if (!tbaAddress) return;
-
-    const tx = await tokenboundClient.execute({
-      account: tbaAddress,
-      to: traitsContract,
-      value: 0n,
-      data: encodedData(false),
-      chainId,
-    });
-
-    return tx
-  }
-
   return {
-    finalIsApproved,
     handleApproveTBAForMarketplace,
     approvalError,
-    disconnectTBA
   };
 }
