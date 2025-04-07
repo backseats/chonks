@@ -515,14 +515,14 @@ export default function ChonkDetail({ id }: { id: string }) {
               : "https://www.chonks.xyz"
           }/api/og?id=${id}`}
         />
-        <meta property="og:title" content={`Chonk #${id} - Chonks`} />
+        <meta property="og:title" content={`Chonk #${id}`} />
         <meta
           property="og:url"
           content={`https://www.chonks.xyz/chonks/${id}`}
         />
         <meta
           property="og:description"
-          content={`View Chonk #${id} on Chonks`}
+          content={`View Chonk #${id} on Chonks.xyz`}
         />
         <meta property="og:type" content="website" />
         <meta name="twitter:title" content="Chonks.xyz" />
