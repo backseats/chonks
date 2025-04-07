@@ -539,6 +539,7 @@ export default function ChonkDetail({ id }: { id: string }) {
           }/api/og?id=${id}`}
         />
         <meta property="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@Chonksxyz" />
 
         <meta name="robots" content="index, follow" />
 
