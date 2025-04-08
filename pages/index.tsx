@@ -194,26 +194,32 @@ export default function Home() {
     <>
       <Head>
         <title>CHONKS - Chonkie Characters Onchain</title>
-        <meta name="description" content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base" />
+        <meta
+          name="description"
+          content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
+        />
         <meta
           property="og:image"
           content="https://www.chonks.xyz/marka/marka-chonk.png"
         />
         <meta content="720" property="og:image:width" />
         <meta content="720" property="og:image:height" />
-        <meta property="og:title" content="CHONKS - Chonkie Characters Onchain" />
-        <meta property="og:type" content="website" />
         <meta
-          property="og:url"
-          content={`https://www.chonks.xyz`}
+          property="og:title"
+          content="CHONKS - Chonkie Characters Onchain"
         />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://www.chonks.xyz`} />
         <meta
           property="og:description"
           content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
         />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Chonksxyz" />
-        <meta name="twitter:title" content="CHONKS - Chonkie Characters Onchain" />
+        <meta
+          name="twitter:title"
+          content="CHONKS - Chonkie Characters Onchain"
+        />
         <meta
           name="twitter:description"
           content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
@@ -859,9 +865,9 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="w-full mt-[3.45vw] bg-[#181818] py-[3.45vw]">
+              <div className="w-full mt-[3.45vw] py-[3.45vw]">
                 <Image
-                  src="/chonks-market.webp"
+                  src="/chonksmarket.png"
                   alt="Chonks Market"
                   width={3000}
                   height={1688}
