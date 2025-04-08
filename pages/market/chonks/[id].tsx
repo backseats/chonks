@@ -32,8 +32,6 @@ import Link from "next/link";
 // }
 
 export default function ChonkDetail({ id }: { id: string }) {
-  const TOKEN_URI = "tokenURI";
-
   const { address } = useAccount();
 
   const { data: walletClient } = useWalletClient();
@@ -55,7 +53,7 @@ export default function ChonkDetail({ id }: { id: string }) {
   const { data: tokenURIData } = useReadContract({
     address: mainContract,
     abi: mainABI,
-    functionName: TOKEN_URI,
+    functionName: "tokenURI",
     args: [BigInt(id)],
     chainId,
   }) as { data: string };

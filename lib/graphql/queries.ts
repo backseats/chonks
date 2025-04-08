@@ -246,3 +246,72 @@ query traitListing($id: BigInt!) {
   }
 }
 `;
+
+export const GET_ACTIVE_CHONK_LISTINGS = gql`
+query activeChonkListings {
+  activeChonkListings(
+    orderBy: "listingTime"
+    orderDirection: "desc"
+    where: {isActive: true}
+  ) {
+    items {
+      id
+      isActive
+      listingTime
+      listingTxHash
+      price
+      seller
+      sellerTBA
+    }
+  }
+}
+`;
+
+export const GET_ACTIVE_TRAIT_LISTINGS = gql`
+query TraitListings {
+  traitListings(
+    where: {isActive: true}
+    orderBy: "listingTime"
+    orderDirection: "desc"
+  ) {
+    items {
+      id
+      isActive
+      listingTime
+      listingTxHash
+      sellerTBA
+      seller
+      price
+      traitMetadata {
+        traitName
+        traitType
+        colorMap
+      }
+    }
+  }
+}
+`;
+
+export const GET_CHONK_RECENT_SALES = gql`
+query ChonkRecentSales {
+  chonkTransactionHistories(
+    where: {txType_in: ["ChonkBought", "ChonkBidAccepted"]}
+    orderBy: "time"
+    orderDirection: "desc"
+  ) {
+    items {
+      id
+      txType
+      txHash
+      to
+      time
+      sellerTBA
+      seller
+      from
+      chonkId
+      bidder
+      amount
+    }
+  }
+}
+`;
