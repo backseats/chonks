@@ -202,6 +202,7 @@ export default function Home() {
         <meta content="720" property="og:image:width" />
         <meta content="720" property="og:image:height" />
         <meta property="og:title" content="CHONKS - Chonkie Characters Onchain" />
+        <meta property="og:type" content="website" />
         <meta
           property="og:url"
           content={`https://www.chonks.xyz`}
@@ -209,6 +210,17 @@ export default function Home() {
         <meta
           property="og:description"
           content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@Chonksxyz" />
+        <meta name="twitter:title" content="CHONKS - Chonkie Characters Onchain" />
+        <meta
+          name="twitter:description"
+          content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
+        />
+        <meta
+          name="twitter:image"
+          content="https://www.chonks.xyz/marka/marka-chonk.png"
         />
         <meta
           name="viewport"
