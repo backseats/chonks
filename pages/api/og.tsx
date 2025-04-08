@@ -11,7 +11,11 @@ export const config = {
 const convertSvgToPng = async (svgDataUri: string) => {
   const svgText = Buffer.from(svgDataUri.split(",")[1], "base64").toString("utf-8");
 
-  const res = await fetch(`https://www.chonks.xyz/api/convert`, {
+  const baseUrl = process.env.NODE_ENV === "development"
+    ? "http://localhost:3000"
+    : "https://www.chonks.xyz";
+
+  const res = await fetch(`${baseUrl}/api/convert`, {
     method: "POST",
     headers: {
       "Content-Type": "image/svg+xml",
