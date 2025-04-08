@@ -12,8 +12,8 @@ export default function ListingInfo(props: Props) {
   const { chonkOrTrait, id, price, traitName } = props;
 
   return (
-    <div className="p-4 text-[16px]">
-      <h3 className="font-bold">
+    <div className="p-4 text-[16px] flex flex-col justify-between">
+      <h3 className="font-bold line-clamp-1 overflow-hidden">
         {chonkOrTrait === "chonk"
           ? `Chonk #${id}`
           : traitName

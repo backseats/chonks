@@ -26,42 +26,6 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
     opacity = 1,
   } = props;
 
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  // Don't render until we have a proper size
-  const [pixelSize, setPixelSize] = React.useState<number | null>(null);
-
-  // Use ResizeObserver to detect container size changes
-  React.useEffect(() => {
-    if (!containerRef.current) return;
-
-    const calculateSize = (element: HTMLElement) => {
-      const width = element.clientWidth;
-      const height = element.clientHeight;
-      const minDimension = Math.min(width, height);
-      setPixelSize(Math.floor(minDimension / gridSize));
-    };
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        // Get the smallest dimension (width or height) to maintain square aspect ratio
-        const boundingRect = entry.contentRect;
-        const minDimension = Math.min(boundingRect.width, boundingRect.height);
-        setPixelSize(Math.floor(minDimension / gridSize));
-      }
-    });
-
-    resizeObserver.observe(containerRef.current);
-
-    // Initial size calculation
-    calculateSize(containerRef.current);
-
-    return () => {
-      if (containerRef.current) {
-        resizeObserver.unobserve(containerRef.current);
-      }
-    };
-  }, []);
-
   // Memoize grid generation to avoid recreating on every render
   const generateGrid = React.useCallback((): Pixel[] => {
     const grid: Pixel[] = [];
@@ -142,31 +106,16 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
   // Memoize the empty grid for the background layer
   const emptyGrid = React.useMemo(() => generateGrid(), [generateGrid]);
 
-  // const gridWidth = gridSize * pixelSize;
-  // const gridHeight = gridSize * pixelSize;
-
-  // If we don't have a pixel size yet, render just the container
-  if (pixelSize === null) {
-    return (
-      <div
-        ref={containerRef}
-        className="relative w-full h-full"
-        style={{ aspectRatio: "1 / 1" }}
-      />
-    );
-  }
-
   return (
     <div
-      ref={containerRef}
       className="grid relative w-full h-full"
       style={{
         display: "grid",
-        gridTemplateColumns: `repeat(${gridSize}, ${pixelSize}px)`,
-        gridTemplateRows: `repeat(${gridSize}, ${pixelSize}px)`,
+        gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+        gridTemplateRows: `repeat(${gridSize}, 1fr)`,
         gap: 0,
         backgroundColor: backgroundColor,
-        aspectRatio: "1 / 1", // Maintain square aspect ratio
+        aspectRatio: "1 / 1",
       }}
     >
       {/* Background Body Layer */}
@@ -174,8 +123,8 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
         className="absolute inset-0 grid"
         style={{
           display: "grid",
-          gridTemplateColumns: `repeat(${gridSize}, ${pixelSize}px)`,
-          gridTemplateRows: `repeat(${gridSize}, ${pixelSize}px)`,
+          gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
+          gridTemplateRows: `repeat(${gridSize}, 1fr)`,
           gap: 0,
           opacity: opacity
             ? opacity
@@ -192,8 +141,6 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
             <div
               key={`bg-${pixel.x}-${pixel.y}`}
               style={{
-                width: `${pixelSize}px`,
-                height: `${pixelSize}px`,
                 backgroundColor: backgroundPixel?.color || "transparent",
               }}
             />
@@ -206,8 +153,6 @@ export default function ChonkRenderer(props: ChonkRendererProps) {
         <div
           key={`pixel-${pixel.x}-${pixel.y}`}
           style={{
-            width: `${pixelSize}px`,
-            height: `${pixelSize}px`,
             backgroundColor: pixel.color || "transparent",
             position: "relative",
             zIndex: 1,

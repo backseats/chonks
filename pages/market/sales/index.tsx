@@ -3,7 +3,10 @@ import { formatEther } from "viem";
 import Head from "next/head";
 import MenuBar from "@/components/MenuBar";
 import Tabs from "@/components/marketplace/Tabs";
-import { GET_CHONK_RECENT_SALES } from "@/lib/graphql/queries";
+import {
+  GET_RECENT_CHONK_SALES,
+  GET_RECENT_TRAIT_SALES,
+} from "@/lib/graphql/queries";
 import client from "@/lib/apollo-client";
 import ChonkRenderer from "@/components/ChonkRenderer";
 import { useReadContracts } from "wagmi";
@@ -30,6 +33,7 @@ type Sale = {
   bidder: string;
   amount: string;
   type: "chonk" | "trait";
+  traitMetadata?: TraitMetadata;
 };
 
 export default function Sales() {
@@ -41,13 +45,13 @@ export default function Sales() {
       try {
         // Fetch chonk listings
         const chonkResponse = await client.query({
-          query: GET_CHONK_RECENT_SALES,
+          query: GET_RECENT_CHONK_SALES,
         });
 
         // Fetch trait listings
-        // const traitResponse = await client.query({
-        //   query: GET_ACTIVE_TRAIT_LISTINGS,
-        // });
+        const traitResponse = await client.query({
+          query: GET_RECENT_TRAIT_SALES,
+        });
 
         // Extract items from both responses
         const chonkSales =
@@ -68,28 +72,32 @@ export default function Sales() {
             })
           );
 
-        // const traitListings = traitResponse.data.traitListings.items.map(
-        //   (item: any): Listing => ({
-        //     id: item.id,
-        //     isActive: item.isActive,
-        //     listingTime: item.listingTime,
-        //     listingTxHash: item.listingTxHash,
-        //     price: item.price,
-        //     seller: item.seller,
-        //     sellerTBA: item.sellerTBA,
-        //     type: "trait",
-        //     traitMetadata: item.traitMetadata,
-        //   })
-        // );
+        const traitSales =
+          traitResponse.data.traitTransactionHistories.items.map(
+            (item: any): Sale => ({
+              id: item.id,
+              txType: item.txType,
+              txHash: item.txHash,
+              to: item.to,
+              time: item.time,
+              sellerTBA: item.sellerTBA,
+              seller: item.seller,
+              from: item.from,
+              chonkId: item.chonkId,
+              bidder: item.bidder,
+              amount: item.amount,
+              type: "trait",
+              traitMetadata: item.trait,
+            })
+          );
 
-        // Combine and sort by listingTime in descending order
-        // const combinedListings = [...chonkListings, ...traitListings].sort(
-        //   (a: Listing, b: Listing) =>
-        //     new Date(Number(b.listingTime)).getTime() -
-        //     new Date(Number(a.listingTime)).getTime()
-        // );
+        const combinedSales = [...chonkSales, ...traitSales].sort(
+          (a: Sale, b: Sale) =>
+            new Date(Number(b.time)).getTime() -
+            new Date(Number(a.time)).getTime()
+        );
 
-        setSales(chonkSales);
+        setSales(combinedSales);
       } catch (error) {
         console.error("Error fetching sales:", error);
       }
@@ -174,7 +182,7 @@ export default function Sales() {
             Sales
           </h1>
 
-          <div className="grid grid-cols-3 lg:grid-cols-10 gap-4 p-4 sm:px-[3.45vw] mt-4">
+          <div className="grid grid-cols-3 lg:grid-cols-8 gap-4 p-4 sm:px-[3.45vw] mt-4">
             {/* Example listing items - replace with actual data */}
             {sales.map((item: Sale) => (
               <Link key={item.id} href={`/market/${item.type}s/${item.id}`}>
@@ -184,7 +192,7 @@ export default function Sales() {
                 >
                   <div className="aspect-square bg-gray-100 relative">
                     <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                      {getImage(item.chonkId, item.type)}
+                      {getImage(item.chonkId, item.type, item.traitMetadata)}
                     </div>
                   </div>
 
@@ -237,7 +245,7 @@ const Listing = ({ id }: { id: string }) => {
   const bodyIndex = results?.[1]?.result as number;
 
   return (
-    <div className="w-full flex justify-center items-center bg-[#0F6E9D]">
+    <div className="w-full flex justify-center items-center bg-black">
       <ChonkRenderer bytes={bytes} bodyIndex={bodyIndex} />
     </div>
   );

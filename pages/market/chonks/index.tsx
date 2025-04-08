@@ -166,7 +166,7 @@ export default function ChonksMarketplace() {
         <link rel="manifest" href="/site.webmanifest" />
       </Head>
 
-      <div className="sm:min-h-screen w-full text-black font-source-code-pro font-weight-600 text-[3vw] sm:text-[1.5vw]">
+      <div className="sm:min-h-screen w-full text-black font-source-code-pro font-weight-600">
         <MenuBar />
 
         <main className="w-full border-t border-gray-300">

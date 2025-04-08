@@ -21,7 +21,7 @@ export default function Listings({
 
   return (
     <div className={`${isSidebarVisible ? "w-3/4" : "w-full"} `}>
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 px-0">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4 px-0">
         {chonkListings.map((listing) => (
           <Link
             href={`/market/chonks/${listing.id}`}

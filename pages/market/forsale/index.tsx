@@ -169,7 +169,7 @@ export default function ForSale() {
             For Sale
           </h1>
 
-          <div className="grid grid-cols-3 lg:grid-cols-8 gap-4 p-4 sm:px-[3.45vw] mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-4 p-4 sm:px-[3.45vw] mt-4">
             {listings.map((item: Listing) => (
               <Link key={item.id} href={`/market/${item.type}s/${item.id}`}>
                 <div

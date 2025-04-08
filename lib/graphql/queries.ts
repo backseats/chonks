@@ -292,7 +292,7 @@ query TraitListings {
 }
 `;
 
-export const GET_CHONK_RECENT_SALES = gql`
+export const GET_RECENT_CHONK_SALES = gql`
 query ChonkRecentSales {
   chonkTransactionHistories(
     where: {txType_in: ["ChonkBought", "ChonkBidAccepted"]}
@@ -311,6 +311,37 @@ query ChonkRecentSales {
       chonkId
       bidder
       amount
+    }
+  }
+}
+`;
+
+
+export const GET_RECENT_TRAIT_SALES = gql`
+query TraitRecentSales {
+  traitTransactionHistories(
+    orderBy: "time"
+    orderDirection: "desc"
+    where: {txType_in: ["TraitBought","TraitBidAccepted"]}
+  ) {
+    items {
+      amount
+      bidder
+      from
+      id
+      seller
+      sellerTBA
+      time
+      to
+      traitId
+      txHash
+      txType
+      trait {
+        id
+        traitName
+        traitType
+        colorMap
+      }
     }
   }
 }
