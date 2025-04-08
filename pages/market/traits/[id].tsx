@@ -295,9 +295,37 @@ export default function TraitDetail({ id }: { id: string }) {
           content={`View Trait #${id} on the Chonks Market`}
         />
 
-        {/* // TODO: add trait image */}
-        {/* {traitImage && <meta property="og:image" content={traitImage} />} */}
+        <meta
+          property="og:image"
+          content={`${
+            process.env.NODE_ENV === "development"
+              ? "http://localhost:3000"
+              : "https://www.chonks.xyz"
+          }/api/og-trait?id=${id}`}
+        />
 
+        <meta property="og:type" content="website" />
+        <meta property="twitter:card" content="summary_large_image" />
+
+        <meta name="robots" content="index, follow" />
+
+        <meta name="twitter:title" content="Chonks.xyz" />
+        <meta
+          name="twitter:description"
+          content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
+        />
+        <meta
+          name="twitter:image"
+          content={`${
+            process.env.NODE_ENV === "development"
+              ? "http://localhost:3000"
+              : "https://www.chonks.xyz"
+          }/api/og-trait?id=${id}`}
+        />
+        <meta property="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@Chonksxyz" />
+
+        <meta property="og:type" content="website" />
         <meta
           property="og:url"
           content={`https://chonks.xyz/market/traits/${id}`}

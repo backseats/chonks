@@ -54,7 +54,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     svg = svg.replace(/shape-rendering=["']crispEdges["']/g, '');
 
     const pngBuffer = await sharp(Buffer.from(svg), { density: 300 })
-      .resize(1200, 1200, {
+      .resize(12000, 12000, {
         fit: "fill",
         background: { r: 0, g: 0, b: 0, alpha: 0 },
       })

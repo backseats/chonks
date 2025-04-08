@@ -525,6 +525,7 @@ export default function ChonkDetail({ id }: { id: string }) {
           content={`View Chonk #${id} on Chonks.xyz`}
         />
         <meta property="og:type" content="website" />
+
         <meta name="twitter:title" content="Chonks.xyz" />
         <meta
           name="twitter:description"
