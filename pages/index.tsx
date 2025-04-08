@@ -194,7 +194,22 @@ export default function Home() {
     <>
       <Head>
         <title>CHONKS - Chonkie Characters Onchain</title>
-        <meta name="description" content="Welcome to my homepage" />
+        <meta name="description" content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base" />
+        <meta
+          property="og:image"
+          content="https://www.chonks.xyz/marka/marka-chonk.png"
+        />
+        <meta content="720" property="og:image:width" />
+        <meta content="720" property="og:image:height" />
+        <meta property="og:title" content="CHONKS - Chonkie Characters Onchain" />
+        <meta
+          property="og:url"
+          content={`https://www.chonks.xyz`}
+        />
+        <meta
+          property="og:description"
+          content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
+        />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
