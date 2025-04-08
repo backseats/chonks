@@ -8,6 +8,22 @@ export const config = {
   runtime: "edge",
 };
 
+const convertSvgToPng = async (svgDataUri: string) => {
+  const svgText = Buffer.from(svgDataUri.split(",")[1], "base64").toString("utf-8");
+
+  const res = await fetch(`https://www.chonks.xyz/api/convert`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "image/svg+xml",
+    },
+    body: svgText,
+  });
+
+  if (!res.ok) throw new Error("SVG to PNG conversion failed");
+
+  return await res.arrayBuffer(); // PNG buffer
+};
+
 export default async function handler(req: NextRequest) {
   const chains = edgeConfig.chains;
   const transports = edgeConfig.transports;
@@ -38,7 +54,7 @@ export default async function handler(req: NextRequest) {
       args: [chonkId],
     })) as string;
 
-    console.log("Received data string:", dataString.substring(0, 100) + "...");
+    // console.log("Received data string:", dataString.substring(0, 100) + "...");
 
     // Process response data
     let imageUrl = "";
@@ -65,33 +81,55 @@ export default async function handler(req: NextRequest) {
     // Since we need to return an image directly, we'll use the imageUrl if we have it
     if (imageUrl) {
       // If the image URL is a data URI, we can extract and return its content
-      if (imageUrl.startsWith("data:image/")) {
-        const [, format, base64Data] =
-          imageUrl.match(/^data:image\/(\w+);base64,(.*)$/) || [];
+      // if (imageUrl.startsWith("data:image/")) {
+      //   const [, format, base64Data] =
+      //     imageUrl.match(/^data:image\/(\w+);base64,(.*)$/) || [];
 
-        if (format && base64Data) {
-          const binaryData = Buffer.from(base64Data, "base64");
-          return new Response(binaryData, {
-            headers: {
-              "Content-Type": `image/${format}`,
-              "Cache-Control": "public, max-age=60, s-maxage=60",
-            },
-          });
-        }
-      }
+      //   if (format && base64Data) {
+      //     // Decode base64 string using atob and convert to Uint8Array for edge compatibility
+      //     const decodedString = atob(base64Data);
+      //     const binaryData = new Uint8Array(decodedString.length);
+      //     for (let i = 0; i < decodedString.length; i++) {
+      //       binaryData[i] = decodedString.charCodeAt(i);
+      //     }
+
+      //     return new Response(binaryData.buffer, { // Return ArrayBuffer
+      //       headers: {
+      //         "Content-Type": `image/${format}`,
+      //         "Cache-Control": "public, max-age=60, s-maxage=60",
+      //       },
+      //     });
+      //   }
+      // }
 
       // If it's an external URL, fetch and return it
       try {
-        const response = await fetch(imageUrl);
-        const imageData = await response.arrayBuffer();
-        const contentType = response.headers.get("Content-Type") || "image/png";
 
-        return new Response(imageData, {
+        // svg output....
+        // const response = await fetch(imageUrl);
+        // const imageData = await response.arrayBuffer();
+        // const contentType = response.headers.get("Content-Type") || "image/png";
+
+        // return new Response(imageData, {
+        //   headers: {
+        //     "Content-Type": contentType,
+        //     "Cache-Control": "public, max-age=60, s-maxage=60",
+        //   },
+        // });
+
+
+        // png output....
+        const pngBuffer = await convertSvgToPng(imageUrl);
+
+        return new Response(pngBuffer, {
           headers: {
-            "Content-Type": contentType,
+            "Content-Type": "image/png",
             "Cache-Control": "public, max-age=60, s-maxage=60",
           },
         });
+
+
+
       } catch (error) {
         console.error("Error fetching image from URL:", error);
       }
