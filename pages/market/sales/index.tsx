@@ -57,7 +57,7 @@ export default function Sales() {
         const chonkSales =
           chonkResponse.data.chonkTransactionHistories.items.map(
             (item: any): Sale => ({
-              id: item.id,
+              id: item.chonkId,
               txType: item.txType,
               txHash: item.txHash,
               to: item.to,
@@ -75,7 +75,7 @@ export default function Sales() {
         const traitSales =
           traitResponse.data.traitTransactionHistories.items.map(
             (item: any): Sale => ({
-              id: item.id,
+              id: item.trait.id,
               txType: item.txType,
               txHash: item.txHash,
               to: item.to,
@@ -90,6 +90,8 @@ export default function Sales() {
               traitMetadata: item.trait,
             })
           );
+
+        // debugger;
 
         const combinedSales = [...chonkSales, ...traitSales].sort(
           (a: Sale, b: Sale) =>
@@ -182,7 +184,7 @@ export default function Sales() {
             Sales
           </h1>
 
-          <div className="grid grid-cols-3 lg:grid-cols-8 gap-4 p-4 sm:px-[3.45vw] mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-4 p-4 sm:px-[3.45vw] mt-4">
             {/* Example listing items - replace with actual data */}
             {sales.map((item: Sale) => (
               <Link key={item.id} href={`/market/${item.type}s/${item.id}`}>
