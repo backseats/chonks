@@ -26,6 +26,31 @@ export const TRAIT_LISTINGS = gql`
   }
 `;
 
+export const GET_TRAIT_LISTINGS_BY_NAME = gql`
+query TraitListingsByName($traitName: String!) {
+    traitListings(where: {isActive: true, traitMetadata_: {traitName: $traitName}}) {
+      items {
+        id
+        listingTime
+        listingTxHash
+        price
+        seller
+        sellerTBA
+        traitMetadata {
+          colorMap
+          traitName
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+        hasPreviousPage
+        startCursor
+      }
+    }
+  }
+`;
+
 // used on /market/chonks
 export const GET_CHONK_LISTINGS = gql`
 query chonkListings {
@@ -345,4 +370,62 @@ query TraitRecentSales {
     }
   }
 }
+`;
+
+export const GET_TRAIT_COUNTS = gql`
+query TraitCounts {
+  traitNameCounts(limit: 1000) {
+    items {
+    count
+    traitCategory
+    id
+    }
+  }
+}
+`;
+
+// Maybe this should return all the
+export const GET_TRAIT_BY_NAME = gql`
+query TraitCounts($traitName: String!) {
+  traitNameCounts(where: {id: $traitName}) {
+    items {
+      count
+      id
+      traitCategory
+    }
+  }
+}
+`;
+
+// How do i get more than that?. why not paginating?
+export const GET_TRAITS_BY_NAME = gql`
+query TraitMetadataById($traitName: String!) {
+  traitMetadata(where: { traitName: $traitName } limit: 1000) {
+    items {
+      id
+      traitName
+      traitType
+      colorMap
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+      hasPreviousPage
+      startCursor
+    }
+  }
+}
+`;
+
+export const GET_TRAITS_BY_CATEGORY = gql`
+  query TraitMetadataById($traitType: Int!) {
+    traitMetadata(where: { traitType: $traitType }) {
+      items {
+        id
+        traitType
+        traitName
+        colorMap
+      }
+    }
+  }
 `;
