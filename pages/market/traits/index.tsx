@@ -140,6 +140,36 @@ export default function TraitsMarketplace() {
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
         />
+        <meta
+          property="og:image"
+          content="https://www.chonks.xyz/marka/marka-chonk.png"
+        />
+        <meta content="720" property="og:image:width" />
+        <meta content="720" property="og:image:height" />
+        <meta
+          property="og:title"
+          content="Traits Market | Chonks"
+        />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://www.chonks.xyz/market/traits`} />
+        <meta
+          property="og:description"
+          content="Traits Market | Chonks"
+        />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@Chonksxyz" />
+        <meta
+          name="twitter:title"
+          content="Traits Market | Chonks"
+        />
+        <meta
+          name="twitter:description"
+          content="Traits Market | Chonks"
+        />
+        <meta
+          name="twitter:image"
+          content="https://www.chonks.xyz/marka/marka-chonk.png"
+        />
         <link rel="icon" href="/favicon.ico" />
         <link
           rel="apple-touch-icon"
