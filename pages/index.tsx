@@ -200,7 +200,7 @@ export default function Home() {
         />
         <meta
           property="og:image"
-          content="https://www.chonks.xyz/marka/marka-chonk.png"
+          content="https://www.chonks.xyz/chonks/chonk-naked.png"
         />
         <meta content="720" property="og:image:width" />
         <meta content="720" property="og:image:height" />
@@ -226,7 +226,7 @@ export default function Home() {
         />
         <meta
           name="twitter:image"
-          content="https://www.chonks.xyz/marka/marka-chonk.png"
+          content="https://www.chonks.xyz/chonks/chonk-naked.png"
         />
         <meta
           name="viewport"

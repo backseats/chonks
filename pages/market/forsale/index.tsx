@@ -139,6 +139,16 @@ export default function ForSale() {
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
         />
+        <meta property="og:image" content="https://www.chonks.xyz/chonks/chonk-naked.png" />
+        <meta property="og:title" content="For Sale | Chonks" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://www.chonks.xyz/market/traits`} />
+        <meta property="og:description" content="For Sale | Chonks"/>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@Chonksxyz" />
+        <meta name="twitter:title" content="For Sale | Chonkss"/>
+        <meta name="twitter:description" content="For Sale  Chonks"/>
+        <meta name="twitter:image" content="https://www.chonks.xyz/chonks/chonk-naked.png" />
         <link rel="icon" href="/favicon.ico" />
         <link
           rel="apple-touch-icon"

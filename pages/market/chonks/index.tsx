@@ -141,9 +141,18 @@ export default function ChonksMarketplace() {
       <Head>
         <title>Chonks Market | Chonks</title>
         <meta name="description" content="Chonks Market | Chonks" />
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+        />
+        <meta property="og:image" content="https://www.chonks.xyz/chonks/chonk-naked.png" />
+        <meta property="og:title" content="Chonks Market | Chonks" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://www.chonks.xyz/market/chonks`} />
+        <meta property="og:description" content="Chonks Market | Chonks"/>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@Chonksxyz" />
+        <meta name="twitter:title" content="Chonks Market | Chonkss"/>
+        <meta name="twitter:description" content="Chonks Market | Chonks"/>
+        <meta name="twitter:image" content="https://www.chonks.xyz/chonks/chonk-naked.png"
         />
         <link rel="icon" href="/favicon.ico" />
         <link
