@@ -116,15 +116,15 @@ export default function Trait(props: Props) {
 
         {isYours ? (
           <button
-            className={buttonClass}
+            className={`${buttonClass} z-10`}
             onClick={
               isRevealed ? (isEquipped ? handleUnequip : handleEquip) : () => {}
             }
-            disabled={!isRevealed || (isEquipped && traitInfo.traitName == "")}
+            disabled={!isRevealed || (isEquipped && !traitInfo.traitName)}
           >
             <span
               className={
-                (isEquipped && traitInfo.traitName == "") || !isRevealed
+                (isEquipped && !traitInfo.traitName) || !isRevealed
                   ? "opacity-50"
                   : ""
               }
@@ -140,7 +140,7 @@ export default function Trait(props: Props) {
           <button className={buttonClass} onClick={() => {}}>
             <span
               className={
-                (isEquipped && traitInfo.traitName == "") || !isRevealed
+                (isEquipped && !traitInfo.traitName) || !isRevealed
                   ? "opacity-50"
                   : ""
               }
