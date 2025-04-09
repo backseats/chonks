@@ -364,7 +364,11 @@ export default function TraitDetail({ id }: { id: string }) {
             <>
               <div className="hidden sm:flex sm:flex-row sm:gap-[3.45vw] sm:py-[1.725vw] sm:px-[3.45vw]">
                 <div className="w-2/5 h-fit">
-                  <ChonkRenderer bytes={traitMetadata.colorMap.slice(2)} />
+                  <ChonkRenderer
+                    bytes={traitMetadata.colorMap.slice(2)}
+                    bodyIndex={1}
+                    opacity={0.6}
+                  />
                 </div>
 
                 <div className="w-3/5">
@@ -405,7 +409,11 @@ export default function TraitDetail({ id }: { id: string }) {
                 </h1>
 
                 <div className="w-full h-auto p-4">
-                  <ChonkRenderer bytes={traitMetadata.colorMap.slice(2)} />
+                  <ChonkRenderer
+                    bytes={traitMetadata.colorMap.slice(2)}
+                    bodyIndex={1}
+                    opacity={0.6}
+                  />
                 </div>
 
                 <OwnershipSection
