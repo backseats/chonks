@@ -22,13 +22,13 @@ export default function Actions({
   return (
     <section className="actions flex flex-col bg-white py-[1.725vw] px-[3.45vw]">
       <div className="flex justify-between items-center mb-4">
-        <button
+        {/* <button
           // onClick={() => setIsSidebarVisible(!isSidebarVisible)}
           onClick={() => {}} // temp disabled
           className="flex items-center gap-2 px-4 py-2 border border-black hover:bg-gray-100"
         >
           <VscListFilter />
-        </button>
+        </button> */}
 
         <div className="flex items-center gap-4">
           {/* <div className="relative">
