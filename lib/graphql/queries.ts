@@ -378,7 +378,7 @@ query TraitCounts {
     items {
     count
     traitCategory
-    id
+    traitName: id
     }
   }
 }

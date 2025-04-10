@@ -8,7 +8,6 @@ interface TraitCount {
   count: number;
   traitName: string;
   traitCategory: string;
-  id: string;
 }
 
 interface TraitsProps {
@@ -32,12 +31,12 @@ export default function Traits({ traitsByCategory, categories }: TraitsProps) {
             <h2 className="text-xl font-semibold mb-4">{category}</h2>
             <ul>
               {traitsByCategory[category].map((trait) => (
-                <li key={trait.id} className="mb-2">
+                <li key={trait.traitName} className="mb-2">
                   <Link
                     className="underline"
-                    href={`/traits/${transformTraitName(trait.id)}`}
+                    href={`/traits/${transformTraitName(trait.traitName)}`}
                   >
-                    {trait.id}
+                    {trait.traitName}
                   </Link>{" "}
                   - Count: {trait.count}
                 </li>
@@ -75,8 +74,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
       if (!traitsByCategory[category]) {
         traitsByCategory[category] = [];
       }
+      // console.log("trait", trait);
       traitsByCategory[category].push({
-        ...trait,
+        count: trait.count,
+        traitName: trait.traitName,
         traitCategory: category,
       });
     });
