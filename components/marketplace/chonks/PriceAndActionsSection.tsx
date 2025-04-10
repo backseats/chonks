@@ -333,11 +333,11 @@ export default function PriceAndActionsSection({
                   disabled={Boolean(price && !accountBalanceIsEnough)}
                 />
 
-                {price && !accountBalanceIsEnough && (
+                {/* {price && !accountBalanceIsEnough && (
                   <div className="text-red-500 text-sm mt-1">
                     Please add more ETH to your account
                   </div>
-                )}
+                )} */}
 
                 <ActionButton
                   variant="primary"

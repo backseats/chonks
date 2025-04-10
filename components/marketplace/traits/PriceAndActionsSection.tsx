@@ -188,10 +188,19 @@ export default function PriceAndActionsSection(
 
   // Calculate if balance is sufficient (price + estimated gas)
   const estimatedGasInEth = 0.0002; // Rough estimate // Deploy: check what this could be set to!?
-  const hasInsufficientBalance =
-    price &&
-    balance &&
-    balance.value < parseEther((price + estimatedGasInEth).toString());
+  // const hasInsufficientBalance =
+  //   price &&
+  //   balance &&
+  //   balance.value < parseEther((price + estimatedGasInEth).toString());
+
+  const accountBalanceIsEnough = useMemo(() => {
+    return (
+      balance &&
+      price &&
+      balance.value &&
+      balance.value > parseEther((price + estimatedGasInEth).toString())
+    );
+  }, [balance, price, estimatedGasInEth]);
 
   const { data: storedTrait } = useReadContract({
     address: traitsContract,
@@ -400,15 +409,16 @@ export default function PriceAndActionsSection(
             window.location.reload(); // TODO: probably a better refetch here
             setError(null);
           }}
+          disabled={Boolean(price && !accountBalanceIsEnough)}
         />
       </div>
 
-      {hasInsufficientBalance && (
+      {/* {hasInsufficientBalance && (
         <ErrorDisplay
           error="Your ETH balance is too low to buy this Trait."
           className="mt-2"
         />
-      )}
+      )} */}
 
       {error && <ErrorDisplay error={error} className="mt-2" />}
 
