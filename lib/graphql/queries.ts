@@ -384,6 +384,16 @@ query TraitCounts {
 }
 `;
 
+export const GET_TRAIT_COUNT = gql`
+query TraitCount($traitName: String!) {
+  traitNameCounts(where: {id: $traitName}) {
+    items {
+      count
+    }
+  }
+}
+`;
+
 // Maybe this should return all the
 export const GET_TRAIT_BY_NAME = gql`
 query TraitCounts($traitName: String!) {
@@ -412,6 +422,28 @@ query TraitMetadataById($traitName: String!) {
       hasNextPage
       hasPreviousPage
       startCursor
+    }
+  }
+}
+`;
+
+export const GET_TRAIT_COLORMAP_BY_NAME = gql`
+query TraitMetadataById($traitName: String!) {
+  traitMetadata(where: { traitName: $traitName } limit: 1) {
+    items {
+      colorMap
+    }
+  }
+}
+`;
+
+export const GET_TRAIT_COLORMAPS_BY_NAMES = gql`
+query TraitMetadataById($traitNames: [String!]!) {
+  traitMetadata(where: { traitName_in: $traitNames }) {
+    items {
+        traitName
+        traitIndex
+        colorMap
     }
   }
 }
