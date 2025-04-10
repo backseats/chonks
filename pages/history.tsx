@@ -25,26 +25,26 @@ export default function History() {
     const fetchChonkHistory = async () => {
       const response = await client.query({
         query: GET_CHONK_HISTORY,
-        variables: { id: "1" },
+        variables: { id: "83202" },
       });
 
       if (!response.data) return;
 
       const transactions = response.data.chonk.transactions.items;
 
-      // // Loop through transactions and log the transaction type
-      // if (transactions && transactions.length > 0) {
-      //   transactions.forEach((transaction: any) => {
-      //     console.log("Transaction Type:", transaction.txType);
-      //     console.log("Transaction Time:", transaction.txType);
-      //     // Convert Unix timestamp to readable date
-      //     const date = new Date(transaction.time * 1000);
-      //     console.log("Transaction Date:", date.toLocaleString());
-      //     console.log("");
-      //   });
-      // } else {
-      //   console.log("No transactions found");
-      // }
+      // Loop through transactions and log the transaction type
+      if (transactions && transactions.length > 0) {
+        transactions.forEach((transaction: any) => {
+          console.log("Transaction Type:", transaction.txType);
+          console.log("Transaction Time:", transaction.time);
+          // Convert Unix timestamp to readable date
+          const date = new Date(transaction.time * 1000);
+          console.log("Transaction Date:", date.toLocaleString());
+          console.log("");
+        });
+      } else {
+        console.log("No transactions found");
+      }
 
       setChonkHistory(transactions);
       // debugger;

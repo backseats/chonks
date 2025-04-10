@@ -83,7 +83,8 @@ export default function ActivityAndOffersSection({
           </svg>
         </div>
 
-        {isOffersOpen && (
+        {/* isOffersOpen */}
+        {true && (
           <div className="mt-[1.725vw] overflow-x-auto">
             <table className="w-full text-[0.8vw]">
               <thead>
@@ -214,7 +215,8 @@ export default function ActivityAndOffersSection({
           </svg>
         </div>
 
-        {isActivityOpen && (
+        {/* isActivityOpen */}
+        {true && (
           <div className="mt-[1.725vw] overflow-x-auto">
             <table className="w-full text-[0.8vw]">
               <thead>

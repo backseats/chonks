@@ -16,12 +16,15 @@ import { StoredChonk } from "@/types/StoredChonk";
 import { Category } from "@/types/Category";
 import OwnershipSection from "@/components/marketplace/chonks/OwnershipSection";
 import TraitsSection from "@/components/marketplace/TraitsSection";
-// import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
+// import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection'; // OLD simplehash usePublicClient endpoints
+import ActivitySection from '@/components/marketplace/chonks/ActivitySection';
 import PriceAndActionsSection from "@/components/marketplace/chonks/PriceAndActionsSection";
 import { CurrentChonk } from "@/types/CurrentChonk";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
 import Loading from "@/components/marketplace/Loading";
 import Link from "next/link";
+import { IoArrowBackOutline } from "react-icons/io5";
+
 
 // type ChonkOffer = {
 //     priceInWei: bigint;
@@ -158,7 +161,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId,
   });
 
-  // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
+  // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
     address: traitsContract,
     abi: traitsABI,
@@ -342,6 +345,13 @@ export default function ChonkDetail({ id }: { id: string }) {
         <main className="w-full border-t border-gray-300">
           {tokenData ? (
             <>
+
+              <div className="hidden sm:block sm:pt-[0.69vw] sm:px-[3.45vw] ">
+                <Link href="/market/chonks" className="text-sm hover:underline inline-flex items-center">
+                  <IoArrowBackOutline className="mr-2" /> View All Listed Chonks
+                </Link>
+              </div>
+
               <div className="hidden sm:flex sm:flex-row sm:gap-[3.45vw] sm:py-[1.725vw] sm:px-[3.45vw]">
                 <div className="w-2/5 h-fit">
                   <img
@@ -390,14 +400,19 @@ export default function ChonkDetail({ id }: { id: string }) {
                   />
 
                   {/* <ActivityAndOffersSection
-                          isActivityOpen={isActivityOpen}
-                          setIsActivityOpen={setIsActivityOpen}
-                          isOffersOpen={isOffersOpen}
-                          setIsOffersOpen={setIsOffersOpen}
+                          // isActivityOpen={isActivityOpen}
+                          // setIsActivityOpen={setIsActivityOpen}
+                          // isOffersOpen={isOffersOpen}
+                          // setIsOffersOpen={setIsOffersOpen}
                           type="chonk"
                           tokenId={id}
                           address={address}
                       /> */}
+
+                  <ActivitySection
+                    tokenId={id}
+                    address={address}
+                  />
                 </div>
               </div>
 

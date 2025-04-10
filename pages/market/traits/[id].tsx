@@ -20,6 +20,8 @@ import { TraitMetadata, TraitMetadataResponse } from "@/types/TraitMetadata";
 import { GET_TRAIT_METADATA_BY_ID } from "@/lib/graphql/queries";
 import client from "@/lib/apollo-client";
 import ChonkRenderer from "@/components/ChonkRenderer";
+import Link from "next/link";
+import { IoArrowBackOutline } from "react-icons/io5";
 
 export default function TraitDetail({ id }: { id: string }) {
   // const router = useRouter()
@@ -362,6 +364,13 @@ export default function TraitDetail({ id }: { id: string }) {
         <main className="w-full border-t border-gray-300">
           {traitMetadata ? (
             <>
+
+              <div className="hidden sm:block sm:pt-[0.69vw] sm:px-[3.45vw] ">
+                <Link href="/market/traits" className="text-sm hover:underline inline-flex items-center">
+                  <IoArrowBackOutline className="mr-2" /> View All Listed Traits
+                </Link>
+              </div>
+
               <div className="hidden sm:flex sm:flex-row sm:gap-[3.45vw] sm:py-[1.725vw] sm:px-[3.45vw]">
                 <div className="w-2/5 h-fit">
                   <ChonkRenderer
