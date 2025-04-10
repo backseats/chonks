@@ -17,7 +17,7 @@ export const traitsContract = "0x74D8725A65C21251A83f6647aa23140Bd80504b1";
 // 0xf127467f1e94593b1606bf0da3d08e3c15b2b291 old marketplace contract
 export const marketplaceContract = "0x6d00a9A2a0C6B5499d56bd4c9005663C88a544a6";
 
-export const colorMapContract = "0x92BC112321E1EEd44C7CdB802ED727Ef2a9864Cd";
+export const colorMapContract = "0x03C977338100ac0B2C0D40F0b61238B76Ef94C4d";
 
 export const bulkTraitTransferContract = "0xEf6cA22D4e55F0c60ACdB2269463fC261Df95bf3";
 
