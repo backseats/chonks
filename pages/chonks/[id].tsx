@@ -505,7 +505,7 @@ export default function ChonkDetail({ id }: { id: string }) {
     <>
       <Head>
         <title>{`Chonk #${id} Explorer`}</title>
-        <meta name="description" content={`Chonk #${id} Explorer - Chonks`} />
+        <meta name="description" content={`Chonk #${id} Explorer | Chonks`} />
 
         <meta
           property="og:image"

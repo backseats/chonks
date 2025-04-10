@@ -11,7 +11,10 @@ export default function ThreeD() {
     <>
       <Head>
         <title>Export a 3D Chonk - Chonks</title>
-        <meta name="description" content="Welcome to my homepage" />
+        <meta
+          name="description"
+          content="Chonks is a PFP project, customizable with swappable traits, fully onchain on Base"
+        />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"

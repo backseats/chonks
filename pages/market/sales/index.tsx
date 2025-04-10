@@ -91,8 +91,6 @@ export default function Sales() {
             })
           );
 
-        // debugger;
-
         const combinedSales = [...chonkSales, ...traitSales].sort(
           (a: Sale, b: Sale) =>
             new Date(Number(b.time)).getTime() -
