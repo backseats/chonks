@@ -2,28 +2,27 @@ import { gql } from '@apollo/client';
 
 // used on /market/traits
 export const TRAIT_LISTINGS = gql`
-  query chonkListings {
-    traitListings(where: {isActive: true}) {
-      items {
-        id
-        listingTime
-        listingTxHash
-        price
-        seller
-        sellerTBA
-        traitMetadata {
-          colorMap
-          traitName
-        }
-      }
-      pageInfo {
-        endCursor
-        hasNextPage
-        hasPreviousPage
-        startCursor
+  query chonksListings {
+  traitListings(
+    where: {isActive: true}
+    orderBy: "price"
+    orderDirection: "asc"
+    limit: 1000
+  ) {
+    items {
+      id
+      listingTime
+      listingTxHash
+      price
+      seller
+      sellerTBA
+      traitMetadata {
+        colorMap
+        traitName
       }
     }
   }
+}
 `;
 
 export const GET_TRAIT_LISTINGS_BY_NAME = gql`
