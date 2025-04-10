@@ -27,7 +27,8 @@ contract ChonkColorMap {
     function getColorMapForChonk(uint256 _chonkId) public view returns (bytes memory) {
         IChonkStorage.StoredChonk memory storedChonk = CHONKS_MAIN.getChonk(_chonkId);
 
-        uint256[7] memory tokenIds = [storedChonk.headId, storedChonk.hairId, storedChonk.faceId, storedChonk.accessoryId, storedChonk.topId, storedChonk.bottomId, storedChonk.shoesId];
+        uint256[7] memory tokenIds = [storedChonk.shoesId, storedChonk.bottomId, storedChonk.topId, storedChonk.hairId, storedChonk.faceId, storedChonk.headId, storedChonk.accessoryId
+    ];
 
         bytes memory colorMap;
         for (uint256 i; i < tokenIds.length; ++i) {
