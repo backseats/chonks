@@ -53,8 +53,6 @@ export default function TraitsSection({
     [equippedTraits]
   );
 
-  console.log("equippedTraitIds", equippedTraitIds);
-
   useEffect(() => {
     if (!tokenData) return;
 
@@ -64,7 +62,6 @@ export default function TraitsSection({
         variables: { id: BigInt(chonkId).toString() },
       });
 
-      console.log("GraphQL traits result:", response);
       const traits = response.data.chonk.tbas.items[0].traits?.items;
 
       if (traits) {

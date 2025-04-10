@@ -267,7 +267,7 @@ export default function ChonkDetail({ id }: { id: string }) {
 
         <meta
           name="description"
-          content="View Chonk #${id} on the Chonks Market"
+          content={`View Chonk #${id} on the Chonks Market`}
         />
         <meta property="og:title" content={`Chonk #${id} - Market - Chonks`} />
         <meta
@@ -312,7 +312,6 @@ export default function ChonkDetail({ id }: { id: string }) {
         />
         <meta property="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Chonksxyz" />
-
 
         <meta
           name="viewport"

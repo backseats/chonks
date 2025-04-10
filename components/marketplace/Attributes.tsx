@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   traitsABI,
@@ -10,6 +10,8 @@ import {
 import { useReadContract } from "wagmi";
 import ChonkRenderer from "../ChonkRenderer";
 import { getCategoryString } from "@/types/Category";
+import { GET_TRAIT_COUNT } from "@/lib/graphql/queries";
+import client from "@/lib/apollo-client";
 
 // Later we can add floor prices here for other stuff
 {
@@ -82,6 +84,34 @@ const Attribute = ({
   const colorMap = data ? data.toString().substring(2) : null;
 
   const [showPreview, setShowPreview] = useState(false);
+  const [traitCount, setTraitCount] = useState(null);
+
+  useEffect(() => {
+    // TODO handle things like Pants Black/Navy/Yellow Check
+    const transformTraitName = (traitName: string) => {
+      return traitName
+        .split("-")
+        .map((word) =>
+          word.toLowerCase() === "and"
+            ? "and"
+            : word.charAt(0).toUpperCase() + word.slice(1)
+        )
+        .join(" ");
+    };
+
+    const fetchTraitCount = async () => {
+      const { data } = await client.query({
+        query: GET_TRAIT_COUNT,
+        variables: { traitName: transformTraitName(value) },
+      });
+
+      if (data.traitNameCounts) {
+        setTraitCount(data.traitNameCounts.items[0].count);
+      }
+    };
+
+    fetchTraitCount();
+  }, []);
 
   return (
     <div
@@ -106,6 +136,7 @@ const Attribute = ({
       >
         {value}
       </Link>
+      {traitCount ? ` (${traitCount})` : ""}
 
       {showPreview && colorMap && (
         <div
