@@ -275,6 +275,12 @@ export default function PriceAndActionsSection(
 
     if (offerAmount) {
       const offerAmountNum = Number(offerAmount);
+
+      if (balance && offerAmountNum > Number(formatEther(balance.value))) {
+        setPriceError("Please add more ETH to your account");
+        isValid = false;
+      }
+
       if (offerAmountNum < Number(MIN_LISTING_PRICE)) {
         setPriceError(`Minimum Offer is ${MIN_LISTING_PRICE} ETH`);
         setOfferAmount(MIN_LISTING_PRICE);
@@ -749,6 +755,7 @@ export default function PriceAndActionsSection(
           functionName="bidOnTrait"
           inFlightLabel="Creating Bid..."
           setError={setError}
+          balance={balance?.value}
         />
       </ModalWrapper>
     </>

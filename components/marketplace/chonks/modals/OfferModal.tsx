@@ -30,6 +30,7 @@ interface OfferModalProps {
   value: bigint;
   functionName: string;
   inFlightLabel: string;
+  balance: bigint | undefined;
   setOfferAmount: (amount: string) => void;
   onClose: () => void;
   setSelectedChonkId?: (chonkId: string) => void;
@@ -61,6 +62,7 @@ export const OfferModal = ({
   validateBid,
   onSuccess,
   setError,
+  balance,
 }: OfferModalProps) => {
   const [isSimulating, setIsSimulating] = useState(false);
   const [bottomError, setBottomError] = useState<string | null>(null);
@@ -174,8 +176,21 @@ export const OfferModal = ({
       isValid = false;
     }
 
+    if (balance && offerAmountNum > Number(balance)) {
+      debugger;
+      setError("Insufficient balance");
+      isValid = false;
+    }
+
     return isValid;
-  }, [offerAmount, minimumOffer, hasActiveBid, selectedChonkId, setError]);
+  }, [
+    offerAmount,
+    minimumOffer,
+    hasActiveBid,
+    selectedChonkId,
+    setError,
+    balance,
+  ]);
 
   const priceInWei = useMemo(() => {
     try {

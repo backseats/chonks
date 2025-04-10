@@ -133,10 +133,6 @@ export default function PriceAndActionsSection({
 
   // Calculate if balance is sufficient (price + estimated gas)
   const estimatedGasInEth = 0.0002; // Rough estimate // Deploy: check what this could be set to!?
-  const hasInsufficientBalance =
-    price &&
-    balance &&
-    balance.value < parseEther((price + estimatedGasInEth).toString());
 
   const handleModalClose = useCallback(() => {
     setIsModalOpen(false);
@@ -191,6 +187,15 @@ export default function PriceAndActionsSection({
     recipientAddress,
   ]);
 
+  const accountBalanceIsEnough = useMemo(() => {
+    return (
+      balance &&
+      price &&
+      balance.value &&
+      balance.value > parseEther((price + estimatedGasInEth).toString())
+    );
+  }, [balance, price, estimatedGasInEth]);
+
   const validateBid = useCallback(() => {
     let isValid = true;
 
@@ -206,6 +211,12 @@ export default function PriceAndActionsSection({
 
     if (offerAmount) {
       const offerAmountNum = Number(offerAmount);
+
+      if (balance && offerAmountNum > Number(formatEther(balance.value))) {
+        setPriceError("Please add more ETH to your account");
+        isValid = false;
+      }
+
       if (offerAmountNum < Number(MIN_LISTING_PRICE)) {
         setPriceError(`Minimum Offer is ${MIN_LISTING_PRICE} ETH`);
         setOfferAmount(MIN_LISTING_PRICE);
@@ -319,9 +330,16 @@ export default function PriceAndActionsSection({
                     refetchOwner();
                     refetchChonkListing();
                   }}
+                  disabled={Boolean(price && !accountBalanceIsEnough)}
                 />
 
-                {/* <ActionButton
+                {price && !accountBalanceIsEnough && (
+                  <div className="text-red-500 text-sm mt-1">
+                    Please add more ETH to your account
+                  </div>
+                )}
+
+                <ActionButton
                   variant="primary"
                   onClick={() => {
                     setOfferAmount("");
@@ -330,7 +348,6 @@ export default function PriceAndActionsSection({
                 >
                   Make an Offer
                 </ActionButton>
-                */}
 
                 <ErrorDisplay error={error} />
               </div>
@@ -510,6 +527,7 @@ export default function PriceAndActionsSection({
           value={parseEther(offerAmount)}
           validateBid={validateBid}
           setError={setError}
+          balance={balance?.value}
         />
       </ModalWrapper>
     </>

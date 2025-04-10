@@ -27,8 +27,10 @@ type TransactionButtonProps = {
   setError: (e: string | null) => void;
   reset: () => void;
   setIsCancelingOffer?: (isCancelingOffer: boolean) => void;
+  disabled?: boolean;
 };
 
+// TODO: add disabled state
 function TransactionButton(props: TransactionButtonProps) {
   const {
     buttonStyle,
@@ -43,6 +45,7 @@ function TransactionButton(props: TransactionButtonProps) {
     setError,
     reset,
     setIsCancelingOffer,
+    disabled,
   } = props;
 
   const [isSimulating, setIsSimulating] = useState(false);
@@ -139,8 +142,8 @@ function TransactionButton(props: TransactionButtonProps) {
   };
 
   const isDisabled = useMemo(() => {
-    return isSimulating || isWriteContractPending || isWaiting;
-  }, [isSimulating, isWriteContractPending, isWaiting]);
+    return isSimulating || isWriteContractPending || isWaiting || disabled;
+  }, [isSimulating, isWriteContractPending, isWaiting, disabled]);
 
   const buttonLabel = useMemo(() => {
     if (isSimulating) return label;
