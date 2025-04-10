@@ -48,7 +48,7 @@ export default function ActivityAndOffersSection({
     const fetchChonkHistory = async () => {
       const response = await client.query({
         query: GET_CHONK_HISTORY,
-        variables: { id: "83202" },
+        variables: { id: tokenId },
       });
 
       if (!response.data) return;
