@@ -1,8 +1,15 @@
+import { useEffect, useState } from "react";
 import client from "@/lib/apollo-client";
-import { GET_TRAIT_COUNTS } from "@/lib/graphql/queries";
+import {
+  GET_TRAIT_COUNTS,
+  GET_TRAIT_COLORMAPS_BY_NAMES,
+} from "@/lib/graphql/queries";
 import { GetServerSideProps } from "next";
 import { getCategoryString } from "@/types/Category";
 import Link from "next/link";
+import MenuBar from "@/components/MenuBar";
+import { TraitMetadata } from "@/types/TraitMetadata";
+import ChonkRenderer from "@/components/ChonkRenderer";
 
 interface TraitCount {
   count: number;
@@ -16,35 +23,111 @@ interface TraitsProps {
 }
 
 export default function Traits({ traitsByCategory, categories }: TraitsProps) {
+  const [traitColormaps, setTraitColormaps] = useState<
+    Record<string, Record<string, string>>
+  >({});
+
   // This function transforms trait names by replacing underscores and spaces with hyphens
   // Used for URL-friendly paths when linking to individual trait pages
   const transformTraitName = (traitName: string) => {
     return traitName.toLowerCase().replace(/[_\s]/g, "-");
   };
 
+  useEffect(() => {
+    const fetchTraitColormaps = async (
+      category: string,
+      traitNames: string[]
+    ) => {
+      if (!traitNames.length) return;
+
+      try {
+        const { data } = await client.query({
+          query: GET_TRAIT_COLORMAPS_BY_NAMES,
+          variables: { traitNames },
+        });
+
+        if (data?.traitMetadata?.items) {
+          const categoryColormaps: Record<string, string> = {};
+
+          data.traitMetadata.items.forEach((item: any) => {
+            if (item.traitName && item.colorMap) {
+              categoryColormaps[item.traitName] = item.colorMap;
+            }
+          });
+
+          setTraitColormaps((prev) => ({
+            ...prev,
+            [category]: categoryColormaps,
+          }));
+        }
+      } catch (error) {
+        console.error(`Error fetching colormaps for ${category}:`, error);
+      }
+    };
+
+    Object.keys(traitsByCategory).forEach((category) => {
+      const traitNames =
+        traitsByCategory[category]?.map((trait: any) => {
+          return trait.traitName;
+        }) || [];
+
+      fetchTraitColormaps(category, traitNames);
+    });
+  }, [traitsByCategory]);
+
+  const getImage = (category: string, traitName: string) => {
+    const colorMap = traitColormaps[category]?.[traitName];
+    return (
+      <ChonkRenderer
+        bytes={colorMap?.slice(2) ?? ""}
+        bodyIndex={1}
+        opacity={0.6}
+      />
+    );
+  };
+
   return (
-    <div>
-      <h1 className="text-2xl font-bold p-8">Traits</h1>
-      <div className="px-8">
+    <div className="min-h-screen w-full text-black font-source-code-pro">
+      <MenuBar />
+
+      <main className="w-full border-t border-gray-300 ">
+        <h1 className="text-[22px] sm:text-[24px] font-weight-600 px-4 sm:px-[3.45vw] mt-4 mb-8">
+          Traits
+        </h1>
+
         {categories.map((category) => (
           <div key={category} className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">{category}</h2>
-            <ul>
+            <h2 className="text-xl font-semibold mb-4 sm:px-[3.45vw]">
+              {category}
+            </h2>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-4 p-4 sm:px-[3.45vw] mt-4">
               {traitsByCategory[category].map((trait) => (
-                <li key={trait.traitName} className="mb-2">
-                  <Link
-                    className="underline"
-                    href={`/traits/${transformTraitName(trait.traitName)}`}
-                  >
-                    {trait.traitName}
-                  </Link>{" "}
-                  - Count: {trait.count}
-                </li>
+                <>
+                  <Link href={`/traits/${transformTraitName(trait.traitName)}`}>
+                    <div
+                      key={trait.traitName}
+                      className="border border-gray-300 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                    >
+                      <div className="aspect-square bg-gray-100 relative">
+                        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                          {getImage(category, trait.traitName)}
+                        </div>
+                      </div>
+
+                      <div className="p-2 flex flex-col items-center">
+                        <span className="font-bold text-[14px]">
+                          {trait.traitName} ({trait.count})
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </>
               ))}
-            </ul>
+            </div>
           </div>
         ))}
-      </div>
+      </main>
     </div>
   );
 }
@@ -84,7 +167,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
     // Sort traits within each category by decreasing count
     Object.keys(traitsByCategory).forEach((category) => {
-      traitsByCategory[category].sort((a, b) => b.count - a.count);
+      traitsByCategory[category].sort((a, b) => a.count - b.count);
     });
 
     // Filter categories to only include those in our predefined order
