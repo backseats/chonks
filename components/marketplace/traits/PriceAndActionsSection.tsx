@@ -517,8 +517,11 @@ export default function PriceAndActionsSection(
               )}
 
               {hasActiveBid && traitBid && (
-                <div className="text-xl">
-                  Your Offer: {formatEther(traitBid.amountInWei)} ETH
+                <div className="text-[18px] mt-1">
+                  {traitBid.bidder === address
+                    ? `Your Offer: `
+                    : "Highest Bid:"}{" "}
+                  {formatEther(traitBid.amountInWei)} ETH
                 </div>
               )}
             </div>

@@ -261,8 +261,11 @@ export default function PriceAndActionsSection({
               )}
 
               {hasActiveBid && chonkBid && (
-                <div className="text-xl">
-                  Your Offer: {formatEther(chonkBid.amountInWei)} ETH
+                <div className="text-[18px] mt-1">
+                  {chonkBid.bidder === address
+                    ? `Your Offer: `
+                    : "Highest Bid:"}{" "}
+                  {formatEther(chonkBid.amountInWei)} ETH
                 </div>
               )}
             </div>
@@ -318,8 +321,7 @@ export default function PriceAndActionsSection({
                   }}
                 />
 
-                {
-                /* <ActionButton
+                {/* <ActionButton
                   variant="primary"
                   onClick={() => {
                     setOfferAmount("");

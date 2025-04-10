@@ -396,11 +396,9 @@ export default function ChonkDetail({ id }: { id: string }) {
 
                 <div className="w-3/5">
                   <MemoizedOwnershipSection {...ownershipSectionProps} />
-
                   <MemoizedPriceAndActionsSection
                     {...priceAndActionsSectionProps}
                   />
-
                   <MemoizedActivitySection tokenId={id} address={address} />
                 </div>
               </div>
@@ -419,13 +417,10 @@ export default function ChonkDetail({ id }: { id: string }) {
                 />
 
                 <MemoizedOwnershipSection {...ownershipSectionProps} />
-
                 <MemoizedPriceAndActionsSection
                   {...priceAndActionsSectionProps}
                 />
-
                 <MemoizedTraitsSection {...traitsSectionProps} />
-
                 <MemoizedActivitySection tokenId={id} address={address} />
               </div>
             </>
