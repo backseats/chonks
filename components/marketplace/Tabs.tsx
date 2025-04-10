@@ -8,7 +8,7 @@ interface TabsProps {
 
 export default function Tabs({ activeTab, onTabChange }: TabsProps) {
   const router = useRouter();
-  const tabs = ["Traits", "Chonks", "For Sale", "Sales"]; //, 'Offers', 'Activity'];
+  const tabs = ["Traits", "Chonks", "Recently Listed", "Sales"]; //, 'Offers', 'Activity'];
 
   const handleTabClick = (tab: string) => {
     onTabChange(tab);
@@ -21,7 +21,7 @@ export default function Tabs({ activeTab, onTabChange }: TabsProps) {
       case "Chonks":
         router.push("/market/chonks");
         break;
-      case "For Sale":
+      case "Recently Listed":
         router.push("/market/forsale");
         break;
       case "Sales":

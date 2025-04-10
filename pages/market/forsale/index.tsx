@@ -176,7 +176,7 @@ export default function ForSale() {
           <Tabs activeTab={activeTab} onTabChange={setActiveTab} />
 
           <h1 className="text-[22px] sm:text-[24px] font-weight-600 px-4 sm:px-[3.45vw] mt-4">
-            For Sale
+            Recently Listed
           </h1>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-4 p-4 sm:px-[3.45vw] mt-4">

@@ -465,6 +465,13 @@ export default function ChonkDetail({ id }: { id: string }) {
                   onToggleTraits={() => setIsTraitsOpen(!isTraitsOpen)}
                   type="chonk"
                 />
+
+                  <ActivitySection
+                    tokenId={id}
+                    address={address}
+                  />
+
+
               </div>
             </>
           ) : (

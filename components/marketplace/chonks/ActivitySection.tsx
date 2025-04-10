@@ -7,6 +7,7 @@ import {
   IoExitOutline,
   IoPricetagOutline,
   IoHandRightOutline,
+  IoArrowRedoOutline,
 } from "react-icons/io5";
 import { FaEthereum } from "react-icons/fa6";
 import { formatDistanceToNow } from "date-fns";
@@ -58,10 +59,13 @@ export default function ActivityAndOffersSection({
       // Loop through transactions and log the transaction type
       if (transactions && transactions.length > 0) {
         transactions.forEach((transaction: any) => {
+
           console.log("Transaction Type:", transaction.txType);
           console.log("Transaction Time:", transaction.time);
           console.log("Transaction From:", transaction.from);
           console.log("Transaction To:", transaction.to);
+          // Log the entire transaction object
+          console.log("Transaction Data:", transaction);
           // Convert Unix timestamp to readable date
           const date = new Date(transaction.time * 1000);
           console.log("Transaction Date:", date.toLocaleString());
@@ -98,7 +102,9 @@ export default function ActivityAndOffersSection({
         );
       case "ChonkTransferred":
         return (
-         "Transferred"
+          <>
+            <IoArrowRedoOutline className="mr-2" /><strong>Transfer</strong>
+          </>
         );
       case "ChonkOfferCreated":
         return (
@@ -141,13 +147,13 @@ export default function ActivityAndOffersSection({
 
   return (
     <>
-
-<div className="mt-[3.45vw] border border-black p-[1.725vw]">
+      {/* mx-4 sm:mx-0 mt-[1.725vw] pt-[1.725vw] */}
+      <div className="mx-4 sm:mx-0 mt-[3.45vw] border border-black p-[1.725vw]">
         <div
           className="flex items-center justify-between cursor-pointer"
           onClick={() => setIsActivityOpen(!isActivityOpen)}
         >
-          <h3 className="text-[1.2vw] font-bold">
+          <h3 className="text-xl font-bold">
             {/* Listings &amp; Bids {isEventsLoading && "(Loading...)"} */}
             Activity
           </h3>
@@ -170,14 +176,14 @@ export default function ActivityAndOffersSection({
 
         {isActivityOpen && (
           <div className="mt-[1.725vw] overflow-x-auto">
-            <table className="w-full text-[0.8vw]">
+            <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-2">Event</th>
-                  <th className="text-left py-2">Price</th>
-                  <th className="text-left py-2">From</th>
-                  <th className="text-left py-2">To</th>
-                  <th className="text-right py-2">Time</th>
+                <tr className="border-b border-gray-200 text-gray-500 uppercase">
+                  <th className="text-left py-2 font-normal">Event</th>
+                  <th className="text-left py-2 font-normal">Price</th>
+                  <th className="text-left py-2 font-normal">From</th>
+                  <th className="text-left py-2 font-normal">To</th>
+                  <th className="text-right py-2 font-normal">Time</th>
                 </tr>
               </thead>
               <tbody>
@@ -210,7 +216,9 @@ export default function ActivityAndOffersSection({
 
                     {/* From */}
                     <td className="py-2">
-                      {transaction.txType === "ChonkMinted" || transaction.txType === "ChonkTransferred" ? (
+                      {transaction.txType === "ChonkMinted"
+                      // || transaction.txType === "ChonkTransferred"
+                      ? (
                         <span>-</span>
                       ) : (
                         truncateEthAddress(transaction.from)
@@ -242,14 +250,17 @@ export default function ActivityAndOffersSection({
                           className="flex items-center justify-end hover:underline"
                         >
 
-                            {new Date(parseInt(transaction.time) * 1000).toLocaleDateString(
+                            {/* {new Date(parseInt(transaction.time) * 1000).toLocaleDateString(
                               "en-US",
                               {
                                 year: "numeric",
                                 month: "short",
                                 day: "numeric",
                               }
-                            )}
+                            )} */}
+                             {formatDistanceToNow(new Date(parseInt(transaction.time) * 1000), {
+                              addSuffix: true,
+                            })}
                             <IoExitOutline className="ml-2" />
                         </Link>
                     </td>
