@@ -374,7 +374,7 @@ export default function ChonkDetail({ id }: { id: string }) {
         <main className="w-full border-t border-gray-300">
           {tokenData ? (
             <>
-              <div className="hidden sm:block sm:pt-[0.69vw] sm:px-[3.45vw] ">
+              <div className="hidden sm:block sm:pt-[0.69vw] sm:px-[3.45vw] mt-2">
                 <Link
                   href="/market/chonks"
                   className="text-sm hover:underline inline-flex items-center"
