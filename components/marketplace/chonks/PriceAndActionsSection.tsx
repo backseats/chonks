@@ -277,8 +277,8 @@ export default function PriceAndActionsSection({
                   abi={marketplaceABI}
                   args={[Number(chonkId)]}
                   functionName={"cancelOfferChonk"}
-                  label={"Cancel Offer"}
-                  inFlightLabel={"Canceling Offer..."}
+                  label={"Cancel Listing"}
+                  inFlightLabel={"Canceling Listing..."}
                   onSuccess={() => {
                     refetchChonkListing();
                     setListingPrice("");
