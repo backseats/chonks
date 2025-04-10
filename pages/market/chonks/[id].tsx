@@ -1,7 +1,6 @@
 import Head from "next/head";
 import MenuBar from "@/components/MenuBar";
-4;
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, memo } from "react";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
@@ -16,8 +15,7 @@ import { StoredChonk } from "@/types/StoredChonk";
 import { Category } from "@/types/Category";
 import OwnershipSection from "@/components/marketplace/chonks/OwnershipSection";
 import TraitsSection from "@/components/marketplace/TraitsSection";
-// import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection'; // OLD simplehash usePublicClient endpoints
-import ActivitySection from '@/components/marketplace/chonks/ActivitySection';
+import ActivitySection from "@/components/marketplace/chonks/ActivitySection";
 import PriceAndActionsSection from "@/components/marketplace/chonks/PriceAndActionsSection";
 import { CurrentChonk } from "@/types/CurrentChonk";
 import { decodeAndSetData } from "@/lib/decodeAndSetData";
@@ -25,14 +23,10 @@ import Loading from "@/components/marketplace/Loading";
 import Link from "next/link";
 import { IoArrowBackOutline } from "react-icons/io5";
 
-
-// type ChonkOffer = {
-//     priceInWei: bigint;
-//     seller: string;
-//     sellerTBA: string;
-//     onlySellTo: string;
-//     encodedTraitIds: string;
-// }
+const MemoizedTraitsSection = memo(TraitsSection);
+const MemoizedOwnershipSection = memo(OwnershipSection);
+const MemoizedPriceAndActionsSection = memo(PriceAndActionsSection);
+const MemoizedActivitySection = memo(ActivitySection);
 
 export default function ChonkDetail({ id }: { id: string }) {
   const { address } = useAccount();
@@ -84,12 +78,10 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId,
   }) as { data: StoredChonk };
 
-  useEffect(() => {
-    if (!storedChonk) return;
+  const currentChonkData = useMemo(() => {
+    if (!storedChonk) return null;
 
-    console.log("storedChonk", storedChonk);
-
-    setCurrentChonk({
+    return {
       tokenId: parseInt(id),
       head: {
         tokenId:
@@ -148,18 +140,22 @@ export default function ChonkDetail({ id }: { id: string }) {
       bodyIndex: parseInt(storedChonk.bodyIndex.toString()),
       backgroundColor: storedChonk.backgroundColor,
       render3D: storedChonk.render3D,
-    });
-  }, [storedChonk]);
+    };
+  }, [storedChonk, id]);
 
   useEffect(() => {
-    console.log("currentChonk", currentChonk);
-  }, [currentChonk]);
+    setCurrentChonk(currentChonkData);
+  }, [currentChonkData]);
 
-  const account = tokenboundClient.getAccount({
-    tokenContract: mainContract,
-    tokenId: id.toString(),
-    chainId,
-  });
+  const account = useMemo(
+    () =>
+      tokenboundClient.getAccount({
+        tokenContract: mainContract,
+        tokenId: id.toString(),
+        chainId,
+      }),
+    [tokenboundClient, id]
+  );
 
   // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
   const { data: allTraitTokenIds } = useReadContract({
@@ -170,13 +166,13 @@ export default function ChonkDetail({ id }: { id: string }) {
     chainId,
   }) as { data: BigInt[] };
 
-  console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
+  // console.log("allTraitTokenIds", allTraitTokenIds);
 
   // This gets the ids that are equipped to the chonk
   useEffect(() => {
     if (!storedChonk) return;
 
-    console.log("storedChonk", storedChonk);
+    // console.log("storedChonk", storedChonk
     if (!allTraitTokenIds) return;
 
     const hatIdIndex =
@@ -259,6 +255,40 @@ export default function ChonkDetail({ id }: { id: string }) {
   }, [owner, address]);
 
   // const [isListingSuccess, setIsListingSuccess] = useState(false);
+
+  const traitsSectionProps = useMemo(
+    () => ({
+      chonkId: id,
+      tokenData,
+      equippedTraits: currentChonk,
+      isEquippedTraitsOpen,
+      onToggleEquippedTraits: () =>
+        setIsEquippedTraitsOpen(!isEquippedTraitsOpen),
+      isTraitsOpen,
+      onToggleTraits: () => setIsTraitsOpen(!isTraitsOpen),
+      type: "chonk" as const,
+    }),
+    [id, tokenData, currentChonk, isEquippedTraitsOpen, isTraitsOpen]
+  );
+
+  const ownershipSectionProps = useMemo(
+    () => ({
+      id,
+      tokenData,
+      owner,
+      address,
+    }),
+    [id, tokenData, owner, address]
+  );
+
+  const priceAndActionsSectionProps = useMemo(
+    () => ({
+      chonkId: parseInt(id),
+      isOwner,
+      refetchOwner,
+    }),
+    [id, isOwner, refetchOwner]
+  );
 
   return (
     <>
@@ -344,9 +374,11 @@ export default function ChonkDetail({ id }: { id: string }) {
         <main className="w-full border-t border-gray-300">
           {tokenData ? (
             <>
-
               <div className="hidden sm:block sm:pt-[0.69vw] sm:px-[3.45vw] ">
-                <Link href="/market/chonks" className="text-sm hover:underline inline-flex items-center">
+                <Link
+                  href="/market/chonks"
+                  className="text-sm hover:underline inline-flex items-center"
+                >
                   <IoArrowBackOutline className="mr-2" /> View All Listed Chonks
                 </Link>
               </div>
@@ -359,59 +391,17 @@ export default function ChonkDetail({ id }: { id: string }) {
                     className="w-full h-auto"
                   />
 
-                  <TraitsSection
-                    chonkId={id}
-                    tokenData={tokenData}
-                    equippedTraits={currentChonk}
-                    isEquippedTraitsOpen={isEquippedTraitsOpen}
-                    onToggleEquippedTraits={() =>
-                      setIsEquippedTraitsOpen(!isEquippedTraitsOpen)
-                    }
-                    isTraitsOpen={isTraitsOpen}
-                    onToggleTraits={() => setIsTraitsOpen(!isTraitsOpen)}
-                    type="chonk"
-                  />
+                  <MemoizedTraitsSection {...traitsSectionProps} />
                 </div>
 
                 <div className="w-3/5">
-                  <OwnershipSection
-                    id={id}
-                    tokenData={tokenData}
-                    owner={owner}
-                    address={address}
+                  <MemoizedOwnershipSection {...ownershipSectionProps} />
+
+                  <MemoizedPriceAndActionsSection
+                    {...priceAndActionsSectionProps}
                   />
 
-                  <PriceAndActionsSection
-                    chonkId={parseInt(id)}
-                    isOwner={isOwner}
-                    refetchOwner={refetchOwner}
-                    // price={formattedPrice}
-                    // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
-                    // isOfferSpecific={isOfferSpecific}
-                    // canAcceptOffer={canAcceptOffer}
-
-                    // hasActiveOffer={hasActiveOffer}
-                    // hasActiveBid={hasActiveBid}
-                    // chonkBid={chonkBid}
-                    // onListingSuccess={() => {
-                    //     setIsListingSuccess(true);
-                    // }}
-                  />
-
-                  {/* <ActivityAndOffersSection
-                          // isActivityOpen={isActivityOpen}
-                          // setIsActivityOpen={setIsActivityOpen}
-                          // isOffersOpen={isOffersOpen}
-                          // setIsOffersOpen={setIsOffersOpen}
-                          type="chonk"
-                          tokenId={id}
-                          address={address}
-                      /> */}
-
-                  <ActivitySection
-                    tokenId={id}
-                    address={address}
-                  />
+                  <MemoizedActivitySection tokenId={id} address={address} />
                 </div>
               </div>
 
@@ -428,49 +418,15 @@ export default function ChonkDetail({ id }: { id: string }) {
                   className="w-full h-auto p-4"
                 />
 
-                <OwnershipSection
-                  id={id}
-                  tokenData={tokenData}
-                  owner={owner}
-                  address={address}
+                <MemoizedOwnershipSection {...ownershipSectionProps} />
+
+                <MemoizedPriceAndActionsSection
+                  {...priceAndActionsSectionProps}
                 />
 
-                <PriceAndActionsSection
-                  chonkId={parseInt(id)}
-                  isOwner={isOwner}
-                  refetchOwner={refetchOwner}
-                  // price={formattedPrice}
-                  // priceUSD={formattedPrice ? formattedPrice * 3500 : 0}
-                  // isOfferSpecific={isOfferSpecific}
-                  // canAcceptOffer={canAcceptOffer}
+                <MemoizedTraitsSection {...traitsSectionProps} />
 
-                  // hasActiveOffer={hasActiveOffer}
-                  // hasActiveBid={hasActiveBid}
-                  // chonkBid={chonkBid}
-                  // onListingSuccess={() => {
-                  //     setIsListingSuccess(true);
-                  // }}
-                />
-
-                <TraitsSection
-                  chonkId={id}
-                  tokenData={tokenData}
-                  equippedTraits={currentChonk}
-                  isEquippedTraitsOpen={isEquippedTraitsOpen}
-                  onToggleEquippedTraits={() =>
-                    setIsEquippedTraitsOpen(!isEquippedTraitsOpen)
-                  }
-                  isTraitsOpen={isTraitsOpen}
-                  onToggleTraits={() => setIsTraitsOpen(!isTraitsOpen)}
-                  type="chonk"
-                />
-
-                  <ActivitySection
-                    tokenId={id}
-                    address={address}
-                  />
-
-
+                <MemoizedActivitySection tokenId={id} address={address} />
               </div>
             </>
           ) : (

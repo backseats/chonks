@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Chonk } from "@/types/Chonk";
 import { CurrentChonk } from "@/types/CurrentChonk";
 import EquippedAttributes from "@/components/marketplace/EquippedAttributes";
@@ -85,12 +85,21 @@ export default function TraitsSection({
     fetchTraits();
   }, [chonkId, equippedTraitIds]);
 
+  // Memoize callbacks
+  const handleToggleEquippedTraits = useCallback(() => {
+    onToggleEquippedTraits();
+  }, [onToggleEquippedTraits]);
+
+  const handleToggleTraits = useCallback(() => {
+    onToggleTraits();
+  }, [onToggleTraits]);
+
   return (
     <>
       <div className="mx-4 sm:mx-0 mt-[1.725vw] pt-[1.725vw]">
         <div
           className="flex items-center justify-between cursor-pointer mb-4 sm:mb-0"
-          onClick={onToggleEquippedTraits}
+          onClick={handleToggleEquippedTraits}
         >
           <h3 className="text-[16px] font-bold">Equipped Traits</h3>
 
@@ -124,7 +133,7 @@ export default function TraitsSection({
         <div className="mx-4 sm:mx-0 mt-4 sm:mt-[1.725vw] pt-[1.725vw]">
           <div
             className="flex items-center justify-between cursor-pointer"
-            onClick={onToggleTraits}
+            onClick={handleToggleTraits}
           >
             <h3 className="text-[16px] font-bold">
               Traits in Backpack ({traits.length})

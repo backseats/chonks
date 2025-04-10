@@ -210,7 +210,7 @@ export const ListingModal = (props: ListingModalProps) => {
         </div>
 
         <div className="text-xs text-gray-600 border-t border-gray-300 pt-4 mt-4">
-          Note: A 2.5% marketplace fee will be charged on sales of Chonks and traits.
+          A 2.5% marketplace fee will be charged on sales of Chonks and Traits
         </div>
 
         {bottomError && (

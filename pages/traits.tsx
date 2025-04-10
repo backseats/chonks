@@ -86,6 +86,8 @@ export default function Traits({ traitsByCategory, categories }: TraitsProps) {
     );
   };
 
+  return null;
+
   return (
     <div className="min-h-screen w-full text-black font-source-code-pro">
       <MenuBar />

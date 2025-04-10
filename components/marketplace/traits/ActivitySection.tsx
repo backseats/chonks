@@ -19,7 +19,6 @@ import client from "@/lib/apollo-client";
 import { GET_TRAIT_HISTORY } from "@/lib/graphql/queries";
 import DisplayAddress from "@/components/shared/DisplayAddress";
 
-
 interface ActivitySectionProps {
   tokenId: string;
   address?: Address | undefined;
@@ -35,7 +34,7 @@ type TraitTransaction = {
   time: string;
   to: string;
   txHash: string;
-  txType: string; // todo: get all the values here
+  txType: string; // TODO: get all the values here
 };
 
 export default function ActivityAndOffersSection({
@@ -58,24 +57,24 @@ export default function ActivityAndOffersSection({
 
       const transactions = response.data.traitTransactionHistories.items;
 
-      // Loop through transactions and log the transaction type
-      if (transactions && transactions.length > 0) {
-        transactions.forEach((transaction: any) => {
+      // // Loop through transactions and log the transaction type
+      // if (transactions && transactions.length > 0) {
+      //   transactions.forEach((transaction: any) => {
 
-          console.log("Transaction Type:", transaction.txType);
-          console.log("Transaction Time:", transaction.time);
-          console.log("Transaction From:", transaction.from);
-          console.log("Transaction To:", transaction.to);
-          // Log the entire transaction object
-          console.log("Transaction Data:", transaction);
-          // Convert Unix timestamp to readable date
-          const date = new Date(transaction.time * 1000);
-          console.log("Transaction Date:", date.toLocaleString());
-          console.log("");
-        });
-      } else {
-        console.log("No transactions found");
-      }
+      //     console.log("Transaction Type:", transaction.txType);
+      //     console.log("Transaction Time:", transaction.time);
+      //     console.log("Transaction From:", transaction.from);
+      //     console.log("Transaction To:", transaction.to);
+      //     // Log the entire transaction object
+      //     console.log("Transaction Data:", transaction);
+      //     // Convert Unix timestamp to readable date
+      //     const date = new Date(transaction.time * 1000);
+      //     console.log("Transaction Date:", date.toLocaleString());
+      //     console.log("");
+      //   });
+      // } else {
+      //   console.log("No transactions found");
+      // }
 
       setTraitHistory(transactions);
       // debugger;
@@ -89,59 +88,58 @@ export default function ActivityAndOffersSection({
       case "TraitOfferCanceled":
         return (
           <>
-          <IoBackspaceOutline className="mr-2" />Listing Canceled
-        </>
+            <IoBackspaceOutline className="mr-2" />
+            Listing Canceled
+          </>
         );
       case "TraitOffered":
         return (
           <>
-            <IoPricetagOutline className="mr-2" /><strong>Listing</strong>
+            <IoPricetagOutline className="mr-2" />
+            <strong>Listing</strong>
           </>
         );
       case "TraitMinted":
         return (
           <>
-            <IoSparklesOutline className="mr-2" /><strong>Minted</strong>
+            <IoSparklesOutline className="mr-2" />
+            <strong>Minted</strong>
           </>
         );
       case "TraitTransferred":
         return (
           <>
-            <IoArrowRedoOutline className="mr-2" />Transfer
+            <IoArrowRedoOutline className="mr-2" />
+            Transfer
           </>
         );
       case "TraitOfferCreated":
-        return (
-         "Trait Offer Created"
-        );
+        return "Trait Offer Created";
       case "TraitOfferAccepted":
-        return (
-         "Trait Offer Accepted"
-        );
+        return "Trait Offer Accepted";
       case "TraitOfferUpdated":
-        return (
-         "Trait Offer Updated"
-        );
+        return "Trait Offer Updated";
       case "TraitBought":
         return (
           <>
-            <IoCartOutline className="mr-2" /><strong>Sale</strong>
+            <IoCartOutline className="mr-2" />
+            <strong>Sale</strong>
           </>
         );
       case "TraitBidEntered":
         return (
           <>
-            <IoHandRightOutline className="mr-2" /><strong>Bid Placed</strong>
+            <IoHandRightOutline className="mr-2" />
+            <strong>Bid Placed</strong>
           </>
         );
       case "TraitBidWithdrawn":
-        return (
-         "Bid Withdrawn"
-        );
+        return "Bid Withdrawn";
       case "TraitBidAccepted":
         return (
           <>
-            <IoCartOutline className="mr-2" /><strong>Sale (Bid Accepted)</strong>
+            <IoCartOutline className="mr-2" />
+            <strong>Sale (Bid Accepted)</strong>
           </>
         );
       default:
@@ -191,60 +189,66 @@ export default function ActivityAndOffersSection({
                 </tr>
               </thead>
               <tbody>
-              {traitHistory.slice().reverse().map((transaction) => (
+                {traitHistory
+                  .slice()
+                  .reverse()
+                  .map((transaction) => (
+                    <tr
+                      key={transaction.txHash}
+                      className="border-b border-gray-200"
+                    >
+                      {/* Event */}
+                      <td className="py-2 flex items-center">
+                        {renderTransactionType(transaction.txType)}
+                      </td>
 
-                <tr key={transaction.txHash} className="border-b border-gray-200">
-
-                    {/* Event */}
-                    <td className="py-2 flex items-center">
-                      {renderTransactionType(transaction.txType)}
-                    </td>
-
-                    {/* Price */}
-                    <td className="py-2">
-                      {transaction.txType === "TraitMinted" || transaction.txType === "TraitTransferred" || transaction.txType === "TraitOfferCanceled" ? (
-                         "-"
-                      ) : (
-                        <span className="inline-flex items-center whitespace-nowrap">
-                        {"amount" in transaction ? (
-                          <>
-                            {formatEther(BigInt(transaction.amount))}{" "}
-                            <FaEthereum className="ml-1 text-[1vw]" />
-                          </>
-                        ) : (
+                      {/* Price */}
+                      <td className="py-2">
+                        {transaction.txType === "TraitMinted" ||
+                        transaction.txType === "TraitTransferred" ||
+                        transaction.txType === "TraitOfferCanceled" ? (
                           "-"
+                        ) : (
+                          <span className="inline-flex items-center whitespace-nowrap">
+                            {"amount" in transaction ? (
+                              <>
+                                {formatEther(BigInt(transaction.amount))}{" "}
+                                <FaEthereum className="ml-1 text-[1vw]" />
+                              </>
+                            ) : (
+                              "-"
+                            )}
+                          </span>
                         )}
-                      </span>
-                      )}
-                    </td>
+                      </td>
 
-                    {/* From */}
-                    <td className="py-2">
-                      {transaction.txType === "TraitMinted"
-                      || transaction.txType === "TraitOfferCanceled"
-                      // || transaction.txType === "ChonkTransferred"
-                      ? (
-                        <span>-</span>
-                      ) : (
-                        <DisplayAddress address={transaction.from as Address} />
-                      )}
-                    </td>
+                      {/* From */}
+                      <td className="py-2">
+                        {transaction.txType === "TraitMinted" ||
+                        transaction.txType === "TraitOfferCanceled" ? (
+                          // || transaction.txType === "ChonkTransferred"
+                          <span>-</span>
+                        ) : (
+                          <DisplayAddress
+                            address={transaction.from as Address}
+                          />
+                        )}
+                      </td>
 
-                    {/* To */}
-                    <td className="py-2">
-                      {transaction.txType === "TraitOffered"
-                      || transaction.txType === "TraitBidEntered"
-                      || transaction.txType === "TraitOfferCanceled"
-                      ? (
-                        <span>-</span>
-                      ) : (
-                        <DisplayAddress address={transaction.to as Address} />
-                      )}
-                    </td>
+                      {/* To */}
+                      <td className="py-2">
+                        {transaction.txType === "TraitOffered" ||
+                        transaction.txType === "TraitBidEntered" ||
+                        transaction.txType === "TraitOfferCanceled" ? (
+                          <span>-</span>
+                        ) : (
+                          <DisplayAddress address={transaction.to as Address} />
+                        )}
+                      </td>
 
-                    {/* Time */}
-                    <td className="py-2 text-right">
-                      {/* {new Date(parseInt(transaction.time) * 1000).toLocaleDateString(
+                      {/* Time */}
+                      <td className="py-2 text-right">
+                        {/* {new Date(parseInt(transaction.time) * 1000).toLocaleDateString(
                         "en-US",
                         {
                           year: "numeric",
@@ -252,13 +256,12 @@ export default function ActivityAndOffersSection({
                           day: "numeric",
                         }
                       )} */}
-                       <Link
+                        <Link
                           href={`https://basescan.org/tx/${transaction.txHash}`}
                           target="_blank"
                           className="flex items-center justify-end hover:underline"
                         >
-
-                            {/* {new Date(parseInt(transaction.time) * 1000).toLocaleDateString(
+                          {/* {new Date(parseInt(transaction.time) * 1000).toLocaleDateString(
                               "en-US",
                               {
                                 year: "numeric",
@@ -266,20 +269,22 @@ export default function ActivityAndOffersSection({
                                 day: "numeric",
                               }
                             )} */}
-                             {formatDistanceToNow(new Date(parseInt(transaction.time) * 1000), {
+                          {formatDistanceToNow(
+                            new Date(parseInt(transaction.time) * 1000),
+                            {
                               addSuffix: true,
-                            })}
-                            <IoExitOutline className="ml-2" />
+                            }
+                          )}
+                          <IoExitOutline className="ml-2" />
                         </Link>
-                    </td>
-                </tr>
-              ))}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
         )}
       </div>
-
     </>
   );
 }

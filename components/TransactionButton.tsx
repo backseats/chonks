@@ -152,7 +152,7 @@ function TransactionButton(props: TransactionButtonProps) {
   // Determine button style based on variant prop
   const style = useMemo(() => {
     if (buttonStyle === "primary") {
-      return "bg-[#2F7BA7] hover:bg-[#2F7BA7] text-white";
+      return "bg-[#2F7BA7] hover:bg-[#3a86b2] text-white";
     } else if (buttonStyle === "secondary") {
       return "bg-gray-300 hover:bg-gray-400 text-gray-800";
     } else if (buttonStyle === "simple") {

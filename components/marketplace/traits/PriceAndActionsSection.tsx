@@ -366,34 +366,36 @@ export default function PriceAndActionsSection(
         </div>
       )}
 
-      <TransactionButton
-        buttonStyle="primary"
-        address={marketplaceContract}
-        abi={marketplaceABI}
-        args={[traitId, parseInt(selectedChonkId || "0")]}
-        functionName="buyTrait"
-        priceInWei={price ? parseEther(price.toString()) : undefined}
-        label={
-          isOfferSpecific
-            ? canAcceptOffer
-              ? "Accept Private Offer"
-              : "Private Offer - Not For You"
-            : "Buy Now"
-        }
-        inFlightLabel="Purchasing Trait..."
-        // disabled={Boolean(
-        //   (isOfferSpecific && !canAcceptOffer) ||
-        //     hasInsufficientBalance ||
-        //     (!isOfferSpecific && !selectedChonkId) ||
-        //     !price
-        // )}
-        reset={() => setError(null)}
-        setError={setError}
-        onSuccess={() => {
-          window.location.reload(); // TODO: probably a better refetch here
-          setError(null);
-        }}
-      />
+      <div className="mb-1">
+        <TransactionButton
+          buttonStyle="primary"
+          address={marketplaceContract}
+          abi={marketplaceABI}
+          args={[traitId, parseInt(selectedChonkId || "0")]}
+          functionName="buyTrait"
+          priceInWei={price ? parseEther(price.toString()) : undefined}
+          label={
+            isOfferSpecific
+              ? canAcceptOffer
+                ? "Accept Private Offer"
+                : "Private Offer - Not For You"
+              : "Buy Now"
+          }
+          inFlightLabel="Purchasing Trait..."
+          // disabled={Boolean(
+          //   (isOfferSpecific && !canAcceptOffer) ||
+          //     hasInsufficientBalance ||
+          //     (!isOfferSpecific && !selectedChonkId) ||
+          //     !price
+          // )}
+          reset={() => setError(null)}
+          setError={setError}
+          onSuccess={() => {
+            window.location.reload(); // TODO: probably a better refetch here
+            setError(null);
+          }}
+        />
+      </div>
 
       {hasInsufficientBalance && (
         <ErrorDisplay
@@ -472,7 +474,6 @@ export default function PriceAndActionsSection(
           )}
         </>
       )}
-
     </div>
   );
 

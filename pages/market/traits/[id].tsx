@@ -10,9 +10,7 @@ import {
   chainId,
 } from "@/config";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
-import TraitsSection from "@/components/marketplace/TraitsSection";
-// import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection'; // OLD simplehash usePublicClient endpoints
-import ActivitySection from '@/components/marketplace/traits/ActivitySection';
+import ActivitySection from "@/components/marketplace/traits/ActivitySection";
 import PriceAndActionsSection from "@/components/marketplace/traits/PriceAndActionsSection";
 import { Address, getAddress } from "viem";
 import Loading from "@/components/marketplace/Loading";
@@ -25,13 +23,6 @@ import Link from "next/link";
 import { IoArrowBackOutline } from "react-icons/io5";
 
 export default function TraitDetail({ id }: { id: string }) {
-  // const router = useRouter()
-  // const { id } = router.query
-  const [isActivityOpen, setIsActivityOpen] = useState(true);
-  const [isOffersOpen, setIsOffersOpen] = useState(true);
-  const [isTraitsOpen, setIsTraitsOpen] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-
   const { address } = useAccount();
 
   const { data: walletClient } = useWalletClient();
@@ -40,8 +31,8 @@ export default function TraitDetail({ id }: { id: string }) {
     chainId,
   });
 
-  //get Trait Offers - accessing the offers directly from mapping
-  // but we now have : getTraitOffer
+  // get Trait Offers - accessing the offers directly from mapping
+  // but we now have: getTraitOffer
   const { data: traitOfferArray } = useReadContract({
     address: marketplaceContract,
     abi: marketplaceABI,
@@ -49,88 +40,6 @@ export default function TraitDetail({ id }: { id: string }) {
     args: [BigInt(id)],
     chainId,
   }) as { data: [bigint, string, string, string, string] };
-
-  // Convert array to object
-  // const traitOffer: TraitOffer | null = useMemo(() => {
-  //   if (!traitOfferArray) return null;
-  //   return {
-  //     priceInWei: traitOfferArray[0],
-  //     seller: traitOfferArray[1],
-  //     sellerTBA: traitOfferArray[2],
-  //     onlySellTo: traitOfferArray[3],
-  //   };
-  // }, [traitOfferArray]);
-
-  // // Add this console log to see the raw response
-  // useEffect(() => {
-  //   console.group("Raw Response");
-  //   console.log("Raw traitOffer:", traitOffer);
-  //   if (Array.isArray(traitOffer)) {
-  //     console.log("Is array, length:", traitOffer.length);
-  //     traitOffer.forEach((item, index) => {
-  //       console.log(`Item ${index}:`, item);
-  //     });
-  //   } else {
-  //     console.log("Is not array, type:", typeof traitOffer);
-  //   }
-  //   console.groupEnd();
-  // }, [traitOffer]);
-
-  // const formattedPrice = useMemo(() => {
-  //   if (!traitOffer?.priceInWei) return null;
-  //   console.log("Price in Wei before formatting:", traitOffer.priceInWei);
-  //   return parseFloat(formatEther(traitOffer.priceInWei));
-  // }, [traitOffer]);
-
-  // const isOfferSpecific = useMemo(() => {
-  //   if (!traitOffer?.onlySellTo) return false;
-  //   return (
-  //     traitOffer.onlySellTo !== "0x0000000000000000000000000000000000000000"
-  //   );
-  // }, [traitOffer]);
-
-  // const canAcceptOffer = useMemo(() => {
-  //   if (!traitOffer?.onlySellTo || !address || !isOfferSpecific) return false;
-  //   return traitOffer.onlySellTo.toLowerCase() === address.toLowerCase();
-  // }, [traitOffer, address, isOfferSpecific]);
-
-  // Get main body tokenURI
-  // const { data: tokenURIData } = useReadContract({
-  //   address: traitsContract,
-  //   abi: mainABI,
-  //   functionName: TOKEN_URI,
-  //   args: [BigInt(id)],
-  //   chainId,
-  // }) as { data: string };
-
-  // const { data: owner } = useReadContract({
-  //     address: traitsContract,
-  //     abi: traitsABI,
-  //     functionName: "ownerOf",
-  //     args: [BigInt(id)],
-  //     chainId
-  // }) as { data: string };
-
-  // // Add this new query to get the tokenId from the TBA address
-  // const { data: tokenIdOfTBA } = useReadContract({
-  //     address: mainContract,
-  //     abi: mainABI,
-  //     functionName: "tbaAddressToTokenId",
-  //     args: [owner],
-  //     chainId,
-  // }) as { data: bigint };
-
-  // const { data: ownerOfTraitOwner } = useReadContract({
-  //     address: mainContract,
-  //     abi: mainABI,
-  //     functionName: "ownerOf",
-  //     args: [tokenIdOfTBA ? BigInt(tokenIdOfTBA) : undefined],
-  //     chainId,
-  // }) as { data: string };
-
-  // console.log("owner (TBA address)", owner);
-  // console.log("tokenId of owning Chonk", tokenIdOfTBA?.toString());
-  // console.log("owner of trait owner", ownerOfTraitOwner);
 
   //getFullPictureForTrait
   const {
@@ -177,80 +86,6 @@ export default function TraitDetail({ id }: { id: string }) {
         chainId,
       })
     : null;
-
-  // function checkIfTraitIsEquipped(uint256 _chonkId, uint256 _traitId) public view returns (bool) {
-  //     IChonkStorage.StoredChonk memory storedChonk = getChonk(_chonkId);
-  //     return storedChonk.headId == _traitId ||
-  //         storedChonk.hairId == _traitId ||
-  //         storedChonk.faceId == _traitId ||
-  //         storedChonk.accessoryId == _traitId ||
-  //         storedChonk.topId == _traitId ||
-  //         storedChonk.bottomId == _traitId ||
-  //         storedChonk.shoesId == _traitId;
-  // }
-
-  // const { data: isEquipped } = useReadContract({
-  //     address: mainContract,
-  //     abi: mainABI,
-  //     functionName: "checkIfTraitIsEquipped",
-  //     args: [tokenIdOfTBA, BigInt(id)],
-  //     chainId,
-  // }) as { data: boolean };
-
-  // const account = tokenboundClient.getAccount({
-  //     tokenContract: mainContract,
-  //     tokenId: id.toString(),
-  //     chainId
-  // });
-
-  // console.log(" ===== account (this is the TBA of the main token id, not trait)", account);
-
-  // // Get all the traits that the TBA owns, equipped or not (ex  [1n, 2n, 3n, 4n, 5n])
-  // const { data: allTraitTokenIds } = useReadContract({
-  //     address: traitsContract,
-  //     abi: traitsABI,
-  //     functionName: "walletOfOwner",
-  //     args: [account],
-  //     chainId,
-  // }) as { data: BigInt[] };
-
-  // console.log("allTraitTokenIds", allTraitTokenIds); // this is good, works
-
-  // Add these console logs
-  // useEffect(() => {
-  //   console.log("Raw contract response:", traitOffer);
-  //   if (traitOffer) {
-  //     try {
-  //       // Log each property individually
-  //       console.group("Trait Offer Details");
-  //       if (traitOffer.priceInWei) {
-  //         console.log("Price in Wei:", traitOffer.priceInWei.toString());
-  //       } else {
-  //         console.log("Price in Wei: undefined");
-  //       }
-  //       console.log("Seller:", traitOffer.seller || "undefined");
-  //       console.log("Seller TBA:", traitOffer.sellerTBA || "undefined");
-  //       console.log("Only sell to:", traitOffer.onlySellTo || "undefined");
-  //       console.groupEnd();
-
-  //       if (address) {
-  //         console.group("Wallet Info");
-  //         console.log("Connected wallet:", address);
-  //         console.log(
-  //           "Can accept offer:",
-  //           traitOffer.onlySellTo?.toLowerCase() === address.toLowerCase()
-  //         );
-  //         console.groupEnd();
-  //       }
-  //     } catch (error) {
-  //       console.error("Error accessing traitOffer properties:", error);
-  //       console.log("traitOffer type:", typeof traitOffer);
-  //       console.log("traitOffer keys:", Object.keys(traitOffer));
-  //     }
-  //   } else {
-  //     console.log("No offer found for this Trait");
-  //   }
-  // }, [traitOffer, address]);
 
   const isOwner = useMemo(() => {
     if (!owner || !address) return false;
@@ -365,9 +200,11 @@ export default function TraitDetail({ id }: { id: string }) {
         <main className="w-full border-t border-gray-300">
           {traitMetadata ? (
             <>
-
               <div className="hidden sm:block sm:pt-[0.69vw] sm:px-[3.45vw] ">
-                <Link href="/market/traits" className="text-sm hover:underline inline-flex items-center">
+                <Link
+                  href="/market/traits"
+                  className="text-sm hover:underline inline-flex items-center"
+                >
                   <IoArrowBackOutline className="mr-2" /> View All Listed Traits
                 </Link>
               </div>
@@ -410,10 +247,7 @@ export default function TraitDetail({ id }: { id: string }) {
                                         tokenId={id}
                                         address={address}
                                     /> */}
-                  <ActivitySection
-                    tokenId={id}
-                    address={address}
-                  />
+                  <ActivitySection tokenId={id} address={address} />
                 </div>
               </div>
 
@@ -449,10 +283,7 @@ export default function TraitDetail({ id }: { id: string }) {
                   refetchFullPictureForTrait={refetchFullPictureForTrait}
                 />
 
-                <ActivitySection
-                    tokenId={id}
-                    address={address}
-                  />
+                <ActivitySection tokenId={id} address={address} />
               </div>
             </>
           ) : (

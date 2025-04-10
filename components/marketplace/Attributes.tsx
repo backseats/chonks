@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import Link from "next/link";
 import {
   traitsABI,
@@ -86,45 +86,77 @@ const Attribute = ({
   const [showPreview, setShowPreview] = useState(false);
   const [traitCount, setTraitCount] = useState(null);
 
-  useEffect(() => {
-    // TODO handle things like Pants Black/Navy/Yellow Check
-    const transformTraitName = (traitName: string) => {
-      return traitName
-        .split("-")
-        .map((word) =>
-          word.toLowerCase() === "and"
-            ? "and"
-            : word.charAt(0).toUpperCase() + word.slice(1)
-        )
-        .join(" ");
-    };
+  const transformTraitNameCache = new Map<string, string>();
 
-    const fetchTraitCount = async () => {
-      const { data } = await client.query({
-        query: GET_TRAIT_COUNT,
-        variables: { traitName: transformTraitName(value) },
-      });
+  const transformTraitName = useCallback((traitName: string) => {
+    if (transformTraitNameCache.has(traitName)) {
+      return transformTraitNameCache.get(traitName)!;
+    }
 
-      if (data.traitNameCounts) {
-        setTraitCount(data.traitNameCounts.items[0].count);
-      }
-    };
+    const transformed = traitName
+      .split("-")
+      .map((word) =>
+        word.toLowerCase() === "and"
+          ? "and"
+          : word.charAt(0).toUpperCase() + word.slice(1)
+      )
+      .join(" ");
 
-    fetchTraitCount();
+    transformTraitNameCache.set(traitName, transformed);
+    return transformed;
   }, []);
+
+  // useEffect(() => {
+  //   const fetchTraitCount = async () => {
+  //     const { data } = await client.query({
+  //       query: GET_TRAIT_COUNT,
+  //       variables: { traitName: transformTraitName(value) },
+  //     });
+
+  //     if (data.traitNameCounts) {
+  //       setTraitCount(data.traitNameCounts.items[0].count);
+  //     }
+  //   };
+
+  //   fetchTraitCount();
+  // }, [value, transformTraitName]);
+
+  const handleMouseEnter = useCallback(() => {
+    if (isLoading) return;
+    setShowPreview(true);
+  }, [isLoading]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isLoading) return;
+    setShowPreview(false);
+  }, [isLoading]);
+
+  const PreviewRenderer = useMemo(() => {
+    if (!showPreview || !colorMap) return null;
+
+    return (
+      <div
+        className="absolute z-10 w-[150px] h-[150px]"
+        style={{ top: "-160px", left: "50%", transform: "translateX(-50%)" }}
+      >
+        <div className="w-full h-full">
+          <ChonkRenderer
+            bytes={colorMap}
+            backgroundColor="#0F6E9D"
+            bodyIndex={bodyIndexData}
+            opacity={0.6}
+          />
+        </div>
+      </div>
+    );
+  }, [showPreview, colorMap, bodyIndexData]);
 
   return (
     <div
       className="border border-black p-2 sm:p-3 relative"
       key={tokenId}
-      onMouseEnter={() => {
-        if (isLoading) return;
-        setShowPreview(true);
-      }}
-      onMouseLeave={() => {
-        if (isLoading) return;
-        setShowPreview(false);
-      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <div className="text-sm text-gray-600">
         {getCategoryString(traitType)}
@@ -136,23 +168,11 @@ const Attribute = ({
       >
         {value}
       </Link>
-      {traitCount ? ` (${traitCount})` : ""}
+      <span className="text-sm text-gray-600">
+        {traitCount ? ` (${traitCount})` : ""}
+      </span>
 
-      {showPreview && colorMap && (
-        <div
-          className="absolute z-10 w-[150px] h-[150px]"
-          style={{ top: "-160px", left: "50%", transform: "translateX(-50%)" }}
-        >
-          <div className="w-full h-full">
-            <ChonkRenderer
-              bytes={colorMap}
-              backgroundColor="#0F6E9D"
-              bodyIndex={bodyIndexData}
-              opacity={0.6}
-            />
-          </div>
-        </div>
-      )}
+      {PreviewRenderer}
     </div>
   );
 };

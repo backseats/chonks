@@ -30,7 +30,7 @@ export default function OwnershipSection(props: Props) {
   return (
     <>
       <div className="px-4 sm:px-0">
-        <div className="text-[16px] text-gray-600 black mb-3">
+        {/* <div className="text-[16px] text-gray-600 black mb-3">
           <Link href="/market/traits" className="underline">
             Traits
           </Link>
@@ -41,7 +41,8 @@ export default function OwnershipSection(props: Props) {
           >
             {traitName}
           </Link>
-        </div>
+        </div> */}
+
         <div className="flex flex-row justify-between w-full sm:justify-start sm:items-baseline sm:gap-2">
           <h1 className="hidden sm:flex sm:text-[26px] sm:font-bold">
             {traitName ? `${traitName}` : ""}
