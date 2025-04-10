@@ -103,9 +103,11 @@ export default function ForSale() {
     if (diffInSeconds < 60) {
       return `${diffInSeconds} seconds ago`;
     } else if (diffInSeconds < 3600) {
-      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
     } else if (diffInSeconds < 86400) {
-      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
     } else {
       const days = Math.floor(diffInSeconds / 86400);
       return `${days} ${days === 1 ? "day" : "days"} ago`;
@@ -139,16 +141,25 @@ export default function ForSale() {
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
         />
-        <meta property="og:image" content="https://www.chonks.xyz/chonks/chonk-naked.png" />
+        <meta
+          property="og:image"
+          content="https://www.chonks.xyz/chonks/chonk-naked.png"
+        />
         <meta property="og:title" content="For Sale | Chonks" />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content={`https://www.chonks.xyz/market/traits`} />
-        <meta property="og:description" content="For Sale | Chonks"/>
+        <meta
+          property="og:url"
+          content={`https://www.chonks.xyz/market/traits`}
+        />
+        <meta property="og:description" content="For Sale | Chonks" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Chonksxyz" />
-        <meta name="twitter:title" content="For Sale | Chonkss"/>
-        <meta name="twitter:description" content="For Sale  Chonks"/>
-        <meta name="twitter:image" content="https://www.chonks.xyz/chonks/chonk-naked.png" />
+        <meta name="twitter:title" content="For Sale | Chonkss" />
+        <meta name="twitter:description" content="For Sale  Chonks" />
+        <meta
+          name="twitter:image"
+          content="https://www.chonks.xyz/chonks/chonk-naked.png"
+        />
         <link rel="icon" href="/favicon.ico" />
         <link
           rel="apple-touch-icon"
