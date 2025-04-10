@@ -16,7 +16,7 @@ import { formatDistanceToNow } from "date-fns";
 import { formatEther, zeroAddress } from "viem";
 import { Address } from "viem";
 import client from "@/lib/apollo-client";
-import { GET_CHONK_HISTORY } from "@/lib/graphql/queries";
+import { GET_TRAIT_HISTORY } from "@/lib/graphql/queries";
 import DisplayAddress from "@/components/shared/DisplayAddress";
 
 
@@ -25,7 +25,7 @@ interface ActivitySectionProps {
   address?: Address | undefined;
 }
 
-type ChonkTransaction = {
+type TraitTransaction = {
   amount: string;
   bidder: string;
   from: string;
@@ -42,103 +42,103 @@ export default function ActivityAndOffersSection({
   tokenId,
   address,
 }: ActivitySectionProps) {
-  const [chonkHistory, setChonkHistory] = useState<ChonkTransaction[]>([]);
+  const [traitHistory, setTraitHistory] = useState<TraitTransaction[]>([]);
 
   // const [isOffersOpen, setIsOffersOpen] = useState(false);
   const [isActivityOpen, setIsActivityOpen] = useState(true);
 
   useEffect(() => {
-    const fetchChonkHistory = async () => {
+    const fetchTraitHistory = async () => {
       const response = await client.query({
-        query: GET_CHONK_HISTORY,
+        query: GET_TRAIT_HISTORY,
         variables: { id: tokenId },
       });
 
       if (!response.data) return;
 
-      const transactions = response.data.chonk.transactions.items;
+      const transactions = response.data.traitTransactionHistories.items;
 
       // Loop through transactions and log the transaction type
-      // if (transactions && transactions.length > 0) {
-      //   transactions.forEach((transaction: any) => {
+      if (transactions && transactions.length > 0) {
+        transactions.forEach((transaction: any) => {
 
-      //     console.log("Transaction Type:", transaction.txType);
-      //     console.log("Transaction Time:", transaction.time);
-      //     console.log("Transaction From:", transaction.from);
-      //     console.log("Transaction To:", transaction.to);
-      //     // Log the entire transaction object
-      //     console.log("Transaction Data:", transaction);
-      //     // Convert Unix timestamp to readable date
-      //     const date = new Date(transaction.time * 1000);
-      //     console.log("Transaction Date:", date.toLocaleString());
-      //     console.log("");
-      //   });
-      // } else {
-      //   console.log("No transactions found");
-      // }
+          console.log("Transaction Type:", transaction.txType);
+          console.log("Transaction Time:", transaction.time);
+          console.log("Transaction From:", transaction.from);
+          console.log("Transaction To:", transaction.to);
+          // Log the entire transaction object
+          console.log("Transaction Data:", transaction);
+          // Convert Unix timestamp to readable date
+          const date = new Date(transaction.time * 1000);
+          console.log("Transaction Date:", date.toLocaleString());
+          console.log("");
+        });
+      } else {
+        console.log("No transactions found");
+      }
 
-      setChonkHistory(transactions);
+      setTraitHistory(transactions);
       // debugger;
     };
 
-    fetchChonkHistory();
+    fetchTraitHistory();
   }, []);
 
   const renderTransactionType = (txType: string) => {
     switch (txType) {
-      case "ChonkOfferCanceled":
+      case "TraitOfferCanceled":
         return (
           <>
           <IoBackspaceOutline className="mr-2" />Listing Canceled
         </>
         );
-      case "ChonkOffered":
+      case "TraitOffered":
         return (
           <>
             <IoPricetagOutline className="mr-2" /><strong>Listing</strong>
           </>
         );
-      case "ChonkMinted":
+      case "TraitMinted":
         return (
           <>
             <IoSparklesOutline className="mr-2" /><strong>Minted</strong>
           </>
         );
-      case "ChonkTransferred":
+      case "TraitTransferred":
         return (
           <>
             <IoArrowRedoOutline className="mr-2" />Transfer
           </>
         );
-      case "ChonkOfferCreated":
+      case "TraitOfferCreated":
         return (
-         "Chonk Offer Created"
+         "Trait Offer Created"
         );
-      case "ChonkOfferAccepted":
+      case "TraitOfferAccepted":
         return (
-         "Chonk Offer Accepted"
+         "Trait Offer Accepted"
         );
-      case "ChonkOfferUpdated":
+      case "TraitOfferUpdated":
         return (
-         "Chonk Offer Updated"
+         "Trait Offer Updated"
         );
-      case "ChonkBought":
+      case "TraitBought":
         return (
           <>
             <IoCartOutline className="mr-2" /><strong>Sale</strong>
           </>
         );
-      case "ChonkBidEntered":
+      case "TraitBidEntered":
         return (
           <>
             <IoHandRightOutline className="mr-2" /><strong>Bid Placed</strong>
           </>
         );
-      case "ChonkBidWithdrawn":
+      case "TraitBidWithdrawn":
         return (
          "Bid Withdrawn"
         );
-      case "ChonkBidAccepted":
+      case "TraitBidAccepted":
         return (
           <>
             <IoCartOutline className="mr-2" /><strong>Sale (Bid Accepted)</strong>
@@ -191,7 +191,7 @@ export default function ActivityAndOffersSection({
                 </tr>
               </thead>
               <tbody>
-              {chonkHistory.slice().reverse().map((transaction) => (
+              {traitHistory.slice().reverse().map((transaction) => (
 
                 <tr key={transaction.txHash} className="border-b border-gray-200">
 
@@ -202,7 +202,7 @@ export default function ActivityAndOffersSection({
 
                     {/* Price */}
                     <td className="py-2">
-                      {transaction.txType === "ChonkMinted" || transaction.txType === "ChonkTransferred" || transaction.txType === "ChonkOfferCanceled" ? (
+                      {transaction.txType === "TraitMinted" || transaction.txType === "TraitTransferred" || transaction.txType === "TraitOfferCanceled" ? (
                          "-"
                       ) : (
                         <span className="inline-flex items-center whitespace-nowrap">
@@ -220,8 +220,8 @@ export default function ActivityAndOffersSection({
 
                     {/* From */}
                     <td className="py-2">
-                      {transaction.txType === "ChonkMinted"
-                      || transaction.txType === "ChonkOfferCanceled"
+                      {transaction.txType === "TraitMinted"
+                      || transaction.txType === "TraitOfferCanceled"
                       // || transaction.txType === "ChonkTransferred"
                       ? (
                         <span>-</span>
@@ -232,9 +232,9 @@ export default function ActivityAndOffersSection({
 
                     {/* To */}
                     <td className="py-2">
-                      {transaction.txType === "ChonkOffered"
-                      || transaction.txType === "ChonkBidEntered"
-                      || transaction.txType === "ChonkOfferCanceled"
+                      {transaction.txType === "TraitOffered"
+                      || transaction.txType === "TraitBidEntered"
+                      || transaction.txType === "TraitOfferCanceled"
                       ? (
                         <span>-</span>
                       ) : (

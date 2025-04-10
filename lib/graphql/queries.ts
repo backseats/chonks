@@ -115,7 +115,7 @@ query GetTraitsForChonkId($id: BigInt!) {
 }
 `;
 
-// unused
+// used in /market/chonks/[id]
 export const GET_CHONK_HISTORY = gql`
 query GetChonkHistory($id: BigInt!) {
   chonk(id: $id) {

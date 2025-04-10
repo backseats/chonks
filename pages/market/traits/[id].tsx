@@ -11,7 +11,8 @@ import {
 } from "@/config";
 import OwnershipSection from "@/components/marketplace/traits/OwnershipSection";
 import TraitsSection from "@/components/marketplace/TraitsSection";
-// import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection';
+// import ActivityAndOffersSection from '@/components/marketplace/ActivityAndOffersSection'; // OLD simplehash usePublicClient endpoints
+import ActivitySection from '@/components/marketplace/traits/ActivitySection';
 import PriceAndActionsSection from "@/components/marketplace/traits/PriceAndActionsSection";
 import { Address, getAddress } from "viem";
 import Loading from "@/components/marketplace/Loading";
@@ -409,6 +410,10 @@ export default function TraitDetail({ id }: { id: string }) {
                                         tokenId={id}
                                         address={address}
                                     /> */}
+                  <ActivitySection
+                    tokenId={id}
+                    address={address}
+                  />
                 </div>
               </div>
 
@@ -443,6 +448,11 @@ export default function TraitDetail({ id }: { id: string }) {
                   tbaAddress={tbaAddress as Address | null}
                   refetchFullPictureForTrait={refetchFullPictureForTrait}
                 />
+
+                <ActivitySection
+                    tokenId={id}
+                    address={address}
+                  />
               </div>
             </>
           ) : (
