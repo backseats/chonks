@@ -441,6 +441,38 @@ export default function PriceAndActionsSection(
           </div>
         </>
       )}
+
+      {/* Add Make an Offer button if user is not the current bidder */}
+      {!(hasActiveBid && traitBid && traitBid.bidder === address) && (
+        <>
+          {ownedChonks && ownedChonks.length > 0 ? (
+            <ActionButton
+              variant="primary"
+              onClick={() => {
+                // Reset errors and open modal
+                setPriceError("");
+                setError(null);
+                setIsOfferModalOpen(true);
+              }}
+            >
+              Make an Offer
+            </ActionButton>
+          ) : (
+            <p className="text-red-500 text-[1.25vw]">
+              You need to own a Chonk to make an offer on this trait
+              <br />
+              <Link
+                className="text-chonk-blue underline"
+                href="/market/chonks"
+                rel="noopener noreferrer"
+              >
+                Go buy one here
+              </Link>
+            </p>
+          )}
+        </>
+      )}
+
     </div>
   );
 

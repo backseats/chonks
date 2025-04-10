@@ -318,6 +318,18 @@ export default function PriceAndActionsSection({
                   }}
                 />
 
+                {
+                /* <ActionButton
+                  variant="primary"
+                  onClick={() => {
+                    setOfferAmount("");
+                    setIsOfferModalOpen(true);
+                  }}
+                >
+                  Make an Offer
+                </ActionButton>
+                */}
+
                 <ErrorDisplay error={error} />
               </div>
             )}
