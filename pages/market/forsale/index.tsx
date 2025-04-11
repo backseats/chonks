@@ -154,7 +154,7 @@ export default function ForSale() {
         <meta property="og:description" content="For Sale | Chonks" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Chonksxyz" />
-        <meta name="twitter:title" content="For Sale | Chonkss" />
+        <meta name="twitter:title" content="For Sale | Chonks" />
         <meta name="twitter:description" content="For Sale  Chonks" />
         <meta
           name="twitter:image"

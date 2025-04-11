@@ -150,7 +150,7 @@ export default function ChonksMarketplace() {
         <meta property="og:description" content="Chonks Market | Chonks"/>
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Chonksxyz" />
-        <meta name="twitter:title" content="Chonks Market | Chonkss"/>
+        <meta name="twitter:title" content="Chonks Market | Chonks"/>
         <meta name="twitter:description" content="Chonks Market | Chonks"/>
         <meta name="twitter:image" content="https://www.chonks.xyz/chonks/chonk-naked.png"
         />

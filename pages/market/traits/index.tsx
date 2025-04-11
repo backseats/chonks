@@ -145,7 +145,7 @@ export default function TraitsMarketplace() {
         <meta property="og:description" content="Traits Market | Chonks"/>
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Chonksxyz" />
-        <meta name="twitter:title" content="Traits Market | Chonkss"/>
+        <meta name="twitter:title" content="Traits Market | Chonks"/>
         <meta name="twitter:description" content="Traits Market | Chonks"/>
         <meta name="twitter:image" content="https://www.chonks.xyz/chonks/chonk-naked.png" />
         <link rel="icon" href="/favicon.ico" />

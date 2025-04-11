@@ -159,7 +159,7 @@ export default function Sales() {
         <meta property="og:description" content="Sales | Chonks"/>
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@Chonksxyz" />
-        <meta name="twitter:title" content="Sales | Chonkss"/>
+        <meta name="twitter:title" content="Sales | Chonks"/>
         <meta name="twitter:description" content="Sales  Chonks"/>
         <meta name="twitter:image" content="https://www.chonks.xyz/chonks/chonk-naked.png" />
         <link rel="icon" href="/favicon.ico" />
