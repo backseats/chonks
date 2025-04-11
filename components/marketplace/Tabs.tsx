@@ -41,6 +41,9 @@ export default function Tabs({ activeTab, onTabChange }: TabsProps) {
 
           return (
             <Fragment key={index}>
+              {/* Add a line break before the third tab on mobile */}
+              {index === 2 && <div className="w-full sm:hidden mb-2" />}
+
               <button
                 className={`hover:bg-gray-200 hover:text-black px-4 ${
                   index === tabs.length - 1 ? "" : "mr-2"

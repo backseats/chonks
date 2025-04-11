@@ -1,30 +1,33 @@
-import { useEnsName } from "wagmi";
-import { mainnet } from "wagmi/chains";
 import { Address } from "viem";
 import Link from "next/link";
-import { truncateEthAddress } from "@/utils/truncateEthAddress";
+import { useDisplayAddress } from "@/hooks/useDisplayAddress";
 
 interface DisplayAddressProps {
   address: Address;
+  span?: boolean;
+  link?: boolean;
 }
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-export default function DisplayAddress({ address }: DisplayAddressProps) {
-  const { data: ensName } = useEnsName({
-    address: address,
-    chainId: mainnet.id,
-  });
+export default function DisplayAddress({ address, span = true, link = true }: DisplayAddressProps) {
+  const displayValue = useDisplayAddress(address);
 
-  const displayValue = ensName || truncateEthAddress(address);
+  if (!displayValue) {
+    return null;
+  }
 
   if (address === ZERO_ADDRESS) {
-    return <span>{displayValue}</span>;
+    return span ? <span>{displayValue}</span> : <>{displayValue}</>;
   }
 
   return (
-    <Link href={`/profile/${address}`} className="hover:underline">
-      {displayValue}
-    </Link>
+    link ? (
+      <Link href={`/profile/${address}`} className="hover:underline">
+        {displayValue}
+      </Link>
+    ) : (
+      span ? <span>{displayValue}</span> : <>{displayValue}</>
+    )
   );
 }

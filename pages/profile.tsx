@@ -9,7 +9,8 @@ import Listings from "@/components/profile/Listings";
 import Actions from "@/components/marketplace/Actions";
 import { Address } from "viem";
 import { useAccount } from "wagmi";
-
+import { useDisplayAddress } from "@/hooks/useDisplayAddress";
+import Footer from "@/components/layout/Footer";
 interface Props {
   possibleAddress: Address | undefined;
 }
@@ -32,6 +33,9 @@ export default function Profile(props: Props) {
 
   const { address } = useAccount();
 
+  // Get the display address string using the hook
+  const displayAddressString = useDisplayAddress(possibleAddress);
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -50,7 +54,8 @@ export default function Profile(props: Props) {
     <>
       <Head>
         <title>
-          {possibleAddress ? `${possibleAddress}'s Chonks` : "Your Chonks"}
+          {/* Use the display string directly in the title */}
+          {displayAddressString ? `${displayAddressString}'s Chonks` : "Your Chonks"}
         </title>
         <meta name="description" content="My Chonks| Chonks" />
         <meta
@@ -124,33 +129,25 @@ export default function Profile(props: Props) {
                         /> */}
           </div>
 
-          {/* <Tabs activeTab={activeTab} onTabChange={setActiveTab} /> */}
 
-          {/* <Actions
-                        type="chonk"
-                        isSidebarVisible={isSidebarVisible}
-                        setIsSidebarVisible={setIsSidebarVisible}
-                        searchId={searchId}
-                        setSearchId={setSearchId}
-                        sortOrder={sortOrder}
-                        setSortOrder={setSortOrder}
-                    /> */}
+
+          <section>
+
+          </section>
 
           <section
             className={`listingsAndFilters flex flex-col bg-white py-[1.725vw] px-[3.45vw]`}
           >
+            <div>
+              <h1 className="text-2xl font-weight-600 pb-4">{displayAddressString ? `${displayAddressString}'s Chonks` : "My Chonks"}</h1>
+            </div>
             <div className="flex relative">
-              {/* <Sidebar
-                                isSidebarVisible={isSidebarVisible}
-                                priceMin={priceMin}
-                                setPriceMin={setPriceMin}
-                                priceMax={priceMax}
-                                setPriceMax={setPriceMax}
-                            /> */}
+
               <Listings address={_address} />
             </div>
           </section>
         </main>
+        <Footer />
       </div>
     </>
   );

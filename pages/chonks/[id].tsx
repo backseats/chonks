@@ -6,6 +6,7 @@ import {
   useWriteContract,
   useEnsAddress,
 } from "wagmi";
+import Footer from "@/components/layout/Footer";
 import { Address, getAddress, isAddress, parseEther } from "viem";
 import { TokenboundClient } from "@tokenbound/sdk";
 import { Chonk } from "@/types/Chonk";
@@ -895,6 +896,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             </div>
           )}
         </div>
+        <Footer />
       </div>
 
       {showSendModal && (
@@ -992,7 +994,7 @@ const ChonkControls = ({
   const [error, setError] = useState<string | null>(null);
 
   const base =
-    "bg-white text-black px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 mt-4 text-sm border-2 border-black";
+    "bg-white text-black px-4 py-2 hover:bg-gray-100 transition-colors duration-200 mt-4 text-sm border-2 border-black";
 
   return (
     <>

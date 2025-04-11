@@ -21,7 +21,7 @@ import client from "@/lib/apollo-client";
 import ChonkRenderer from "@/components/ChonkRenderer";
 import Link from "next/link";
 import { IoArrowBackOutline } from "react-icons/io5";
-
+import Footer from "@/components/layout/Footer";
 export default function TraitDetail({ id }: { id: string }) {
   const { address } = useAccount();
 
@@ -290,6 +290,7 @@ export default function TraitDetail({ id }: { id: string }) {
             <Loading />
           )}
         </main>
+        <Footer />
       </div>
     </>
   );

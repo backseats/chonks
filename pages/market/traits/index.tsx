@@ -9,6 +9,7 @@ import Actions from "@/components/marketplace/Actions";
 import { TRAIT_LISTINGS } from "@/lib/graphql/queries";
 import client from "@/lib/apollo-client";
 import { useTraitsTotalSupply } from "@/hooks/useTotalSupply";
+import Footer from "@/components/layout/Footer";
 
 type TraitMetadata = {
   colorMap: string;
@@ -220,6 +221,7 @@ export default function TraitsMarketplace() {
             </div>
           </section>
         </main>
+        <Footer />
       </div>
     </>
   );

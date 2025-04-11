@@ -9,7 +9,7 @@ import Actions from "@/components/marketplace/Actions";
 import { GET_CHONK_LISTINGS } from "@/lib/graphql/queries";
 import client from "@/lib/apollo-client";
 import { useChonksTotalSupply } from "@/hooks/useTotalSupply";
-
+import Footer from "@/components/layout/Footer";
 export type ChonkListing = {
   id: string;
   isActive: boolean;
@@ -226,6 +226,7 @@ export default function ChonksMarketplace() {
             </div>
           </section>
         </main>
+        <Footer />
       </div>
     </>
   );

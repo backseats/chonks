@@ -1,5 +1,6 @@
 import Head from "next/head";
 import MenuBar from "@/components/MenuBar";
+import Footer from "@/components/layout/Footer";
 import { useState, useEffect, useMemo, memo } from "react";
 import { useReadContract, useWalletClient, useAccount } from "wagmi";
 import { TokenboundClient } from "@tokenbound/sdk";
@@ -428,6 +429,7 @@ export default function ChonkDetail({ id }: { id: string }) {
             <Loading />
           )}
         </main>
+        <Footer />
       </div>
     </>
   );

@@ -30,7 +30,7 @@ export default function MenuBar(props: Props) {
   return (
     <nav
       id="top"
-      className="w-full flex justify-between sm:px-[3.45vw] py-4 bg-white relative"
+      className="w-full flex justify-between px-4 sm:px-[3.45vw] py-4 bg-white relative"
     >
       <div>
         <Link href="/" className="hover:opacity-80 transition-opacity">

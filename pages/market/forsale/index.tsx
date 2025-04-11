@@ -12,7 +12,7 @@ import ChonkRenderer from "@/components/ChonkRenderer";
 import { useReadContracts } from "wagmi";
 import { colorMapContract, colorMapABI, chainId } from "@/config";
 import Link from "next/link";
-
+import Footer from "@/components/layout/Footer";
 type TraitMetadata = {
   traitName: string;
   traitType: string;
@@ -191,39 +191,43 @@ export default function ForSale() {
           </h1>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-4 p-4 sm:px-[3.45vw] mt-4">
-            {listings.map((item: Listing) => (
-              <Link key={item.id} href={`/market/${item.type}s/${item.id}`}>
-                <div
-                  key={item.id}
-                  className="border border-gray-300 overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                >
-                  <div className="aspect-square bg-gray-100 relative">
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                      {getImage(item.id, item.type, item.traitMetadata)}
+            {listings.map((item: Listing) => {
+              // Calculate display name with truncation
+              const traitName = item.traitMetadata?.traitName ?? "";
+              const displayName = traitName.length > 14 ? traitName.slice(0, 14) + "..." : traitName;
+
+              return (
+                <Link key={item.id + item.type} href={`/market/item/${item.type}/${item.id}`}>
+                  <div className="border overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200 ease-in-out bg-white flex flex-col justify-between h-full">
+                    <div className="aspect-square bg-gray-100 relative">
+                      <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                        {getImage(item.id, item.type, item.traitMetadata)}
+                      </div>
+                    </div>
+
+                    <div className="pt-2 flex flex-col items-center">
+                      <span className="font-bold text-[14px]">
+                        {item.type === "chonk"
+                          ? "Chonk #" + (item?.id ?? "")
+                          : displayName}
+                      </span>
+                    </div>
+
+                    <div className="p-2 flex flex-col items-center">
+                      <span className="font-bold text-[14px]">
+                        {formatEther(BigInt(item.price))} ETH
+                      </span>
+                      <span className="text-[12px] text-gray-500 mt-1">
+                        {getTimeAgo(item.listingTime)}
+                      </span>
                     </div>
                   </div>
-
-                  <div className="pt-2 flex flex-col items-center">
-                    <span className="font-bold text-[14px]">
-                      {item.type === "chonk"
-                        ? "Chonk #" + (item?.id ?? "")
-                        : (item.traitMetadata?.traitName ?? "")}
-                    </span>
-                  </div>
-
-                  <div className="p-2 flex flex-col items-center">
-                    <span className="font-bold text-[14px]">
-                      {formatEther(BigInt(item.price))} ETH
-                    </span>
-                    <span className="text-[12px] text-gray-500 mt-1">
-                      {getTimeAgo(item.listingTime)}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </main>
+        <Footer />
       </div>
     </>
   );

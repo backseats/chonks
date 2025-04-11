@@ -12,6 +12,7 @@ import ChonkRenderer from "@/components/ChonkRenderer";
 import { useReadContracts } from "wagmi";
 import { colorMapContract, colorMapABI, chainId } from "@/config";
 import Link from "next/link";
+import Footer from "@/components/layout/Footer";
 
 type TraitMetadata = {
   traitName: string;
@@ -195,6 +196,7 @@ export default function Sales() {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-4 p-4 sm:px-[3.45vw] mt-4">
             {/* Example listing items - replace with actual data */}
             {sales.map((item: Sale) => (
+
               <Link key={item.id} href={`/market/${item.type}s/${item.id}`}>
                 <div
                   key={item.id}
@@ -210,7 +212,7 @@ export default function Sales() {
                     <span className="font-bold text-[14px]">
                       {item.type === "chonk"
                         ? "Chonk #" + (item?.id ?? "")
-                        : (item.traitMetadata?.traitName ?? "")}
+                        : (item.traitMetadata?.traitName ?? "").length > 14 ? (item.traitMetadata?.traitName ?? "").slice(0, 14) + "..." : (item.traitMetadata?.traitName ?? "")}
                     </span>
                   </div>
 
@@ -227,6 +229,7 @@ export default function Sales() {
             ))}
           </div>
         </main>
+        <Footer />
       </div>
     </>
   );
