@@ -197,7 +197,7 @@ export default function ForSale() {
               const displayName = traitName.length > 14 ? traitName.slice(0, 14) + "..." : traitName;
 
               return (
-                <Link key={item.id + item.type} href={`/market/item/${item.type}/${item.id}`}>
+                <Link key={item.id + item.type} href={`/market/${item.type}s/${item.id}`}>
                   <div className="border overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-200 ease-in-out bg-white flex flex-col justify-between h-full">
                     <div className="aspect-square bg-gray-100 relative">
                       <div className="absolute inset-0 flex items-center justify-center text-gray-400">
