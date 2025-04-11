@@ -203,6 +203,14 @@ export default function ForSale() {
                     </div>
                   </div>
 
+                  <div className="pt-2 flex flex-col items-center">
+                    <span className="font-bold text-[14px]">
+                      {item.type === "chonk"
+                        ? "Chonk #" + (item?.id ?? "")
+                        : (item.traitMetadata?.traitName ?? "")}
+                    </span>
+                  </div>
+
                   <div className="p-2 flex flex-col items-center">
                     <span className="font-bold text-[14px]">
                       {formatEther(BigInt(item.price))} ETH
